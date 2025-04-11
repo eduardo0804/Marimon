@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Marimon</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Marimon.styles.css" asp-append-version="true" />
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+
+</head>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+    }
+
+    html,
+    body {
+        height: 100%;
+    }
+    </style>
+<body>
+<header>
+    <div class="contenedor-menu">
+        <!-- Logo -->
+        <div class="logo-contenedor">
+            <a href="#" class="logo"><img src="~/images/logo_marimon.png" alt="Logo" style="width: 140px;"></a>
+        </div>
+        
+        <!-- Toggle para menú móvil -->
+        <input type="checkbox" id="menu-toggle" class="hidden">
+        <label for="menu-toggle" class="menu-icon"><i class="fa-solid fa-bars"></i></label>
+        <label for="menu-toggle" class="close-icon"><i class="fa-solid fa-xmark"></i></label>
+        
+        <!-- Menú principal -->
+        <nav class="primer_menu">
+            <a href="#">INICIO</a>
+            <div class="dropdown">
+                <a href="#" class="dropdown-main">SERVICIOS</a>
+                <input type="checkbox" id="services-toggle" class="submenu-toggle hidden">
+                <label for="services-toggle" class="dropdown-toggle"><i class="fa-solid fa-plus"></i><i class="fa-solid fa-minus"></i></label>
+                <ul class="submenu text_drop">
+                    <li><a href="#">Mantenimiento y Frenos</a></li>
+                    <li><a href="#">Diagnóstico y Scanner</a></li>
+                    <li><a href="#">Mecatrónica y Electrónica</a></li>
+                    <li><a href="#">Sistema de Refrigeración</a></li>
+                    <li><a href="#">Aire Acondicionado</a></li>
+                    <li><a href="#">Planchado y Pintura</a></li>
+                    <li><a href="#">Servicio de Planchado y Pintura automotriz</a></li>
+                    <li><a href="#">Conversión a GLP en Lima</a></li>
+                    <li><a href="#">Conversión a GNV en Lima</a></li>
+                    <li><a href="#">Auxilio Mecánico</a></li>
+                </ul>
+            </div>
+            <a href="#">CATÁLOGOS</a>
+            <a href="#">NOSOTROS</a>
+        </nav>
+        
+        <!-- Menú secundario (carrito y usuario) -->
+        <nav class="segundo_menu">
+            <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
+            <div class="dropdown-user">
+                <a href="#" class="dropdown-main">Iniciar Sesión <i class="fa-solid fa-user"></i></a>
+                <input type="checkbox" id="user-toggle" class="submenu-toggle hidden">
+                <label for="user-toggle" class="dropdown-user-toggle"><i class="fa-solid fa-plus"></i><i class="fa-solid fa-minus"></i></label>
+                <ul class="submenu-user text_drop">
+                    <li><a href="#">Escritorio</a></li>
+                    <li><a href="#">Salir</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<!--<input type="checkbox"><i class="fa-solid fa-bars"></i></input>
+            <input type="checkbox"><i class="fa-solid fa-xmark"></i></input>-->
+
+
+<!--
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">marimon</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">INICIO</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">SERVICIO</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">CATALOGOS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">NOSOTROS</a>
+                        </li>
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+-->
+    
+    <div class="container">
+        <main role="main" class="pb-0">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        <div class="contenido-footer">
+            <!-- Parte superior: logo y redes -->
+            <div class="top">
+                <div class="logo-details">
+                    <a asp-area="" asp-controller="Home" asp-action="Index">
+                        <img style="width: 140px;" src="/images/logo_marimon.png" alt="Logo Marimon">
+                    </a>
+                </div>
+                <div class="media-icons-wrapper">
+                    <span class="media-label">Síguenos en:</span>
+                    <div class="media-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parte media: contacto -->
+            <div class="middle">
+                <div class="contact-item">
+                    <div class="icono-circle">
+                        <i class="fas fa-envelope icono"></i>
+                    </div>
+                    <div>
+                        <strong>Email:</strong><br>
+                        maximito@gmail.com
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icono-circle">
+                        <i class="fas fa-phone icono"></i>
+                    </div>
+                    <div>
+                        <strong>Teléfono:</strong><br>
+                        +51 964 489 537<br>
+                        +51 970 274 214
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icono-circle">
+                        <i class="fas fa-map-marker-alt icono"></i>
+                    </div>
+                    <div>
+                        <strong>Dirección:</strong><br>
+                        Jr. Las Ánguilas 283 - Ofic. 103 Bellavista
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parte inferior -->
+        <div class="bottom">
+            <div class="bottom-content">
+                <div>Copyright &#169; 2021 <a asp-controller="Home" asp-action="Index" style="color: white; text-decoration: none;">Marimon</a></div>
+                <div><a href="#"><i class="fa-solid fa-book"></i> Libro de Reclamaciones</a> | <a href="#">Términos y Condiciones</a></div>
+                <div>Developed by <strong>Name_Grupo</strong></div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <!--<footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - marimon - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>-->
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,444 @@
+﻿header {
+  z-index: 99;
+  width: 100%;
+  background: #000000;
+  position: relative;
+}
+header .contenedor-menu {
+  position: relative;
+  max-width: 1650px;
+  padding: 0px 30px;
+  height: 65px;
+  line-height: 65px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+/* Estilos para el menú principal */
+nav.primer_menu {
+  display: flex;
+  align-items: center;
+}
+nav.primer_menu a {
+  color: white;
+  padding: 0 15px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+}
+nav.primer_menu a:hover {
+  color: #ccc;
+}
+/* Estilos para los dropdowns */
+.dropdown,
+.dropdown-user {
+  position: relative;
+  display: inline-block;
+}
+/* Estilos para los submenús */
+.submenu,
+.submenu-user {
+  display: none;
+  position: absolute;
+  background: white;
+  border-radius: 5px;
+  top: 65px;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  z-index: 100;
+  line-height: normal;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 0 0 1px #000;
+}
+/* Anchos diferentes para cada dropdown */
+.submenu {
+  min-width: 250px; /* Más ancho para el menú de servicios */
+}
+.submenu-user {
+  min-width: 180px; /* Menos ancho para el menú de usuario */
+}
+/* Mostrar submenús al hacer hover SOLO en escritorio */
+@media screen and (min-width: 808px) {
+  .dropdown:hover .submenu,
+  .dropdown-user:hover .submenu-user {
+    display: block;
+  }
+}
+/* Estilos para los elementos de la lista */
+.submenu li,
+.submenu-user li {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+.submenu li:last-child,
+.submenu-user li:last-child {
+  border-bottom: none;
+}
+.submenu a,
+.submenu-user a {
+  color: #000;
+  padding: 12px 15px;
+  text-decoration: none;
+  display: block;
+  line-height: 1.5;
+  transition: background 0.2s ease;
+}
+.submenu a:hover,
+.submenu-user a:hover {
+  color: #920505 !important;
+}
+/* Estilos específicos para el segundo menú */
+.segundo_menu {
+  display: flex;
+  align-items: center;
+}
+.segundo_menu a {
+  color: white;
+  padding: 0 15px;
+  text-decoration: none;
+}
+.segundo_menu a:hover {
+  color: #d31616;
+}
+/* Ajuste para el dropdown de usuario */
+.dropdown-user .submenu-user {
+  right: 0;
+  left: auto;
+}
+.text_drop a {
+  color: #000 !important;
+}
+/* Estilos para menú móvil */
+.menu-icon,
+.close-icon {
+  display: none;
+  cursor: pointer;
+  color: white;
+  font-size: 24px;
+}
+#menu-toggle {
+  display: none;
+}
+.hidden {
+  display: none;
+}
+
+/* Controles para los dropdowns en móvil */
+.dropdown-toggle,
+.dropdown-user-toggle {
+  display: none;
+}
+
+.dropdown-toggle .fa-minus,
+.dropdown-user-toggle .fa-minus {
+  display: none;
+}
+
+.submenu-toggle:checked ~ .dropdown-toggle .fa-plus,
+.submenu-toggle:checked ~ .dropdown-user-toggle .fa-plus {
+  display: none;
+}
+
+.submenu-toggle:checked ~ .dropdown-toggle .fa-minus,
+.submenu-toggle:checked ~ .dropdown-user-toggle .fa-minus {
+  display: inline-block;
+}
+
+/* Responsive */
+@media screen and (max-width: 807px) {
+  .menu-icon {
+    display: block;
+  }
+  .close-icon {
+    display: none;
+  }
+  #menu-toggle:checked ~ .menu-icon {
+    display: none;
+  }
+  #menu-toggle:checked ~ .close-icon {
+    display: block;
+  }
+  .primer_menu,
+  .segundo_menu {
+    display: none;
+    position: absolute;
+    top: 65px;
+    left: 0;
+    width: 100%;
+    background: #000000;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 0;
+    z-index: 1000;
+    margin: 0;
+  }
+  .primer_menu a,
+  .segundo_menu a {
+    width: 100%;
+    padding: 15px 30px;
+    border-bottom: 1px solid #333;
+  }
+  .dropdown,
+  .dropdown-user {
+    width: 100%;
+    position: relative;
+  }
+  /* Mostrar toggles en móvil */
+  .dropdown-toggle,
+  .dropdown-user-toggle {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50px;
+    height: 100%;
+    text-align: center;
+    cursor: pointer;
+    z-index: 10;
+    color: white;
+  }
+  /* Cambiar posicionamiento de submenús en móvil */
+  .submenu,
+  .submenu-user {
+    position: relative;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 20px;
+    box-shadow: none;
+    border-left: 2px solid #920505;
+    border-radius: 0;
+  }
+  .dropdown-user .submenu-user {
+    right: auto;
+    left: 0;
+  }
+  /* Cuando el checkbox está marcado, mostrar menú */
+  #menu-toggle:checked ~ .primer_menu,
+  #menu-toggle:checked ~ .segundo_menu {
+    display: flex;
+  }
+  /* Control de submenús con checkboxes */
+  .submenu-toggle:checked ~ .submenu,
+  .submenu-toggle:checked ~ .submenu-user {
+    display: block;
+  }
+}
+
+/* Asegurar que el carrito y el ícono de usuario se muestren correctamente */
+.cart-icon i,
+.dropdown-user i {
+  font-size: 16px;
+}
+
+/* Para que el hover no afecte en móvil */
+@media screen and (max-width: 807px) {
+  .dropdown:hover .submenu,
+  .dropdown-user:hover .submenu-user {
+    display: none;
+  }
+  .submenu-toggle:checked ~ .submenu,
+  .submenu-toggle:checked ~ .submenu-user {
+    display: block !important;
+  }
+}
+/*Footer*/
+footer {
+  margin-top: auto;
+  background: #ffffff;
+}
+
+footer .contenido-footer {
+  max-width: 1650px;
+  margin: auto;
+  padding: 30px 40px 20px 40px;
+}
+
+.contenido-footer .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgb(0, 0, 0);
+}
+
+.logo-details img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Sección Redes Sociales */
+.media-icons-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.media-label {
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
+}
+
+.media-icons {
+  display: flex;
+}
+
+.media-icons a {
+  height: 40px;
+  width: 40px;
+  margin: 0 8px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 40px;
+  color: #fff;
+  font-size: 17px;
+  text-decoration: none;
+  transition: all 0.4s ease;
+}
+
+.media-icons a:nth-child(1) {
+  background: #4267b2;
+}
+.media-icons a:nth-child(1):hover {
+  color: #4267b2;
+  background: #fff;
+}
+.media-icons a:nth-child(2) {
+  background: #e1306c;
+}
+.media-icons a:nth-child(2):hover {
+  color: #e1306c;
+  background: #fff;
+}
+.media-icons a:nth-child(3) {
+  background: #0077b5;
+}
+.media-icons a:nth-child(3):hover {
+  color: #0077b5;
+  background: #fff;
+}
+
+/* Contacto */
+.middle {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  width: 30%;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+/* Círculo Rojo para íconos */
+.icono-circle {
+  background-color: #fd0028;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-item .icono {
+  font-size: 24px;
+  color: white;
+}
+
+/* Parte inferior */
+.bottom {
+  background-color: #fd0028;
+  padding: 20px 40px 20px 40px;
+  margin-top: 24px;
+}
+
+.bottom-content {
+  max-width: 1650px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  color: #fff;
+  font-size: 14px;
+}
+
+.bottom-content a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 5px;
+}
+
+.bottom-content a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive para tablets (ancho máximo 1024px) */
+@media (max-width: 1024px) {
+  .media-icons-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .middle {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .contact-item {
+    width: 100%;
+  }
+
+  .bottom-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}
+
+/* Responsive para móviles (ancho máximo 768px) */
+@media (max-width: 768px) {
+  footer .contenido-footer {
+    padding: 20px;
+  }
+
+  .media-label {
+    font-size: 15px;
+  }
+
+  .media-icons a {
+    margin: 0 6px;
+    height: 36px;
+    width: 36px;
+    font-size: 15px;
+    line-height: 36px;
+  }
+
+  .icono-circle {
+    width: 42px;
+    height: 42px;
+  }
+
+  .contact-item .icono {
+    font-size: 20px;
+  }
+
+  .bottom-content {
+    font-size: 13px;
+  }
+
+  .bottom-content a {
+    margin: 0 3px;
+  }
+}
