@@ -75,13 +75,13 @@
             <nav class="primer_menu">
                 <a href="#">INICIO</a>
                 <div class="dropdown">
-                    <a href="#" class="dropdown-main">SERVICIOS</a>
+                    <a asp-controller="Servicios" asp-action="Index" class="dropdown-main">SERVICIOS</a>
                     <input type="checkbox" id="services-toggle" class="submenu-toggle hidden">
                     <label for="services-toggle" class="dropdown-toggle"><i class="fa-solid fa-plus"></i><i
                             class="fa-solid fa-minus"></i></label>
                     <ul class="submenu text_drop">
                         <li><a href="#">Mantenimiento y Frenos</a></li>
-                        <li><a asp-controller="Servicios" asp-action="Index">Diagnóstico y Scanner</a></li>
+                        <li><a asp-controller="Servicios" asp-action="Servicio">Diagnóstico y Scanner</a></li>
                         <li><a href="#">Mecatrónica y Electrónica</a></li>
                         <li><a href="#">Sistema de Refrigeración</a></li>
                         <li><a href="#">Aire Acondicionado</a></li>
@@ -96,13 +96,14 @@
                 <a asp-controller="Nosotros" asp-action="Index">NOSOTROS</a>
             </nav>
 
-         <!-- Menú secundario (carrito y login) -->
+            <!-- Menú secundario (carrito y login) -->
             <nav class="segundo_menu">
-            <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
-            <div class="dropdown-user">
-                <a href="/Identity/Account/Login" class="dropdown-main">Iniciar Sesión <i class="fa-solid fa-user"></i></a>
-            </div>
-        </nav>
+                <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
+                <div class="dropdown-user">
+                    <a href="/Identity/Account/Login" class="dropdown-main">Iniciar Sesión <i
+                            class="fa-solid fa-user"></i></a>
+                </div>
+            </nav>
         </div>
     </header>
 

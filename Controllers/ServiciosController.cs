@@ -18,6 +18,11 @@ public class ServiciosController : Controller
         return View("~/Views/Servicios/Index.cshtml");
     }
 
+    public IActionResult Servicio()
+    {
+        return View("~/Views/Servicios/Servicio.cshtml");
+    }
+
     public IActionResult Privacy()
     {
         return View();

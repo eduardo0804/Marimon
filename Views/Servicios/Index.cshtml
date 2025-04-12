@@ -1,130 +1,113 @@
-@{
-    ViewBag.Title = "Servicios";
-    ViewBag.FullWidthLayout = true;
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<style>
-    .full-width-banner {
-        width: 100vw;
-        overflow: hidden;
-        position: relative;
-        margin-left: calc(-50vw + 50%);
-        margin-top: 0;
-    }
-
-    .full-width-banner img {
-        width: 100%;
-        height: auto;
-        display: block;
-        filter: brightness(70%);
-    }
-
-    .banner-text {
-        position: absolute;
-        top: 40%;
-        left: 10%;
-        color: white;
-    }
-
-    .form-label {
-        font-weight: 600;
-    }
-
-    .contact-section p {
-        margin-bottom: 0.5rem;
-    }
-
-    .contact-section strong {
-        display: block;
-        margin-bottom: 0.3rem;
-    }
-</style>
-
-<!-- Banner Superior -->
-<div class="full-width-banner">
-    <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048" alt="Banner Scanner" />
-    <div class="banner-text">
-        <h4 class="text-uppercase">TALLER ESPECIALIZADO EN</h4>
-        <h2 class="fw-bold">Vehículos Europeos y Americanos</h2>
-        <a href="#formulario" class="btn btn-danger mt-3">INSPECCIONAR</a>
-    </div>
-</div>
-
-<!-- Contenido -->
-<div class="container-fluid mt-4 px-4"> <!-- Usamos container-fluid + padding lateral opcional -->
-
-    <!-- Sección de Título -->
-    <h2 class="text-center bg-dark text-white py-5">Servicio de Diagnóstico y Scanner</h2>
-
-    <!-- Imagen y descripción -->
-    <div class="row my-5 align-items-center">
-        <div class="col-md-6 text-center">
-            <img src="https://images.ctfassets.net/gs0ws48zcft1/5Zs0uT2EM3NsOWikYDRDHB/71e1660c98ebb476c149625efd1ee4d3/imagen-compuesta-interfaz-ingenieria.jpg"
-                 alt="Servicio Scanner" class="img-fluid rounded shadow" style="max-height: 350px;" />
-        </div>
-        <div class="col-md-6">
-            <h5><strong>Diagnóstico y Scanner</strong></h5>
-            <p class="text-muted">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br />
-                Sed do eiusmod tempor incididunt ut labore et dolore."</p>
+<body>
+    <div class="container" style="background: #000000;padding-top: 20px;">
+        <div class="row gy-4 gy-md-0">
+            <div class="col-md-6">
+                <div class="p-xl-5 m-xl-5"
+                    style="background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fservicios-marimon-02.jpg?alt=media&amp;token=c82b9eac-83e4-42e6-aae0-814d5cc6bc45.png&quot;) center / cover no-repeat;height: 284px;">
+                </div>
+            </div>
+            <div class="col-md-6 d-md-flex align-items-md-center">
+                <div style="max-width: 350px;">
+                    <h2 class="fw-bold" style="font-family: Akatab, sans-serif;color: rgb(255,255,255);">Hola somos
+                        Marimon y traemos las mejores soluciones a sus vehiculos</h2>
+                    <p class="my-3" style="color: rgb(249,249,249);">Tincidunt laoreet leo, adipiscing taciti tempor.
+                        Primis senectus sapien, risus donec ad fusce augue interdum.</p><a
+                        class="btn btn-primary btn-lg me-2 pe-3" role="button" href="#"
+                        style="text-align: center;background: rgb(255,255,255);color: rgb(0,0,0);font-weight: bold;transform: translate(78px);border-radius: 15;">Ver
+                        servicios</a>
+                </div>
+            </div>
         </div>
     </div>
-
-    <hr />
-
-    <!-- Sección de Reserva -->
-    <div class="row align-items-center my-5">
-    <!-- Imagen a la izquierda -->
-    <div class="col-md-6 text-center">
-        <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
-             alt="Reserva tu Servicio" class="img-fluid rounded shadow" style="max-height: 300px;" />
+    <div class="container-xxl py-4 py-xl-5 pb-xxl-5">
+        <div class="row gx-0 gy-0 justify-content-start align-items-start mb-5">
+            <div class="col">
+                <h2>¿Cual es nuestro Procedimiento?</h2>
+            </div>
+        </div>
+        <div class="row gy-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
+            <div class="col-md-3 col-lg-4 align-content-center">
+                <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                    <h4 class="text-end d-flex ms-xxl-0 me-xxl-5 ps-xxl-0"><img
+                            class="d-lg-flex justify-content-lg-start me-xxl-5 pe-xxl-0"
+                            src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image.png?alt=media&token=cd7b240e-1dc3-4b6f-a2f0-b90620001add.png"
+                            width="111" height="69">Escuchamos
+                        y<br>&nbsp;atendemos&nbsp;</h4>
+                    <div class="px-3">
+                        <p>Escuchamos todos los inconvenientes que tiene nuestros clientes frente a su vehículo.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 align-content-center">
+                <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                    <h4 class="me-xxl-0 ps-xxl-0"><img
+                            src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-1.png?alt=media&token=c164c118-ff0c-433a-80c7-b0b2b2ec666b.png"
+                            width="99" height="99">Analizamos</h4>
+                    <div class="px-3">
+                        <p>El asesor asigna a los tecnicos especializados de acuerdo a los incovenientes presentados por
+                            el cliente y la hipotesis del mismo.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 align-content-center">
+                <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                    <h4><img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-2.png?alt=media&token=a8ff5a75-7e15-4031-ada5-751a793d95f2.png"
+                            width="139" height="100">Cotizamos</h4>
+                    <div class="px-3">
+                        <p>De acuerdo a las pruebas realizadas el asesor realiza la cotización. De acuerdo a la
+                            información obtenida por el scanner, las pruebas mecánicas realizadas o el diagnostico de
+                            falla</p>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="col-md-3 col-lg-4 d-lg-flex align-content-center mx-auto justify-content-lg-center align-items-lg-center">
+                <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                    <h4><img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-3.png?alt=media&token=ff84c240-0f32-45c1-bb7e-c219e430e687.png"
+                            width="92" height="85">Seguimiento</h4>
+                    <div class="text-center px-3">
+                        <p class="d-xl-flex justify-content-xl-center">Se procede a realizar el trabajo realizado<br>Se
+                            establece fechas limite de entrega<br>Asimismo, el asesor encargado se comunica el cliente
+                            periódicamente para informar el avance del vehículo&nbsp;</p>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="col-md-3 col-lg-4 d-lg-flex align-content-center mx-auto justify-content-lg-center align-items-lg-center">
+                <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
+                    <h4><img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-4.png?alt=media&token=121b653d-5a08-4ac0-932c-7232fa0da153.png"
+                            width="119" height="74">Entrega</h4>
+                    <div class="px-3">
+                        <p>Después de realizado las pruebas correspondientes del vehículo se procede a lavado del
+                            vehículo y posterior entrega al cliente&nbsp;</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- Formulario a la derecha -->
-    <div class="col-md-6">
-        <h4 class="text-center mb-4">Reserva tu Servicio</h4>
-        <form class="row g-3" id="formulario">
-            <div class="col-md-6">
-                <label for="nombre" class="form-label">Nombre*</label>
-                <input type="text" class="form-control" id="nombre" placeholder="Tu nombre" required>
+    <div class="container ms-xxl-3" style="background: #D42025;height: 352px;padding-bottom: 8px;">
+        <h1 style="color: rgb(255,255,255);font-weight: bold;text-align: center;">Nuestros Servicios</h1>
+        <div class="row justify-content-center align-items-center align-content-center align-self-center">
+            <div class="col-md-4 col-xl-3 offset-xl-0 d-xl-flex justify-content-center align-items-center align-content-center justify-content-xl-center align-items-xl-end me-3 ms-3"
+                style="height: 280px;width: 256px;background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-5.png?alt=media&amp;token=5a2552aa-598c-48aa-81ce-e8435257fbda.png&quot;) center / cover;">
+                <p class="d-xl-flex justify-content-xl-end align-items-xl-end"
+                    style="color: rgb(255,255,255);font-weight: bold;">Mantenimientos y frenos</p>
             </div>
-            <div class="col-md-6">
-                <label for="apellido" class="form-label">Apellido*</label>
-                <input type="text" class="form-control" id="apellido" placeholder="Tu apellido" required>
+            <div class="col-md-4 col-xl-3 d-xl-flex justify-content-xl-center me-3"
+                style="background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-6.png?alt=media&amp;token=e23674d0-cee9-4bf5-a4cb-a6f089370d8a.png&quot;) center / cover;height: 276px;">
+                <p class="d-xl-flex align-items-xl-end" style="color: rgb(255,255,255);font-weight: bold;">Diagnostico y
+                    escaner</p>
             </div>
-            <div class="col-md-6">
-                <label for="placa" class="form-label">Placa*</label>
-                <input type="text" class="form-control" id="placa" placeholder="ABC123" required>
+            <div class="col d-xl-flex justify-content-xl-center align-items-xl-end me-3"
+                style="background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-7.png?alt=media&amp;token=4203295e-cc55-4a0a-8db6-d33c6cf32c5e.png&quot;) center / cover;width: 256px;height: 280px;">
+                <p class="d-xl-flex justify-content-xl-center align-items-xl-end"
+                    style="color: rgb(255,255,255);font-weight: bold;">Mecatrónica y Electrónica</p>
             </div>
-            <div class="col-md-6">
-                <label for="telefono" class="form-label">Número de Teléfono*</label>
-                <input type="tel" class="form-control" id="telefono" placeholder="+51 900000000" required>
+            <div class="col d-xl-flex justify-content-xl-center align-items-xl-end me-3"
+                style="background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-8.png?alt=media&amp;token=590f96af-f3b3-4f32-928d-ffc76f9fc5cb.png&quot;) center / cover;width: 256px;height: 280px;">
+                <p style="color: rgb(253,254,255);">Aire acondicionado</p>
             </div>
-            <div class="col-md-6">
-                <label for="fecha" class="form-label">Fecha*</label>
-                <input type="date" class="form-control" id="fecha" required>
-            </div>
-            <div class="col-md-6 d-flex align-items-end">
-                <button type="submit" class="btn btn-danger w-100">RESERVAR CITA</button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-    <!-- Sección de Contacto 
-    <h4 class="text-center mb-4">CONTÁCTANOS</h4>
-
-    <div class="row text-center contact-section">
-        <div class="col-md-4">
-            <p><strong>Email:</strong> maximito@gmail.com</p>
-        </div>
-        <div class="col-md-4">
-            <p><strong>Teléfonos:</strong> +51 956456357<br />+51 970742114</p>
-        </div>
-        <div class="col-md-4">
-            <p><strong>Dirección:</strong> Jr. Los Águilas 284 - Ofic. 103, Bellavista</p>
-        </div>
-    </div>-->
-
-</div>
-
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
