@@ -10,7 +10,8 @@
 
     <!-- Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
-
+    
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <style>
     body {
@@ -58,7 +59,7 @@
                 </ul>
             </div>
             <a href="#">CATÁLOGOS</a>
-            <a href="#">NOSOTROS</a>
+            <a asp-controller="Nosotros" asp-action="Index">NOSOTROS</a>
         </nav>
         
         <!-- Menú secundario (carrito y usuario) -->
