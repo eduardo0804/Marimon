@@ -25,23 +25,36 @@
     body {
         height: 100%;
     }
-     .bottom-content a {
+
+    .bottom-content a {
         color: white;
         text-decoration: none;
     }
-    
+
     .bottom-content a:hover {
         text-decoration: underline;
     }
-    
+
     /* Estilo para los enlaces del menú principal */
-    .primer_menu a {
-        color: inherit;
-        text-decoration: none;
+    .primer_menu {
+        display: flex;
+        align-items: center;
     }
-    
-    .primer_menu a:hover {
-        text-decoration: underline;
+
+    .primer_menu>a,
+    .primer_menu .dropdown>a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 0 15px;
+        /* Aumentar el espaciado horizontal */
+        transition: color 0.3s;
+    }
+
+    .primer_menu>a:hover,
+    .primer_menu .dropdown>a:hover {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
     }
 </style>
 
@@ -79,8 +92,8 @@
                         <li><a href="#">Auxilio Mecánico</a></li>
                     </ul>
                 </div>
-                <a href="#">CATÁLOGOS</a>
-                <a asp-controller="Nosotros" asp-action="Index" style="color: white;text-decoration: none;">NOSOTROS</a>
+                <a asp-controller="Catalogo" asp-action="Index">CATÁLOGOS</a>
+                <a asp-controller="Nosotros" asp-action="Index">NOSOTROS</a>
             </nav>
 
             <!-- Menú secundario (carrito y usuario) -->
