@@ -1,19 +1,64 @@
+<style>
+    .slider-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        padding: 0 45px;
+    }
+
+    .slider {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+
+    .slide {
+        width: 256px;
+        height: 280px;
+        margin: 0 15px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .arrows {
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        right: 20px;
+        display: flex;
+        justify-content: space-between;
+        width: calc(100% - 40px);
+        transform: translateY(-50%);
+    }
+
+    .arrows button {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+</style>
+
 <body>
-    <div class="container" style="background: #000000;padding-top: 20px;">
-        <div class="row gy-4 gy-md-0">
-            <div class="col-md-6">
+    <div class="container" style="background: #000000; padding: 0; margin: 0;">
+        <div class="row gy-4 gy-md-0" style="margin: 0;">
+            <div class="col-md-6" style="padding: 0;">
                 <div class="p-xl-5 m-xl-5"
                     style="background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fservicios-marimon-02.jpg?alt=media&amp;token=c82b9eac-83e4-42e6-aae0-814d5cc6bc45.png&quot;) center / cover no-repeat;height: 284px;">
                 </div>
             </div>
-            <div class="col-md-6 d-md-flex align-items-md-center">
-                <div style="max-width: 350px;">
+            <div class="col-md-6 d-md-flex align-items-md-center" style="padding: 0;">
+                <div style="max-width: 350px; margin: auto;">
                     <h2 class="fw-bold" style="font-family: Akatab, sans-serif;color: rgb(255,255,255);">Hola somos
                         Marimon y traemos las mejores soluciones a sus vehiculos</h2>
                     <p class="my-3" style="color: rgb(249,249,249);">Tincidunt laoreet leo, adipiscing taciti tempor.
                         Primis senectus sapien, risus donec ad fusce augue interdum.</p><a
                         class="btn btn-primary btn-lg me-2 pe-3" role="button" href="#"
-                        style="text-align: center;background: rgb(255,255,255);color: rgb(0,0,0);font-weight: bold;transform: translate(78px);border-radius: 15;">Ver
+                        style="text-align: center;background: rgb(255,255,255);color: rgb(0,0,0);font-weight: bold;transform: translate(0);border-radius: 15;">Ver
                         servicios</a>
                 </div>
             </div>
@@ -34,7 +79,8 @@
                             width="111" height="69">Escuchamos
                         y<br>&nbsp;atendemos&nbsp;</h4>
                     <div class="px-3">
-                        <p>Escuchamos todos los inconvenientes que tiene nuestros clientes frente a su vehículo.</p>
+                        <p><span style="font-size: 1.5em;">✓</span> Escuchamos todos los inconvenientes que tiene
+                            nuestros clientes frente a su vehículo.</p>
                     </div>
                 </div>
             </div>
@@ -44,7 +90,8 @@
                             src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-1.png?alt=media&token=c164c118-ff0c-433a-80c7-b0b2b2ec666b.png"
                             width="99" height="99">Analizamos</h4>
                     <div class="px-3">
-                        <p>El asesor asigna a los tecnicos especializados de acuerdo a los incovenientes presentados por
+                        <p><span style="font-size: 1.5em;">✓</span>El asesor asigna a los tecnicos especializados de
+                            acuerdo a los incovenientes presentados por
                             el cliente y la hipotesis del mismo.</p>
                     </div>
                 </div>
@@ -53,11 +100,15 @@
                 <div class="text-center d-flex flex-column align-items-center align-items-xl-center">
                     <h4><img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-2.png?alt=media&token=a8ff5a75-7e15-4031-ada5-751a793d95f2.png"
                             width="139" height="100">Cotizamos</h4>
-                    <div class="px-3">
-                        <p>De acuerdo a las pruebas realizadas el asesor realiza la cotización. De acuerdo a la
-                            información obtenida por el scanner, las pruebas mecánicas realizadas o el diagnostico de
-                            falla</p>
+                    <div class="px-3 text-center">
+                        <ul style="list-style: none; padding: 0;">
+                            <li><span style="font-size: 1.5em;">✓</span> De acuerdo a las pruebas realizadas, el asesor
+                                realiza la cotización.</li>
+                            <li><span style="font-size: 1.5em;">✓</span> De acuerdo a la información obtenida por el
+                                scanner, las pruebas mecánicas realizadas o el diagnóstico de falla.</li>
+                        </ul>
                     </div>
+
                 </div>
             </div>
             <div
@@ -66,10 +117,14 @@
                     <h4><img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-3.png?alt=media&token=ff84c240-0f32-45c1-bb7e-c219e430e687.png"
                             width="92" height="85">Seguimiento</h4>
                     <div class="text-center px-3">
-                        <p class="d-xl-flex justify-content-xl-center">Se procede a realizar el trabajo realizado<br>Se
-                            establece fechas limite de entrega<br>Asimismo, el asesor encargado se comunica el cliente
-                            periódicamente para informar el avance del vehículo&nbsp;</p>
+                        <ul style="list-style: none; padding: 0;">
+                            <li><span style="font-size: 1.5em;">✓</span> Se procede a realizar el trabajo realizado</li>
+                            <li><span style="font-size: 1.5em;">✓</span> Se establece fechas límite de entrega</li>
+                            <li><span style="font-size: 1.5em;">✓</span> Asimismo, el asesor encargado se comunica con
+                                el cliente periódicamente para informar el avance del vehículo</li>
+                        </ul>
                     </div>
+
                 </div>
             </div>
             <div
@@ -78,36 +133,120 @@
                     <h4><img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-4.png?alt=media&token=121b653d-5a08-4ac0-932c-7232fa0da153.png"
                             width="119" height="74">Entrega</h4>
                     <div class="px-3">
-                        <p>Después de realizado las pruebas correspondientes del vehículo se procede a lavado del
+                        <p><span style="font-size: 1.5em;">✓</span>Después de realizado las pruebas correspondientes del
+                            vehículo se procede a lavado del
                             vehículo y posterior entrega al cliente&nbsp;</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container ms-xxl-3" style="background: #D42025;height: 352px;padding-bottom: 8px;">
-        <h1 style="color: rgb(255,255,255);font-weight: bold;text-align: center;">Nuestros Servicios</h1>
-        <div class="row justify-content-center align-items-center align-content-center align-self-center">
-            <div class="col-md-4 col-xl-3 offset-xl-0 d-xl-flex justify-content-center align-items-center align-content-center justify-content-xl-center align-items-xl-end me-3 ms-3"
-                style="height: 280px;width: 256px;background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-5.png?alt=media&amp;token=5a2552aa-598c-48aa-81ce-e8435257fbda.png&quot;) center / cover;">
-                <p class="d-xl-flex justify-content-xl-end align-items-xl-end"
-                    style="color: rgb(255,255,255);font-weight: bold;">Mantenimientos y frenos</p>
+    <div class="container ms-xxl-3" style="background: #D42025; height: 352px; padding-bottom: 8px;">
+        <h1 style="color: rgb(255,255,255); font-weight: bold; text-align: center;">Nuestros Servicios</h1>
+        <div class="slider-container">
+            <div class="slider">
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-5.png?alt=media&amp;token=5a2552aa-598c-48aa-81ce-e8435257fbda.png"
+                        alt="Mantenimientos y frenos" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Mantenimientos y frenos</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-6.png?alt=media&amp;token=e23674d0-cee9-4bf5-a4cb-a6f089370d8a.png"
+                        alt="Diagnostico y escaner" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Diagnostico y escaner</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-7.png?alt=media&amp;token=4203295e-cc55-4a0a-8db6-d33c6cf32c5e.png"
+                        alt="Mecatrónica y Electrónica" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Mecatrónica y Electrónica</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-8.png?alt=media&amp;token=590f96af-f3b3-4f32-928d-ffc76f9fc5cb.png"
+                        alt="Aire acondicionado" width="259" height="194">
+                    <p style="color: rgb(253,254,255);">Aire acondicionado</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fimages%20(1).jpg?alt=media&token=1bc2cac4-02eb-4196-aad5-da8f26d1be3b.png"
+                        alt="Dirección y Suspensión" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Dirección y Suspensión</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fimages%20(2).jpg?alt=media&token=0cc709d7-81d8-4360-81ea-f8bbbc37a732.png"
+                        alt="Frenos" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Frenos</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fimages%20(6).jpg?alt=media&token=fc9c798b-faa3-4b08-be27-b11dbb13fe43.png"
+                        alt="Servicio de Llanta y Aros" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Servicio de Llanta y Aros</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fimages%20(3).jpg?alt=media&token=94a36b75-0b2a-4afb-845b-008fd1d79f74.png"
+                        alt="Cambio de Aceite" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Cambio de Aceite</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fimportancia-de-la-alineacion-y-balanceo.jpg?alt=media&token=4c2f9beb-726c-4ad0-82a2-df3e05d55ebe.png"
+                        alt="Balanceo" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Balanceo</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fcambio-llantas-autoland.jpg?alt=media&token=deb4322d-2937-4b6d-bed3-0b22ee545208.png"
+                        alt="Enllante" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Enllante</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fc_img_740x370.fcm781k38a46h4.jpg?alt=media&token=b80fcab6-663c-4fab-bce1-f7befe4263f2.png"
+                        alt="Scanner" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Scanner</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fgeneral-car-repair-CA-Motor-Works.jpg?alt=media&token=9d90108b-0b6f-4bb5-800d-a0eb823e19c4.png"
+                        alt="Motor" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Motor</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fimages%20(4).jpg?alt=media&token=e44c8e47-6b4d-4a87-ae28-297e4126dff7.png"
+                        alt="Electricidad Automotriz" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Electricidad Automotriz</p>
+                </div>
+                <div class="slide">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fimages%20(5).jpg?alt=media&token=6a281880-f8cf-4639-bb25-f6125445db38.png"
+                        alt="Cajas" width="259" height="194">
+                    <p style="color: rgb(255,255,255); font-weight: bold;">Cajas</p>
+                </div>
+
             </div>
-            <div class="col-md-4 col-xl-3 d-xl-flex justify-content-xl-center me-3"
-                style="background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-6.png?alt=media&amp;token=e23674d0-cee9-4bf5-a4cb-a6f089370d8a.png&quot;) center / cover;height: 276px;">
-                <p class="d-xl-flex align-items-xl-end" style="color: rgb(255,255,255);font-weight: bold;">Diagnostico y
-                    escaner</p>
-            </div>
-            <div class="col d-xl-flex justify-content-xl-center align-items-xl-end me-3"
-                style="background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-7.png?alt=media&amp;token=4203295e-cc55-4a0a-8db6-d33c6cf32c5e.png&quot;) center / cover;width: 256px;height: 280px;">
-                <p class="d-xl-flex justify-content-xl-center align-items-xl-end"
-                    style="color: rgb(255,255,255);font-weight: bold;">Mecatrónica y Electrónica</p>
-            </div>
-            <div class="col d-xl-flex justify-content-xl-center align-items-xl-end me-3"
-                style="background: url(&quot;https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-8.png?alt=media&amp;token=590f96af-f3b3-4f32-928d-ffc76f9fc5cb.png&quot;) center / cover;width: 256px;height: 280px;">
-                <p style="color: rgb(253,254,255);">Aire acondicionado</p>
+            <div class="arrows">
+                <button id="prev">
+                    < <button id="next">>
+                </button>
             </div>
         </div>
     </div>
+
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
+
+<script>
+    const slider = document.querySelector('.slider');
+    const slides = document.querySelectorAll('.slide');
+    const prevButton = document.getElementById('prev');
+    const nextButton = document.getElementById('next');
+
+    let currentIndex = 0;
+
+    function updateSlider() {
+        slider.style.transform = `translateX(${-currentIndex * 256}px)`;
+    }
+
+    nextButton.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        updateSlider();
+    });
+
+    prevButton.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        updateSlider();
+    });
+</script>
