@@ -143,6 +143,21 @@
         </div>
     </div>
 </div>
+<!-- Carrito lateral (inicialmente oculto) -->
+<div id="carritoLateral" class="carrito-lateral d-none">
+    <div class="d-flex justify-content-between align-items-center px-3 pt-2">
+        <h5 class="mb-0">🛒 Carrito</h5>
+        <button id="cerrarCarrito" class="btn btn-sm btn-outline-secondary">&times;</button>
+    </div>
+    <ul class="lista-carrito list-unstyled px-3 mt-2"></ul>
+    <div class="subtotal px-3 mt-2">
+        <strong>Subtotal:</strong> <span id="subtotal">S/ 0.00</span>
+    </div>
+    <div class="text-center mt-3 mb-2">
+        <a  a asp-controller="Carrito" asp-action="Index" class="btn btn-ver-carrito">Ver Carrito</a>
+    </div>
+</div>
+
 
 @section Styles {
     <style>
@@ -208,6 +223,90 @@
             background-color: #28a745;
             border-color: #28a745;
         }
+        
+        .carrito-lateral {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            width: 300px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            z-index: 1050;
+            max-height: 80vh;
+            overflow-y: auto;
+            transition: all 0.3s ease-in-out;
+            border: none;
+            padding-bottom: 10px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .lista-carrito li {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .lista-carrito img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .lista-carrito .flex-grow-1 {
+            font-size: 0.85rem;
+            color: #333;
+        }
+
+        .lista-carrito .btn-outline-secondary {
+            border: none;
+            background-color: #eee;
+            color: #333;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            transition: background 0.2s ease;
+        }
+
+        .lista-carrito .btn-outline-secondary:hover {
+            background-color: #ddd;
+        }
+
+        .subtotal {
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: right;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+
+        #cerrarCarrito {
+            font-size: 1.5rem;
+            padding: 0 10px;
+            color: #999;
+        }
+
+        #cerrarCarrito:hover {
+            color: #000;
+        }
+
+        .btn-ver-carrito {
+            background-color: #dc3545;
+            color: white;
+            font-weight: bold;
+            border-radius: 20px;
+            padding: 8px 24px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
     </style>
 }
 
@@ -221,6 +320,98 @@
                 var value = $(this).val();
                 // Aquí podrías implementar la lógica para filtrar por precio
                 console.log('Precio máximo seleccionado: S/' + value);
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            let carrito = [];
+            let subtotal = 0;
+
+            // Mostrar carrito al añadir producto
+            $('.btn-dark').on('click', function () {
+                const card = $(this).closest('.producto-card');
+                const nombre = card.find('.card-title').text();
+                const precioText = card.find('.precio strong').text();
+                const precio = parseFloat(precioText.replace('S/', '').trim());
+                const imagen = card.find('img').attr('src');
+
+                // Verifica si ya está en el carrito
+                let existente = carrito.find(item => item.nombre === nombre);
+                if (existente) {
+                    existente.cantidad += 1;
+                } else {
+                    carrito.push({ nombre, precio, imagen, cantidad: 1 });
+                }
+
+                // Actualiza subtotal
+                subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
+
+                // Muestra carrito
+                $('#carritoLateral').removeClass('d-none');
+
+                // Renderiza el carrito en HTML
+                renderizarCarrito();
+                $('#subtotal').text('S/ ' + subtotal.toFixed(2));
+
+                // Guardar en localStorage
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+                // Log para mostrar el carrito y la cantidad de productos
+    console.log('Carrito guardado en localStorage:', JSON.parse(localStorage.getItem('carrito')));
+    console.log('Cantidad de productos en el carrito:', carrito.length);
+
+            });
+
+            function renderizarCarrito() {
+                $('.lista-carrito').html('');
+
+                carrito.forEach((item, index) => {
+                    $('.lista-carrito').append(`
+                        <li class="d-flex align-items-center">
+                            <img src="${item.imagen}" alt="${item.nombre}">
+                            <div class="flex-grow-1">
+                                <div><strong>${item.nombre}</strong></div>
+                                <div class="text-muted">S/ ${item.precio.toFixed(2)}</div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-secondary disminuir" data-index="${index}">−</button>
+                                <span class="mx-2">${item.cantidad}</span>
+                                <button class="btn btn-sm btn-outline-secondary aumentar" data-index="${index}">+</button>
+                            </div>
+                        </li>
+                    `);
+                });
+            }
+
+            // Delegación de eventos para aumentar/disminuir
+            $(document).on('click', '.aumentar', function () {
+                const index = $(this).data('index');
+                carrito[index].cantidad += 1;
+                actualizarCarrito();
+            });
+
+            $(document).on('click', '.disminuir', function () {
+                const index = $(this).data('index');
+                carrito[index].cantidad -= 1;
+                if (carrito[index].cantidad <= 0) {
+                    carrito.splice(index, 1);
+                }
+                actualizarCarrito();
+            });
+
+            function actualizarCarrito() {
+                subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
+                renderizarCarrito();
+                $('#subtotal').text('S/ ' + subtotal.toFixed(2));
+
+                // Guardar en localStorage
+                localStorage.setItem('carrito', JSON.stringify(carrito));
+            }
+
+            // Cerrar carrito al hacer clic en "×"
+            $('#cerrarCarrito').on('click', function () {
+                $('#carritoLateral').addClass('d-none');
             });
         });
     </script>
