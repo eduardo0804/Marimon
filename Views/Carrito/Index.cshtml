@@ -283,7 +283,7 @@
             if (e.target.classList.contains('decrease-btn')) {
                 const nombreProducto = e.target.dataset.nombre;
                 const producto = carrito.find(item => item.nombre === nombreProducto);
-                if (producto && producto.cantidad > 1) {
+                if (producto && producto.cantidad > 1) 
                     producto.cantidad--;
                     // Actualizar el carrito en localStorage
                     localStorage.setItem('carrito', JSON.stringify(carrito));
