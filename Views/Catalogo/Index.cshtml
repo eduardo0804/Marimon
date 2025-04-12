@@ -313,20 +313,7 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            // Aquí puedes agregar cualquier JavaScript que necesites
-            
-            // Ejemplo: actualizar el rango de precio
-            $('#precioRange').on('input', function() {
-                var value = $(this).val();
-                // Aquí podrías implementar la lógica para filtrar por precio
-                console.log('Precio máximo seleccionado: S/' + value);
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function () {
-            let carrito = [];
+            let carrito = JSON.parse(localStorage.getItem('carrito')) || []; // Recuperar carrito desde localStorage
             let subtotal = 0;
 
             // Mostrar carrito al añadir producto
@@ -337,34 +324,36 @@
                 const precio = parseFloat(precioText.replace('S/', '').trim());
                 const imagen = card.find('img').attr('src');
 
-                // Verifica si ya está en el carrito
+                // Verifica si el producto ya está en el carrito
                 let existente = carrito.find(item => item.nombre === nombre);
                 if (existente) {
-                    existente.cantidad += 1;
+                    existente.cantidad += 1; // Si existe, aumenta la cantidad
                 } else {
-                    carrito.push({ nombre, precio, imagen, cantidad: 1 });
+                    carrito.push({ nombre, precio, imagen, cantidad: 1 }); // Si no existe, lo agrega al carrito
                 }
 
                 // Actualiza subtotal
                 subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
 
-                // Muestra carrito
+                // Muestra el carrito lateral
                 $('#carritoLateral').removeClass('d-none');
 
-                // Renderiza el carrito en HTML
+                // Renderiza el carrito en el lateral
                 renderizarCarrito();
+
+                // Muestra el subtotal actualizado
                 $('#subtotal').text('S/ ' + subtotal.toFixed(2));
 
-                // Guardar en localStorage
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-                // Log para mostrar el carrito y la cantidad de productos
-    console.log('Carrito guardado en localStorage:', JSON.parse(localStorage.getItem('carrito')));
-    console.log('Cantidad de productos en el carrito:', carrito.length);
+                // Guardar carrito actualizado en localStorage
+                localStorage.setItem('carrito', JSON.stringify(carrito));
 
+                // Log para mostrar el carrito y la cantidad de productos
+                console.log('Carrito guardado en localStorage:', carrito);
+                console.log('Cantidad de productos en el carrito:', carrito.length);
             });
 
             function renderizarCarrito() {
-                $('.lista-carrito').html('');
+                $('.lista-carrito').html(''); // Limpiar la lista antes de renderizar
 
                 carrito.forEach((item, index) => {
                     $('.lista-carrito').append(`
@@ -384,7 +373,7 @@
                 });
             }
 
-            // Delegación de eventos para aumentar/disminuir
+            // Delegación de eventos para aumentar/disminuir la cantidad
             $(document).on('click', '.aumentar', function () {
                 const index = $(this).data('index');
                 carrito[index].cantidad += 1;
@@ -395,24 +384,37 @@
                 const index = $(this).data('index');
                 carrito[index].cantidad -= 1;
                 if (carrito[index].cantidad <= 0) {
-                    carrito.splice(index, 1);
+                    carrito.splice(index, 1); // Elimina el producto si la cantidad es 0 o menos
                 }
                 actualizarCarrito();
             });
 
             function actualizarCarrito() {
+                // Recalcula el subtotal
                 subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
+
+                // Renderiza el carrito actualizado
                 renderizarCarrito();
+
+                // Muestra el subtotal actualizado
                 $('#subtotal').text('S/ ' + subtotal.toFixed(2));
 
-                // Guardar en localStorage
+                // Guardar el carrito actualizado en localStorage
                 localStorage.setItem('carrito', JSON.stringify(carrito));
             }
 
-            // Cerrar carrito al hacer clic en "×"
+            // Cerrar carrito lateral al hacer clic en "×"
             $('#cerrarCarrito').on('click', function () {
                 $('#carritoLateral').addClass('d-none');
             });
+
+            // Al cargar la página, verificar si hay productos en el carrito
+            if (carrito.length > 0) {
+                $('#carritoLateral').removeClass('d-none'); // Mostrar el carrito lateral si no está vacío
+                renderizarCarrito(); // Renderiza los productos en el carrito
+                subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
+                $('#subtotal').text('S/ ' + subtotal.toFixed(2)); // Muestra el subtotal al cargar
+            }
         });
     </script>
 }
