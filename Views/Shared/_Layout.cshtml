@@ -63,7 +63,7 @@
         <div class="contenedor-menu">
             <!-- Logo -->
             <div class="logo-contenedor">
-                <a href="#" class="logo"><img src="~/images/logo_marimon.png" alt="Logo" style="width: 140px;"></a>
+                <a href="/" class="logo"><img src="~/images/logo_marimon.png" alt="Logo" style="width: 140px;"></a>
             </div>
 
             <!-- Toggle para menú móvil -->
@@ -96,20 +96,13 @@
                 <a asp-controller="Nosotros" asp-action="Index">NOSOTROS</a>
             </nav>
 
-            <!-- Menú secundario (carrito y usuario) -->
+         <!-- Menú secundario (carrito y login) -->
             <nav class="segundo_menu">
-                <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
-                <div class="dropdown-user">
-                    <a href="#" class="dropdown-main">Iniciar Sesión <i class="fa-solid fa-user"></i></a>
-                    <input type="checkbox" id="user-toggle" class="submenu-toggle hidden">
-                    <label for="user-toggle" class="dropdown-user-toggle"><i class="fa-solid fa-plus"></i><i
-                            class="fa-solid fa-minus"></i></label>
-                    <ul class="submenu-user text_drop">
-                        <li><a href="#">Escritorio</a></li>
-                        <li><a href="#">Salir</a></li>
-                    </ul>
-                </div>
-            </nav>
+            <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
+            <div class="dropdown-user">
+                <a href="/Identity/Account/Login" class="dropdown-main">Iniciar Sesión <i class="fa-solid fa-user"></i></a>
+            </div>
+        </nav>
         </div>
     </header>
 
