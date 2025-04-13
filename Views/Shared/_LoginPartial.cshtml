@@ -2,25 +2,30 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
-</ul>
+<link rel="stylesheet" href="~/css/menus.css" />
+
+<nav class="segundo_menu">
+    <a asp-area="" asp-controller="Carrito" asp-action="Index" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
+    
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <!-- Dropdown para usuario logueado -->
+        <div class="dropdown-user">
+            <a class="desktop-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@User.Identity?.Name! <i class="fa-solid fa-user"></i></a>
+
+            <ul class="drop-menu-user">
+                <li><a asp-area="Identity" asp-page="/Account/Manage/Index">Escritorio</a></li>
+                <li>
+                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button type="submit">Salir</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        <!-- Para usuario no logueado -->
+        <a asp-area="Identity" asp-page="/Account/Login">Iniciar Sesión</a>
+    }
+</nav>

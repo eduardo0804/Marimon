@@ -1,0 +1,251 @@
+@{
+    ViewData["Title"] = "Nosotros - AUTOMOTRIZ MARIMON S.A.C";
+}
+
+    
+    <style>
+        .nosotros-container {
+            padding: 50px 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header-section {
+            margin-bottom: 60px;
+        }
+
+        .about-us-intro {
+            padding-right: 30px;
+        }
+
+        .company-name {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .indicator-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot.active {
+            background-color: #dc3545;
+        }
+
+        .mission-vision-section {
+            margin-bottom: 60px;
+        }
+
+        .mission-card,
+        .vision-card,
+        .objectives-card {
+            padding: 30px 15px;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .icon-container {
+            margin-bottom: 15px;
+        }
+
+        .icon-container i {
+            font-size: 2rem;
+        }
+
+        .section-title {
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        .values-cards {
+            margin-top: 30px;
+        }
+
+        .value-card {
+            margin-bottom: 30px;
+        }
+
+        .value-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .red-separator {
+            width: 50px;
+            height: 4px;
+            background-color: #dc3545;
+            margin: 15px auto;
+        }
+
+        h3,
+        h4 {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+
+
+    <script>
+        // Aquí puedes agregar cualquier JavaScript que necesites
+        $(document).ready(function () {
+            // Por ejemplo, para cambiar los dots de la imagen automáticamente
+            let currentDot = 0;
+            const dots = $('.dot');
+
+            setInterval(function () {
+                dots.removeClass('active');
+                currentDot = (currentDot + 1) % dots.length;
+                $(dots[currentDot]).addClass('active');
+            }, 3000);
+        });
+    </script>
+    
+<div class="container nosotros-container">
+    <div class="row header-section">
+        <div class="col-md-6">
+            <div class="about-us-intro">
+                <h5 class="text-danger">Nosotros</h5>
+                <h2 class="company-name">AUTOMOTRIZ MARIMON S.A.C</h2>
+                <p class="company-desc">
+                    Somos una empresa comprometida con brindar servicios automotrices de calidad superior.
+                    Nuestra experiencia en el sector nos ha permitido entender las necesidades de nuestros clientes
+                    y ofrecer soluciones efectivas y confiables para el mantenimiento y reparación de sus vehículos.
+                    Contamos con personal altamente calificado y tecnología de punta para garantizar resultados
+                    excepcionales
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="about-image">
+                <img src="~/images/nosotros-car.PNG" alt="Taller Automotriz" class="img-fluid rounded" />
+                <div class="indicator-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mission-vision-section text-center">
+        <div class="col-md-4">
+            <div class="card mission-card">
+                <div class="icon-container">
+                    <i class="fas fa-globe text-danger"></i>
+                </div>
+                <h3>Misión</h3>
+                <p>
+                    Es brindar un servicio integral de excelencia en el
+                    mantenimiento y reparación de vehículos, con el compromiso de
+                    superar la plena satisfacción de las necesidades de los
+                    propietarios de nuestros talleres.
+                </p>
+                <div class="red-separator"></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card vision-card">
+                <div class="icon-container">
+                    <i class="fas fa-eye text-danger"></i>
+                </div>
+                <h3>Visión</h3>
+                <p>
+                    Es convertirnos en el taller autorizado de referencia en el
+                    mantenimiento y reparación de marcas seleccionadas de
+                    vehículos en Lima Moderna. Creemos sobre para nuestros
+                    clientes, colaboradores internos, colaboradores externos y
+                    nuestro entorno social.
+                </p>
+                <div class="red-separator"></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card objectives-card">
+                <div class="icon-container">
+                    <i class="fas fa-bullseye text-danger"></i>
+                </div>
+                <h3>Objetivos</h3>
+                <p>
+                    Es alcanzar constantemente altos índices de disponibilidad
+                    operativa, atendiendo con prontitud las necesidades de
+                    reparación de los vehículos para la satisfacción de
+                    nuestros clientes.
+                </p>
+                <div class="red-separator"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="our-values-section">
+        <h2 class="text-center section-title">Nuestros valores</h2>
+        <div class="row values-cards">
+            <div class="col-md-3">
+                <div class="value-card text-center">
+                    <img src="~/images/nosotros-marim.PNG" alt="Servicio" class="img-fluid rounded value-img" />
+                    <h4>Servicio:</h4>
+                    <p>
+                        Compromiso con la satisfacción y atención al cliente.
+                    </p>
+                    <div class="red-separator"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="value-card text-center">
+                    <img src="~/images/nosotros-marim.PNG" alt="Integridad" class="img-fluid rounded value-img" />
+                    <h4>Integridad:</h4>
+                    <p>
+                        Honestidad y transparencia en nuestra interacción con
+                        nuestros clientes.
+                    </p>
+                    <div class="red-separator"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="value-card text-center">
+                    <img src="~/images/nosotros-marim.PNG" alt="Excelencia" class="img-fluid rounded value-img" />
+                    <h4>Excelencia:</h4>
+                    <p>
+                        Perseguimos la perfección
+                        en cada detalle de nuestro
+                        trabajo.
+                    </p>
+                    <div class="red-separator"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="value-card text-center">
+                    <img src="~/images/nosotros-marim.PNG" alt="Innovación" class="img-fluid rounded value-img" />
+                    <h4>Innovación:</h4>
+                    <p>
+                        Adoptamos nuevas tecnologías para mejorar
+                        constantemente nuestros
+                        servicios.
+                    </p>
+                    <div class="red-separator"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -4,28 +4,30 @@ using Marimon.Models;
 
 namespace Marimon.Controllers;
 
-public class HomeController : Controller
+public class ServiciosController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    private readonly ILogger<ServiciosController> _logger;
 
-    public HomeController(ILogger<HomeController> logger)
+    public ServiciosController(ILogger<ServiciosController> logger)
     {
         _logger = logger;
     }
 
     public IActionResult Index()
     {
-        return View();
+        return View("~/Views/Servicios/Index.cshtml");
+    }
+
+    public IActionResult Servicio()
+    {
+        return View("~/Views/Servicios/Servicio.cshtml");
     }
 
     public IActionResult Privacy()
     {
         return View();
     }
-    public IActionResult Terminos()
-    {
-        return View();
-    }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

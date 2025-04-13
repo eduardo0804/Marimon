@@ -1,0 +1,159 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Registrar Usuario";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        background-color: #f8f9fa;
+    }
+
+    .register-wrapper {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+
+    .register-container {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        width: 100%;
+        max-width: 960px;
+        height: auto;
+        background-color: #f8f9fa; /* color de fondo */
+        border-radius: 1rem;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .register-form-section {
+        flex: 1;
+        padding: 3rem;
+        background-color: white;
+    }
+
+    .register-form-section h2 {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        color: #000;
+    }
+
+    .form-label {
+        color: #D42025;
+        font-weight: 600;
+    }
+
+    .form-control {
+        border: 2px solid #D42025;
+        border-radius: 0.5rem;
+        padding: 0.8rem;
+    }
+
+    .register-btn {
+        background-color: #E42229;
+        color: white;
+        font-weight: bold;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+
+    .register-btn:hover {
+        background-color: #D42025;
+    }
+
+    .image-section {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #626C66;
+        padding: 2rem;
+    }
+
+    .image-section img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.75rem;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .login-link a {
+        color: #D42025;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-container">
+        <!-- Sección del formulario -->
+        <div class="register-form-section">
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <h2>@ViewData["Title"]</h2>
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Nombres</label>
+                    <input type="text" name="nombres" class="form-control" placeholder="Complete este campo" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Apellidos</label>
+                    <input type="text" name="apellidos" class="form-control" placeholder="Complete este campo" required />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label">Correo</label>
+                    <input asp-for="Input.Email" class="form-control" placeholder="ejemplo@correo.com" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Password" class="form-label">Contraseña</label>
+                    <input asp-for="Input.Password" class="form-control" placeholder="************" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.ConfirmPassword" class="form-label">Confirmar Contraseña</label>
+                    <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="************" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn w-100 register-btn">Registrar</button>
+                </div>
+
+                <div class="login-link">
+                    ¿Ya tienes cuenta? <a asp-page="./Login">Iniciar Sesión</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección de imagen -->
+        <div class="image-section">
+            <img src="/images/registro-lateral.jpg" alt="Imagen de registro" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

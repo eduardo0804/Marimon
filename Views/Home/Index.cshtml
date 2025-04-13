@@ -1,8 +1,111 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Para ASP.NET, cuando incluyas este fragmento en tu página .aspx o .cshtml, deberás usar las rutas adecuadas -->
+<!-- Para archivos .aspx puedes usar:  -->
+<div class="container">
+    <!-- Slider Section -->
+    <div class="slider-container">
+        <div class="slider">
+            <div class="slide active">
+                <img src="~/images/slider-01.jpg" alt="Slider 1">
+                <div class="slider-content">
+                    <!-- Contenido para slide 1 -->
+                </div>
+            </div>
+            <div class="slide">
+                <img src="~/images/slider-02.jpg" alt="Slider 2">
+                <div class="slider-content">
+                    <!-- Contenido para slide 2 -->
+                </div>
+            </div>
+            <div class="slide">
+                <img src="~/images/slider-03.jpg" alt="Slider 3">
+                <div class="slider-content">
+                    <!-- Contenido para slide 3 -->
+                </div>
+            </div>
+        </div>
+        <div class="slider-controls">
+            <button class="slider-btn prev-btn">&lt;</button>
+            <button class="slider-btn next-btn">&gt;</button>
+        </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div class="welcome-wrapper">
+        <div class="welcome-section">
+            <div class="welcome-image">
+                <img src="~/images/bienvenidos.jpg" alt="Bienvenidos a Marimon">
+            </div>
+            <div class="welcome-content">
+                <h2>BIENVENIDOS <br><span>A MARIMON PERÚ</span></h2>
+                <p>Desde hace 50 años nos consideramos expertos en el tema; estamos siempre acompañados por el personal más eficiente, profesional y oportuno para brindarte la satisfacción que mereces.</p>
+                <a asp-area="" asp-controller="Servicios" asp-action="Index" class="btn-servicios">Ver Servicios</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Links Section -->
+    <div class="services-section">
+        <a asp-area="" asp-controller="Servicios" asp-action="Index" class="service-link">
+            <img src="~/images/servicios.jpg" alt="Servicios">
+            <div class="service-overlay">
+                <h3>SERVICIOS</h3>
+            </div>
+        </a>
+        <a asp-area="" asp-controller="Catalogo" asp-action="Index" class="service-link">
+            <img src="~/images/tienda.jpg" alt="Tienda Online">
+            <div class="service-overlay">
+                <h3>TIENDA ONLINE</h3>
+            </div>
+        </a>
+    </div>
+
+    <!-- Best Option Section -->
+    <div class="best-option">
+        <h2>¿POR QUÉ SOMOS <span>LA MEJOR OPCIÓN</span>?</h2>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <div class="feature-number">1</div>
+                    <img src="~/images/icono_innovacion.jpg" alt="Innovación">
+                </div>
+                <h3>INNOVACIÓN</h3>
+                <p>Utilizamos tecnología de punta para diagnosticar y reparar su vehículo. Nuestro sistema computarizado identifica con precisión cualquier falla, ahorrándole tiempo y dinero.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <div class="feature-number">2</div>
+                    <img src="~/images/icono_security.jpg" alt="Seguridad">
+                </div>
+                <h3>SEGURIDAD</h3>
+                <p>Todos nuestros productos y servicios cumplen con los más altos estándares de seguridad. Trabajamos con marcas certificadas y ofrecemos garantía en todas nuestras reparaciones.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <div class="feature-number">3</div>
+                    <img src="~/images/icono_economia.jpg" alt="Economia">
+                </div>
+                <h3>COSTOS</h3>
+                <p>Ofrecemos los precios más competitivos del mercado sin sacrificar calidad. Nuestros planes de mantenimiento le permiten ahorrar significativamente a largo plazo.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <div class="feature-number">4</div>
+                    <img src="~/images/icono_eficiencia.jpg" alt="Eficiencia">
+                </div>
+                <h3>EFICIENCIA</h3>
+                <p>Entregamos su vehículo en el tiempo prometido. Nuestro equipo trabaja con rapidez y precisión para que usted pueda volver a la carretera lo antes posible.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="~/js/home.js" asp-append-version="true"></script>
