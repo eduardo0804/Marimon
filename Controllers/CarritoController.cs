@@ -1,18 +1,31 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-public class CarritoController : Controller
+namespace Marimon.Controllers
 {
-    private readonly ILogger<CarritoController> _logger;
-
-    public CarritoController(ILogger<CarritoController> logger)
+    public class CarritoController : Controller
     {
-        _logger = logger;
-    }
+        private readonly ILogger<CarritoController> _logger;
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+        public CarritoController(ILogger<CarritoController> logger)
+        {
+            _logger = logger;
+        }
 
-    
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View("Error!");
+        }
+    }
 }

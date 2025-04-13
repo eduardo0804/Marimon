@@ -1,11 +1,128 @@
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-@{
     ViewData["Title"] = "Nosotros - AUTOMOTRIZ MARIMON S.A.C";
 }
 
+    
+    <style>
+        .nosotros-container {
+            padding: 50px 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header-section {
+            margin-bottom: 60px;
+        }
+
+        .about-us-intro {
+            padding-right: 30px;
+        }
+
+        .company-name {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .indicator-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot.active {
+            background-color: #dc3545;
+        }
+
+        .mission-vision-section {
+            margin-bottom: 60px;
+        }
+
+        .mission-card,
+        .vision-card,
+        .objectives-card {
+            padding: 30px 15px;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .icon-container {
+            margin-bottom: 15px;
+        }
+
+        .icon-container i {
+            font-size: 2rem;
+        }
+
+        .section-title {
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        .values-cards {
+            margin-top: 30px;
+        }
+
+        .value-card {
+            margin-bottom: 30px;
+        }
+
+        .value-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .red-separator {
+            width: 50px;
+            height: 4px;
+            background-color: #dc3545;
+            margin: 15px auto;
+        }
+
+        h3,
+        h4 {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+
+
+    <script>
+        // Aquí puedes agregar cualquier JavaScript que necesites
+        $(document).ready(function () {
+            // Por ejemplo, para cambiar los dots de la imagen automáticamente
+            let currentDot = 0;
+            const dots = $('.dot');
+
+            setInterval(function () {
+                dots.removeClass('active');
+                currentDot = (currentDot + 1) % dots.length;
+                $(dots[currentDot]).addClass('active');
+            }, 3000);
+        });
+    </script>
+    
 <div class="container nosotros-container">
     <div class="row header-section">
         <div class="col-md-6">
@@ -132,145 +249,3 @@
         </div>
     </div>
 </div>
-
-@section Styles {
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body,
-        .nosotros-container,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        p,
-        .company-name,
-        .company-desc,
-        .mission-card,
-        .vision-card,
-        .objectives-card,
-        .value-card {
-            font-family: 'Nunito', sans-serif;
-        }
-
-        .nosotros-container {
-            padding: 50px 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .header-section {
-            margin-bottom: 60px;
-        }
-
-        .about-us-intro {
-            padding-right: 30px;
-        }
-
-        .company-name {
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .about-image {
-            position: relative;
-        }
-
-        .indicator-dots {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .dot.active {
-            background-color: #dc3545;
-        }
-
-        .mission-vision-section {
-            margin-bottom: 60px;
-        }
-
-        .mission-card,
-        .vision-card,
-        .objectives-card {
-            padding: 30px 15px;
-            height: 100%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: none;
-        }
-
-        .icon-container {
-            margin-bottom: 15px;
-        }
-
-        .icon-container i {
-            font-size: 2rem;
-        }
-
-        .section-title {
-            margin-bottom: 40px;
-            font-weight: bold;
-        }
-
-        .values-cards {
-            margin-top: 30px;
-        }
-
-        .value-card {
-            margin-bottom: 30px;
-        }
-
-        .value-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            margin-bottom: 15px;
-        }
-
-        .red-separator {
-            width: 50px;
-            height: 4px;
-            background-color: #dc3545;
-            margin: 15px auto;
-        }
-
-        h3,
-        h4 {
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        p {
-            color: #666;
-            line-height: 1.6;
-        }
-    </style>
-}
-
-@section Scripts {
-    <script>
-        // Aquí puedes agregar cualquier JavaScript que necesites
-        $(document).ready(function () {
-            // Por ejemplo, para cambiar los dots de la imagen automáticamente
-            let currentDot = 0;
-            const dots = $('.dot');
-
-            setInterval(function () {
-                dots.removeClass('active');
-                currentDot = (currentDot + 1) % dots.length;
-                $(dots[currentDot]).addClass('active');
-            }, 3000);
-        });
-    </script>
-}

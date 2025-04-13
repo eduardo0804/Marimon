@@ -1,0 +1,25 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+    
+<link rel="stylesheet" href="~/css/menus.css" />
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="dropdown-user-movil">
+        <input type="checkbox" id="showUsuario-movil">
+        <label for="showUsuario-movil">@User.Identity?.Name <i class="fa-solid fa-user"></i></label>
+        <ul class="drop-menu-movil">
+            <li><a asp-area="Identity" asp-page="/Account/Manage/Index">Escritorio</a></li>
+            <li>
+                <form class="logout-form-movil" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="logout-button-movil">Salir</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+}
+else
+{
+    <a asp-area="Identity" asp-page="/Account/Login">Iniciar Sesión</a>
+}

@@ -1,0 +1,289 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Estilos del Slider */
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+}
+
+.slider {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slide.active {
+  opacity: 1;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slider-logo {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #e62e2d;
+  font-size: 3rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+/* Controles del slider - Corrección de alineación vertical */
+.slider-controls {
+  position: absolute;
+  bottom: 50%;
+  transform: translateY(50%);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 10;
+}
+
+.slider-btn {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+  line-height: 0; /* Esto ayuda a centrar mejor el símbolo */
+  padding: 0; /* Elimina cualquier padding que pueda desalinear */
+}
+
+/* El resto del código para los botones se mantiene igual */
+.slider-btn:hover {
+  background-color: rgba(230, 46, 45, 0.8);
+}
+
+/* Sección de Bienvenida con fondo extendido */
+.welcome-wrapper {
+  background-color: #111;
+  margin: 20px 0;
+  width: 100%;
+}
+
+.welcome-section {
+  display: flex;
+  color: white;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-image {
+  flex: 1;
+  overflow: hidden;
+}
+
+.welcome-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.welcome-content {
+  flex: 1;
+  padding: 40px;
+}
+
+.welcome-content h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.welcome-content h2 span {
+  color: #e62e2d;
+}
+
+.welcome-content p {
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Botón Ver Servicios */
+.btn-servicios {
+  display: inline-block;
+  background-color: #e62e2d;
+  color: white;
+  padding: 12px 25px;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  margin-top: 15px;
+}
+
+.btn-servicios:hover {
+  background-color: #c21f1e;
+  color: white;
+}
+
+/* Sección de Servicios - Altura aumentada */
+.services-section {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.service-link {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  height: 300px; /* Aumentado de 200px a 300px */
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.service-link:hover {
+  transform: scale(1.02);
+}
+
+.service-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.service-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+.service-overlay h3 {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+}
+
+/* Sección Mejor Opción */
+.best-option {
+  margin: 40px 0;
+  text-align: center;
+}
+
+.best-option h2 {
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+.best-option h2 span {
+  color: #e62e2d;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.feature {
+  flex-basis: 22%;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* Iconos de características - Tamaño aumentado */
+.feature-icon {
+  width: 120px; /* Aumentado de 80px a 120px */
+  height: 120px; /* Aumentado de 80px a 120px */
+  background-color: #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-icon img {
+  width: 80px; /* Aumentado de 50px a 80px */
+  height: 80px; /* Aumentado de 50px a 80px */
+  object-fit: contain;
+}
+
+.feature-number {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 30px;
+  height: 30px;
+  background-color: #e62e2d;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.feature h3 {
+  margin: 15px 0 10px;
+  color: #333;
+}
+
+.feature p {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .welcome-section {
+    flex-direction: column;
+  }
+
+  .services-section {
+    flex-direction: column;
+  }
+
+  .feature {
+    flex-basis: 48%;
+  }
+}
+
+@media (max-width: 480px) {
+  .feature {
+    flex-basis: 100%;
+  }
+}

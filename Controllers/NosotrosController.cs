@@ -9,23 +9,23 @@ using Microsoft.Extensions.Logging;
 namespace Marimon.Controllers
 {
     public class NosotrosController : Controller
-{
-    private readonly ILogger<NosotrosController> _logger;
-    
-    public NosotrosController(ILogger<NosotrosController> logger)
     {
-        _logger = logger;
+        private readonly ILogger<NosotrosController> _logger;
+
+        public NosotrosController(ILogger<NosotrosController> logger)
+        {
+            _logger = logger;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View("Error!");
+        }
     }
-    
-    public IActionResult Index()
-    {
-        return View();  
-    }
-    
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View("Error!");
-    }
-}
 }
