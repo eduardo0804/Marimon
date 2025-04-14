@@ -1,2 +1,38 @@
+## Build Folders ##
 bin/
 obj/
+
+## User-specific files ##
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio working folder ##
+.vs/
+
+## ASP.NET Scaffolding ##
+ScaffoldingReadMe.txt
+
+## Others ##
+*.dbmdl
+*.bak
+*.log
+*.vspscc
+
+## Publish ##
+publish/
+
+## Others ##
+*.pidb
+*.userprefs
+TestResult.xml
+*.aps
+*.ncb
+*.opendb
+*.VC.db
+*.vscode/
+
+# Rider
+.idea/
+*.sln.iml

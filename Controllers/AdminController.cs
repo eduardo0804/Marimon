@@ -11,6 +11,11 @@ namespace Marimon.Controllers
             return View();
         }
 
+        // GET: AdminController
+        public ActionResult RegistrarAutopartes()
+        {
+            return View("~/Views/Admin/RegistrarAutoparte.cshtml");
+        }
         // GET: AdminController/Details/5
         public ActionResult Details(int id)
         {
