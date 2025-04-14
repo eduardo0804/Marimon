@@ -3,60 +3,51 @@
     ViewBag.FullWidthLayout = true;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <style>
-    .full-width-banner {
-        width: 100vw;
-        overflow: hidden;
-        position: relative;
-        margin-left: calc(-50vw + 50%);
-        margin-top: 0;
+    .container {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    .full-width-banner img {
-        width: 100%;
-        height: auto;
-        display: block;
-        filter: brightness(70%);
+    .bg-black {
+        background-color: #000 !important;
+    }
+
+    .btn {
+        display: none;
     }
 
     .banner-text {
         position: absolute;
-        top: 40%;
-        left: 10%;
-        color: white;
-    }
-
-    .form-label {
-        font-weight: 600;
-    }
-
-    .contact-section p {
-        margin-bottom: 0.5rem;
-    }
-
-    .contact-section strong {
-        display: block;
-        margin-bottom: 0.3rem;
+        top: 50%;
+        left: 40px;
+        transform: translateY(-50%);
     }
 </style>
 
 <!-- Banner Superior -->
-<div class="full-width-banner">
+<div class="container-fluid full-width-banner p-0 position-relative">
     <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
-        alt="Banner Scanner" />
-    <div class="banner-text">
-        <h4 class="text-uppercase">TALLER ESPECIALIZADO EN</h4>
-        <h2 class="fw-bold">Vehículos Europeos y Americanos</h2>
-        <a href="#formulario" class="btn btn-danger mt-3">INSPECCIONAR</a>
+        alt="Banner Scanner" class="img-fluid w-100" />
+    <div class="banner-text position-absolute top-10 start-0 ps-5 text-white">
+        <h4 class="text-uppercase fw-bold fs-7">TALLER ESPECIALIZADO EN</h4>
+        <h2 class="fw-bold fs-5">Vehículos Europeos y Americanos</h2>
     </div>
 </div>
 
-<!-- Contenido -->
-<div class="container-fluid mt-4 px-4"> <!-- Usamos container-fluid + padding lateral opcional -->
 
-    <!-- Sección de Título -->
-    <h2 class="text-center bg-dark text-white py-5">Servicio de Diagnóstico y Scanner</h2>
+<!-- Contenido -->
+<!-- Sección de Título -->
+<div class="container-fluid p-0 m-0 pt-3">
+    <h2 class="text-center text-white py-5 w-100 bg-black">
+        Servicio de Diagnóstico y Scanner
+    </h2>
+</div>
+
+<div class="container-fluid mt-4 px-4"> <!-- Usamos container-fluid + padding lateral opcional -->
 
     <!-- Imagen y descripción -->
     <div class="row my-5 align-items-center">
@@ -74,57 +65,43 @@
     <hr />
 
     <!-- Sección de Reserva -->
-    <div class="row align-items-center my-5">
-        <!-- Imagen a la izquierda -->
-        <div class="col-md-6 text-center">
-            <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
-                alt="Reserva tu Servicio" class="img-fluid rounded shadow" style="max-height: 300px;" />
-        </div>
+    <div class="container my-5">
+        <div class="row align-items-center">
+            <!-- Imagen a la izquierda -->
+            <div class="col-lg-6 col-md-12 text-center mb-4 mb-lg-0">
+                <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
+                    alt="Reserva tu Servicio" class="img-fluid rounded shadow" />
+            </div>
 
-        <!-- Formulario a la derecha -->
-        <div class="col-md-6">
-            <h4 class="text-center mb-4">Reserva tu Servicio</h4>
-            <form class="row g-3" id="formulario">
-                <div class="col-md-6">
-                    <label for="nombre" class="form-label">Nombre*</label>
-                    <input type="text" class="form-control" id="nombre" placeholder="Tu nombre" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="apellido" class="form-label">Apellido*</label>
-                    <input type="text" class="form-control" id="apellido" placeholder="Tu apellido" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="placa" class="form-label">Placa*</label>
-                    <input type="text" class="form-control" id="placa" placeholder="ABC123" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="telefono" class="form-label">Número de Teléfono*</label>
-                    <input type="tel" class="form-control" id="telefono" placeholder="+51 900000000" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="fecha" class="form-label">Fecha*</label>
-                    <input type="date" class="form-control" id="fecha" required>
-                </div>
-                <div class="col-md-6 d-flex align-items-end">
-                    <button type="submit" class="btn btn-danger w-100">RESERVAR CITA</button>
-                </div>
-            </form>
+            <!-- Formulario a la derecha -->
+            <div class="col-lg-6 col-md-12">
+                <h4 class="text-center mb-4">Reserva tu Servicio</h4>
+                <form class="row g-3" id="formulario">
+                    <div class="col-sm-6">
+                        <label for="nombre" class="form-label">Nombre*</label>
+                        <input type="text" class="form-control" id="nombre" placeholder="Tu nombre" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="apellido" class="form-label">Apellido*</label>
+                        <input type="text" class="form-control" id="apellido" placeholder="Tu apellido" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="placa" class="form-label">Placa*</label>
+                        <input type="text" class="form-control" id="placa" placeholder="ABC123" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="telefono" class="form-label">Número de Teléfono*</label>
+                        <input type="tel" class="form-control" id="telefono" placeholder="+51 900000000" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="fecha" class="form-label">Fecha*</label>
+                        <input type="date" class="form-control" id="fecha" required>
+                    </div>
+                    <div class="col-sm-6 d-flex align-items-end ">
+                        <button type="submit" class="btn2 btn-danger w-100 btn-lg">RESERVAR CITA</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
-    <!-- Sección de Contacto 
-    <h4 class="text-center mb-4">CONTÁCTANOS</h4>
-
-    <div class="row text-center contact-section">
-        <div class="col-md-4">
-            <p><strong>Email:</strong> maximito@gmail.com</p>
-        </div>
-        <div class="col-md-4">
-            <p><strong>Teléfonos:</strong> +51 956456357<br />+51 970742114</p>
-        </div>
-        <div class="col-md-4">
-            <p><strong>Dirección:</strong> Jr. Los Águilas 284 - Ofic. 103, Bellavista</p>
-        </div>
-    </div>-->
-
 </div>
