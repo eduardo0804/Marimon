@@ -1,229 +1,74 @@
 @model List<Marimon.Controllers.Repuesto>
 
-@{
+    @{
     ViewData["Title"] = "Catálogo - AUTOMOTRIZ MARIMON S.A.C";
-}
+    }
 
-<div class="container catalogo-container">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="text-center">Catálogo de Repuestos</h2>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Filtros -->
-        <div class="col-md-3">
-            <div class="filtros-container shadow-sm p-4 mb-4 bg-white rounded">
-                <h5 class="mb-3">Filtrar por:</h5>
-                
-                <div class="mb-2">
-                    <input type="text" class="form-control" placeholder="Buscar...">
-                </div>
-                
-                <div class="accordion" id="accordionFiltros">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroMarca">
-                                Marca
-                            </button>
-                        </h2>
-                        <div id="filtroMarca" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="marca1">
-                                    <label class="form-check-label" for="marca1">Marca 1</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="marca2">
-                                    <label class="form-check-label" for="marca2">Marca 2</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="marca3">
-                                    <label class="form-check-label" for="marca3">Marca 3</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroCategoria">
-                                Categoría
-                            </button>
-                        </h2>
-                        <div id="filtroCategoria" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="categoria1">
-                                    <label class="form-check-label" for="categoria1">Llantas</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="categoria2">
-                                    <label class="form-check-label" for="categoria2">Frenos</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="categoria3">
-                                    <label class="form-check-label" for="categoria3">Suspensión</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroPrecio">
-                                Precio
-                            </button>
-                        </h2>
-                        <div id="filtroPrecio" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Min: S/50</span>
-                                    <span>Max: S/200</span>
-                                </div>
-                                <input type="range" class="form-range" min="50" max="200" value="150" id="precioRange">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Productos -->
-        <div class="col-md-9">
-            <div class="row mb-3">
-                <div class="col-12 d-flex justify-content-between align-items-center">
-                    <div class="ordenar-por d-flex align-items-center">
-                        <span class="me-2">Ordenar por:</span>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-success rounded-pill px-3">Relevancia</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Precio</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Más nuevo</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                @foreach (var repuesto in Model)
-                {
-                    <div class="col-md-4 mb-4">
-                        <div class="card producto-card h-100 shadow-sm">
-                            <div class="p-3 text-center">
-                                <img src="@Url.Content(repuesto.Imagen)" class="card-img-top producto-img" alt="@repuesto.Nombre">
-                            </div>
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Repuesto @repuesto.Id</h5>
-                                <p class="card-text precio">Precio: <strong>S/ @repuesto.Precio.ToString("0.00")</strong></p>
-                                <button class="btn btn-dark rounded-pill btn-sm px-3">Añadir Carrito</button>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-            
-            <div class="row mt-4">
-                <div class="col-12">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Siguiente</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Carrito lateral (inicialmente oculto) -->
-<div id="carritoLateral" class="carrito-lateral d-none">
-    <div class="d-flex justify-content-between align-items-center px-3 pt-2">
-        <h5 class="mb-0">🛒 Carrito</h5>
-        <button id="cerrarCarrito" class="btn btn-sm btn-outline-secondary">&times;</button>
-    </div>
-    <ul class="lista-carrito list-unstyled px-3 mt-2"></ul>
-    <div class="subtotal px-3 mt-2">
-        <strong>Subtotal:</strong> <span id="subtotal">S/ 0.00</span>
-    </div>
-    <div class="text-center mt-3 mb-2">
-        <a  a asp-controller="Carrito" asp-action="Index" class="btn btn-ver-carrito">Ver Carrito</a>
-    </div>
-</div>
-
-
-@section Styles {
     <style>
-        
+
+
         .catalogo-container {
             font-family: 'Nunito', sans-serif;
             padding: 30px 0;
         }
-        
+
         .filtros-container {
             border-radius: 10px;
             background-color: #f9f9f9;
         }
-        
+
         .producto-card {
             border-radius: 10px;
             overflow: hidden;
             transition: all 0.3s ease;
             border: 1px solid #eee;
         }
-        
-        .producto-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-        }
-        
+
+            .producto-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+            }
+
         .producto-img {
             height: 150px;
             object-fit: contain;
             padding: 10px;
         }
-        
+
         .precio {
             color: #333;
             font-size: 0.9rem;
         }
-        
+
         .pagination .page-item.active .page-link {
             background-color: #343a40;
             border-color: #343a40;
         }
-        
+
         .pagination .page-link {
             color: #343a40;
         }
-        
+
         .btn-success {
             background-color: #28a745;
             border-color: #28a745;
         }
-        
+
         .accordion-button:not(.collapsed) {
             background-color: #f8f9fa;
             color: #333;
         }
-        
+
         .accordion-button:focus {
             box-shadow: none;
             border-color: rgba(0,0,0,.125);
         }
-        
+
         .form-check-input:checked {
             background-color: #28a745;
             border-color: #28a745;
         }
-        
+
         .carrito-lateral {
             position: fixed;
             top: 100px;
@@ -274,9 +119,9 @@
             transition: background 0.2s ease;
         }
 
-        .lista-carrito .btn-outline-secondary:hover {
-            background-color: #ddd;
-        }
+            .lista-carrito .btn-outline-secondary:hover {
+                background-color: #ddd;
+            }
 
         .subtotal {
             font-size: 1rem;
@@ -286,135 +131,144 @@
             margin-top: 10px;
             padding-top: 10px;
         }
-
-        #cerrarCarrito {
-            font-size: 1.5rem;
-            padding: 0 10px;
-            color: #999;
-        }
-
-        #cerrarCarrito:hover {
-            color: #000;
-        }
-
-        .btn-ver-carrito {
-            background-color: #dc3545;
-            color: white;
-            font-weight: bold;
-            border-radius: 20px;
-            padding: 8px 24px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
-
     </style>
-}
 
-@section Scripts {
-    <script>
-        $(document).ready(function() {
-            let carrito = JSON.parse(localStorage.getItem('carrito')) || []; // Recuperar carrito desde localStorage
-            let subtotal = 0;
+    <div class="container catalogo-container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="text-center">Catálogo de Repuestos</h2>
+            </div>
+        </div>
 
-            // Mostrar carrito al añadir producto
-            $('.btn-dark').on('click', function () {
-                const card = $(this).closest('.producto-card');
-                const nombre = card.find('.card-title').text();
-                const precioText = card.find('.precio strong').text();
-                const precio = parseFloat(precioText.replace('S/', '').trim());
-                const imagen = card.find('img').attr('src');
+        <div class="row">
+            <!-- Filtros -->
+            <div class="col-md-3">
+                <div class="filtros-container shadow-sm p-4 mb-4 bg-white rounded">
+                    <h5 class="mb-3">Filtrar por:</h5>
 
-                // Verifica si el producto ya está en el carrito
-                let existente = carrito.find(item => item.nombre === nombre);
-                if (existente) {
-                    existente.cantidad += 1; // Si existe, aumenta la cantidad
-                } else {
-                    carrito.push({ nombre, precio, imagen, cantidad: 1 }); // Si no existe, lo agrega al carrito
-                }
+                    <div class="mb-2">
+                        <input type="text" class="form-control" placeholder="Buscar...">
+                    </div>
 
-                // Actualiza subtotal
-                subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
-
-                // Muestra el carrito lateral
-                $('#carritoLateral').removeClass('d-none');
-
-                // Renderiza el carrito en el lateral
-                renderizarCarrito();
-
-                // Muestra el subtotal actualizado
-                $('#subtotal').text('S/ ' + subtotal.toFixed(2));
-
-                // Guardar carrito actualizado en localStorage
-                localStorage.setItem('carrito', JSON.stringify(carrito));
-
-                // Log para mostrar el carrito y la cantidad de productos
-                console.log('Carrito guardado en localStorage:', carrito);
-                console.log('Cantidad de productos en el carrito:', carrito.length);
-            });
-
-            function renderizarCarrito() {
-                $('.lista-carrito').html(''); // Limpiar la lista antes de renderizar
-
-                carrito.forEach((item, index) => {
-                    $('.lista-carrito').append(`
-                        <li class="d-flex align-items-center">
-                            <img src="${item.imagen}" alt="${item.nombre}">
-                            <div class="flex-grow-1">
-                                <div><strong>${item.nombre}</strong></div>
-                                <div class="text-muted">S/ ${item.precio.toFixed(2)}</div>
+                    <div class="accordion" id="accordionFiltros">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroMarca">
+                                    Marca
+                                </button>
+                            </h2>
+                            <div id="filtroMarca" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="marca1">
+                                        <label class="form-check-label" for="marca1">Marca 1</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="marca2">
+                                        <label class="form-check-label" for="marca2">Marca 2</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="marca3">
+                                        <label class="form-check-label" for="marca3">Marca 3</label>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <button class="btn btn-sm btn-outline-secondary disminuir" data-index="${index}">−</button>
-                                <span class="mx-2">${item.cantidad}</span>
-                                <button class="btn btn-sm btn-outline-secondary aumentar" data-index="${index}">+</button>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroCategoria">
+                                    Categoría
+                                </button>
+                            </h2>
+                            <div id="filtroCategoria" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="categoria1">
+                                        <label class="form-check-label" for="categoria1">Llantas</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="categoria2">
+                                        <label class="form-check-label" for="categoria2">Frenos</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="categoria3">
+                                        <label class="form-check-label" for="categoria3">Suspensión</label>
+                                    </div>
+                                </div>
                             </div>
-                        </li>
-                    `);
-                });
-            }
+                        </div>
 
-            // Delegación de eventos para aumentar/disminuir la cantidad
-            $(document).on('click', '.aumentar', function () {
-                const index = $(this).data('index');
-                carrito[index].cantidad += 1;
-                actualizarCarrito();
-            });
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroPrecio">
+                                    Precio
+                                </button>
+                            </h2>
+                            <div id="filtroPrecio" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Min: S/50</span>
+                                        <span>Max: S/200</span>
+                                    </div>
+                                    <input type="range" class="form-range" min="50" max="200" value="150" id="precioRange">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            $(document).on('click', '.disminuir', function () {
-                const index = $(this).data('index');
-                carrito[index].cantidad -= 1;
-                if (carrito[index].cantidad <= 0) {
-                    carrito.splice(index, 1); // Elimina el producto si la cantidad es 0 o menos
+            <!-- Productos -->
+            <div class="col-md-9">
+                <div class="row mb-3">
+                    <div class="col-12 d-flex justify-content-between align-items-center">
+                        <div class="ordenar-por d-flex align-items-center">
+                            <span class="me-2">Ordenar por:</span>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-success rounded-pill px-3">Relevancia</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Precio</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Más nuevo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    @foreach (var repuesto in Model)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card producto-card h-100 shadow-sm">
+                            <div class="p-3 text-center">
+                                <img src="@Url.Content(repuesto.Imagen)" class="card-img-top producto-img" alt="@repuesto.Nombre">
+                            </div>
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Repuesto @repuesto.Id</h5>
+                                <p class="card-text precio">Precio: <strong>S/ @repuesto.Precio.ToString("0.00")</strong></p>
+                                <button class="btn btn-dark rounded-pill btn-sm px-3">Añadir Carrito</button>
+                            </div>
+                        </div>
+                    </div>
                 }
-                actualizarCarrito();
-            });
+                </div>
 
-            function actualizarCarrito() {
-                // Recalcula el subtotal
-                subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
-
-                // Renderiza el carrito actualizado
-                renderizarCarrito();
-
-                // Muestra el subtotal actualizado
-                $('#subtotal').text('S/ ' + subtotal.toFixed(2));
-
-                // Guardar el carrito actualizado en localStorage
-                localStorage.setItem('carrito', JSON.stringify(carrito));
-            }
-
-            // Cerrar carrito lateral al hacer clic en "×"
-            $('#cerrarCarrito').on('click', function () {
-                $('#carritoLateral').addClass('d-none');
-            });
-
-            // Al cargar la página, verificar si hay productos en el carrito
-            if (carrito.length > 0) {
-                $('#carritoLateral').removeClass('d-none'); // Mostrar el carrito lateral si no está vacío
-                renderizarCarrito(); // Renderiza los productos en el carrito
-                subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
-                $('#subtotal').text('S/ ' + subtotal.toFixed(2)); // Muestra el subtotal al cargar
-            }
-        });
-    </script>
-}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
