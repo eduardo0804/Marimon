@@ -22,6 +22,12 @@ namespace Marimon.Controllers
             return View();
         }
 
+        public IActionResult Side()
+        {
+            return PartialView("_Side");
+        }
+
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
