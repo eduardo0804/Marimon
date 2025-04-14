@@ -1,50 +1,165 @@
 ﻿@{
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Módulo de Autopartes</title>
+    <title>@ViewData["Title"] - Panel de Administración</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/menus.css" asp-append-version="true" />
+    <style>
+        .sidebar {
+            min-height: calc(100vh - 56px - 56px);
+        }
+        .nav-link {
+            color: #212529;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <!-- Cabecera -->
     <div class="container-fluid px-0">
-
-
         <!-- Banner rojo con título -->
-        <div class="bg-danger text-white py-2">
-            <div class="container-fluid d-flex justify-content-between align-items-center">
-                <h2 class="mb-0">MODULO DE AUTOPARTES</h2>
-                <i class="fas fa-user-circle fa-2x"></i>
-            </div>
+
+        <!-- Navbar de administración -->
+<header>
+    <div class="contenedor-menu">
+        <!-- Logo izquierdo -->
+        <div class="logo-contenedor">
+            <a href="#" class="logo">
+                <img src="~/images/logo_marimon.png" alt="Logo" style="width: 140px;">
+            </a>
         </div>
 
-        <!-- Contenido principal -->
-        <div class="container-fluid py-4">
-            @RenderBody()
+        <!-- Menú central con 4 opciones -->
+        <ul class="primer_menu">
+            <li class="dropdown">
+                <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            </li>
+            <li class="dropdown">
+                <a href="#"><i class="fas fa-box"></i>Consulatar Autopartes</a>
+                <ul class="drop-menu">
+                    <li><a href="#">Listar Productos</a></li>
+                    <li><a href="#">Agregar Producto</a></li>
+                    <li><a href="#">Categorías</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#"><i class="fas fa-users"></i>Autopartes</a>
+                <ul class="drop-menu">
+                    <li><a href="#">Listar Usuarios</a></li>
+                    <li><a href="#">Agregar Usuario</a></li>
+                    <li><a href="#">Roles</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#"><i class="fas fa-cogs"></i> Configuración</a>
+            </li>
+        </ul>
+
+        <!-- Menú usuario derecho -->
+        <ul class="segundo_menu">
+            <li class="dropdown-user">
+                <a href="#"><i class="fas fa-user-circle"></i> Admin</a>
+                <ul class="drop-menu-user">
+                    <li><a href="#">Mi perfil</a></li>
+                    <li><a href="#">Configuración</a></li>
+                    <li>
+                        <form>
+                            <button type="submit">Cerrar sesión</button>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <!-- Botones para móvil (necesarios para la funcionalidad responsive) -->
+        <input type="checkbox" id="menu-btn" class="hidden-input">
+        <input type="checkbox" id="close-btn" class="hidden-input">
+        <label for="menu-btn" class="btn menu-btn"><i class="fas fa-bars"></i></label>
+        <label for="close-btn" class="btn close-btn"><i class="fas fa-times"></i></label>
+    </div>
+
+    <!-- Menú móvil (necesario para la versión responsive) -->
+    <div class="movil_menu">
+        <div class="close-btn-inside">
+            <label for="close-btn"><i class="fas fa-times"></i></label>
         </div>
+
+        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+
+        <div class="dropdown-movil">
+            <input type="checkbox" id="showProductos-movil" class="hidden-input">
+            <label for="showProductos-movil"><i class="fas fa-box"></i> Productos <i class="fas fa-chevron-down float-end mt-2"></i></label>
+            <ul class="drop-menu-movil">
+                <li><a href="#">Listar Productos</a></li>
+                <li><a href="#">Agregar Producto</a></li>
+                <li><a href="#">Categorías</a></li>
+            </ul>
+        </div>
+
+        <div class="dropdown-movil">
+            <input type="checkbox" id="showUsuarios-movil" class="hidden-input">
+            <label for="showUsuarios-movil"><i class="fas fa-users"></i> Usuarios <i class="fas fa-chevron-down float-end mt-2"></i></label>
+            <ul class="drop-menu-movil">
+                <li><a href="#">Listar Usuarios</a></li>
+                <li><a href="#">Agregar Usuario</a></li>
+                <li><a href="#">Roles</a></li>
+            </ul>
+        </div>
+
+        <a href="#"><i class="fas fa-cogs"></i> Configuración</a>
+
+        <div class="dropdown-user-movil">
+            <input type="checkbox" id="showAdmin-movil" class="hidden-input">
+            <label for="showAdmin-movil"><i class="fas fa-user-circle"></i> Admin <i class="fas fa-chevron-down float-end mt-2"></i></label>
+            <ul class="drop-menu-movil">
+                <li><a href="#">Mi perfil</a></li>
+                <li><a href="#">Configuración</a></li>
+                <li>
+                    <form class="logout-form-movil">
+                        <button type="submit" class="logout-button-movil">Cerrar sesión</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+
+                <!-- Contenido principal -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                        </ol>
+                    </nav>
+                    @RenderBody()
+                </main>
+
 
         <!-- Footer -->
         <footer class="bg-danger text-white py-2 mt-4">
             <div class="container-fluid">
-                <div class="row align-items-baseline">
-                    <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-6">
                         <small>Copyright 2021 © Maritimori</small>
                     </div>
-
-                    <div class="col-md-4 text-end">
+                    <div class="col-md-6 text-end">
                         <small>Developed by "Name_Grupo"</small>
                     </div>
                 </div>
             </div>
         </footer>
     </div>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
