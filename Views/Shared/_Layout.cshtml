@@ -91,7 +91,13 @@
                 <a asp-area="" asp-controller="Catalogo" asp-action="Index">CATÁLOGOS</a>
                 <a asp-area="" asp-controller="Nosotros" asp-action="Index">NOSOTROS</a>
 
-                <a asp-controller="Carrito" asp-action="Index" class="cart-icon-movil"><i class="fa-solid fa-cart-shopping"></i> Carrito</a>
+                @* <a asp-controller="Carrito" asp-action="Index" class="cart-icon-movil"><i class="fa-solid fa-cart-shopping"></i> Carrito</a> *@
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
+                    Ver carrito
+                </button>
+
+
+
                 <!-- Dropdown Iniciar Sesión móvil -->
                 <partial name="_LoginPartial_Movil" />
             </nav>
@@ -165,7 +171,7 @@
             </div>
         </div>
     </footer>
-
+    @await Html.PartialAsync("~/Views/Carrito/_Side.cshtml")
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!--<script src="~/js/site.js" asp-append-version="true"></script> -->

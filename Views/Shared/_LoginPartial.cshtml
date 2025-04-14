@@ -5,8 +5,10 @@
 <link rel="stylesheet" href="~/css/menus.css" />
 
 <nav class="segundo_menu">
-    <a asp-area="" asp-controller="Carrito" asp-action="Index" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a>
-    
+    @* <a asp-area="" asp-controller="Carrito" asp-action="Index" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a> *@
+    <a href="#" class="cart-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito" aria-controls="offcanvasCarrito">
+        <i class="fa-solid fa-cart-shopping"></i>
+    </a>
     @if (SignInManager.IsSignedIn(User))
     {
         <!-- Dropdown para usuario logueado -->
@@ -28,4 +30,5 @@
         <!-- Para usuario no logueado -->
         <a asp-area="Identity" asp-page="/Account/Login">Iniciar Sesión</a>
     }
+
 </nav>
