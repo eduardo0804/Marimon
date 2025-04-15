@@ -4,6 +4,7 @@
 
 using System;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -43,6 +44,9 @@ namespace Marimon.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public string EmailConfirmationUrl { get; set; }
+        
+        [TempData]
+        public string StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string email, string returnUrl = null)
         {
@@ -55,24 +59,52 @@ namespace Marimon.Areas.Identity.Pages.Account
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return NotFound($"Unable to load user with email '{email}'.");
+                return NotFound($"No se pudo cargar el usuario con el correo '{email}'.");
             }
 
             Email = email;
-            // Once you add a real email sender, you should remove this code that lets you confirm the account
-            DisplayConfirmAccountLink = true;
-            if (DisplayConfirmAccountLink)
+            // Cambiamos a false porque estamos usando un servicio de correo real
+            DisplayConfirmAccountLink = false;
+
+            return Page();
+        }
+        
+        public async Task<IActionResult> OnPostAsync()
+        {
+            // Obtener el correo del formulario
+            string email = Request.Form["Email"].ToString();
+            
+            if (string.IsNullOrEmpty(email))
             {
-                var userId = await _userManager.GetUserIdAsync(user);
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                EmailConfirmationUrl = Url.Page(
-                    "/Account/ConfirmEmail",
-                    pageHandler: null,
-                    values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                    protocol: Request.Scheme);
+                StatusMessage = "Error: El correo electrónico es requerido.";
+                return Page();
+            }
+            
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // No indicamos que el usuario no existe por razones de seguridad
+                StatusMessage = "Se ha enviado el correo de verificación. Por favor revisa tu bandeja de entrada.";
+                Email = email;
+                return Page();
             }
 
+            var userId = await _userManager.GetUserIdAsync(user);
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = Url.Page(
+                "/Account/ConfirmEmail",
+                pageHandler: null,
+                values: new { userId = userId, code = code },
+                protocol: Request.Scheme);
+                
+            await _sender.SendEmailAsync(
+                email,
+                "Confirma tu correo electrónico",
+                $"Por favor confirma tu cuenta haciendo <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clic aquí</a>.");
+
+            StatusMessage = "Se ha reenviado el correo de verificación. Por favor revisa tu bandeja de entrada.";
+            Email = email;
             return Page();
         }
     }
