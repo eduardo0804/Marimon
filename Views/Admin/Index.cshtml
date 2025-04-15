@@ -1,51 +1,96 @@
-﻿@{
+﻿
+@{
     Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Módulo de Autopartes - Administración";
 }
+
+
+
 <!-- Contenido principal -->
 <main class="container my-4">
     <div class="row g-4">
         <!-- Consultar Autopartes -->
         <div class="col-md-6">
-            <div class="card text-center">
-                <img src="~/images/car.jpg" class="card-img-top" alt="Consultar Autopartes">
-                <div class="card-body bg-dark text-white">
-                    <h5 class="card-title">CONSULTAR AUTOPARTES</h5>
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100 shadow-sm rounded-3 border-0 hover-zoom">
+                    <div class="card-img-container position-relative overflow-hidden" style="height: 200px;">
+                        <img src="~/images/admin-foto-1.png" class="card-img-top h-100 object-fit-cover" alt="Consultar Autopartes">
+                    </div>
+                    <div class="card-footer bg-dark text-white py-3 text-center border-0">
+                        <h5 class="card-title mb-0 text-uppercase fw-bold">Consultar Autopartes</h5>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+
         <!-- Autopartes -->
         <div class="col-md-6">
-            <div class="card text-center">
-                <img src="~/images/car-parts.jpg" class="card-img-top" alt="Autopartes">
-                <div class="card-body bg-dark text-white">
-                    <h5 class="card-title">AUTOPARTES</h5>
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100 shadow-sm rounded-3 border-0 hover-zoom">
+                    <div class="card-img-container position-relative overflow-hidden" style="height: 200px;">
+                        <img src="~/images/admin-foto-2.png" class="card-img-top h-100 object-fit-cover" alt="Autopartes">
+                    </div>
+                    <div class="card-footer bg-dark text-white py-3 text-center border-0">
+                        <h5 class="card-title mb-0 text-uppercase fw-bold">Autopartes</h5>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+
         <!-- Flujo de Autopartes -->
         <div class="col-md-6">
-            <div class="card text-center">
-                <div class="row g-0">
-                    <div class="col-6">
-                        <img src="~/images/entradas.jpg" class="img-fluid" alt="Entradas">
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100 shadow-sm rounded-3 border-0 hover-zoom">
+                    <div class="row g-0 card-img-container position-relative overflow-hidden" style="height: 200px;">
+                        <div class="col-6 h-100 border-end border-light">
+                            <div class="p-2 h-100 d-flex flex-column justify-content-center align-items-center bg-light">
+                                <img src="~/images/admin-foto-3.png" class="img-fluid rounded-start" alt="Entradas">
+                                <span class="badge bg-primary mt-2">ENTRADAS</span>
+                            </div>
+                        </div>
+                        <div class="col-6 h-100">
+                            <div class="p-2 h-100 d-flex flex-column justify-content-center align-items-center bg-light">
+                                <img src="~/images/admin-foto-3.png" class="img-fluid rounded-end" alt="Salidas">
+                                <span class="badge bg-danger mt-2">SALIDAS</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <img src="~/images/salidas.jpg" class="img-fluid" alt="Salidas">
+                    <div class="card-footer bg-dark text-white py-3 text-center border-0">
+                        <h5 class="card-title mb-0 text-uppercase fw-bold">Flujo de Autopartes</h5>
                     </div>
                 </div>
-                <div class="card-body bg-dark text-white">
-                    <h5 class="card-title">FLUJO DE AUTOPARTES</h5>
-                </div>
-            </div>
+            </a>
         </div>
+
         <!-- Reportes -->
         <div class="col-md-6">
-            <div class="card text-center">
-                <img src="~/images/reports.jpg" class="card-img-top" alt="Reportes">
-                <div class="card-body bg-dark text-white">
-                    <h5 class="card-title">REPORTES</h5>
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100 shadow-sm rounded-3 border-0 hover-zoom">
+                    <div class="card-img-container position-relative overflow-hidden" style="height: 200px;">
+                        <img src="~/images/admin-foto-1.png" class="card-img-top h-100 object-fit-cover" alt="Reportes">
+                    </div>
+                    <div class="card-footer bg-dark text-white py-3 text-center border-0">
+                        <h5 class="card-title mb-0 text-uppercase fw-bold">Reportes</h5>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </main>
+
+
+<!-- Estilos adicionales -->
+<style>
+    .hover-zoom {
+        transition: transform 0.3s ease;
+    }
+    
+    .hover-zoom:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .object-fit-cover {
+        object-fit: cover;
+    }
+</style>
