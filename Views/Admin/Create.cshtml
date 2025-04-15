@@ -1,0 +1,53 @@
+@model Marimon.Models.Autoparte
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewBag.Title = "Registrar Autoparte";
+}
+
+<div class="container mt-4" style="max-width: 400px;">
+    <h3 class="text-center" style="color: #E42229;">Registrar Autoparte</h3>
+
+    <form asp-action="Create" asp-controller="Admin" enctype="multipart/form-data" method="post">
+        <div class="form-group mt-3">
+            <label for="aut_nombre">Nombre <span class="text-danger">*</span></label>
+            <input asp-for="aut_nombre" class="form-control" required />
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="aut_descripcion">Descripción <span class="text-danger">*</span></label>
+            <textarea asp-for="aut_descripcion" class="form-control" rows="2" required></textarea>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="aut_especificacion">Especificaciones <span class="text-danger">*</span></label>
+            <textarea asp-for="aut_especificacion" class="form-control" rows="2" required></textarea>
+        </div>
+
+        <div class="form-row mt-3 d-flex gap-2">
+            <div class="form-group w-50">
+                <label for="aut_precio">Precio <span class="text-danger">*</span></label>
+                <input asp-for="aut_precio" class="form-control" step="0.01" required />
+            </div>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="imagen">Imagen</label>
+            <input type="file" class="form-control" name="imagen" />
+
+            <!-- Mostrar mensaje de error si no se cargó la imagen -->
+            <span asp-validation-for="aut_imagen" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="CategoriaId">Categoría <span class="text-danger">*</span></label>
+            <select asp-for="CategoriaId" class="form-control" asp-items="@(ViewBag.Categorias as SelectList)">
+                <option value="">-- Selecciona una categoría --</option>
+            </select>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" >Registrar</button>
+        </div>
+    </form>
+</div>

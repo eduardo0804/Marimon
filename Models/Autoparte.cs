@@ -15,6 +15,7 @@ namespace Marimon.Models
         public decimal aut_precio { get; set; }
         public string aut_especificacion { get; set; }
         public string aut_imagen { get; set; }
+        public int CategoriaId { get; set; } 
 
         [ForeignKey("CategoriaId")]
         public Categoria? Categoria { get; set; }
