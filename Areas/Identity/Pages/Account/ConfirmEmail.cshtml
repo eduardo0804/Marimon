@@ -1,8 +1,12 @@
-﻿@page
-@model ConfirmEmailModel
+﻿@model ConfirmEmailModel
 @{
-    ViewData["Title"] = "Confirm email";
+    ViewData["Title"] = "Confirmación de correo electrónico";
 }
 
 <h1>@ViewData["Title"]</h1>
 <partial name="_StatusMessage" model="Model.StatusMessage" />
+
+
+<div class="text-center mt-4">
+    <p>Tu cuenta ha sido activada correctamente. Ahora puedes iniciar sesión con tus credenciales.</p>
+</div>

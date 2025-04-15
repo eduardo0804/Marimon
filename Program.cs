@@ -15,8 +15,6 @@ var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConn
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
-
 /*builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>(); ELIMINAR*/
 
@@ -64,7 +62,7 @@ builder.Services.AddRazorPages();
 // Protección de datos persistente en carpeta del contenedor
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
-    .SetApplicationName("marimon_defaultd");
+    .SetApplicationName("Marimon");
 var app = builder.Build();
 // Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Marimon.Areas.Identity.Pages.Account
 {
@@ -25,17 +26,21 @@ namespace Marimon.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
+            // Cierra la sesión principal
             await _signInManager.SignOutAsync();
+            
+            // Cierra también la sesión externa (importante para autenticación con Google)
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            
             _logger.LogInformation("User logged out.");
+            
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);
             }
             else
             {
-                // This needs to be a redirect so that the browser performs a new
-                // request and the identity for the user gets updated.
-                return RedirectToPage();
+                return LocalRedirect("~/");  // Redirecciona siempre a la página principal
             }
         }
     }
