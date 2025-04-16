@@ -85,7 +85,7 @@ namespace Marimon.Areas.Identity.Pages.Account
             [EmailAddress]
             public string Email { get; set; }
         }
-        
+
         public IActionResult OnGet() => RedirectToPage("./Login");
 
         public IActionResult OnPost(string provider, string returnUrl = null)
@@ -94,6 +94,13 @@ namespace Marimon.Areas.Identity.Pages.Account
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
+        }
+
+        // Función para limpiar el nombre de usuario
+        private string CleanUserName(string userName)
+        {
+            // Reemplazar caracteres no permitidos con un guion bajo
+            return new string(userName.Where(char.IsLetterOrDigit).ToArray());
         }
 
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
@@ -125,15 +132,36 @@ namespace Marimon.Areas.Identity.Pages.Account
             else
             {
                 // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                ProviderDisplayName = info.ProviderDisplayName;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email; // Usa el nombre o el correo como fallback
+                var cleanedUserName = CleanUserName(name);
+
+                var user = new IdentityUser
                 {
-                    Input = new InputModel
-                    {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                    UserName = cleanedUserName, // Asignar el nombre como UserName
+                    Email = email,
+                    EmailConfirmed = true // Confirmar automáticamente el correo
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (createResult.Succeeded)
+                {
+                    await _userManager.AddLoginAsync(user, info);
+                    _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+
+                    // Iniciar sesión automáticamente
+                    await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+
+                    return LocalRedirect(returnUrl);
                 }
+
+                foreach (var error in createResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                ProviderDisplayName = info.ProviderDisplayName;
+                ReturnUrl = returnUrl;
                 return Page();
             }
         }
@@ -153,7 +181,12 @@ namespace Marimon.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                // Establecer el UserName como el nombre del usuario o el correo electrónico
+                var userName = info.Principal.HasClaim(c => c.Type == ClaimTypes.Name)
+                    ? info.Principal.FindFirstValue(ClaimTypes.Name)
+                    : Input.Email;
+
+                await _userStore.SetUserNameAsync(user, userName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
                 var result = await _userManager.CreateAsync(user);
@@ -164,25 +197,13 @@ namespace Marimon.Areas.Identity.Pages.Account
                     {
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = userId, code = code },
-                            protocol: Request.Scheme);
+                        // Confirmar el correo automáticamente
+                        user.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(user);
 
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                        // If account confirmation is required, we need to show the link if we don't have a real email sender
-                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                        {
-                            return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
-                        }
-
+                        // Iniciar sesión automáticamente
                         await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+
                         return LocalRedirect(returnUrl);
                     }
                 }
