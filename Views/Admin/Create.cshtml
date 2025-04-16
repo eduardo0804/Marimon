@@ -1,14 +1,10 @@
 @model Marimon.Models.Autoparte
 
-@{
-    Layout = "_LayoutAdmin";
-    ViewBag.Title = "Registrar Autoparte";
-}
-
 <div class="container mt-4" style="max-width: 400px;">
-    <h3 class="text-center" style="color: #E42229;">Registrar Autoparte</h3>
+    <!-- Título dinámico -->
+    <h3 class="text-center" style="color: #E42229;">@ViewBag.Title</h3>
 
-    <form asp-action="Create" asp-controller="Admin" enctype="multipart/form-data" method="post">
+    <form asp-controller="Admin" asp-action="Create" method="post" enctype="multipart/form-data">
         <div class="form-group mt-3">
             <label for="aut_nombre">Nombre <span class="text-danger">*</span></label>
             <input asp-for="aut_nombre" class="form-control" required />
@@ -31,12 +27,10 @@
             </div>
         </div>
 
-        <div class="form-group mt-3">
-            <label for="imagen">Imagen</label>
-            <input type="file" class="form-control" name="imagen" />
-
-            <!-- Mostrar mensaje de error si no se cargó la imagen -->
-            <span asp-validation-for="aut_imagen" class="text-danger"></span>
+        <div class="form-group">
+            <label for="imagen">Imagen <span class="text-danger">*</span></label>
+            <input type="file" class="form-control" name="imagen" id="imagen" required />
+            <span class="text-danger">@Html.ValidationMessage("imagen", null, new { @class = "text-danger" })</span>
         </div>
 
         <div class="form-group mt-3">
@@ -47,7 +41,8 @@
         </div>
 
         <div class="text-center mt-4">
-            <button type="submit" >Registrar</button>
+            <!-- Botón con texto dinámico -->
+            <button type="submit">@ViewBag.ButtonText</button>
         </div>
     </form>
 </div>
