@@ -1,0 +1,107 @@
+@model IEnumerable<Marimon.Models.Autoparte>
+
+@{
+    ViewData["Title"] = "Repuestos y Llantas";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-4">
+    <!-- Encabezado con imagen y texto -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6 text-center">
+            <img src="~/images/auto.png" alt="Auto" class="img-fluid" />
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold">Repuestos y Llantas</h2>
+            <p>
+                Contamos con una amplia variedad de autopartes y llantas para tu vehículo.
+                Consulta la lista y encuentra lo que necesitas.
+            </p>
+        </div>
+    </div>
+
+    <!-- Botón para abrir el modal de registro -->
+    <div class="mb-3">
+        <button  data-bs-toggle="modal" data-bs-target="#registerModal">
+            Registrar nueva autoparte
+        </button>
+    </div>
+
+    <!-- Botón de registro -->
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success">Registrar nueva autoparte</a>
+    </div>
+
+    <!-- Modal de Registro (Carga el formulario de la otra vista) -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Registrar nueva autoparte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    <!-- Aquí se cargará el formulario de la vista separada -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de autopartes -->
+    <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Especificaciones</th>
+                    <th>Precio (S/)</th>
+                    <th>Categoría</th>
+                    <th>Imagen</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.aut_id</td>
+                        <td>@item.aut_nombre</td>
+                        <td>@item.aut_descripcion</td>
+                        <td>@item.aut_especificacion</td>
+                        <td>@item.aut_precio.ToString("F2")</td>
+                        <td>@item.Categoria?.cat_nombre</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.aut_imagen))
+                            {
+                                <img src="@item.aut_imagen" alt="Imagen" class="img-thumbnail" style="width: 60px; height: 60px;" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">Sin imagen</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.aut_id" class="btn btn-warning btn-sm">Modificar</a>
+                            <a asp-action="Delete" asp-route-id="@item.aut_id" class="btn btn-danger btn-sm">Eliminar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Este script carga el formulario desde otra página al abrir el modal
+        $('#registerModal').on('show.bs.modal', function (e) {
+            $.get('@Url.Action("Create", "Admin")', function (data) {
+                $('#modalContent').html(data); // Inserta el contenido en el modal
+            });
+        });
+    </script>
+}
+

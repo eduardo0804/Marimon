@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marimon.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250415002554_Autoparte")]
+    [Migration("20250415144947_Autoparte")]
     partial class Autoparte
     {
         /// <inheritdoc />
