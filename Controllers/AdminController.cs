@@ -29,6 +29,10 @@ namespace Marimon.Controllers
         {
             return View();
         }
+        public ActionResult Entradas()
+        {
+            return View("~/Views/Flujos/Entradas.cshtml");
+        }
         
         // GET: Admin/ListaAutopartes
         public async Task<IActionResult> ListaAutopartes()
