@@ -1,4 +1,4 @@
-@model List<Marimon.Controllers.Repuesto>
+@model List<Marimon.Models.Autoparte>
 
     @{
     ViewData["Title"] = "Catálogo - AUTOMOTRIZ MARIMON S.A.C";
@@ -235,17 +235,17 @@
                 </div>
 
                 <div class="row">
-                    @foreach (var repuesto in Model)
+                    @foreach (var autoparte in Model)
                 {
                     <div class="col-md-4 mb-4">
                         <div class="card producto-card h-100 shadow-sm">
                             <div class="p-3 text-center">
-                                <img src="@Url.Content(repuesto.Imagen)" class="card-img-top producto-img" alt="@repuesto.Nombre">
+                                <img src="@Url.Content(autoparte.aut_imagen)" class="card-img-top producto-img" alt="@autoparte.aut_nombre">
                             </div>
                             <div class="card-body text-center">
-                                <h5 class="card-title">Repuesto @repuesto.Id</h5>
-                                <p class="card-text precio">Precio: <strong>S/ @repuesto.Precio.ToString("0.00")</strong></p>
-                                <button class="btn btn-dark rounded-pill btn-sm px-3">Añadir Carrito</button>
+                                <h5 class="card-title">Autoparte @autoparte.aut_id</h5>
+                                <p class="card-text precio">Precio: <strong>S/ @autoparte.aut_precio.ToString("0.00")</strong></p>
+                                <button type="submit">Añadir Carrito</button>
                             </div>
                         </div>
                     </div>
