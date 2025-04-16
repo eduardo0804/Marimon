@@ -3,7 +3,9 @@
 @{
     ViewData["Title"] = "Repuestos y Llantas";
     Layout = "_LayoutAdmin";
+    
 }
+
 
 <div class="container py-4">
     <!-- Encabezado con imagen y texto -->
@@ -27,11 +29,8 @@
         </button>
     </div>
 
-    <!-- Botón de registro -->
-    <div class="mb-3">
-        <a asp-action="Create" class="btn btn-success">Registrar nueva autoparte</a>
-    </div>
 
+    
     <!-- Modal de Registro (Carga el formulario de la otra vista) -->
     <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -46,6 +45,25 @@
             </div>
         </div>
     </div>
+
+    
+
+    <!-- Modal para editar autoparte -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar autoparte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="modalContentEdit">
+                    <!-- Aquí se cargará el formulario de edición -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- Tabla de autopartes -->
     <div class="table-responsive">
@@ -83,9 +101,13 @@
                             }
                         </td>
                         <td>
-                            <a asp-action="Edit" asp-route-id="@item.aut_id" class="btn btn-warning btn-sm">Modificar</a>
-                            <a asp-action="Delete" asp-route-id="@item.aut_id" class="btn btn-danger btn-sm">Eliminar</a>
-                        </td>
+                            <a href="#" onclick="event.preventDefault(); loadEditModal('@item.aut_id');">
+                                Modificar
+                            </a>
+                            <form asp-action="Eliminar" asp-controller="Admin" asp-route-id="@item.aut_id" method="post" onsubmit="return confirm('¿Estás seguro de eliminar esta autoparte?');">
+                                <button type="submit">Eliminar</button>
+                            </form>
+                     </td>
                     </tr>
                 }
             </tbody>
@@ -96,12 +118,21 @@
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Este script carga el formulario desde otra página al abrir el modal
+        // Este script carga el formulario desde otra página al abrir el modal de registro
         $('#registerModal').on('show.bs.modal', function (e) {
             $.get('@Url.Action("Create", "Admin")', function (data) {
                 $('#modalContent').html(data); // Inserta el contenido en el modal
             });
         });
+
+        // Este script carga el formulario desde otra página al abrir el modal de edición
+        function loadEditModal(aut_id) {
+            $.get('/Admin/Editar/' + aut_id, function (data) {
+                $('#modalContentEdit').html(data);
+                $('#editModal').modal('show');
+            });
+        }
     </script>
+
 }
 

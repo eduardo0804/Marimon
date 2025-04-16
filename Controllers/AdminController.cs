@@ -11,11 +11,13 @@ namespace Marimon.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<AdminController> _logger;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public AdminController(ApplicationDbContext context, ILogger<AdminController> logger)
+        public AdminController(ApplicationDbContext context, ILogger<AdminController> logger, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _logger = logger;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // GET: AdminController
@@ -38,11 +40,13 @@ namespace Marimon.Controllers
         public async Task<IActionResult> ListaAutopartes()
         {
             var autopartes = await _context.Autopartes
-                                        .Include(a => a.Categoria)
-                                        .ToListAsync();
+                .Include(a => a.Categoria)  // Cargar la categoría relacionada
+                .OrderBy(a => a.aut_id) // Aquí defines el orden
+                .ToListAsync();
 
             return View(autopartes);
         }
+
         
         public IActionResult Create()
         {
@@ -132,7 +136,9 @@ namespace Marimon.Controllers
                 _context.Autopartes.Add(autoparte);
                 await _context.SaveChangesAsync();
                 Console.WriteLine("=> Autoparte guardada exitosamente en la base de datos.");
-
+                // Usamos TempData para pasar el mensaje de éxito
+                TempData["SuccessMessage"] = "La autoparte se registró correctamente.";
+                await Task.Delay(3000); 
                 return RedirectToAction("ListaAutopartes", "Admin");
             }
             catch (Exception ex)
@@ -146,53 +152,90 @@ namespace Marimon.Controllers
             }
         }
 
-
-        // GET: AdminController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public IActionResult Editar(int id)
         {
             var autoparte = _context.Autopartes.Find(id);
-            if (autoparte == null) return NotFound();
-            return View(autoparte);
+            if (autoparte == null)
+            {
+                return NotFound();
+            }
+
+            // Llenar el ViewBag con las categorías para el dropdown
+            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
+            
+            return PartialView("_EditarAutoparte", autoparte);
         }
 
-        // POST: AdminController/Edit/5
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Editar(Autoparte autoparte, IFormFile imagen)
         {
-            try
+            // Recuperar la autoparte existente desde la base de datos
+            var autoparteExistente = await _context.Autopartes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.aut_id == autoparte.aut_id);
+
+            if (autoparteExistente == null)
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
+
+            if (imagen != null && imagen.Length > 0)
             {
-                return View();
+                var fileName = Path.GetFileNameWithoutExtension(imagen.FileName);
+                var fileExtension = Path.GetExtension(imagen.FileName);
+                var uniqueFileName = fileName + "_" + Guid.NewGuid().ToString() + fileExtension;
+
+                var imagePath = Path.Combine(_hostingEnvironment.WebRootPath, "images", uniqueFileName);
+
+                using (var stream = new FileStream(imagePath, FileMode.Create))
+                {
+                    await imagen.CopyToAsync(stream);
+                }
+
+                autoparte.aut_imagen = "/images/" + uniqueFileName;
             }
+            else
+            {
+                // Mantener la imagen anterior si no se sube una nueva
+                autoparte.aut_imagen = autoparteExistente.aut_imagen;
+            }
+
+            _context.Autopartes.Update(autoparte);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ListaAutopartes", "Admin");
         }
 
-        // GET: AdminController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            var autoparte = _context.Autopartes.Find(id);
-            if (autoparte == null) return NotFound();
-            return View(autoparte);
-        }
-
-        // POST: AdminController/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> Eliminar(int id)
         {
-            try
+            var autoparte = await _context.Autopartes.FindAsync(id);
+
+            if (autoparte == null)
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
+
+            // Eliminar la imagen del servidor si existe
+            if (!string.IsNullOrEmpty(autoparte.aut_imagen))
             {
-                return View();
+                var rutaImagen = Path.Combine(_hostingEnvironment.WebRootPath, autoparte.aut_imagen.TrimStart('/'));
+
+                if (System.IO.File.Exists(rutaImagen))
+                {
+                    System.IO.File.Delete(rutaImagen);
+                }
             }
+
+            // Eliminar la autoparte de la base de datos
+            _context.Autopartes.Remove(autoparte);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ListaAutopartes", "Admin");
         }
 
-        
+
     }
 }
