@@ -1,6 +1,4 @@
-﻿
-
-/* ========== HEADER GENERAL ========== */
+﻿/* ========== HEADER GENERAL ========== */
 header {
   z-index: 99;
   width: 100%;
@@ -197,7 +195,7 @@ header .contenedor-menu {
 }
 
 /* ========== BOTONES DEL MENÚ MÓVIL ========= */
-.btn {
+.botones {
   display: none;
   color: #ffffff;
   font-size: 22px;
@@ -211,17 +209,17 @@ header .contenedor-menu {
     display: none;
   }
 
-  .btn {
+  .botones {
     display: block;
   }
 
-  .btn.menu-btn {
+  .botones.menu-btn {
     position: absolute;
     right: 30px;
     z-index: 90;
   }
 
-  .btn.close-btn {
+  .botones.close-btn {
     display: none;
     position: absolute;
     right: 30px;
@@ -240,19 +238,19 @@ header .contenedor-menu {
     right: -100%;
   }
 
-  #menu-btn:checked ~ .btn.menu-btn {
+  #menu-btn:checked ~ .botones.menu-btn {
     display: none;
   }
 
-  #menu-btn:checked ~ .btn.close-btn {
+  #menu-btn:checked ~ .botones.close-btn {
     display: block;
   }
 
-  #close-btn:checked ~ .btn.menu-btn {
+  #close-btn:checked ~ .botones.menu-btn {
     display: block;
   }
 
-  #close-btn:checked ~ .btn.close-btn {
+  #close-btn:checked ~ .botones.close-btn {
     display: none;
   }
 

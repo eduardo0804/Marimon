@@ -35,17 +35,19 @@ namespace Marimon.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("/Index");
             }
-
+            
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
-
+            
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
             StatusMessage = result.Succeeded ? "Gracias. Tu correo electrónico ha sido confirmado con éxito." : "Error al confirmar tu correo electrónico.";
+            
             return Page();
         }
+        
     }
 }

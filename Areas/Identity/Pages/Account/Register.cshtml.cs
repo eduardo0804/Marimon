@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Marimon.Data;
+using Marimon.Models;
 
 namespace Marimon.Areas.Identity.Pages.Account
 {
@@ -29,13 +31,15 @@ namespace Marimon.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context; // Agregamos el contexto de base de datos
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context) // Añadimos el parámetro para el contexto
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -43,6 +47,7 @@ namespace Marimon.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context; // Inicializamos el contexto
         }
 
         /// <summary>
@@ -70,32 +75,29 @@ namespace Marimon.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
+            [Required(ErrorMessage = "El campo nombres es obligatorio.")]
+            [Display(Name = "Nombres")]
+            public string Nombres { get; set; }
+
+            [Required(ErrorMessage = "El campo apellidos es obligatorio.")]
+            [Display(Name = "Apellidos")]
+            public string Apellidos { get; set; }
+
+            [Required(ErrorMessage = "El campo Correo electrónico es obligatorio.")]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "El campo Contraseña es obligatorio.")]
+            [StringLength(100, ErrorMessage = "La {0} debe tener al menos {2} y como máximo {1} caracteres.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Contraseña")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            [Required(ErrorMessage = "El campo Contraseña es obligatorio.")]
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Confirmar contraseña")]
+            [Compare("Password", ErrorMessage = "La contraseña y la confirmación no coinciden.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -106,6 +108,8 @@ namespace Marimon.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
+
+
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -113,16 +117,50 @@ namespace Marimon.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
-
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-
+                    
+                    // Obtener el ID generado correctamente
                     var userId = await _userManager.GetUserIdAsync(user);
+                    
+                    try
+                    {
+                        // Crear el registro en nuestra tabla personalizada
+                        var usuario = new Usuario
+                        {
+                            usu_id = userId, // Usamos el ID generado por Identity
+                            usu_nombre = Input.Nombres,
+                            usu_apellido = Input.Apellidos,
+                            usu_correo = Input.Email,
+                            usu_correo_verificado = false,
+                            // No guardar la contraseña en texto plano, Identity ya la gestiona
+                            // usu_contrasenia = Input.Password,
+                            usu_bloqueohab = false,
+                            usu_recuento = 0
+                            // Otros campos según necesites
+                        };
+                        
+                        _context.Usuarios.Add(usuario);
+                        
+                        // Guarda los cambios y verifica si hubo éxito
+                        var saveResult = await _context.SaveChangesAsync();
+                        _logger.LogInformation($"Se guardaron {saveResult} registros en la tabla Usuario");
+                        
+                        if (saveResult <= 0)
+                        {
+                            _logger.LogWarning("No se guardó ningún registro en la tabla Usuario");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Registra cualquier error durante el guardado
+                        _logger.LogError(ex, "Error al guardar en la tabla Usuario");
+                    }
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
@@ -130,11 +168,10 @@ namespace Marimon.Areas.Identity.Pages.Account
                         pageHandler: null,
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
-
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    // Siempre redirigir a RegisterConfirmation, independientemente de la configuración
+                    
+                    // Siempre redirigir a RegisterConfirmation
                     return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                 }
                 foreach (var error in result.Errors)
@@ -142,7 +179,6 @@ namespace Marimon.Areas.Identity.Pages.Account
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
-
             // If we got this far, something failed, redisplay form
             return Page();
         }

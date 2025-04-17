@@ -1,12 +1,23 @@
-﻿@model ConfirmEmailModel
+﻿@page
+@model Marimon.Areas.Identity.Pages.Account.ConfirmEmailModel
 @{
     ViewData["Title"] = "Confirmación de correo electrónico";
 }
 
 <h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
 
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="alert @(Model.StatusMessage?.StartsWith("Error") == true ? "alert-danger" : "alert-success")">
+            @Model.StatusMessage
+        </div>
 
-<div class="text-center mt-4">
-    <p>Tu cuenta ha sido activada correctamente. Ahora puedes iniciar sesión con tus credenciales.</p>
+        @if (!Model.StatusMessage?.StartsWith("Error") == true)
+        {
+            <div class="text-center mt-4">
+                <p>Tu cuenta ha sido activada correctamente. Ahora puedes iniciar sesión con tus credenciales.</p>
+                <a class="btn btn-primary" href="/Identity/Account/Login">Iniciar sesión</a>
+            </div>
+        }
+    </div>
 </div>
