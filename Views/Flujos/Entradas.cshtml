@@ -1,4 +1,4 @@
-@model Marimon.Models.Autoparte
+@model Marimon.Models.Entradas
 @{
     ViewData["Title"] = "Registro de Entradas";
     Layout = "_LayoutAdmin";
@@ -70,10 +70,10 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="aut_id" class="form-label fw-semibold">Producto</label>
+                            <label for="AutoparteId" class="form-label fw-semibold">Producto</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-box"></i></span>
-                                <select id="productoSelect" class="form-select py-2" name="aut_id" disabled>
+                                <select id="productoSelect" class="form-select py-2" name="AutoparteId" disabled>
                                     <option value="">-- Primero seleccione una categoría --</option>
                                 </select>
                             </div>
@@ -81,22 +81,34 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="Cantidad" class="form-label fw-semibold">Cantidad</label>
+                            <label for="ent_cantidad" class="form-label fw-semibold">Cantidad</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
-                                <input name="Cantidad" id="Cantidad" type="number" class="form-control py-2" min="1"
+                                <input name="ent_cantidad" id="ent_cantidad" type="number" class="form-control py-2" min="1"
                                     value="1">
                                 <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('Cantidad').stepUp()">
+                                    onclick="document.getElementById('ent_cantidad').stepUp()">
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('Cantidad').stepDown()">
+                                    onclick="document.getElementById('ent_cantidad').stepDown()">
                                     <i class="fas fa-minus"></i>
                                 </button>
                             </div>
                             <span class="text-danger"></span>
                         </div>
+
+                        <div class="mb-4">
+                            <label for="ent_proveedor" class="form-label fw-semibold">Proveedor (opcional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-truck"></i></span>
+                                <input name="ent_proveedor" id="ent_proveedor" type="text" class="form-control py-2" 
+                                    placeholder="Nombre del proveedor">
+                            </div>
+                        </div>
+
+                        <!-- Campo oculto para la fecha -->
+                        <input type="hidden" name="ent_fechaent" value="@DateOnly.FromDateTime(DateTime.Now)" />
 
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
@@ -127,85 +139,64 @@
                         <table class="table table-hover mb-0" id="entriesTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="border-0 ps-3">Código</th>
-                                    <th class="border-0">Nombre</th>
+                                    <th class="border-0 ps-3">ID</th>
+                                    <th class="border-0">Producto</th>
                                     <th class="border-0">Cantidad</th>
                                     <th class="border-0">Imagen</th>
                                     <th class="border-0">Fecha</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="align-middle">
-                                    <td class="ps-3 fw-semibold">FRE001</td>
-                                    <td>Pastilla de freno</td>
-                                    <td><span class="badge bg-success rounded-pill">25</span></td>
-                                    <td>
-                                        <div class="avatar-item">
-                                            <img src="~/images/pastilla-freno.png" alt="Pastilla de freno"
-                                                class="rounded" width="36" />
-                                        </div>
-                                    </td>
-                                    <td>04-06-2023</td>
-                                </tr>
-                                <tr class="align-middle">
-                                    <td class="ps-3 fw-semibold">FRE002</td>
-                                    <td>Disco de freno</td>
-                                    <td><span class="badge bg-success rounded-pill">40</span></td>
-                                    <td>
-                                        <div class="avatar-item">
-                                            <img src="~/images/disco-freno.png" alt="Disco de freno" class="rounded"
-                                                width="36" />
-                                        </div>
-                                    </td>
-                                    <td>04-06-2023</td>
-                                </tr>
-                                <tr class="align-middle">
-                                    <td class="ps-3 fw-semibold">FIL001</td>
-                                    <td>Filtro de aceite</td>
-                                    <td><span class="badge bg-success rounded-pill">60</span></td>
-                                    <td>
-                                        <div class="avatar-item">
-                                            <img src="~/images/filtro-aceite.png" alt="Filtro de aceite" class="rounded"
-                                                width="36" />
-                                        </div>
-                                    </td>
-                                    <td>04-06-2023</td>
-                                </tr>
-                                <tr class="align-middle">
-                                    <td class="ps-3 fw-semibold">AMO001</td>
-                                    <td>Amortiguador</td>
-                                    <td><span class="badge bg-success rounded-pill">15</span></td>
-                                    <td>
-                                        <div class="avatar-item">
-                                            <img src="~/images/amortiguador.png" alt="Amortiguador" class="rounded"
-                                                width="36" />
-                                        </div>
-                                    </td>
-                                    <td>04-06-2023</td>
-                                </tr>
+                                @if (ViewBag.ListaEntradas != null)
+                                {
+                                    @foreach (var entrada in ViewBag.ListaEntradas)
+                                    {
+                                        <tr class="align-middle">
+                                            <td class="ps-3 fw-semibold">@entrada.ent_id</td>
+                                            <td>@entrada.Autoparte.aut_nombre</td>
+                                            <td><span class="badge bg-success rounded-pill">@entrada.ent_cantidad</span></td>
+                                            <td>
+                                                <div class="avatar-item">
+                                                    <img src="@entrada.Autoparte.aut_imagen" alt="@entrada.Autoparte.aut_nombre"
+                                                        class="rounded" width="36" />
+                                                </div>
+                                            </td>
+                                            <td>@entrada.ent_fechaent.ToString("dd-MM-yyyy")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center py-3">No hay registros de entradas disponibles</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <div class="card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center">
-                    <span class="text-muted">Mostrando 4 de 4 entradas</span>
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    <span class="text-muted">Mostrando @(ViewBag.ListaEntradas != null ? ViewBag.ListaEntradas.Count : 0) entradas</span>
+                    @if (ViewBag.ListaEntradas != null && ViewBag.ListaEntradas.Count > 0)
+                    {
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
                 </div>
             </div>
         </div>
@@ -262,12 +253,9 @@
     </div>
 </div>
 
-<!-- Importaciones de estilos para el botón -->
-<link rel="stylesheet" href="~/css/site.css" />
-
 @section Scripts {
     <script>
-        // Función para cargar productos por categoría (existente)
+        // Función para cargar productos por categoría
         function cargarProductos() {
             var categoriaId = document.getElementById("categoriaSelect").value;
             var productoSelect = document.getElementById("productoSelect");
@@ -312,19 +300,26 @@
                 });
         }
 
-        // Efecto de hover para el botón (corregido)
+        // Efecto de hover para el botón
         document.addEventListener('DOMContentLoaded', function() {
             // Aplicar el estilo directamente al botón
             const submitButton = document.getElementById('submitButton');
             if (submitButton) {
+                // Asegurarse de que el botón sea visible y tenga el color correcto
                 submitButton.style.backgroundColor = '#d42025';
+                submitButton.style.display = 'block';
+                submitButton.style.width = '100%';
                 
                 submitButton.addEventListener('mouseover', function() {
                     this.style.backgroundColor = '#b91d21';
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
                 });
                 
                 submitButton.addEventListener('mouseout', function() {
                     this.style.backgroundColor = '#d42025';
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
                 });
             }
         });
@@ -354,12 +349,32 @@
                 }
             }
         });
+
+        // Validación del formulario
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const productoSelect = document.getElementById('productoSelect');
+            const cantidadInput = document.getElementById('ent_cantidad');
+            
+            if (productoSelect.value === '') {
+                e.preventDefault();
+                alert('Por favor seleccione un producto');
+                return false;
+            }
+            
+            if (cantidadInput.value < 1) {
+                e.preventDefault();
+                alert('La cantidad debe ser mayor a 0');
+                return false;
+            }
+            
+            return true;
+        });
     </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <style>
-
+        /* Estilos generales incluidos directamente */
         
         /* Estilos para el botón de registro */
         .btn-registro {
@@ -422,15 +437,10 @@
 
         /* Footer de las tarjetas */
         .card-footer {
-            background-color: #1c1c1c;
-            color: white;
+            background-color: #f8f9fa;
+            color: #6c757d;
             padding: 12px;
             text-align: center;
-        }
-
-        .card-footer span {
-            font-weight: 600;
-            font-size: 15px;
         }
 
         /* Footer principal */
@@ -485,6 +495,19 @@
             animation: fadeInDown 0.5s ease;
         }
         
+
       
+        /* Asegurarse de que el botón de registro sea visible y destacado */
+        #submitButton {
+            background-color: #d42025 !important;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: block;
+            width: 100%;
+        }
     </style>
 }
