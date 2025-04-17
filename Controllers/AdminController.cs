@@ -31,10 +31,57 @@ namespace Marimon.Controllers
         {
             return View();
         }
+        
+        // GET: Admin/Entradas - Página de entrada de productos
         public ActionResult Entradas()
         {
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
             return View("~/Views/Flujos/Entradas.cshtml");
+        }
+        
+        // AJAX - Obtener productos por categoría
+        [HttpGet]
+        public IActionResult ObtenerProductosPorCategoria(int categoriaId)
+        {
+            try
+            {
+                var productos = _context.Autopartes
+                    .Where(p => p.CategoriaId == categoriaId)
+                    .Select(p => new { 
+                        aut_id = p.aut_id, 
+                        aut_nombre = p.aut_nombre 
+                    })
+                    .ToList();
+                
+                _logger.LogInformation($"Productos encontrados para categoría {categoriaId}: {productos.Count}");
+                return Json(productos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error al obtener productos por categoría: {ex.Message}");
+                return Json(new { error = "Error al obtener productos" });
+            }
+        }
+
+        // POST: Admin/RegistrarEntrada - Procesar entrada de productos
+        [HttpPost]
+        public IActionResult RegistrarEntrada(int aut_id, int Cantidad)
+        {
+            try
+            {
+                // Lógica para registrar la entrada en inventario
+                // Aquí deberías implementar la lógica para aumentar el stock
+                
+                _logger.LogInformation($"Entrada registrada: Producto ID {aut_id}, Cantidad {Cantidad}");
+                TempData["Mensaje"] = "Entrada registrada correctamente.";
+                return RedirectToAction("Entradas");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error al registrar entrada: {ex.Message}");
+                TempData["Error"] = "Error al registrar la entrada.";
+                return RedirectToAction("Entradas");
+            }
         }
         
         // GET: Admin/ListaAutopartes
@@ -236,7 +283,5 @@ namespace Marimon.Controllers
 
             return RedirectToAction("ListaAutopartes", "Admin");
         }
-
-
     }
 }
