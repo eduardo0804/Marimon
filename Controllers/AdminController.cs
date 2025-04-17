@@ -36,6 +36,16 @@ namespace Marimon.Controllers
         public ActionResult Entradas()
         {
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
+            
+            // Cargar la lista de entradas para mostrar en la tabla
+            var listaEntradas = _context.Entradas
+                .Include(e => e.Autoparte)
+                .OrderByDescending(e => e.ent_id)
+                .Take(20)  // Limitar a las últimas 20 entradas
+                .ToList();
+                
+            ViewBag.ListaEntradas = listaEntradas;
+            
             return View("~/Views/Flujos/Entradas.cshtml");
         }
 
@@ -45,12 +55,13 @@ namespace Marimon.Controllers
         {
             try
             {
+                // Usar una clase auxiliar en lugar de un tipo anónimo
                 var productos = _context.Autopartes
                     .Where(p => p.CategoriaId == categoriaId)
-                    .Select(p => new
-                    {
-                        aut_id = p.aut_id,
-                        aut_nombre = p.aut_nombre
+                    .Select(p => new ProductoDTO 
+                    { 
+                        aut_id = p.aut_id, 
+                        aut_nombre = p.aut_nombre ?? string.Empty 
                     })
                     .ToList();
 
@@ -60,27 +71,72 @@ namespace Marimon.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error al obtener productos por categoría: {ex.Message}");
-                return Json(new { error = "Error al obtener productos" });
+                var errorResponse = new Dictionary<string, string> { { "error", "Error al obtener productos" } };
+                return Json(errorResponse);
             }
+        }
+        
+        // Clase DTO para evitar tipos anónimos
+        public class ProductoDTO
+        {
+            public int aut_id { get; set; }
+            public string aut_nombre { get; set; } = string.Empty;
         }
 
         // POST: Admin/RegistrarEntrada - Procesar entrada de productos
         [HttpPost]
-        public IActionResult RegistrarEntrada(int aut_id, int Cantidad)
+        public IActionResult RegistrarEntrada(int AutoparteId, int ent_cantidad, string ent_proveedor = "")
         {
             try
             {
-                // Lógica para registrar la entrada en inventario
-                // Aquí deberías implementar la lógica para aumentar el stock
+                // Validar entradas
+                if (AutoparteId <= 0)
+                {
+                    TempData["Error"] = "Debe seleccionar un producto válido.";
+                    return RedirectToAction("Entradas");
+                }
 
-                _logger.LogInformation($"Entrada registrada: Producto ID {aut_id}, Cantidad {Cantidad}");
-                TempData["Mensaje"] = "Entrada registrada correctamente.";
+                if (ent_cantidad <= 0)
+                {
+                    TempData["Error"] = "La cantidad debe ser mayor a 0.";
+                    return RedirectToAction("Entradas");
+                }
+
+                // Buscar la autoparte correspondiente
+                var autoparte = _context.Autopartes.Find(AutoparteId);
+                if (autoparte == null)
+                {
+                    TempData["Error"] = "No se encontró el producto seleccionado.";
+                    return RedirectToAction("Entradas");
+                }
+
+                // Crear el registro de entrada
+                var entrada = new Entradas
+                {
+                    AutoparteId = AutoparteId,
+                    ent_cantidad = ent_cantidad,
+                    ent_proveedor = ent_proveedor,
+                    aut_precio = autoparte.aut_precio, // Guardar el precio actual
+                    ent_fechaent = DateOnly.FromDateTime(DateTime.Now),
+                    aut_cantidad = autoparte.aut_cantidad + ent_cantidad // Actualizar la cantidad total
+                };
+
+                // Actualizar el stock de la autoparte
+                autoparte.aut_cantidad += ent_cantidad;
+
+                // Guardar los cambios en la base de datos
+                _context.Entradas.Add(entrada);
+                _context.Autopartes.Update(autoparte);
+                _context.SaveChanges();
+
+                _logger.LogInformation($"Entrada registrada: Producto ID {AutoparteId}, Cantidad {ent_cantidad}");
+                TempData["Mensaje"] = $"Se han registrado {ent_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
                 return RedirectToAction("Entradas");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error al registrar entrada: {ex.Message}");
-                TempData["Error"] = "Error al registrar la entrada.";
+                TempData["Error"] = "Error al registrar la entrada: " + ex.Message;
                 return RedirectToAction("Entradas");
             }
         }
