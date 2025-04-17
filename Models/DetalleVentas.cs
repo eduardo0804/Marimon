@@ -12,8 +12,8 @@ namespace Marimon.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int det_id { get; set; }
         public string? det_cantidad { get; set; }
-        public int ven_id { get; set; }
-        public int aut_id { get; set; }
+        public int VentaId { get; set; }
+        public int AutoParteId { get; set; }
 
         [ForeignKey("VentaId")]
         public Venta? Venta { get; set; }

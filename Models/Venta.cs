@@ -12,7 +12,7 @@ namespace Marimon.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ven_id { get; set; }
          public DateOnly ven_fecha { get; set; }
-        public int pag_id { get; set; }
+        public int MetodoPagoId { get; set; }
 
         [ForeignKey("MetodoPagoId")]
         public MetodoPago? MetodoPago { get; set; }
