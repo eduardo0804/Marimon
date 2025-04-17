@@ -23,5 +23,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Salida> Salida { get; set; } 
     public DbSet<Usuario> Usuario { get; set; } 
     public DbSet<Venta> Venta { get; set; } 
-    
+    public DbSet<Servicio> Servicio { get; set; }
+    public DbSet<Reserva> Reserva { get; set; }
 }
