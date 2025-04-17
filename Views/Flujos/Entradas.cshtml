@@ -219,4 +219,165 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <style>
+    /* Estilos básicos */
+    .admin-container {
+        max-width: 1500px;
+        margin: 0 auto;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header */
+    .modulo-header {
+        width: 100%;
+    }
+
+    .modulo-title-bar {
+        background-color: #e01515;
+        color: white;
+        padding: 15px 25px;
+        text-align: left;
+    }
+
+    .modulo-title {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    /* Contenido principal */
+    .modulo-content {
+        padding: 20px;
+    }
+
+    .modulo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+
+    .modulo-item {
+        border-radius: 0;
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+    .card-content {
+        background-color: #f8f9fa;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+    }
+
+    .card-content img {
+        max-width: 80%;
+        max-height: 80%;
+        object-fit: contain;
+    }
+
+    /* Estilo para la sección de flujo */
+    .flujo-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 200px;
+        background-color: #f8f9fa;
+    }
+    
+    .flujo-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 48%;
+    }
+    
+    .flujo-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        height: 180px;
+    }
+    
+    .flujo-badge-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .small-icon {
+        max-width: 60%;
+        max-height: 60%;
+        object-fit: contain;
+    }
+    
+    .flujo-badge {
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        transform: translateY(-30px);
+    }
+    
+    .entrada {
+        background-color: #007bff;
+    }
+    
+    .salida {
+        background-color: #dc3545;
+    }
+    
+    .card-footer {
+        background-color: #1c1c1c;
+        color: white;
+        padding: 12px;
+        text-align: center;
+    }
+    
+    .flujo-text {
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+    /* Footer de las tarjetas */
+    .card-footer {
+        background-color: #1c1c1c;
+        color: white;
+        padding: 12px;
+        text-align: center;
+    }
+
+    .card-footer span {
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+    /* Footer principal */
+    .modulo-footer {
+        background-color: #e01515;
+        color: white;
+        padding: 15px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modulo-footer a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .modulo-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
 }
