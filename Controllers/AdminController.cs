@@ -31,7 +31,6 @@ namespace Marimon.Controllers
         {
             return View();
         }
-
         // GET: Admin/Entradas - Página de entrada de productos
         public ActionResult Entradas()
         {
@@ -47,6 +46,12 @@ namespace Marimon.Controllers
             ViewBag.ListaEntradas = listaEntradas;
             
             return View("~/Views/Flujos/Entradas.cshtml");
+        }
+
+        public ActionResult Salidas()
+        {
+            
+            return View("~/Views/Flujos/Salida.cshtml");
         }
 
         // AJAX - Obtener productos por categoría

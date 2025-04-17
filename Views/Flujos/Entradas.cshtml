@@ -127,12 +127,14 @@
             <div class="card shadow-sm border-0 rounded-lg h-100">
                 <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-bold">HISTORIAL DE ENTRADAS</h5>
+                    <!-- #region 
                     <div class="input-group" style="width: 250px;">
                         <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
                         <button class="btn btn-outline-secondary" type="button">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
+                    -->
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -175,6 +177,7 @@
                         </table>
                     </div>
                 </div>
+                <!-- #region 
                 <div class="card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center">
                     <span class="text-muted">Mostrando @(ViewBag.ListaEntradas != null ? ViewBag.ListaEntradas.Count : 0) entradas</span>
                     @if (ViewBag.ListaEntradas != null && ViewBag.ListaEntradas.Count > 0)
@@ -198,6 +201,7 @@
                         </nav>
                     }
                 </div>
+                -->
             </div>
         </div>
     </div>
