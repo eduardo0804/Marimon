@@ -186,7 +186,6 @@ namespace Marimon.Controllers
                 Console.WriteLine("=> Autoparte guardada exitosamente en la base de datos.");
                 // Usamos TempData para pasar el mensaje de éxito
                 TempData["SuccessMessage"] = "La autoparte se registró correctamente.";
-                await Task.Delay(3000); 
                 return RedirectToAction("ListaAutopartes", "Admin");
             }
             catch (Exception ex)
