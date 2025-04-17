@@ -13,10 +13,10 @@ namespace Marimon.Models
         public int com_id { get; set; }
         public string? com_nombre { get; set; }
 
-        public string? FacturaId { get; set; }
+        public int? FacturaId { get; set; }
         [ForeignKey("FacturaId")]
         public Factura? Factura { get; set; }
-        public string? BoletaId { get; set; }
+        public int? BoletaId { get; set; }
         [ForeignKey("BoletaId")]
         public Boleta? Boleta { get; set; }
         public int VentaId { get; set; }
