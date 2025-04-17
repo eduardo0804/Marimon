@@ -10,10 +10,11 @@ namespace Marimon.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int aut_id { get; set; }
-        public string aut_nombre { get; set; }
-        public string aut_descripcion { get; set; }
+        public string? aut_nombre { get; set; }
+        public string? aut_descripcion { get; set; }
         public decimal aut_precio { get; set; }
-        public string aut_especificacion { get; set; }
+        public string? aut_especificacion { get; set; }
+        public int aut_cantidad {get;set;}= 0;
         public string aut_imagen { get; set; }  = string.Empty;
         public int CategoriaId { get; set; } 
 

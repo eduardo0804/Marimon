@@ -9,7 +9,7 @@ namespace Marimon.Models
         [Key]
         public int cat_id { get; set; }
         
-        public string cat_nombre { get; set; }
+        public string? cat_nombre { get; set; }
 
     }
 }
