@@ -99,6 +99,7 @@
           <th>Descripción</th>
           <th>Especificaciones</th>
           <th>Precio (S/)</th>
+          <th>Cantidad</th>
           <th>Categoría</th>
           <th>Imagen</th>
           <th>Acciones</th>
@@ -119,6 +120,7 @@
               <div class="description-tooltip">@item.aut_especificacion</div>
             </td>
             <td data-label="Precio">S/ @item.aut_precio.ToString("F2")</td>
+            <td data-label="Cantidad">@item.aut_cantidad.ToString()</td>
             <td data-label="Categoría">@item.Categoria?.cat_nombre</td>
             <td data-label="Imagen">
               @if (!string.IsNullOrEmpty(item.aut_imagen))

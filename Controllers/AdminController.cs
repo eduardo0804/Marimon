@@ -31,59 +31,121 @@ namespace Marimon.Controllers
         {
             return View();
         }
-        
         // GET: Admin/Entradas - Página de entrada de productos
         public ActionResult Entradas()
         {
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
+            
+            // Cargar la lista de entradas para mostrar en la tabla
+            var listaEntradas = _context.Entradas
+                .Include(e => e.Autoparte)
+                .OrderByDescending(e => e.ent_id)
+                .Take(10)  // Limitar a las últimas 20 entradas
+                .ToList();
+                
+            ViewBag.ListaEntradas = listaEntradas;
+            
             return View("~/Views/Flujos/Entradas.cshtml");
         }
-        
+
+        public ActionResult Salidas()
+        {
+            
+            return View("~/Views/Flujos/Salida.cshtml");
+        }
+
         // AJAX - Obtener productos por categoría
         [HttpGet]
         public IActionResult ObtenerProductosPorCategoria(int categoriaId)
         {
             try
             {
+                // Usar una clase auxiliar en lugar de un tipo anónimo
                 var productos = _context.Autopartes
                     .Where(p => p.CategoriaId == categoriaId)
-                    .Select(p => new { 
+                    .Select(p => new ProductoDTO 
+                    { 
                         aut_id = p.aut_id, 
-                        aut_nombre = p.aut_nombre 
+                        aut_nombre = p.aut_nombre ?? string.Empty 
                     })
                     .ToList();
-                
+
                 _logger.LogInformation($"Productos encontrados para categoría {categoriaId}: {productos.Count}");
                 return Json(productos);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error al obtener productos por categoría: {ex.Message}");
-                return Json(new { error = "Error al obtener productos" });
+                var errorResponse = new Dictionary<string, string> { { "error", "Error al obtener productos" } };
+                return Json(errorResponse);
             }
+        }
+        
+        // Clase DTO para evitar tipos anónimos
+        public class ProductoDTO
+        {
+            public int aut_id { get; set; }
+            public string aut_nombre { get; set; } = string.Empty;
         }
 
         // POST: Admin/RegistrarEntrada - Procesar entrada de productos
         [HttpPost]
-        public IActionResult RegistrarEntrada(int aut_id, int Cantidad)
+        public IActionResult RegistrarEntrada(int AutoparteId, int ent_cantidad, string ent_proveedor = "")
         {
             try
             {
-                // Lógica para registrar la entrada en inventario
-                // Aquí deberías implementar la lógica para aumentar el stock
-                
-                _logger.LogInformation($"Entrada registrada: Producto ID {aut_id}, Cantidad {Cantidad}");
-                TempData["Mensaje"] = "Entrada registrada correctamente.";
+                // Validar entradas
+                if (AutoparteId <= 0)
+                {
+                    TempData["Error"] = "Debe seleccionar un producto válido.";
+                    return RedirectToAction("Entradas");
+                }
+
+                if (ent_cantidad <= 0)
+                {
+                    TempData["Error"] = "La cantidad debe ser mayor a 0.";
+                    return RedirectToAction("Entradas");
+                }
+
+                // Buscar la autoparte correspondiente
+                var autoparte = _context.Autopartes.Find(AutoparteId);
+                if (autoparte == null)
+                {
+                    TempData["Error"] = "No se encontró el producto seleccionado.";
+                    return RedirectToAction("Entradas");
+                }
+
+                // Crear el registro de entrada
+                var entrada = new Entradas
+                {
+                    AutoparteId = AutoparteId,
+                    ent_cantidad = ent_cantidad,
+                    ent_proveedor = ent_proveedor,
+                    aut_precio = autoparte.aut_precio, // Guardar el precio actual
+                    ent_fechaent = DateOnly.FromDateTime(DateTime.Now),
+                    aut_cantidad = autoparte.aut_cantidad + ent_cantidad // Actualizar la cantidad total
+                };
+
+                // Actualizar el stock de la autoparte
+                autoparte.aut_cantidad += ent_cantidad;
+
+                // Guardar los cambios en la base de datos
+                _context.Entradas.Add(entrada);
+                _context.Autopartes.Update(autoparte);
+                _context.SaveChanges();
+
+                _logger.LogInformation($"Entrada registrada: Producto ID {AutoparteId}, Cantidad {ent_cantidad}");
+                TempData["Mensaje"] = $"Se han registrado {ent_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
                 return RedirectToAction("Entradas");
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error al registrar entrada: {ex.Message}");
-                TempData["Error"] = "Error al registrar la entrada.";
+                TempData["Error"] = "Error al registrar la entrada: " + ex.Message;
                 return RedirectToAction("Entradas");
             }
         }
-        
+
         // GET: Admin/ListaAutopartes
         public async Task<IActionResult> ListaAutopartes()
         {
@@ -95,7 +157,7 @@ namespace Marimon.Controllers
             return View(autopartes);
         }
 
-        
+
         public IActionResult Create()
         {
             ViewBag.Title = "Registrar Autoparte";
@@ -109,13 +171,13 @@ namespace Marimon.Controllers
         public async Task<IActionResult> Create(Autoparte autoparte, IFormFile imagen)
         {
             Console.WriteLine("=== Iniciando registro de autoparte ===");
-            
+
             // Log de los datos del modelo que vienen desde el formulario
             Console.WriteLine($"aut_nombre: {autoparte.aut_nombre}");
             Console.WriteLine($"aut_descripcion: {autoparte.aut_descripcion}");
             Console.WriteLine($"aut_precio: {autoparte.aut_precio}");
             Console.WriteLine($"CategoriaId: {autoparte.CategoriaId}");
-            
+
             // Log del archivo recibido
             Console.WriteLine($"Imagen: {imagen?.FileName}, Tamaño: {imagen?.Length}");
 
@@ -129,7 +191,7 @@ namespace Marimon.Controllers
                 Console.WriteLine("=> No se recibió imagen.");
                 ModelState.AddModelError("imagen", "La imagen es obligatoria.");
             }
-            
+
             // Aquí imprimimos el estado del ModelState
             if (!ModelState.IsValid)
             {
@@ -151,7 +213,7 @@ namespace Marimon.Controllers
                 var nombreArchivo = Path.GetFileName(imagen.FileName);
                 var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                 Console.WriteLine($"Ruta de carpeta de uploads: {rutaCarpeta}");
-                
+
                 if (!Directory.Exists(rutaCarpeta))
                 {
                     Console.WriteLine("=> Carpeta no existe, creando carpeta...");
@@ -184,9 +246,13 @@ namespace Marimon.Controllers
                 _context.Autopartes.Add(autoparte);
                 await _context.SaveChangesAsync();
                 Console.WriteLine("=> Autoparte guardada exitosamente en la base de datos.");
+
                 // Usamos TempData para pasar el mensaje de éxito
                 TempData["SuccessMessage"] = "La autoparte se registró correctamente.";
-                return RedirectToAction("ListaAutopartes", "Admin");
+
+                // CORRECCIÓN: Usamos return JavaScript para cerrar el modal y recargar la página
+                // para que los toasts se muestren correctamente
+                return Content("<script>window.parent.location.href = '/Admin/ListaAutopartes';</script>", "text/html");
             }
             catch (Exception ex)
             {
@@ -198,7 +264,6 @@ namespace Marimon.Controllers
                 return View(autoparte);
             }
         }
-
         [HttpGet]
         public IActionResult Editar(int id)
         {
@@ -210,7 +275,7 @@ namespace Marimon.Controllers
 
             // Llenar el ViewBag con las categorías para el dropdown
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
-            
+
             return PartialView("_EditarAutoparte", autoparte);
         }
 
