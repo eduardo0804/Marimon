@@ -31,14 +31,14 @@ namespace Marimon.Controllers
         {
             return View();
         }
-        
+
         // GET: Admin/Entradas - Página de entrada de productos
         public ActionResult Entradas()
         {
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
             return View("~/Views/Flujos/Entradas.cshtml");
         }
-        
+
         // AJAX - Obtener productos por categoría
         [HttpGet]
         public IActionResult ObtenerProductosPorCategoria(int categoriaId)
@@ -47,12 +47,13 @@ namespace Marimon.Controllers
             {
                 var productos = _context.Autopartes
                     .Where(p => p.CategoriaId == categoriaId)
-                    .Select(p => new { 
-                        aut_id = p.aut_id, 
-                        aut_nombre = p.aut_nombre 
+                    .Select(p => new
+                    {
+                        aut_id = p.aut_id,
+                        aut_nombre = p.aut_nombre
                     })
                     .ToList();
-                
+
                 _logger.LogInformation($"Productos encontrados para categoría {categoriaId}: {productos.Count}");
                 return Json(productos);
             }
@@ -71,7 +72,7 @@ namespace Marimon.Controllers
             {
                 // Lógica para registrar la entrada en inventario
                 // Aquí deberías implementar la lógica para aumentar el stock
-                
+
                 _logger.LogInformation($"Entrada registrada: Producto ID {aut_id}, Cantidad {Cantidad}");
                 TempData["Mensaje"] = "Entrada registrada correctamente.";
                 return RedirectToAction("Entradas");
@@ -83,7 +84,7 @@ namespace Marimon.Controllers
                 return RedirectToAction("Entradas");
             }
         }
-        
+
         // GET: Admin/ListaAutopartes
         public async Task<IActionResult> ListaAutopartes()
         {
@@ -95,7 +96,7 @@ namespace Marimon.Controllers
             return View(autopartes);
         }
 
-        
+
         public IActionResult Create()
         {
             ViewBag.Title = "Registrar Autoparte";
@@ -109,13 +110,13 @@ namespace Marimon.Controllers
         public async Task<IActionResult> Create(Autoparte autoparte, IFormFile imagen)
         {
             Console.WriteLine("=== Iniciando registro de autoparte ===");
-            
+
             // Log de los datos del modelo que vienen desde el formulario
             Console.WriteLine($"aut_nombre: {autoparte.aut_nombre}");
             Console.WriteLine($"aut_descripcion: {autoparte.aut_descripcion}");
             Console.WriteLine($"aut_precio: {autoparte.aut_precio}");
             Console.WriteLine($"CategoriaId: {autoparte.CategoriaId}");
-            
+
             // Log del archivo recibido
             Console.WriteLine($"Imagen: {imagen?.FileName}, Tamaño: {imagen?.Length}");
 
@@ -129,7 +130,7 @@ namespace Marimon.Controllers
                 Console.WriteLine("=> No se recibió imagen.");
                 ModelState.AddModelError("imagen", "La imagen es obligatoria.");
             }
-            
+
             // Aquí imprimimos el estado del ModelState
             if (!ModelState.IsValid)
             {
@@ -151,7 +152,7 @@ namespace Marimon.Controllers
                 var nombreArchivo = Path.GetFileName(imagen.FileName);
                 var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                 Console.WriteLine($"Ruta de carpeta de uploads: {rutaCarpeta}");
-                
+
                 if (!Directory.Exists(rutaCarpeta))
                 {
                     Console.WriteLine("=> Carpeta no existe, creando carpeta...");
@@ -184,9 +185,13 @@ namespace Marimon.Controllers
                 _context.Autopartes.Add(autoparte);
                 await _context.SaveChangesAsync();
                 Console.WriteLine("=> Autoparte guardada exitosamente en la base de datos.");
+
                 // Usamos TempData para pasar el mensaje de éxito
                 TempData["SuccessMessage"] = "La autoparte se registró correctamente.";
-                return RedirectToAction("ListaAutopartes", "Admin");
+
+                // CORRECCIÓN: Usamos return JavaScript para cerrar el modal y recargar la página
+                // para que los toasts se muestren correctamente
+                return Content("<script>window.parent.location.href = '/Admin/ListaAutopartes';</script>", "text/html");
             }
             catch (Exception ex)
             {
@@ -198,7 +203,6 @@ namespace Marimon.Controllers
                 return View(autoparte);
             }
         }
-
         [HttpGet]
         public IActionResult Editar(int id)
         {
@@ -210,7 +214,7 @@ namespace Marimon.Controllers
 
             // Llenar el ViewBag con las categorías para el dropdown
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
-            
+
             return PartialView("_EditarAutoparte", autoparte);
         }
 
