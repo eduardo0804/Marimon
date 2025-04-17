@@ -33,6 +33,7 @@ namespace Marimon.Controllers
         }
         public ActionResult Entradas()
         {
+            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
             return View("~/Views/Flujos/Entradas.cshtml");
         }
         
