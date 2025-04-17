@@ -41,7 +41,7 @@ namespace Marimon.Controllers
             var listaEntradas = _context.Entradas
                 .Include(e => e.Autoparte)
                 .OrderByDescending(e => e.ent_id)
-                .Take(20)  // Limitar a las últimas 20 entradas
+                .Take(10)  // Limitar a las últimas 20 entradas
                 .ToList();
                 
             ViewBag.ListaEntradas = listaEntradas;
