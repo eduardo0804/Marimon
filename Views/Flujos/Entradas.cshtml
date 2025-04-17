@@ -1,4 +1,4 @@
-@model Marimon.Controllers.FlujoController.EntradaViewModel
+@model Marimon.Models.Autoparte
 @{
     ViewData["Title"] = "Registro de Entradas";
     Layout = "_LayoutAdmin";
@@ -12,11 +12,13 @@
             <div class="card bg-danger text-white">
                 <div class="card-body d-flex">
                     <div class="me-3">
-                        <img src="~/images/entrada-almacen.jpg" alt="Imagen almacén" class="img-fluid" style="max-width: 150px;" />
+                        <img src="~/images/entrada-almacen.jpg" alt="Imagen almacén" class="img-fluid"
+                            style="max-width: 150px;" />
                     </div>
                     <div>
                         <h2>Registro de Entradas</h2>
-                        <p>En esta sección podrá registrar las nuevas entradas de autopartes al inventario. Seleccione la categoría y el producto específico, luego indique la cantidad a ingresar.</p>
+                        <p>En esta sección podrá registrar las nuevas entradas de autopartes al inventario. Seleccione
+                            la categoría y el producto específico, luego indique la cantidad a ingresar.</p>
                     </div>
                 </div>
             </div>
@@ -38,125 +40,126 @@
                 <div class="card-header bg-white">
                     <h5 class="text-center">REGISTRAR ENTRADA</h5>
                 </div>
-                <div class="card-body">
-                    <form asp-action="RegistrarEntrada" asp-controller="Flujo" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="CategoriaId" class="form-label">Categoría de artículo</label>
-                            <select id="categoriaSelect" class="form-select" asp-for="CategoriaId" asp-items="ViewBag.Categorias" onchange="cargarProductos()">
-                                <option value="">-- Seleccionar Categoría --</option>
-                            </select>
-                            <span asp-validation-for="CategoriaId" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="AutoparteId" class="form-label">NOMBRE</label>
-                            <select id="productoSelect" class="form-select" asp-for="AutoparteId" disabled>
-                                <option value="">-- Primero seleccione una categoría --</option>
-                            </select>
-                            <span asp-validation-for="AutoparteId" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Cantidad" class="form-label">Cantidad</label>
-                            <input asp-for="Cantidad" type="number" class="form-control" min="1" value="1">
-                            <span asp-validation-for="Cantidad" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="text-center">
-                            <button type="submit" >REGISTRAR ENTRADA</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+                <div class="card-body"></div>
+                <form asp-action="RegistrarEntrada" asp-controller="Flujo" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <!-- Tabla de registros (ejemplo, puedes ajustarla según tu modelo de datos) -->
-    <div class="row">
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Cod. Autopartes</th>
-                            <th>Nombre</th>
-                            <th>Cantidad</th>
-                            <th>Imagen</th>
-                            <th>Fecha Entrada</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>FRE001</td>
-                            <td>Pastilla de freno</td>
-                            <td>25</td>
-                            <td><img src="~/images/pastilla-freno.png" alt="Pastilla de freno" width="30" /></td>
-                            <td>04-06-2023</td>
-                        </tr>
-                        <tr>
-                            <td>FRE002</td>
-                            <td>Disco de freno</td>
-                            <td>40</td>
-                            <td><img src="~/images/disco-freno.png" alt="Disco de freno" width="30" /></td>
-                            <td>04-06-2023</td>
-                        </tr>
-                        <tr>
-                            <td>FIL001</td>
-                            <td>Filtro de aceite</td>
-                            <td>60</td>
-                            <td><img src="~/images/filtro-aceite.png" alt="Filtro de aceite" width="30" /></td>
-                            <td>04-06-2023</td>
-                        </tr>
-                        <tr>
-                            <td>AMO001</td>
-                            <td>Amortiguador</td>
-                            <td>15</td>
-                            <td><img src="~/images/amortiguador.png" alt="Amortiguador" width="30" /></td>
-                            <td>04-06-2023</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+                    <div class="mb-3">
+                        <label asp-for="CategoriaId" class="form-label">Categoría de artículo</label>
+                        <select id="categoriaSelect" class="form-select" asp-for="CategoriaId"
+                            asp-items="ViewBag.Categorias" onchange="cargarProductos()">
+                            <option value="">-- Seleccionar Categoría --</option>
+                        </select>
+                        <span asp-validation-for="CategoriaId" class="text-danger"></span>
+                    </div>
 
-    <!-- Información de contacto -->
-    <div class="row mt-4 mb-4">
-        <div class="col-12 text-center">
-            <h5>CONTÁCTANOS</h5>
-        </div>
-        <div class="col-12 d-flex justify-content-center gap-4 mt-3">
-            <div class="d-flex align-items-center">
-                <div class="bg-danger rounded-circle p-2 me-2">
-                    <i class="fas fa-envelope text-white"></i>
-                </div>
-                <div>
-                    <strong>Email:</strong><br />
-                    contacto@ejemplo.com
-                </div>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="bg-danger rounded-circle p-2 me-2">
-                    <i class="fas fa-phone text-white"></i>
-                </div>
-                <div>
-                    <strong>Teléfono:</strong><br />
-                    912345678
-                </div>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="bg-danger rounded-circle p-2 me-2">
-                    <i class="fas fa-map-marker-alt text-white"></i>
-                </div>
-                <div>
-                    <strong>Dirección:</strong><br />
-                    Av. Los Álamos 123, Villa Sur
-                </div>
+                    <div class="mb-3">
+                        <label asp-for="aut_id" class="form-label">NOMBRE</label>
+                        <select id="productoSelect" class="form-select" asp-for="aut_id" disabled>
+                            <option value="">-- Primero seleccione una categoría --</option>
+                        </select>
+                        <span asp-validation-for="aut_id" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label  class="form-label">Cantidad</label>
+                        <input  type="number" class="form-control" min="1" value="1">
+                        <span  class="text-danger"></span>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit">REGISTRAR ENTRADA</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Tabla de registros (ejemplo, puedes ajustarla según tu modelo de datos) -->
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Cod. Autopartes</th>
+                        <th>Nombre</th>
+                        <th>Cantidad</th>
+                        <th>Imagen</th>
+                        <th>Fecha Entrada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FRE001</td>
+                        <td>Pastilla de freno</td>
+                        <td>25</td>
+                        <td><img src="~/images/pastilla-freno.png" alt="Pastilla de freno" width="30" /></td>
+                        <td>04-06-2023</td>
+                    </tr>
+                    <tr>
+                        <td>FRE002</td>
+                        <td>Disco de freno</td>
+                        <td>40</td>
+                        <td><img src="~/images/disco-freno.png" alt="Disco de freno" width="30" /></td>
+                        <td>04-06-2023</td>
+                    </tr>
+                    <tr>
+                        <td>FIL001</td>
+                        <td>Filtro de aceite</td>
+                        <td>60</td>
+                        <td><img src="~/images/filtro-aceite.png" alt="Filtro de aceite" width="30" /></td>
+                        <td>04-06-2023</td>
+                    </tr>
+                    <tr>
+                        <td>AMO001</td>
+                        <td>Amortiguador</td>
+                        <td>15</td>
+                        <td><img src="~/images/amortiguador.png" alt="Amortiguador" width="30" /></td>
+                        <td>04-06-2023</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Información de contacto -->
+<div class="row mt-4 mb-4">
+    <div class="col-12 text-center">
+        <h5>CONTÁCTANOS</h5>
+    </div>
+    <div class="col-12 d-flex justify-content-center gap-4 mt-3">
+        <div class="d-flex align-items-center">
+            <div class="bg-danger rounded-circle p-2 me-2">
+                <i class="fas fa-envelope text-white"></i>
+            </div>
+            <div>
+                <strong>Email:</strong><br />
+                contacto@ejemplo.com
+            </div>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="bg-danger rounded-circle p-2 me-2">
+                <i class="fas fa-phone text-white"></i>
+            </div>
+            <div>
+                <strong>Teléfono:</strong><br />
+                912345678
+            </div>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="bg-danger rounded-circle p-2 me-2">
+                <i class="fas fa-map-marker-alt text-white"></i>
+            </div>
+            <div>
+                <strong>Dirección:</strong><br />
+                Av. Los Álamos 123, Villa Sur
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 @section Scripts {
@@ -164,20 +167,20 @@
         function cargarProductos() {
             var categoriaId = document.getElementById("categoriaSelect").value;
             var productoSelect = document.getElementById("productoSelect");
-            
+
             // Limpiar el select de productos
             productoSelect.innerHTML = "";
-            
+
             if (!categoriaId) {
                 // Si no hay categoría seleccionada
                 productoSelect.innerHTML = "<option value=''>-- Primero seleccione una categoría --</option>";
                 productoSelect.disabled = true;
                 return;
             }
-            
+
             // Habilitar el select de productos
             productoSelect.disabled = false;
-            
+
             // Llamada AJAX para obtener los productos de la categoría seleccionada
             fetch(`/Flujo/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
                 .then(response => response.json())
@@ -200,5 +203,7 @@
                 });
         }
     </script>
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
