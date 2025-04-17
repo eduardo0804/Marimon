@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marimon.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Autoparte : Migration
+    public partial class Autoparte2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
