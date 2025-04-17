@@ -8,22 +8,27 @@
 
 
 <div class="container py-4">
-    <!-- Mensajes de notificación -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+   <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Éxito</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
-    }
-
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="toast-body">
+            La autoparte se registró correctamente.
         </div>
-    }
+    </div>
+    
+    <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="errorToastMessage">
+            Ha ocurrido un error.
+        </div>
+    </div>
+</div>
     <!-- Encabezado con imagen y texto -->
     <div class="row align-items-center mb-4">
         <div class="col-md-6 text-center">
@@ -309,6 +314,24 @@
                 $('#editModal').modal('show');
             });
         }
+        $(document).ready(function() {
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+            const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+            successToast.show();
+            </text>
+        }
+        
+        @if (TempData["Error"] != null)
+        {
+            <text>
+            document.getElementById('errorToastMessage').innerText = '@TempData["Error"]';
+            const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            errorToast.show();
+            </text>
+        }
+    });
     </script>
 
 }
