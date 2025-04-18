@@ -54,7 +54,7 @@ namespace Marimon.Areas.Identity.Pages.Account
                 var callbackUrl = Url.Page(
                     "/Account/ResetPassword",
                     pageHandler: null,
-                    values: new { area = "Identity", code },
+                    values: new { area = "Identity", code, email = Input.Email },
                     protocol: Request.Scheme);
 
                 var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "emailContra.html");
@@ -70,6 +70,7 @@ namespace Marimon.Areas.Identity.Pages.Account
                     Input.Email,
                     "Restablecer contraseña",
                     emailBody);
+                TempData["SuccessMessage"] = "Correo de restablecimiento de contraseña enviado con éxito.";
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

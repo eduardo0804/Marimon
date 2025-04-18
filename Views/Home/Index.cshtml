@@ -3,6 +3,13 @@
 }
 <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success success-message" role="alert" style=" margin-top: 10px;transition: opacity 1s ease-out;">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
 <div class="container">
     <!-- Slider Section -->
     <div class="slider-container">
@@ -105,5 +112,15 @@
         </div>
     </div>
 </div>
-
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const successMessage = document.querySelector(".success-message");
+        if (successMessage) {
+            setTimeout(() => {
+                successMessage.style.opacity = "0";
+                setTimeout(() => successMessage.remove(), 1000);
+            }, 10000);
+        }
+    });
+</script>
 <script src="~/js/home.js" asp-append-version="true"></script>
