@@ -73,20 +73,25 @@ namespace Marimon.Areas.Identity.Pages.Account
 
         public IActionResult OnGet(string code = null, string email = null)
         {
-            if (code == null)
+            if (string.IsNullOrEmpty(code) || string.IsNullOrEmpty(email))
             {
-                return BadRequest("A code must be supplied for password reset.");
+                TempData["ErrorMessage"] = "El token es inválido o ha expirado.";
+                return RedirectToPage("./ForgotPassword");
             }
-            else
+            var decodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            var user = _userManager.FindByEmailAsync(email).Result;
+            if (user == null || !_userManager.VerifyUserTokenAsync(user, _userManager.Options.Tokens.PasswordResetTokenProvider, "ResetPassword", decodedCode).Result)
             {
-                Input = new InputModel
-                {
-                    Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)),
-                    Email = email
+                TempData["ErrorMessage"] = "La clave es inválido o ya ha sido utilizado, por favor solicite un nuevo restablecimiento de contraseña de ser necesario.";
+                return RedirectToPage("./ForgotPassword");
+            }
+            Input = new InputModel
+            {
+                Code = decodedCode,
+                Email = email
+            };
 
-                };
-                return Page();
-            }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -107,6 +112,18 @@ namespace Marimon.Areas.Identity.Pages.Account
                 return RedirectToPage("./ResetPasswordConfirmation");
             }
 
+            var isTokenValid = await _userManager.VerifyUserTokenAsync(
+                user,
+                _userManager.Options.Tokens.PasswordResetTokenProvider,
+                "ResetPassword",
+                Input.Code
+            );
+
+            if (!isTokenValid)
+            {
+                TempData["ErrorMessage"] = "El token es inválido o ya ha sido utilizado.";
+                return RedirectToPage("./ForgotPassword");
+            }
             var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
             if (result.Succeeded)
             {
