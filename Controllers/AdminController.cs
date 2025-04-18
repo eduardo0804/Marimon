@@ -232,6 +232,7 @@ namespace Marimon.Controllers
                 {
                     AutoparteId = AutoparteId,
                     sal_cantidad = sal_cantidad,
+                    sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
                     ComprobanteId = comprobante.com_id // Relacionar con el comprobante ya guardado
                 };
                 _context.Salida.Add(salida);
