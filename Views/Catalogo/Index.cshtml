@@ -273,7 +273,6 @@
         transform: translateY(3px);
         color: #28a745;
     }
-
 </style>
 
 <div class="container catalogo-container">
@@ -287,16 +286,18 @@
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="search-container">
-                <div class="search-input-group">
-                    <!-- Ícono de lupa -->
-                    <i class="fas fa-search search-icon"></i>
-                    <!-- Campo de búsqueda -->
-                    <input type="text" class="search-box" placeholder="¿Qué repuesto estás buscando hoy?">
-                    <!-- Botón de búsqueda -->
-                    <button class="btn search-btn" type="button">
-                        Buscar
-                    </button>
-                </div>
+                <form form asp-controller="Catalogo" asp-action="Index" method="get" class="d-flex justify-content-center">
+                    <div class="search-input-group">
+                        <!-- Ícono de lupa -->
+                        <i class="fas fa-search search-icon"></i>
+                        <!-- Campo de búsqueda -->
+                        <input type="text" name="buscar" class="search-box" placeholder="¿Qué repuesto estás buscando hoy?">
+                        <!-- Botón de búsqueda -->
+                        <button class="btn search-btn" type="submit">
+                            Buscar
+                        </button>
+                    </div>
+                </form>
                 <div class="search-suggestion text-center mt-2">
                     Prueba a buscar "filtro de aceite", "frenos", "amortiguadores"...
                 </div>
@@ -332,10 +333,10 @@
                                     alt="@autoparte.aut_nombre">
                             </div>
                             <div class="card-body text-center">
-                                <h5 class="card-title">Autoparte @autoparte.aut_id</h5>
+                                <h5 class="card-title">@autoparte.aut_nombre</h5>
                                 <p class="card-text precio">Precio: <strong>S/
                                         @autoparte.aut_precio.ToString("0.00")</strong></p>
-                                <button class="btn btn-primary" type="submit">Añadir Carrito</button>
+                                <button class="btn-primary" type="submit">Añadir Carrito</button>
                             </div>
                         </div>
                     </div>
