@@ -26,11 +26,6 @@ namespace Marimon.Controllers
             return View();
         }
 
-        // GET: AdminController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
         // GET: Admin/Entradas - Página de entrada de productos
         public ActionResult Entradas()
         {
@@ -46,22 +41,6 @@ namespace Marimon.Controllers
             ViewBag.ListaEntradas = listaEntradas;
             
             return View("~/Views/Flujos/Entradas.cshtml");
-        }
-        
-
-        public ActionResult Salidas()
-        {
-            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
-            
-            // Cargar la lista de entradas para mostrar en la tabla
-            var listaSalidas = _context.Salida
-                .Include(e => e.Autoparte)
-                .OrderByDescending(e => e.sal_id)
-                .Take(10)  // Limitar a las últimas 20 entradas
-                .ToList();
-                
-            ViewBag.ListaSalidas = listaSalidas;
-            return View("~/Views/Flujos/Salida.cshtml");
         }
 
         // AJAX - Obtener productos por categoría
@@ -150,6 +129,21 @@ namespace Marimon.Controllers
             }
         }
 
+        // GET: Admin/Salidas - Página de salida de productos
+        public ActionResult Salidas()
+        {
+            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
+            
+            // Cargar la lista de entradas para mostrar en la tabla
+            var listaSalidas = _context.Salida
+                .Include(e => e.Autoparte)
+                .OrderByDescending(e => e.sal_id)
+                .Take(10)  // Limitar a las últimas 20 entradas
+                .ToList();
+                
+            ViewBag.ListaSalidas = listaSalidas;
+            return View("~/Views/Flujos/Salida.cshtml");
+        }
 
         // POST: Admin/RegistrarSalida - Procesar salida de productos
         [HttpPost]
@@ -257,6 +251,7 @@ namespace Marimon.Controllers
         }
 
 
+        //AUTOPARTE - CRUD
 
         // GET: Admin/ListaAutopartes
         public async Task<IActionResult> ListaAutopartes()
@@ -268,8 +263,6 @@ namespace Marimon.Controllers
 
             return View(autopartes);
         }
-
-
         public IActionResult Create()
         {
             ViewBag.Title = "Registrar Autoparte";
