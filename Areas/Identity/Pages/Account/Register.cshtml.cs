@@ -123,10 +123,10 @@ namespace Marimon.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-                    
+
                     // Obtener el ID generado correctamente
                     var userId = await _userManager.GetUserIdAsync(user);
-                    
+
                     try
                     {
                         // Crear el registro en nuestra tabla personalizada
@@ -143,13 +143,13 @@ namespace Marimon.Areas.Identity.Pages.Account
                             usu_recuento = 0
                             // Otros campos según necesites
                         };
-                        
+
                         _context.Usuarios.Add(usuario);
-                        
+
                         // Guarda los cambios y verifica si hubo éxito
                         var saveResult = await _context.SaveChangesAsync();
                         _logger.LogInformation($"Se guardaron {saveResult} registros en la tabla Usuario");
-                        
+
                         if (saveResult <= 0)
                         {
                             _logger.LogWarning("No se guardó ningún registro en la tabla Usuario");
@@ -161,6 +161,7 @@ namespace Marimon.Areas.Identity.Pages.Account
                         _logger.LogError(ex, "Error al guardar en la tabla Usuario");
                     }
 
+                    var usu_id = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
@@ -168,9 +169,17 @@ namespace Marimon.Areas.Identity.Pages.Account
                         pageHandler: null,
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-                    
+
+                    var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Shared", "email.html");
+                    var emailTemplate = await System.IO.File.ReadAllTextAsync(templatePath);
+
+                    var logoUrl = "https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Flogo-web-marimon.png?alt=media&token=e7fd3cab-30b0-4a6f-a675-30b3b69f836b";
+                    var emailBody = emailTemplate
+                        .Replace("{{LogoUrl}}", logoUrl)
+                        .Replace("{{UserName}}", Input.Nombres)
+                        .Replace("{{CallbackUrl}}", HtmlEncoder.Default.Encode(callbackUrl));
+
+                    await _emailSender.SendEmailAsync(Input.Email, "Bienvenido a Marimon", emailBody);
                     // Siempre redirigir a RegisterConfirmation
                     return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                 }
