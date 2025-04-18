@@ -9,12 +9,10 @@
 <link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
 
 
-
-
 <div class="container catalogo-container">
     <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="text-center">Catálogo de Repuestos</h2>
+        <div class="col-12 text-center">
+            <h2>Catálogo de Repuestos</h2>
         </div>
     </div>
 
@@ -42,36 +40,24 @@
     </div>
 
     <div class="row justify-content-center">
-        <!-- Productos - Cambiado a col-md-12 para usar todo el ancho -->
+        <!-- Productos -->
         <div class="col-md-12">
             <div class="row mb-3">
-                <div class="col-12 d-flex justify-content-between align-items-center">
+                <div class="col-12 d-flex justify-content-center align-items-center">
                     <div class="ordenar-por d-flex align-items-center">
                         <div class="btn-group">
                             <button type="button" class="btn btn-sm btn-success rounded-pill px-3">Relevancia</button>
-                            <button type="button"
-                                class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Precio</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Más
-                                nuevo</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Precio</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Más nuevo</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Mensaje de no resultados -->
-            <div class="no-resultados" id="noResultados">
-                <i class="fas fa-search fa-2x mb-3"></i>
-                <p>No se encontraron productos que coincidan con tu búsqueda.</p>
-                <p class="mt-2">Intenta con otros términos o navega por nuestras categorías.</p>
-            </div>
-
-            <div class="row" id="productosContainer">
+            <div class="row justify-content-center">
                 @foreach (var autoparte in Model)
                 {
-                    <div class="col-md-4 mb-4 producto-item" 
-                         data-nombre="@autoparte.aut_nombre.ToLower()" 
-                         data-descripcion="@(autoparte.aut_descripcion?.ToLower() ?? "")" 
-                         data-categoria="@(autoparte.Categoria?.cat_nombre?.ToLower() ?? "")">
+                    <div class="col-md-4 col-sm-6 mb-4">
                         <div class="card producto-card h-100 shadow-sm">
                             <div class="p-3 text-center">
                                 <img src="@Url.Content(autoparte.aut_imagen)" class="card-img-top producto-img"
@@ -81,7 +67,7 @@
                                 <h5 class="card-title">@autoparte.aut_nombre</h5>
                                 <p class="card-text precio">Precio: <strong>S/
                                         @autoparte.aut_precio.ToString("0.00")</strong></p>
-                                <button class="btn btn-primary" type="button">Añadir Carrito</button>
+                                <button class="btn-primary" type="submit">Añadir al Carrito</button>
                             </div>
                         </div>
                     </div>
@@ -94,6 +80,7 @@
                         <ul class="pagination justify-content-center">
                             <li class="page-item disabled">
                                 <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                            </li>
                             <li class="page-item">
                                 <a class="page-link" href="#">Siguiente</a>
                             </li>

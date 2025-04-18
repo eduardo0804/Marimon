@@ -300,3 +300,170 @@
     color: #666;
     display: none;
 }
+ /* Estilos modernos para el catálogo */
+ .catalogo-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+h2 {
+    font-weight: 700;
+    margin-bottom: 2rem;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h2:after {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 3px;
+    background-color: #28a745;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.search-container {
+    margin-bottom: 3rem;
+}
+
+.search-input-group {
+    position: relative;
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.search-icon {
+    position: absolute;
+    left: 20px;
+    color: #666;
+    z-index: 1;
+}
+
+.search-box {
+    flex-grow: 1;
+    padding: 15px 15px 15px 50px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+}
+
+.search-btn {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    background-color: #333;
+}
+
+.search-suggestion {
+    color: #777;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.ordenar-por {
+    margin-bottom: 20px;
+}
+
+.producto-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.producto-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.producto-img {
+    height: 180px;
+    object-fit: contain;
+    padding: 15px;
+    transition: transform 0.3s ease;
+}
+
+.producto-card:hover .producto-img {
+    transform: scale(1.05);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    height: 40px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.precio {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.precio strong {
+    color: #000;
+}
+
+.btn-primary {
+    background-color: #000;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 80%;
+    display: block;
+    margin: 0 auto;
+}
+
+.btn-primary:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    color: #000;
+    border-radius: 50px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+}
+
+.page-link:hover {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+.page-item.active .page-link {
+    background-color: #000;
+    border-color: #000;
+}
