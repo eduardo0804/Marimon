@@ -50,7 +50,16 @@ namespace Marimon.Controllers
 
         public ActionResult Salidas()
         {
+            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
             
+            // Cargar la lista de entradas para mostrar en la tabla
+            var listaSalidas = _context.Salida
+                .Include(e => e.Autoparte)
+                .OrderByDescending(e => e.sal_id)
+                .Take(10)  // Limitar a las últimas 20 entradas
+                .ToList();
+                
+            ViewBag.ListaSalidas = listaSalidas;
             return View("~/Views/Flujos/Salida.cshtml");
         }
 
@@ -138,6 +147,97 @@ namespace Marimon.Controllers
                 return RedirectToAction("Entradas");
             }
         }
+
+
+        // POST: Admin/RegistrarSalida - Procesar salida de productos
+        [HttpPost]
+        public async Task<IActionResult> RegistrarSalida(int AutoparteId, int sal_cantidad)
+        {
+            try
+            {
+                // Validar entradas
+                if (AutoparteId <= 0)
+                {
+                    TempData["Error"] = "Debe seleccionar un producto válido.";
+                    return RedirectToAction("Entradas");
+                }
+
+                if (sal_cantidad <= 0)
+                {
+                    TempData["Error"] = "La cantidad debe ser mayor a 0.";
+                    return RedirectToAction("Entradas");
+                }
+
+                // Buscar la autoparte correspondiente
+                var autoparte = await _context.Autopartes.FindAsync(AutoparteId);
+                if (autoparte == null)
+                {
+                    TempData["Error"] = "No se encontró el producto seleccionado.";
+                    return RedirectToAction("Entradas");
+                }
+
+                // Paso 2: Crear el método de pago (en efectivo)
+                var metodoPago = new MetodoPago
+                {
+                    pag_importe = (sal_cantidad * autoparte.aut_precio).ToString(), // Calcular el importe
+                    pag_metodo = "Efectivo",
+                    pag_fecha = DateOnly.FromDateTime(DateTime.Now),
+                };
+
+                _context.MetodoPago.Add(metodoPago);
+                await _context.SaveChangesAsync(); // Guardar y generar el ID de metodoPago
+                Console.WriteLine($"Método de pago ID: {metodoPago.pag_id}");
+
+                // Paso 3: Crear la venta
+                var venta = new Venta
+                {
+                    ven_fecha = DateOnly.FromDateTime(DateTime.Now),
+                    MetodoPagoId = metodoPago.pag_id  // Relacionar con el metodo de pago ya guardado
+                };
+                _context.Venta.Add(venta);
+                await _context.SaveChangesAsync(); // Guardar y generar el ID de venta
+
+                // Paso 4: Crear el detalle de venta (usando solo la cantidad y el AutoparteId)
+                var detalleVenta = new DetalleVentas
+                {
+                    VentaId = venta.ven_id,  // Relacionar con la venta ya guardada
+                    AutoParteId = AutoparteId,
+                    det_cantidad = sal_cantidad.ToString()
+                };
+                _context.DetalleVentas.Add(detalleVenta);
+                await _context.SaveChangesAsync(); // Guardar y generar el ID de detalleVenta
+
+                // Paso 5: Crear el comprobante (Boleta)
+                var comprobante = new Comprobante
+                {
+                    com_nombre = "Boleta",  // Definir el tipo de comprobante
+                    VentaId = venta.ven_id   // Relacionar con la venta ya guardada
+                };
+                _context.Comprobante.Add(comprobante);
+                await _context.SaveChangesAsync(); // Guardar y generar el ID de comprobante
+
+                // Paso 6: Registrar la salida
+                var salida = new Salida
+                {
+                    AutoparteId = AutoparteId,
+                    sal_cantidad = sal_cantidad,
+                    ComprobanteId = comprobante.com_id // Relacionar con el comprobante ya guardado
+                };
+                _context.Salida.Add(salida);
+                await _context.SaveChangesAsync(); // Guardar y generar el ID de salida
+
+                TempData["Mensaje"] = $"Se han registrado {sal_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
+                return Ok("Venta registrada con éxito.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error al registrar salida: {ex.Message}");
+                TempData["Error"] = "Error al registrar la entrada: " + ex.Message;
+                return RedirectToAction("Salidas");
+            }
+        }
+
+
 
         // GET: Admin/ListaAutopartes
         public async Task<IActionResult> ListaAutopartes()
