@@ -47,6 +47,7 @@ namespace Marimon.Controllers
             
             return View("~/Views/Flujos/Entradas.cshtml");
         }
+        
 
         public ActionResult Salidas()
         {
@@ -99,6 +100,7 @@ namespace Marimon.Controllers
         [HttpPost]
         public IActionResult RegistrarEntrada(int AutoparteId, int ent_cantidad, string ent_proveedor = "")
         {
+            
             try
             {
                 // Validar entradas
