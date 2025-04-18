@@ -159,13 +159,13 @@ namespace Marimon.Controllers
                 if (AutoparteId <= 0)
                 {
                     TempData["Error"] = "Debe seleccionar un producto válido.";
-                    return RedirectToAction("Entradas");
+                    return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
                 }
 
                 if (sal_cantidad <= 0)
                 {
                     TempData["Error"] = "La cantidad debe ser mayor a 0.";
-                    return RedirectToAction("Entradas");
+                    return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
                 }
 
                 // Buscar la autoparte correspondiente
@@ -173,7 +173,12 @@ namespace Marimon.Controllers
                 if (autoparte == null)
                 {
                     TempData["Error"] = "No se encontró el producto seleccionado.";
-                    return RedirectToAction("Entradas");
+                    return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
+                }
+                else if (autoparte.aut_cantidad < sal_cantidad)
+                {
+                    TempData["Error"] = "No hay suficiente inventario para realizar la salida.";
+                    return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
                 }
 
                 // Paso 2: Crear el método de pago (en efectivo)
@@ -186,7 +191,6 @@ namespace Marimon.Controllers
 
                 _context.MetodoPago.Add(metodoPago);
                 await _context.SaveChangesAsync(); // Guardar y generar el ID de metodoPago
-                Console.WriteLine($"Método de pago ID: {metodoPago.pag_id}");
 
                 // Paso 3: Crear la venta
                 var venta = new Venta
@@ -224,15 +228,20 @@ namespace Marimon.Controllers
                     ComprobanteId = comprobante.com_id // Relacionar con el comprobante ya guardado
                 };
                 _context.Salida.Add(salida);
-                await _context.SaveChangesAsync(); // Guardar y generar el ID de salida
+
+                // ADDED: Update inventory quantity
+                autoparte.aut_cantidad -= sal_cantidad;
+                _context.Autopartes.Update(autoparte);
+
+                await _context.SaveChangesAsync(); // Guardar todo
 
                 TempData["Mensaje"] = $"Se han registrado {sal_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
-                return Ok("Venta registrada con éxito.");
+                return RedirectToAction("Salidas");  // FIXED: Changed to redirect to Salidas instead of returning Ok
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error al registrar salida: {ex.Message}");
-                TempData["Error"] = "Error al registrar la entrada: " + ex.Message;
+                TempData["Error"] = "Error al registrar la salida: " + ex.Message;  // FIXED: Changed "entrada" to "salida"
                 return RedirectToAction("Salidas");
             }
         }
