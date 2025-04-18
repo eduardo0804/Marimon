@@ -70,12 +70,10 @@ namespace Marimon.Controllers
                     })
                     .ToList();
 
-                _logger.LogInformation($"Productos encontrados para categoría {categoriaId}: {productos.Count}");
                 return Json(productos);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error al obtener productos por categoría: {ex.Message}");
                 var errorResponse = new Dictionary<string, string> { { "error", "Error al obtener productos" } };
                 return Json(errorResponse);
             }
@@ -124,15 +122,12 @@ namespace Marimon.Controllers
                     ent_fechaent = DateOnly.FromDateTime(DateTime.Now),
                 };
 
-                // Actualizar el stock de la autoparte
                 autoparte.aut_cantidad += ent_cantidad;
 
-                // Guardar los cambios en la base de datos
                 _context.Entradas.Add(entrada);
                 _context.Autopartes.Update(autoparte);
                 _context.SaveChanges();
 
-                _logger.LogInformation($"Entrada registrada: Producto ID {AutoparteId}, Cantidad {ent_cantidad}");
                 TempData["Mensaje"] = $"Se han registrado {ent_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
                 return RedirectToAction("Entradas");
             }
@@ -168,32 +163,18 @@ namespace Marimon.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Autoparte autoparte, IFormFile imagen)
         {
-            Console.WriteLine("=== Iniciando registro de autoparte ===");
-
-            // Log de los datos del modelo que vienen desde el formulario
-            Console.WriteLine($"aut_nombre: {autoparte.aut_nombre}");
-            Console.WriteLine($"aut_descripcion: {autoparte.aut_descripcion}");
-            Console.WriteLine($"aut_precio: {autoparte.aut_precio}");
-            Console.WriteLine($"CategoriaId: {autoparte.CategoriaId}");
-
-            // Log del archivo recibido
-            Console.WriteLine($"Imagen: {imagen?.FileName}, Tamaño: {imagen?.Length}");
-
-            // Verificar si ya existe una autoparte con el mismo nombre
             var autoparteExistente = await _context.Autopartes
             .FirstOrDefaultAsync(a => a.aut_nombre == autoparte.aut_nombre);
 
             // Verificar que el archivo haya sido enviado y tenga contenido
             if (imagen == null || imagen.Length == 0)
             {
-                Console.WriteLine("=> No se recibió imagen.");
                 ModelState.AddModelError("imagen", "La imagen es obligatoria.");
             }
 
             // Aquí imprimimos el estado del ModelState
             if (!ModelState.IsValid)
             {
-                Console.WriteLine("=> ModelState NO es válido. Errores:");
                 foreach (var error in ModelState)
                 {
                     foreach (var subError in error.Value.Errors)
@@ -210,54 +191,35 @@ namespace Marimon.Controllers
                 // Procesar la imagen: asigna un nombre y guarda en wwwroot/uploads
                 var nombreArchivo = Path.GetFileName(imagen.FileName);
                 var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                Console.WriteLine($"Ruta de carpeta de uploads: {rutaCarpeta}");
 
                 if (!Directory.Exists(rutaCarpeta))
                 {
-                    Console.WriteLine("=> Carpeta no existe, creando carpeta...");
+
                     Directory.CreateDirectory(rutaCarpeta);
                 }
 
                 var rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
-                Console.WriteLine($"Ruta completa del archivo: {rutaCompleta}");
 
                 using (var stream = new FileStream(rutaCompleta, FileMode.Create))
                 {
-                    Console.WriteLine("=> Guardando imagen en disco...");
                     await imagen.CopyToAsync(stream);
                 }
 
                 // Asignar la ruta relativa de la imagen al modelo
                 autoparte.aut_imagen = "/uploads/" + nombreArchivo;
-                Console.WriteLine($"=> Ruta de imagen asignada a autoparte: {autoparte.aut_imagen}");
-
-                // Log de todos los datos del modelo antes de guardarlo
-                Console.WriteLine("=== Datos finales del modelo antes de guardar ===");
-                Console.WriteLine($"aut_nombre: {autoparte.aut_nombre}");
-                Console.WriteLine($"aut_descripcion: {autoparte.aut_descripcion}");
-                Console.WriteLine($"aut_precio: {autoparte.aut_precio}");
-                Console.WriteLine($"aut_especificacion: {autoparte.aut_especificacion}");
-                Console.WriteLine($"aut_imagen: {autoparte.aut_imagen}");
-                Console.WriteLine($"CategoriaId: {autoparte.CategoriaId}");
-
+                
                 // Guardar el modelo en la base de datos
                 _context.Autopartes.Add(autoparte);
                 await _context.SaveChangesAsync();
                 Console.WriteLine("=> Autoparte guardada exitosamente en la base de datos.");
 
-                // Usamos TempData para pasar el mensaje de éxito
                 TempData["SuccessMessage"] = "La autoparte se registró correctamente.";
 
-                // CORRECCIÓN: Usamos return JavaScript para cerrar el modal y recargar la página
-                // para que los toasts se muestren correctamente
                 return Content("<script>window.parent.location.href = '/Admin/ListaAutopartes';</script>", "text/html");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error en Create: {ex.Message}");
                 ModelState.AddModelError("", $"Error al registrar la autoparte: {ex.Message}");
-                _logger.LogError($"Error en Create: {ex}");
-
                 ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
                 return View(autoparte);
             }
@@ -271,7 +233,6 @@ namespace Marimon.Controllers
                 return NotFound();
             }
 
-            // Llenar el ViewBag con las categorías para el dropdown
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
 
             return PartialView("_EditarAutoparte", autoparte);
