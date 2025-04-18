@@ -118,7 +118,7 @@ namespace Marimon.Areas.Identity.Pages.Account
 
             var emailBody = emailTemplate
                 .Replace("{{LogoUrl}}", logoUrl)
-                .Replace("{{UserName}}", $"{usuario.usu_nombre} {usuario.usu_apellido}") // Usa el nombre completo del usuario
+                .Replace("{{UserName}}", $"{usuario.usu_nombre}") // Usa el nombre completo del usuario
                 .Replace("{{CallbackUrl}}", HtmlEncoder.Default.Encode(callbackUrl));
 
             await _emailSender.SendEmailAsync(email, "Reenvío de confirmación de registro", emailBody);
