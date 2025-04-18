@@ -181,6 +181,13 @@ namespace Marimon.Controllers
                     return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
                 }
 
+                // Validar stock disponible
+                if (autoparte.aut_cantidad < sal_cantidad)
+                {
+                    TempData["Error"] = $"Stock insuficiente. Solo hay {autoparte.aut_cantidad} unidades disponibles.";
+                    return RedirectToAction("Salidas");
+                }
+
                 // Paso 2: Crear el método de pago (en efectivo)
                 var metodoPago = new MetodoPago
                 {
