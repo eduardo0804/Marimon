@@ -53,8 +53,8 @@
                     <div class="bg-danger text-white" style="background-color: #d42025 !important;">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="~/images/control-inventario.jpg" alt="Control de inventario"
-                                    class="img-fluid h-100" style="object-fit: cover;">
+                                <img src="~/images/salida.png" alt="Control de inventario" class="img-fluid h-100"
+                                    style="object-fit: cover;">
                             </div>
                             <div class="col-md-8 p-4 d-flex flex-column justify-content-center">
                                 <h3 class="fw-bold mb-3">Control de Inventario Eficiente</h3>
@@ -78,10 +78,9 @@
             <div class="card shadow-sm border-0 rounded-lg mb-4">
                 <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-bold">SELECCIONA UNA AUTOPARTE</h5>
-                    <button type="button" class="btn py-2 text-white fw-bold position-relative overflow-hidden"
-                        id="registrarButton" style="background-color: #d42025;">
+                    <button type="button" class="btn btn-danger py-2 text-white fw-bold position-relative"
+                        id="registrarButton">
                         <i class="fas fa-sign-out-alt me-2"></i>REGISTRAR SALIDAS
-                        <span class="hover-overlay"></span>
                     </button>
                 </div>
                 <div class="card-body p-0">
@@ -141,15 +140,6 @@
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="card-footer bg-white py-3 d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Mostrando @(ViewBag.Productos != null ? ViewBag.Productos.Count :
-                                0) productos</span>
-                            <button type="submit" class="btn py-2 text-white fw-bold position-relative overflow-hidden"
-                                id="submitButton" style="background-color: #d42025;">
-                                <i class="fas fa-sign-out-alt me-2"></i>REGISTRAR SALIDA
-                                <span class="hover-overlay"></span>
-                            </button>
                         </div>
                     </form>
                 </div>
@@ -245,7 +235,7 @@
 
             // Hacer que el botón superior también envíe el formulario
             if (registrarButton) {
-                registrarButton.addEventListener('click', function() {
+                registrarButton.addEventListener('click', function () {
                     document.getElementById('salidaForm').submit();
                 });
             }
@@ -299,30 +289,65 @@
                 return true;
             });
         });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get the buttons
+            const submitButton = document.getElementById('submitButton');
+            const registrarButton = document.getElementById('registrarButton');
+
+            console.log('Submit button:', submitButton); // Debug
+            console.log('Registrar button:', registrarButton); // Debug
+
+            // Ensure buttons exist before adding event listeners
+            if (registrarButton) {
+                registrarButton.addEventListener('click', function () {
+                    document.getElementById('salidaForm').submit();
+                });
+            }
+
+            // Validate that at least one product is selected
+            if (document.getElementById('salidaForm')) {
+                document.getElementById('salidaForm').addEventListener('submit', function (e) {
+                    const productoCheckboxes = document.querySelectorAll('.producto-check');
+                    let alMenosUnoSeleccionado = false;
+
+                    productoCheckboxes.forEach(checkbox => {
+                        if (checkbox.checked) alMenosUnoSeleccionado = true;
+                    });
+
+                    if (!alMenosUnoSeleccionado) {
+                        e.preventDefault();
+                        alert('Debe seleccionar al menos un producto');
+                        return false;
+                    }
+
+                    return true;
+                });
+            }
+        });
     </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <style>
-        /* Estilos generales */
-        .btn-registro,
+        /* Estilo específico para los botones */
+        .btn-danger,
         #submitButton,
         #registrarButton {
             background-color: #d42025 !important;
             color: white !important;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            border: none;
+            border: none !important;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-registro:hover,
-        #submitButton:hover,
-        #registrarButton:hover {
-            background-color: #b91d21 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block !important;
+            /* Forzar visualización */
+            visibility: visible !important;
+            /* Garantizar visibilidad */
+            opacity: 1 !important;
+            /* Garantizar opacidad completa */
+            z-index: 10 !important;
+            /* Colocar por encima de otros elementos */
+            position: relative !important;
+            /* Evitar que position:absolute lo oculte */
         }
 
         .hover-overlay {
@@ -374,11 +399,12 @@
         .card {
             transition: all 0.3s ease;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
         }
+
         /* Header */
         .modulo-header {
             width: 100%;
