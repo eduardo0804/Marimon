@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Marimon.Data;
+using Marimon.Models;
 
 namespace Marimon.Areas.Identity.Pages.Account
 {
@@ -29,13 +31,15 @@ namespace Marimon.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly ApplicationDbContext _context; // Agregamos el contexto de base de datos
 
         public ExternalLoginModel(
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context) // Añadimos el parámetro para el contexto
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -43,6 +47,7 @@ namespace Marimon.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
+            _context = context; // Inicializamos el contexto
         }
 
         /// <summary>
@@ -96,11 +101,61 @@ namespace Marimon.Areas.Identity.Pages.Account
             return new ChallengeResult(provider, properties);
         }
 
-        // Funci�n para limpiar el nombre de usuario
+        // Función para limpiar el nombre de usuario
         private string CleanUserName(string userName)
         {
-            // Reemplazar caracteres no permitidos con un guion bajo
-            return new string(userName.Where(char.IsLetterOrDigit).ToArray());
+            // Reemplazar caracteres no permitidos con guiones bajos
+            return string.Join("", userName.Where(c => char.IsLetterOrDigit(c) || c == '_'));
+        }
+
+        // Función para extraer el nombre y apellido de Google
+        private (string firstName, string lastName) ExtractNameFromClaims(ClaimsPrincipal principal)
+        {
+            // Primero intentamos obtener el given_name y family_name (Google proporciona estos)
+            string firstName = principal.FindFirstValue(ClaimTypes.GivenName);
+            string lastName = principal.FindFirstValue(ClaimTypes.Surname);
+            
+            // También podemos buscar claims específicos de Google
+            if (string.IsNullOrEmpty(firstName))
+                firstName = principal.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
+                
+            if (string.IsNullOrEmpty(lastName))
+                lastName = principal.Claims.FirstOrDefault(c => c.Type == "family_name")?.Value;
+            
+            // Si no encontramos los claims específicos, usamos el nombre completo como fallback
+            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            {
+                string fullName = principal.FindFirstValue(ClaimTypes.Name) ?? "";
+                
+                // Dividir el nombre completo en partes
+                var nameParts = fullName.Split(' ');
+                if (nameParts.Length > 1)
+                {
+                    if (string.IsNullOrEmpty(firstName))
+                        firstName = nameParts[0];
+                        
+                    if (string.IsNullOrEmpty(lastName))
+                        lastName = string.Join(" ", nameParts.Skip(1));
+                }
+                else
+                {
+                    // Si solo hay una parte, usamos eso como nombre
+                    if (string.IsNullOrEmpty(firstName))
+                        firstName = fullName;
+                        
+                    if (string.IsNullOrEmpty(lastName))
+                        lastName = "";
+                }
+            }
+            
+            // Para depuración: loguear todos los claims disponibles
+            _logger.LogInformation("Claims disponibles del proveedor externo:");
+            foreach (var claim in principal.Claims)
+            {
+                _logger.LogInformation($"Claim: {claim.Type} = {claim.Value}");
+            }
+            
+            return (firstName ?? "", lastName ?? "");
         }
 
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
@@ -131,27 +186,67 @@ namespace Marimon.Areas.Identity.Pages.Account
             }
             else
             {
-                // If the user does not have an account, then ask the user to create an account.
+                // Si el usuario no tiene una cuenta, extraemos la información del proveedor externo
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email; // Usa el nombre o el correo como fallback
-                var cleanedUserName = CleanUserName(name);
-
+                
+                // Extraer nombre y apellido usando nuestra función
+                var (firstName, lastName) = ExtractNameFromClaims(info.Principal);
+                
+                var cleanedUserName = CleanUserName(email.Split('@')[0]); // Usar parte del email como nombre de usuario
+                
+                // Crear el nuevo usuario en Identity
                 var user = new IdentityUser
                 {
-                    UserName = cleanedUserName, // Asignar el nombre como UserName
+                    UserName = cleanedUserName,
                     Email = email,
-                    EmailConfirmed = true // Confirmar autom�ticamente el correo
+                    EmailConfirmed = true // Confirmamos automáticamente el correo
                 };
 
                 var createResult = await _userManager.CreateAsync(user);
                 if (createResult.Succeeded)
                 {
+                    // Vincular la cuenta externa con el usuario de Identity
                     await _userManager.AddLoginAsync(user, info);
                     _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
-                    // Iniciar sesi�n autom�ticamente
-                    await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+                    try
+                    {
+                        // Obtener el ID generado correctamente
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        
+                        // Crear el registro en nuestra tabla personalizada
+                        var usuario = new Usuario
+                        {
+                            usu_id = userId, // Usamos el ID generado por Identity
+                            usu_nombre = firstName,
+                            usu_apellido = lastName,
+                            usu_correo = email,
+                            usu_correo_verificado = true, // Los proveedores externos normalmente ya verificaron el correo
+                            usu_bloqueohab = false,
+                            usu_recuento = 0
+                            // Otros campos según necesites
+                        };
+                        
+                        _context.Usuarios.Add(usuario);
+                        
+                        // Guarda los cambios y verifica si hubo éxito
+                        var saveResult = await _context.SaveChangesAsync();
+                        _logger.LogInformation($"Se guardaron {saveResult} registros en la tabla Usuario para login externo");
+                        _logger.LogInformation($"Datos guardados: Nombre={firstName}, Apellido={lastName}, Email={email}");
+                        
+                        if (saveResult <= 0)
+                        {
+                            _logger.LogWarning("No se guardó ningún registro en la tabla Usuario para login externo");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Registra cualquier error durante el guardado
+                        _logger.LogError(ex, "Error al guardar en la tabla Usuario para login externo");
+                    }
 
+                    // Iniciar sesión automáticamente
+                    await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
                     return LocalRedirect(returnUrl);
                 }
 
@@ -181,12 +276,10 @@ namespace Marimon.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                // Establecer el UserName como el nombre del usuario o el correo electr�nico
-                var userName = info.Principal.HasClaim(c => c.Type == ClaimTypes.Name)
-                    ? info.Principal.FindFirstValue(ClaimTypes.Name)
-                    : Input.Email;
+                // Extraer nombre y apellido usando nuestra función
+                var (firstName, lastName) = ExtractNameFromClaims(info.Principal);
 
-                await _userStore.SetUserNameAsync(user, userName, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
                 var result = await _userManager.CreateAsync(user);
@@ -197,11 +290,40 @@ namespace Marimon.Areas.Identity.Pages.Account
                     {
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
-                        // Confirmar el correo autom�ticamente
+                        try
+                        {
+                            // Obtener el ID generado correctamente
+                            var userId = await _userManager.GetUserIdAsync(user);
+                            
+                            // Crear el registro en nuestra tabla personalizada
+                            var usuario = new Usuario
+                            {
+                                usu_id = userId,
+                                usu_nombre = firstName,
+                                usu_apellido = lastName,
+                                usu_correo = Input.Email,
+                                usu_correo_verificado = true,
+                                usu_bloqueohab = false,
+                                usu_recuento = 0
+                                // Otros campos según necesites
+                            };
+                            
+                            _context.Usuarios.Add(usuario);
+                            await _context.SaveChangesAsync();
+                            
+                            _logger.LogInformation($"Datos guardados en confirmación: Nombre={firstName}, Apellido={lastName}, Email={Input.Email}");
+                        }
+                        catch (Exception ex)
+                        {
+                            // Registra cualquier error durante el guardado
+                            _logger.LogError(ex, "Error al guardar en la tabla Usuario durante confirmación externa");
+                        }
+
+                        // Confirmar el correo automáticamente
                         user.EmailConfirmed = true;
                         await _userManager.UpdateAsync(user);
 
-                        // Iniciar sesi�n autom�ticamente
+                        // Iniciar sesión automáticamente
                         await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
 
                         return LocalRedirect(returnUrl);
