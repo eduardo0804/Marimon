@@ -84,16 +84,28 @@
         margin-bottom: 70px;
     }
 
-    .mission-card, .vision-card, .objectives-card {
+    /* Igualar altura y aplicar fondo blanco brillante */
+    .mission-card,
+    .vision-card,
+    .objectives-card,
+    .value-card {
+        height: 100%;
+        min-height: 320px;
         padding: 30px 20px;
         border-radius: 16px;
-        background: #f8d7da;
-        background: linear-gradient(145deg, #ffffff, #f8d7da);
-        border: 2px solid #dc354540;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
-    .mission-card:hover, .vision-card:hover, .objectives-card:hover {
+    .mission-card:hover,
+    .vision-card:hover,
+    .objectives-card:hover,
+    .value-card:hover {
         transform: translateY(-6px);
         box-shadow: 0 12px 30px rgba(220, 53, 69, 0.25);
     }
@@ -134,14 +146,9 @@
     .value-card {
         padding: 25px 15px;
         border-radius: 16px;
-        background: #fff0f1;
+        background: #ffffff;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(220, 53, 69, 0.15);
-    }
-
-    .value-card:hover {
-        transform: scale(1.03);
-        box-shadow: 0 12px 30px rgba(220, 53, 69, 0.25);
     }
 
     .value-img {
@@ -166,6 +173,7 @@
         border-radius: 2px;
     }
 </style>
+
 
 
 
