@@ -170,7 +170,7 @@ namespace Marimon.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Shared", "email.html");
+                    var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "emailReg.html");
                     var emailTemplate = await System.IO.File.ReadAllTextAsync(templatePath);
 
                     var logoUrl = "https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Flogo-web-marimon.png?alt=media&token=e7fd3cab-30b0-4a6f-a675-30b3b69f836b";
