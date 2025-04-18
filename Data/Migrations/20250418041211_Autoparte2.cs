@@ -80,6 +80,22 @@ namespace Marimon.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Servicio",
+                columns: table => new
+                {
+                    ser_id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ser_nombre = table.Column<string>(type: "text", nullable: false),
+                    ser_descripcion = table.Column<string>(type: "text", nullable: false),
+                    ser_img1 = table.Column<string>(type: "text", nullable: false),
+                    ser_img2 = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Servicio", x => x.ser_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Usuario",
                 columns: table => new
                 {
@@ -248,6 +264,28 @@ namespace Marimon.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Reserva",
+                columns: table => new
+                {
+                    res_id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    res_placa = table.Column<string>(type: "text", nullable: false),
+                    res_telefono = table.Column<string>(type: "text", nullable: false),
+                    res_fecha = table.Column<string>(type: "text", nullable: false),
+                    ser_id = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reserva", x => x.res_id);
+                    table.ForeignKey(
+                        name: "FK_Reserva_Servicio_ser_id",
+                        column: x => x.ser_id,
+                        principalTable: "Servicio",
+                        principalColumn: "ser_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Boleta",
                 columns: table => new
                 {
@@ -296,9 +334,7 @@ namespace Marimon.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ent_cantidad = table.Column<int>(type: "integer", nullable: false),
                     ent_proveedor = table.Column<string>(type: "text", nullable: true),
-                    aut_precio = table.Column<decimal>(type: "numeric", nullable: false),
                     ent_fechaent = table.Column<DateOnly>(type: "date", nullable: false),
-                    aut_cantidad = table.Column<int>(type: "integer", nullable: false),
                     AutoparteId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -379,11 +415,18 @@ namespace Marimon.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     sal_fechasalida = table.Column<DateOnly>(type: "date", nullable: false),
                     aut_cantidad = table.Column<int>(type: "integer", nullable: false),
-                    ComprobanteId = table.Column<int>(type: "integer", nullable: false)
+                    ComprobanteId = table.Column<int>(type: "integer", nullable: false),
+                    AutoparteId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Salida", x => x.sal_id);
+                    table.ForeignKey(
+                        name: "FK_Salida_Autoparte_AutoparteId",
+                        column: x => x.AutoparteId,
+                        principalTable: "Autoparte",
+                        principalColumn: "aut_id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Salida_Comprobante_ComprobanteId",
                         column: x => x.ComprobanteId,
@@ -475,6 +518,16 @@ namespace Marimon.Data.Migrations
                 column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reserva_ser_id",
+                table: "Reserva",
+                column: "ser_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Salida_AutoparteId",
+                table: "Salida",
+                column: "AutoparteId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Salida_ComprobanteId",
                 table: "Salida",
                 column: "ComprobanteId");
@@ -510,6 +563,9 @@ namespace Marimon.Data.Migrations
                 name: "Entradas");
 
             migrationBuilder.DropTable(
+                name: "Reserva");
+
+            migrationBuilder.DropTable(
                 name: "Salida");
 
             migrationBuilder.DropTable(
@@ -517,6 +573,9 @@ namespace Marimon.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Servicio");
 
             migrationBuilder.DropTable(
                 name: "Autoparte");

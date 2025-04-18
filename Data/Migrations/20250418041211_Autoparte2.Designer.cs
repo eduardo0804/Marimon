@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marimon.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250417191315_Autoparte2")]
+    [Migration("20250418041211_Autoparte2")]
     partial class Autoparte2
     {
         /// <inheritdoc />
@@ -164,12 +164,6 @@ namespace Marimon.Data.Migrations
                     b.Property<int>("AutoparteId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("aut_cantidad")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("aut_precio")
-                        .HasColumnType("numeric");
-
                     b.Property<int>("ent_cantidad")
                         .HasColumnType("integer");
 
@@ -235,6 +229,36 @@ namespace Marimon.Data.Migrations
                     b.ToTable("MetodoPago");
                 });
 
+            modelBuilder.Entity("Marimon.Models.Reserva", b =>
+                {
+                    b.Property<int>("res_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("res_id"));
+
+                    b.Property<string>("res_fecha")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("res_placa")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("res_telefono")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ser_id")
+                        .HasColumnType("integer");
+
+                    b.HasKey("res_id");
+
+                    b.HasIndex("ser_id");
+
+                    b.ToTable("Reserva");
+                });
+
             modelBuilder.Entity("Marimon.Models.Salida", b =>
                 {
                     b.Property<int>("sal_id")
@@ -242,6 +266,9 @@ namespace Marimon.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("sal_id"));
+
+                    b.Property<int>("AutoparteId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("ComprobanteId")
                         .HasColumnType("integer");
@@ -254,9 +281,40 @@ namespace Marimon.Data.Migrations
 
                     b.HasKey("sal_id");
 
+                    b.HasIndex("AutoparteId");
+
                     b.HasIndex("ComprobanteId");
 
                     b.ToTable("Salida");
+                });
+
+            modelBuilder.Entity("Marimon.Models.Servicio", b =>
+                {
+                    b.Property<int>("ser_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ser_id"));
+
+                    b.Property<string>("ser_descripcion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ser_img1")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ser_img2")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ser_nombre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ser_id");
+
+                    b.ToTable("Servicio");
                 });
 
             modelBuilder.Entity("Marimon.Models.Usuario", b =>
@@ -590,13 +648,32 @@ namespace Marimon.Data.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("Marimon.Models.Reserva", b =>
+                {
+                    b.HasOne("Marimon.Models.Servicio", "Servicio")
+                        .WithMany("Reservas")
+                        .HasForeignKey("ser_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Servicio");
+                });
+
             modelBuilder.Entity("Marimon.Models.Salida", b =>
                 {
+                    b.HasOne("Marimon.Models.Autoparte", "Autoparte")
+                        .WithMany()
+                        .HasForeignKey("AutoparteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Marimon.Models.Comprobante", "Comprobante")
                         .WithMany()
                         .HasForeignKey("ComprobanteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Autoparte");
 
                     b.Navigation("Comprobante");
                 });
@@ -661,6 +738,11 @@ namespace Marimon.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Marimon.Models.Servicio", b =>
+                {
+                    b.Navigation("Reservas");
                 });
 #pragma warning restore 612, 618
         }

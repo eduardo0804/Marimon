@@ -12,9 +12,7 @@ namespace Marimon.Models
         public int ent_id { get; set; }
         public int ent_cantidad { get; set; }
         public string? ent_proveedor { get; set; }
-        public decimal aut_precio { get; set; }
         public DateOnly ent_fechaent { get; set; }
-        public int aut_cantidad {get;set;}
         public int AutoparteId { get; set; } 
 
         [ForeignKey("AutoparteId")]

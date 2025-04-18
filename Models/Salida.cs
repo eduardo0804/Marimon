@@ -15,6 +15,10 @@ namespace Marimon.Models
         public int aut_cantidad { get; set; }
         public int ComprobanteId { get; set; }
 
+        public int AutoparteId { get; set; }
+
+        [ForeignKey("AutoparteId")]
+        public Autoparte? Autoparte { get; set; }
         [ForeignKey("ComprobanteId")]
         public Comprobante? Comprobante { get; set; }
 

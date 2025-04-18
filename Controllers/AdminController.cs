@@ -121,9 +121,7 @@ namespace Marimon.Controllers
                     AutoparteId = AutoparteId,
                     ent_cantidad = ent_cantidad,
                     ent_proveedor = ent_proveedor,
-                    aut_precio = autoparte.aut_precio, // Guardar el precio actual
                     ent_fechaent = DateOnly.FromDateTime(DateTime.Now),
-                    aut_cantidad = autoparte.aut_cantidad + ent_cantidad // Actualizar la cantidad total
                 };
 
                 // Actualizar el stock de la autoparte
