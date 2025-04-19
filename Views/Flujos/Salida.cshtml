@@ -1,6 +1,6 @@
-@model Marimon.Models.Entradas
+@model Marimon.Models.Salida
 @{
-    ViewData["Title"] = "Registro de Entradas";
+    ViewData["Title"] = "Registro de Salidas";
     Layout = "_LayoutAdmin";
 }
 
@@ -83,14 +83,14 @@
                             <label for="sal_cantidad" class="form-label fw-semibold">Cantidad</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
-                                <input name="sal_cantidad" id="ent_cantidad" type="number" class="form-control py-2" min="1"
+                                <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2" min="1"
                                     value="1">
                                 <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('ent_cantidad').stepUp()">
+                                    onclick="document.getElementById('sal_cantidad').stepUp()">
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('ent_cantidad').stepDown()">
+                                    onclick="document.getElementById('sal_cantidad').stepDown()">
                                     <i class="fas fa-minus"></i>
                                 </button>
                             </div>
@@ -149,8 +149,8 @@
                                             <td><span class="badge bg-success rounded-pill">@salida.sal_cantidad</span></td>
                                             <td>
                                                 <div class="avatar-item">
-                                                    <img src="@salida.Autoparte.aut_imagen" alt="@salida.Autoparte.aut_nombre"
-                                                        class="rounded" width="36" />
+                                                   <img src="@salida.Autoparte.aut_imagen" alt="@salida.Autoparte.aut_nombre"
+                                                        title="@salida.Autoparte.aut_nombre" class="rounded" width="36" />
                                                 </div>
                                             </td>
                                             <td>@salida.sal_fechasalida.ToString("dd-MM-yyyy")</td>
@@ -160,7 +160,7 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center py-3">No hay registros de entradas disponibles</td>
+                                        <td colspan="5" class="text-center py-3">No hay registros de salidas disponibles</td>
                                     </tr>
                                 }
                             </tbody>
@@ -195,57 +195,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Información de contacto -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 rounded-lg">
-                <div class="card-body">
-                    <h5 class="text-center mb-4 fw-bold">CONTÁCTANOS</h5>
-                    <div class="row justify-content-center">
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
-                                    style="width: 48px; height: 48px; background-color: #d42025;">
-                                    <i class="fas fa-envelope text-white"></i>
-                                </div>
-                                <div>
-                                    <strong class="d-block mb-1">Email:</strong>
-                                    <a href="mailto:contacto@ejemplo.com"
-                                        class="text-decoration-none text-body">contacto@ejemplo.com</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
-                                    style="width: 48px; height: 48px; background-color: #d42025;">
-                                    <i class="fas fa-phone text-white"></i>
-                                </div>
-                                <div>
-                                    <strong class="d-block mb-1">Teléfono:</strong>
-                                    <a href="tel:912345678" class="text-decoration-none text-body">912 345 678</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
-                                    style="width: 48px; height: 48px; background-color: #d42025;">
-                                    <i class="fas fa-map-marker-alt text-white"></i>
-                                </div>
-                                <div>
-                                    <strong class="d-block mb-1">Dirección:</strong>
-                                    <span>Av. Los Álamos 123, Villa Sur</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 @section Scripts {
     <script>
@@ -347,7 +296,7 @@
         // Validación del formulario
         document.querySelector('form').addEventListener('submit', function(e) {
             const productoSelect = document.getElementById('productoSelect');
-            const cantidadInput = document.getElementById('ent_cantidad');
+            const cantidadInput = document.getElementById('sal_cantidad');
             
             if (productoSelect.value === '') {
                 e.preventDefault();
@@ -355,11 +304,11 @@
                 return false;
             }
             
-            if (cantidadInput.value < 1) {
-                e.preventDefault();
-                alert('La cantidad debe ser mayor a 0');
-                return false;
-            }
+            if (model.AutoparteId == null || model.sal_cantidad < 1) {
+    TempData["Error"] = "Debe seleccionar un producto válido y una cantidad mayor a 0.";
+    return RedirectToAction("Salidas");
+}
+
             
             return true;
         });
