@@ -17,5 +17,8 @@ namespace Marimon.Models
         [ForeignKey("MetodoPagoId")]
         public MetodoPago? MetodoPago { get; set; }
 
+        // Agregar esta línea 👇
+        public ICollection<DetalleVentas> Detalles { get; set; } = new List<DetalleVentas>();
+
     }
 }

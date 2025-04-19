@@ -1,273 +1,93 @@
 @model List<Marimon.Models.Autoparte>
 
-    @{
+@{
     ViewData["Title"] = "Catálogo - AUTOMOTRIZ MARIMON S.A.C";
-    }
+}
 
-    <style>
+<!-- Incluir Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
 
 
-        .catalogo-container {
-            font-family: 'Nunito', sans-serif;
-            padding: 30px 0;
-        }
-
-        .filtros-container {
-            border-radius: 10px;
-            background-color: #f9f9f9;
-        }
-
-        .producto-card {
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            border: 1px solid #eee;
-        }
-
-            .producto-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-            }
-
-        .producto-img {
-            height: 150px;
-            object-fit: contain;
-            padding: 10px;
-        }
-
-        .precio {
-            color: #333;
-            font-size: 0.9rem;
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: #343a40;
-            border-color: #343a40;
-        }
-
-        .pagination .page-link {
-            color: #343a40;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .accordion-button:not(.collapsed) {
-            background-color: #f8f9fa;
-            color: #333;
-        }
-
-        .accordion-button:focus {
-            box-shadow: none;
-            border-color: rgba(0,0,0,.125);
-        }
-
-        .form-check-input:checked {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .carrito-lateral {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            width: 300px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            z-index: 1050;
-            max-height: 80vh;
-            overflow-y: auto;
-            transition: all 0.3s ease-in-out;
-            border: none;
-            padding-bottom: 10px;
-            font-family: 'Nunito', sans-serif;
-        }
-
-        .lista-carrito li {
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .lista-carrito img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            border-radius: 6px;
-        }
-
-        .lista-carrito .flex-grow-1 {
-            font-size: 0.85rem;
-            color: #333;
-        }
-
-        .lista-carrito .btn-outline-secondary {
-            border: none;
-            background-color: #eee;
-            color: #333;
-            font-weight: bold;
-            padding: 4px 10px;
-            border-radius: 50%;
-            font-size: 0.85rem;
-            transition: background 0.2s ease;
-        }
-
-            .lista-carrito .btn-outline-secondary:hover {
-                background-color: #ddd;
-            }
-
-        .subtotal {
-            font-size: 1rem;
-            font-weight: bold;
-            text-align: right;
-            border-top: 1px solid #eee;
-            margin-top: 10px;
-            padding-top: 10px;
-        }
-    </style>
-
-    <div class="container catalogo-container">
-        <div class="row mb-4">
-            <div class="col-12">
-                <h2 class="text-center">Catálogo de Repuestos</h2>
-            </div>
+<div class="container catalogo-container">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2>Catálogo de Repuestos</h2>
         </div>
+    </div>
 
-        <div class="row">
-            <!-- Filtros 
-            <div class="col-md-3">
-                <div class="filtros-container shadow-sm p-4 mb-4 bg-white rounded">
-                    <h5 class="mb-3">Filtrar por:</h5>
-
-                    <div class="mb-2">
-                        <input type="text" class="form-control" placeholder="Buscar...">
+    <!-- Fila para el buscador mejorado -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="search-container">
+                <form asp-controller="Catalogo" asp-action="Index" method="get" class="d-flex justify-content-center">
+                    <div class="search-input-group">
+                        <!-- Ícono de lupa -->
+                        <i class="fas fa-search search-icon"></i>
+                        <!-- Campo de búsqueda -->
+                        <input type="text" name="buscar" class="search-box" placeholder="¿Qué repuesto estás buscando hoy?">
+                        <!-- Botón de búsqueda -->
+                        <button class="btn search-btn" type="submit">
+                            Buscar
+                        </button>
                     </div>
-
-                    <div class="accordion" id="accordionFiltros">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroMarca">
-                                    Marca
-                                </button>
-                            </h2>
-                            <div id="filtroMarca" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="marca1">
-                                        <label class="form-check-label" for="marca1">Marca 1</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="marca2">
-                                        <label class="form-check-label" for="marca2">Marca 2</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="marca3">
-                                        <label class="form-check-label" for="marca3">Marca 3</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroCategoria">
-                                    Categoría
-                                </button>
-                            </h2>
-                            <div id="filtroCategoria" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="categoria1">
-                                        <label class="form-check-label" for="categoria1">Llantas</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="categoria2">
-                                        <label class="form-check-label" for="categoria2">Frenos</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="categoria3">
-                                        <label class="form-check-label" for="categoria3">Suspensión</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroPrecio">
-                                    Precio
-                                </button>
-                            </h2>
-                            <div id="filtroPrecio" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Min: S/50</span>
-                                        <span>Max: S/200</span>
-                                    </div>
-                                    <input type="range" class="form-range" min="50" max="200" value="150" id="precioRange">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            -->
-
-            <!-- Productos -->
-            <div class="col-md-9">
-                <div class="row mb-3">
-                    <div class="col-12 d-flex justify-content-between align-items-center">
-                        <div class="ordenar-por d-flex align-items-center">
-                            <span class="me-2">Ordenar por:</span>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-success rounded-pill px-3">Relevancia</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Precio</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Más nuevo</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    @foreach (var autoparte in Model)
-                {
-                    <div class="col-md-4 mb-4">
-                        <div class="card producto-card h-100 shadow-sm">
-                            <div class="p-3 text-center">
-                                <img src="@Url.Content(autoparte.aut_imagen)" class="card-img-top producto-img" alt="@autoparte.aut_nombre">
-                            </div>
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Autoparte @autoparte.aut_id</h5>
-                                <p class="card-text precio">Precio: <strong>S/ @autoparte.aut_precio.ToString("0.00")</strong></p>
-                                <button class="btn btn-primary" type="submit">Añadir Carrito</button>
-                            </div>
-                        </div>
-                    </div>
-                }
-                </div>
-
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
-                                </li>
-    
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Siguiente</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                </form>
+                <div class="search-suggestion text-center mt-2">
+                    Prueba a buscar "filtro de aceite", "frenos", "amortiguadores"...
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="row justify-content-center">
+        <!-- Productos -->
+        <div class="col-md-12">
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-center align-items-center">
+                    <div class="ordenar-por d-flex align-items-center">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-success rounded-pill px-3">Relevancia</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Precio</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Más nuevo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                @foreach (var autoparte in Model)
+                {
+                    <div class="col-md-4 col-sm-6 mb-4">
+                        <div class="card producto-card h-100 shadow-sm">
+                            <div class="p-3 text-center">
+                                <img src="@Url.Content(autoparte.aut_imagen)" class="card-img-top producto-img"
+                                    alt="@autoparte.aut_nombre">
+                            </div>
+                            <div class="card-body text-center">
+                                <h5 class="card-title">@autoparte.aut_nombre</h5>
+                                <p class="card-text precio">Precio: <strong>S/
+                                        @autoparte.aut_precio.ToString("0.00")</strong></p>
+                                <button class="btn-primary" type="submit">Añadir al Carrito</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Siguiente</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

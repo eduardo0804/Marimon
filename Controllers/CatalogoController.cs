@@ -19,13 +19,20 @@ namespace Marimon.Controllers
         }
 
         // GET: Catalogo/Index
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string buscar)
         {
+            
             // Obtener la lista de autopartes junto con la categoría
             var autopartes = await _context.Autopartes
                 .Include(a => a.Categoria)
                 .OrderBy(a => a.aut_id)  // Cargar la categoría asociada con la autoparte
                 .ToListAsync();
+
+            if (!String.IsNullOrEmpty(buscar))
+            {
+                // Filtrar la lista de autopartes por el nombre de la autoparte
+                autopartes = autopartes.Where(a => a.aut_nombre.Contains(buscar)).ToList();
+            }
 
             // Pasar la lista de autopartes a la vista
             return View(autopartes);
