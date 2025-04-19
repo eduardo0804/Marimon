@@ -16,10 +16,10 @@
                 <span>Detalle de la cuenta</span>
             </div>
             <div class="sidebar-menu-item">
-                <a asp-area="Identity" asp-page="/Account/Pedidos">MIS PEDIDOS</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">MIS PEDIDOS</a>
             </div>
             <div class="sidebar-menu-item">
-                <a asp-area="Identity" asp-page="/Account/Citas">MIS CITAS</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Citas">MIS CITAS</a>
             </div>
             <div class="sidebar-menu-item exit">
                 <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">

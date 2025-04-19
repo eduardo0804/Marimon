@@ -1,0 +1,39 @@
+@page
+@model Marimon.Areas.Identity.Pages.Account.Manage.Citas
+@{
+    ViewData["Title"] = "Citas";
+}
+
+<link rel="stylesheet" href="~/css/perfil_usuario.css" asp-append-version="true" />
+
+<div class="user-profile-container">
+    <div class="profile-header">
+        <h1>Detalle Usuario</h1>
+    </div>
+    <div class="profile-content">
+        <div class="sidebar">
+            <div class="sidebar-menu-item ">
+                <a asp-area="Identity" asp-page="/Account/Manage/Index">Detalle de la cuenta</a>
+            </div>
+            <div class="sidebar-menu-item">
+                <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">Mis pedidos</a>
+            </div>
+            <div class="sidebar-menu-item active">
+                <span>Mis citas</span>
+            </div>
+            <div class="sidebar-menu-item exit">
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit">SALIR</button>
+                </form>
+            </div>
+        </div>
+        <div class="profile-details">
+            
+            <h2>Mis Citas</h2>
+            
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

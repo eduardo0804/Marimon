@@ -12,7 +12,7 @@ namespace Marimon.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int bol_id { get; set; }
 
-        public int UsuarioId { get; set; }
+        public string UsuarioId { get; set; }
 
         [ForeignKey("UsuarioId")]
         public Usuario? Usuario { get; set; }
