@@ -61,15 +61,20 @@
 <body>
     <header>
         <div class="contenedor-menu">
-            <!-- Toggle para menú móvil -->
+            <!-- Toggle para menú móvil a la izquierda -->
             <input type="radio" name="slider" id="menu-btn">
             <input type="radio" name="slider" id="close-btn">
             <label for="menu-btn" class="menu-btn botones"><i class="fa-solid fa-bars"></i></label>
             <label for="close-btn" class="close-btn botones"><i class="fa-solid fa-xmark"></i></label>
             
-            <!-- Logo -->
+            <!-- Logo centrado -->
             <div class="logo-contenedor">
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/logo_marimon.png" alt="Logo" style="width: 140px;"></a>
+            </div>
+            
+            <!-- Carrito a la derecha -->
+            <div class="carrito-movil-container">
+                <a asp-controller="Carrito" asp-action="Index" class="cart-icon-movil"><i class="fa-solid fa-cart-shopping"></i></a>
             </div>
             
             <!-- Menú principal centrado -->
@@ -106,7 +111,7 @@
                 <!-- Dropdown SERVICIOS móvil -->
                 <div class="dropdown-movil">
                     <input type="checkbox" id="showServicios-movil">
-                    <label for="showServicios-movil">SERVICIOS <i class="fa-solid fa-chevron-down"></i></label><!-- FALTA -->
+                    <label for="showServicios-movil">SERVICIOS <i class="fa-solid fa-chevron-down"></i></label>
                     <ul class="drop-menu-movil">
                         <li><a href="#">Mantenimiento y Frenos</a></li>
                         <li><a asp-area="" asp-controller="Servicios" asp-action="Servicio">Diagnóstico y Scanner</a></li>
@@ -123,14 +128,6 @@
             
                 <a asp-area="" asp-controller="Catalogo" asp-action="Index">CATÁLOGOS</a>
                 <a asp-area="" asp-controller="Nosotros" asp-action="Index">NOSOTROS</a>
-
-                <a asp-controller="Carrito" asp-action="Index" class="cart-icon-movil"><i class="fa-solid fa-cart-shopping"></i> Carrito</a>
-
-                <!--<button class="botones btn-primary botones" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
-                    Ver carrito
-                </button>-->
-
-
 
                 <!-- Dropdown Iniciar Sesión móvil -->
                 <partial name="_LoginPartial_Movil" />
