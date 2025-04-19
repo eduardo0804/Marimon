@@ -1,0 +1,295 @@
+/* Estilos generales */
+:root {
+  --primary-color: #e22122;
+  --secondary-color: #c1c1c1;
+  --text-color: #333;
+  --white: #fff;
+  --light-gray: #f5f5f5;
+  --border-color: #ddd;
+}
+
+/* Contenedor principal */
+.login_container {
+  display: flex;
+  margin-top: 40px;
+  height: auto;
+  width: 100%;
+  border-radius: 20px 0px 0px 20px;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  position: relative; /* Importante para posicionar el fondo rojo */
+}
+
+/* Formulario de login */
+.login_form {
+  width: 50%;
+  background-color: var(--secondary-color);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 1; /* Asegura que esté por encima del fondo */
+}
+
+/* Título */
+.login_form h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 15px;
+  color: #000000;
+  text-align: center;
+}
+
+/* Sección de opciones de login */
+.login_option {
+  margin-bottom: 10px;
+}
+
+/* Botones de login social */
+.social-login-btn {
+  width: 100%;
+  padding: 8px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.social-login-btn:hover {
+  background-color: #fae4e4;
+}
+
+/* Logo de Google */
+.google-icon {
+  background: url("https://cdn.cdnlogo.com/logos/g/35/google-icon.svg")
+    no-repeat center center;
+  background-size: contain;
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  display: inline-block;
+}
+
+/* Separador */
+.separator {
+  text-align: center;
+  position: relative;
+  margin: 15px 0;
+}
+
+.separator::before,
+.separator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+.separator::before {
+  left: 0;
+}
+
+.separator::after {
+  right: 0;
+}
+
+.separator span {
+  display: inline-block;
+  padding: 0 10px;
+  background-color: var(--secondary-color);
+  position: relative;
+  z-index: 1;
+}
+
+/* Formulario local */
+.local-login form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Inputs */
+.input_box {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.input_box label {
+  margin-bottom: 4px;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+input[type="email"],
+input[type="password"] {
+  padding: 10px 12px;
+  outline: none;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-size: 0.95rem;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  box-shadow: 0 0 0 2px rgba(80, 80, 80, 0.4); /* sombra gris oscuro más intensa */
+}
+
+/* Password title */
+.password_title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+#forgot-password {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+#forgot-password:hover {
+  text-decoration: underline;
+}
+
+/* Checkbox */
+.checkbox {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.checkbox input {
+  margin-right: 8px;
+}
+
+/* Botón de iniciar sesión */
+#login-submit {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 8px 0;
+}
+
+#login-submit:hover {
+  background-color: #c81213;
+}
+
+/* Enlace para registrarse */
+.sign_up {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 1rem;
+}
+
+.sign_up a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.sign_up a:hover {
+  text-decoration: underline;
+}
+
+/* AJUSTE IMPORTANTE: Fondo rojo completo */
+.login_image {
+  width: 50%;
+  border-radius: 0px 20px 20px 0px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fondo rojo que cubre todo */
+.login_image::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--primary-color);
+  z-index: 0;
+}
+
+/* Centrar la imagen pero mantener fondo rojo completo */
+.login_image img {
+  position: relative;
+  max-width: 80%;
+  max-height: 90%;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+/* Debug info (oculta por defecto) */
+.debug-info {
+  display: none;
+}
+
+/* Validación */
+.text-danger {
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  margin-top: 3px;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .login_container {
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+    margin: 0;
+    margin-top: 40px;
+  }
+
+  .login_form {
+    width: 100%;
+    padding: 25px 20px;
+    border-radius: 20px 20px 0px 0px;
+  }
+
+  .login_image {
+    width: 100%;
+    border-radius: 0px 0px 20px 20px;
+    height: 600px; /* Altura fija para la imagen en móvil */
+    order: 2;
+  }
+
+  .login_image img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .login_form {
+    padding: 20px 15px;
+  }
+
+  .password_title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #forgot-password {
+    margin-top: 5px;
+  }
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .email-header {
+            background-color: black;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .email-header img {
+            max-width: 150px;
+        }
+
+        .email-body {
+            padding: 20px;
+            color: #333333;
+            text-align: center;
+        }
+
+        .email-body h1 {
+            color: black;
+        }
+
+        .email-footer {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #888888;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #E42229;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .button-text {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #E42229;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+
+        }
+
+        .button:hover {
+            background-color: #D42025;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <img src="{{LogoUrl}}" alt="Marimon Logo">
+        </div>
+        <div class="email-body">
+            <p>Hola {{UserName}},</p>
+            <p>Hemos recibido una solicitud para restablecer tu contraseña. Puedes hacerlo haciendo clic en el botón de abajo:</p>
+            <a href="{{CallbackUrl}}" class="button button-text">Restablecer contraseña</a>
+            <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+        </div>
+        <div class="email-footer">
+            <p>Marimon © 2025. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

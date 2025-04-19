@@ -27,7 +27,8 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
     <!--Paquete de datos del Usuario -->
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
-
+    <!--Google-->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.3" />
 
   </ItemGroup>
 

@@ -1,16 +1,42 @@
 @using Microsoft.AspNetCore.Identity
+@using Marimon.Data
+@using Marimon.Models
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-    
-<link rel="stylesheet" href="~/css/menus.css" />
-
+@inject ApplicationDbContext Context
+@{
+    string nombreMostrar = User.Identity?.Name!;
+    var usuario = Context.Usuarios.FirstOrDefault(u => u.usu_id == UserManager.GetUserId(User));
+    if (usuario != null)
+    {
+        if (!string.IsNullOrEmpty(usuario.usu_nombrePerfil))
+        {
+            nombreMostrar = usuario.usu_nombrePerfil;
+        }
+        else if (!string.IsNullOrEmpty(usuario.usu_nombre))
+        {
+            nombreMostrar = usuario.usu_nombre;
+        }
+    }
+}
 @if (SignInManager.IsSignedIn(User))
 {
     <div class="dropdown-user-movil">
         <input type="checkbox" id="showUsuario-movil">
-        <label for="showUsuario-movil">@User.Identity?.Name <i class="fa-solid fa-user"></i></label>
+        <label for="showUsuario-movil">@nombreMostrar <i class="fa-solid fa-user"></i></label>
         <ul class="drop-menu-movil">
-            <li><a asp-area="Identity" asp-page="/Account/Manage/Index">Escritorio</a></li>
+            <li>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Mi Perfil</a>
+            </li>
+            <li>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index">Mis Pedidos</a>
+            </li>
+            <li>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index">Mis citas</a>
+            </li>
+            <li>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index">Favoritos</a>
+            </li>
             <li>
                 <form class="logout-form-movil" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                     <button type="submit" class="logout-button-movil">Salir</button>

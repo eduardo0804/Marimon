@@ -1,11 +1,27 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Marimon.Data
+@using Marimon.Models
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-
+@inject ApplicationDbContext Context
+@{
+    var usuario = Context.Usuarios.FirstOrDefault(u => u.usu_id == UserManager.GetUserId(User));
+    string nombreMostrar = User.Identity?.Name!;
+    
+    if (usuario != null)
+    {
+        if (!string.IsNullOrEmpty(usuario.usu_nombrePerfil))
+        {
+            nombreMostrar = usuario.usu_nombrePerfil;
+        }
+        else if (!string.IsNullOrEmpty(usuario.usu_nombre))
+        {
+            nombreMostrar = usuario.usu_nombre;
+        }
+    }
+}
 <link rel="stylesheet" href="~/css/menus.css" />
-
 <nav class="segundo_menu">
-    @* <a asp-area="" asp-controller="Carrito" asp-action="Index" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></a> *@
     <a href="#" class="cart-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito" aria-controls="offcanvasCarrito">
         <i class="fa-solid fa-cart-shopping"></i>
     </a>
@@ -13,10 +29,17 @@
     {
         <!-- Dropdown para usuario logueado -->
         <div class="dropdown-user">
-            <a class="desktop-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@User.Identity?.Name! <i class="fa-solid fa-user"></i></a>
-
+            <a class="desktop-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@nombreMostrar <i class="fa-solid fa-user"></i></a>
             <ul class="drop-menu-user">
-                <li><a asp-area="Identity" asp-page="/Account/Manage/Index">Escritorio</a></li>
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index">Mis Pedidos</a>
+                </li>
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index">Mis citas</a>
+                </li>
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index">Favoritos</a>
+                </li>
                 <li>
                     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                         <button type="submit">Salir</button>
@@ -30,5 +53,4 @@
         <!-- Para usuario no logueado -->
         <a asp-area="Identity" asp-page="/Account/Login">Iniciar Sesión</a>
     }
-
 </nav>
