@@ -13,8 +13,10 @@ namespace Marimon.Models
 		public string res_telefono { get; set; }
 		public string res_fecha { get; set; }
 
-		//[ForeignKey("User")]
-		//public string user_id { get; set; }
+		public string UsuarioId { get; set; }
+
+        [ForeignKey("UsuarioId")]
+        public Usuario? Usuario { get; set; }
 
 		[ForeignKey("Servicio")]
 		public int ser_id { get; set; }
