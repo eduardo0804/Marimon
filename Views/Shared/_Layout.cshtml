@@ -64,8 +64,8 @@
             <!-- Toggle para menú móvil -->
             <input type="radio" name="slider" id="menu-btn">
             <input type="radio" name="slider" id="close-btn">
-            <label for="menu-btn" class="btn menu-btn"><i class="fa-solid fa-bars"></i></label>
-            <label for="close-btn" class="btn close-btn"><i class="fa-solid fa-xmark"></i></label>
+            <label for="menu-btn" class="menu-btn botones"><i class="fa-solid fa-bars"></i></label>
+            <label for="close-btn" class="close-btn botones"><i class="fa-solid fa-xmark"></i></label>
             
             <!-- Logo -->
             <div class="logo-contenedor">
@@ -100,7 +100,7 @@
             
             <!-- Menú móvil -->
             <nav class="movil_menu">
-                <label for="close-btn" class="btn close-btn-inside"><i class="fa-solid fa-xmark"></i></label>
+                <label for="close-btn" class="botones close-btn-inside"><i class="fa-solid fa-xmark"></i></label>
                 
                 <a asp-area="" asp-controller="Home" asp-action="Index">INICIO</a>
                 <!-- Dropdown SERVICIOS móvil -->
@@ -125,7 +125,7 @@
                 <a asp-area="" asp-controller="Nosotros" asp-action="Index">NOSOTROS</a>
 
                 @* <a asp-controller="Carrito" asp-action="Index" class="cart-icon-movil"><i class="fa-solid fa-cart-shopping"></i> Carrito</a> *@
-                <button class="btn btn-primary botones" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
+                <button class="botones btn-primary botones" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
                     Ver carrito
                 </button>
 

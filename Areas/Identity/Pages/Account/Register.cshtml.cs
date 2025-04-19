@@ -136,12 +136,7 @@ namespace Marimon.Areas.Identity.Pages.Account
                             usu_nombre = Input.Nombres,
                             usu_apellido = Input.Apellidos,
                             usu_correo = Input.Email,
-                            usu_correo_verificado = false,
-                            // No guardar la contraseña en texto plano, Identity ya la gestiona
-                            // usu_contrasenia = Input.Password,
-                            usu_bloqueohab = false,
-                            usu_recuento = 0
-                            // Otros campos según necesites
+                            //usu_contrasenia = Input.Password, No se almacena la contraseña
                         };
 
                         _context.Usuarios.Add(usuario);

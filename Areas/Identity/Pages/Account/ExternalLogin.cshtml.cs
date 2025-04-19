@@ -221,9 +221,6 @@ namespace Marimon.Areas.Identity.Pages.Account
                             usu_nombre = firstName,
                             usu_apellido = lastName,
                             usu_correo = email,
-                            usu_correo_verificado = true, // Los proveedores externos normalmente ya verificaron el correo
-                            usu_bloqueohab = false,
-                            usu_recuento = 0
                             // Otros campos según necesites
                         };
                         
@@ -302,9 +299,6 @@ namespace Marimon.Areas.Identity.Pages.Account
                                 usu_nombre = firstName,
                                 usu_apellido = lastName,
                                 usu_correo = Input.Email,
-                                usu_correo_verificado = true,
-                                usu_bloqueohab = false,
-                                usu_recuento = 0
                                 // Otros campos según necesites
                             };
                             
