@@ -58,6 +58,15 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(1); // Tiempo de vida del carrito
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; // Necesario para que no lo bloquee la política de cookies
+});
+
+
 // Protección de datos persistente en carpeta del contenedor
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
@@ -77,6 +86,7 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication(); // Ya tenías esta línea
 app.UseAuthorization(); // Ya tenías esta línea
 app.MapControllerRoute(
