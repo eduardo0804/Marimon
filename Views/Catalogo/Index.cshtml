@@ -4,10 +4,49 @@
     ViewData["Title"] = "Catálogo - AUTOMOTRIZ MARIMON S.A.C";
 }
 
-<!-- Incluir Font Awesome -->
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
 
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1050;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    #contenidoModal {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+    }
+
+    .cerrar-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .cerrar-modal:hover {
+        color: #d9534f;
+    }
+</style>
 
 <div class="container catalogo-container">
     <div class="row mb-4">
@@ -16,20 +55,15 @@
         </div>
     </div>
 
-    <!-- Fila para el buscador mejorado -->
+    <!-- Buscador -->
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="search-container">
                 <form asp-controller="Catalogo" asp-action="Index" method="get" class="d-flex justify-content-center">
                     <div class="search-input-group">
-                        <!-- Ícono de lupa -->
                         <i class="fas fa-search search-icon"></i>
-                        <!-- Campo de búsqueda -->
                         <input type="text" name="buscar" class="search-box" placeholder="¿Qué repuesto estás buscando hoy?">
-                        <!-- Botón de búsqueda -->
-                        <button class="btn search-btn" type="submit">
-                            Buscar
-                        </button>
+                        <button class="btn search-btn" type="submit">Buscar</button>
                     </div>
                 </form>
                 <div class="search-suggestion text-center mt-2">
@@ -39,21 +73,9 @@
         </div>
     </div>
 
+    <!-- Productos -->
     <div class="row justify-content-center">
-        <!-- Productos -->
         <div class="col-md-12">
-            <div class="row mb-3">
-                <div class="col-12 d-flex justify-content-center align-items-center">
-                    <div class="ordenar-por d-flex align-items-center">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-success rounded-pill px-3">Relevancia</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Precio</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-2">Más nuevo</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="row justify-content-center">
                 @foreach (var autoparte in Model)
                 {
@@ -61,21 +83,12 @@
                         <div class="card producto-card h-100 shadow-sm">
                             <div class="p-3 text-center">
                                 <img src="@Url.Content(autoparte.aut_imagen)" class="card-img-top producto-img"
-                                     alt="@autoparte.aut_nombre">
+                                    alt="@autoparte.aut_nombre">
                             </div>
                             <div class="card-body text-center">
                                 <h5 class="card-title">@autoparte.aut_nombre</h5>
-                                <p class="card-text precio">
-                                    Precio: <strong>
-                                        S/
-                                        @autoparte.aut_precio.ToString("0.00")
-                                    </strong>
-                                </p>
-                                <!-- Formulario para añadir al carrito -->
-                                <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post">
-                                    <input type="hidden" name="id" value="@autoparte.aut_id" />
-                                    <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
-                                </form>
+                                <p class="card-text precio">Precio: <strong>S/ @autoparte.aut_precio.ToString("0.00")</strong></p>
+                                <button class="btn-primary" type="submit">Añadir al Carrito</button>
                             </div>
                         </div>
                     </div>
@@ -83,6 +96,7 @@
 
             </div>
 
+            <!-- Paginación -->
             <div class="row mt-4">
                 <div class="col-12">
                     <nav aria-label="Page navigation">
@@ -100,3 +114,38 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div id="modalAutoparte" class="modal">
+    <div id="contenidoModal">
+        <button class="cerrar-modal" onclick="cerrarModal()">×</button>
+        <!-- Aquí se carga el contenido desde el controlador -->
+    </div>
+</div>
+
+<script>
+    function cargarDetalleAutoparte(id) {
+        fetch(`/Catalogo/DetalleAutoparte/${id}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById("contenidoModal").innerHTML = '<button class="cerrar-modal" onclick="cerrarModal()">×</button>' + html;
+                document.getElementById("modalAutoparte").style.display = "block";
+            });
+    }
+
+    function cerrarModal() {
+        document.getElementById("modalAutoparte").style.display = "none";
+    }
+
+    function agregarFavorito() {
+        alert("Autoparte agregada a favoritos.");
+    }
+
+    function agregarCarrito() {
+        alert("Autoparte añadida al carrito.");
+    }
+
+    function verSimilares() {
+        alert("Mostrando productos similares...");
+    }
+</script>
