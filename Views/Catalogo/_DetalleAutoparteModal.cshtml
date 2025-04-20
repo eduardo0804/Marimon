@@ -1,0 +1,215 @@
+@model Marimon.Models.Autoparte
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles Autoparte</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .modal-custom {
+            display: block;
+            position: fixed;
+            z-index: 1050;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%);
+            overflow: auto;
+            padding: 60px 20px;
+        }
+
+        .modal-content-custom {
+            background-color: #ffffff;
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 1000px;
+            margin: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .autoparte-img {
+            width: 100%;
+            border-radius: 20px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .autoparte-img.zoomed {
+            transform: scale(1.6);
+            cursor: zoom-out;
+        }
+
+        .favorito-icon {
+            font-size: 28px;
+            color: #e63946;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .favorito-icon:hover {
+            color: #d32f2f;
+        }
+
+        .precio {
+            font-size: 28px;
+            font-weight: 700;
+            color: #212529;
+            margin-top: 20px;
+        }
+
+        .btn-whatsapp, .btn-carrito {
+            border-radius: 40px;
+            padding: 10px 24px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #1ebd5a;
+        }
+
+        .btn-carrito {
+            background-color: #e63946;
+            color: white;
+        }
+
+        .btn-carrito:hover {
+            background-color: #c62828;
+        }
+
+        .btn-outline-secondary {
+            font-weight: 600;
+            border-radius: 30px;
+        }
+
+        .close-btn {
+            font-size: 34px;
+            color: #999;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        h4 {
+            font-weight: 700;
+        }
+
+        .center-vertical {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .detalle-item {
+            margin-bottom: 12px;
+        }
+
+        .detalle-item strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+
+<div class="modal-custom" id="modalAutoparte">
+    <div class="modal-content-custom">
+        <div class="d-flex justify-content-end">
+            <span class="close-btn" onclick="cerrarModal()">&times;</span>
+        </div>
+
+        <div class="row g-4 align-items-center" style="min-height: 450px;">
+            <!-- Imagen -->
+            <div class="col-md-6 center-vertical text-center">
+                <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
+            </div>
+
+            <!-- Información -->
+            <div class="col-md-6 center-vertical">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h4 class="mb-0">@Model.aut_nombre</h4>
+                        <div class="favorito-icon" onclick="agregarFavorito()">
+                            <i class="fa-regular fa-heart"></i>
+                        </div>
+                    </div>
+
+                    <p class="text-muted">@Model.aut_descripcion</p>
+
+                    <div class="mb-3">
+                        <div class="detalle-item"><strong>Código:</strong>@Model.aut_nombre</div>
+                        <div class="detalle-item"><strong>Marca:</strong>@Model.aut_descripcion</div>
+                        <div class="detalle-item"><strong>Categoría:</strong>@Model.Categoria.cat_nombre</div>
+                        <div class="detalle-item"><strong>Stock:</strong>@Model.aut_id</div>
+                    </div>
+
+                    <div class="precio mb-4">S/ @Model.aut_precio.ToString("0.00")</div>
+
+                    <!-- Botón Ver Similares -->
+                    <button class="btn btn-outline-secondary mb-3 w-100" onclick="verSimilares()">
+                        <i class="fa-solid fa-box-open me-2"></i> Ver productos similares
+                    </button>
+
+                    <!-- Botones iguales -->
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <button class="btn btn-carrito w-100 h-100" style="min-height: 48px;" onclick="agregarCarrito()">
+                                <i class="fa-solid fa-cart-plus me-2"></i> Añadir al carrito
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <button class="btn btn-whatsapp w-100 h-100" style="min-height: 48px;">
+                                <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function cerrarModal() {
+        document.getElementById("modalAutoparte").style.display = "none";
+    }
+
+    function agregarFavorito() {
+        alert("Autoparte agregada a favoritos.");
+    }
+
+    function agregarCarrito() {
+        alert("Autoparte añadida al carrito.");
+    }
+
+    function verSimilares() {
+        alert("Mostrando productos similares por categoría...");
+    }
+
+    document.getElementById("imgAutoparte").addEventListener("click", function () {
+        this.classList.toggle("zoomed");
+    });
+</script>
+
+</body>
+</html>
