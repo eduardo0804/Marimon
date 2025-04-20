@@ -105,10 +105,13 @@ namespace Marimon.Controllers
             }
             else
             {
+                Console.WriteLine($"Imagen guardada en carrito: {autoparte.aut_imagen}");
+
                 // Agregar un nuevo art�culo al carrito
                 carrito.Add(new Autoparte
                 {
                     aut_id = autoparte.aut_id,
+                    aut_imagen = autoparte.aut_imagen,
                     aut_nombre = autoparte.aut_nombre,
                     aut_precio = autoparte.aut_precio,
                     aut_cantidad = 1

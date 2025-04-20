@@ -1,3 +1,4 @@
+
 <style>
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -207,37 +208,10 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="productos-carrito">
+            <tbody id="productos-carrito"></tbody>
                 <!-- Aquí se mostrarán los productos del carrito -->
             </tbody>
         </table>
-		<h1 >AQUI LO ACOMODAS CON EL TABLE</h1>
-        @foreach (var autoparte in Model)
-        {
-            <div class="col-md-4 col-sm-6 mb-4">
-                <div class="card producto-card h-100 shadow-sm">
-                    <div class="p-3 text-center">
-                        <img src="@Url.Content(autoparte.aut_imagen)" class="card-img-top producto-img"
-                             alt="@autoparte.aut_nombre">
-                    </div>
-                    <div class="card-body text-center">
-                        <h5 class="card-title">@autoparte.aut_nombre</h5>
-                        <p class="card-text precio">
-                            Precio: <strong>
-                                S/
-                                @autoparte.aut_precio.ToString("0.00")
-                            </strong>
-                        </p>
-                        <!-- Formulario para añadir al carrito -->
-                        <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post">
-                            <input type="hidden" name="id" value="@autoparte.aut_id" />
-                            <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        }
-
         <div class="resumen" >
             <p><strong>Subtotal:</strong> S/ <span id="subtotal">0</span></p>
             <p><strong>Total:</strong> S/ <span id="total">0</span></p>
@@ -247,7 +221,19 @@
 
     <script>
         // Obtenemos los productos del carrito desde localStorage
-        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        const carrito = [
+            @foreach (var item in Model)
+            {
+                <text>
+                {
+                    nombre: "@item.aut_nombre",
+                    precio: @item.aut_precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture),
+                    cantidad: @item.aut_cantidad,
+                    imagen: "@Url.Content(item.aut_imagen)"
+                },
+                </text>
+            }
+        ];
         const productosCarrito = document.getElementById('productos-carrito');
         let subtotal = 0;
 

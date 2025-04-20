@@ -6,7 +6,10 @@
     var carrito = string.IsNullOrEmpty(carritoJson)
         ? new List<Autoparte>()
         : JsonSerializer.Deserialize<List<Autoparte>>(carritoJson);
+
+    decimal subtotal = 0;
 }
+
 <style>
     .link-btn {
         display: block;
@@ -18,11 +21,11 @@
         transition: all 0.3s ease;
     }
 
-        .link-btn:hover {
-            background-color: #E42229;
-            color: #ffffff;
-            border-color: #E42229;
-        }
+    .link-btn:hover {
+        background-color: #E42229;
+        color: #ffffff;
+        border-color: #E42229;
+    }
 </style>
 
 <div class="offcanvas offcanvas-end bg-black text-white" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
@@ -39,19 +42,27 @@
     <div class="offcanvas-body d-flex flex-column p-3">
         <!-- Lista de productos -->
         <div class="list-group list-group-flush border-bottom flex-grow-1 overflow-auto mb-3">
-            <ul>
-                @foreach (var item in carrito)
-                {
-                    <li>@item.aut_nombre - Cantidad: @item.aut_cantidad</li>
-                }
-            </ul>
-            
+            @foreach (var item in carrito)
+            {
+                var precioItem = item.aut_precio * item.aut_cantidad;
+                subtotal += precioItem;
+                <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                    <img src="@item.aut_imagen" alt="Imagen de @item.aut_nombre" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 10px;" />
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">@item.aut_nombre</div>
+                        <small>Cantidad: @item.aut_cantidad</small><br />
+                        <small>Precio unitario: S/@item.aut_precio.ToString("0.00")</small><br />
+                        <small>SubTotal: <span class="fw-bold">S/@precioItem.ToString("0.00")</span></small>
+                    </div>
+                </div>
+            }
+        </div>
 
         <!-- Resumen -->
         <div class="border-top border-secondary pt-3">
             <div class="d-flex justify-content-between mb-2">
-                <span>Subtotal:</span>
-                <span class="fw-bold">S/620.50</span>
+                <span>Total:</span>
+                <span class="fw-bold">S/@subtotal.ToString("0.00")</span>
             </div>
             <div class="d-flex justify-content-between mb-3">
                 <span>Envío:</span>
@@ -59,7 +70,7 @@
             </div>
 
             <div class="d-flex flex-column gap-2 text-center mb-3">
-                <a asp-controller="Carrito" asp-action="Index"  class="link-btn">VER CARRITO</a>
+                <a asp-controller="Carrito" asp-action="Index" class="link-btn">VER CARRITO</a>
                 @* <a href="#" class="text-white text-decoration-none" style="padding: 10px; background-color: #E42229; border-radius: 5px;">FINALIZAR COMPRA</a> *@
             </div>
 
@@ -67,7 +78,5 @@
                 <small class="text-white-50">¿Necesitas ayuda? <a href="#" class="text-decoration-none" style="color: #E42229;">Contáctanos</a></small>
             </div>
         </div>
-
     </div>
 </div>
-
