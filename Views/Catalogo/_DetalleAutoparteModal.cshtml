@@ -134,13 +134,31 @@
             margin-bottom: 4px;
             color: #343a40;
         }
+        
+        .custom-tabs .nav-link {
+            color: #212529; /* color negro para inactivos */
+            font-weight: 600;
+        }
+
+        .custom-tabs .nav-link.active {
+            color: #000000 !important; /* color negro para activos */
+            background-color: #f8f9fa; /* un fondo suave */
+            border-color: #dee2e6 #dee2e6 #fff;
+        }
+
     </style>
 </head>
 <body>
 
 <div class="modal-custom" id="modalAutoparte">
     <div class="modal-content-custom" id="modalContent">
-        <button class="close-btn" onclick="cerrarModal()">×</button>
+        <button class="close-btn" onclick="cerrarModal()"></button>
+
+        <div class="row mb-4">
+            <div class="col text-center">
+                <h3 class="text-uppercase text-secondary fw-bold border-bottom pb-2 d-inline-block">Detalle de Autoparte</h3>
+            </div>
+        </div>
 
         <div class="row g-4 align-items-center">
             <div class="col-md-6 text-center position-relative">
@@ -148,13 +166,12 @@
                 <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
             </div>
 
-            <!-- Información -->
-            <div class="col-md-6">
-                <h2 class="fw-bold">@Model.aut_nombre</h2>
-                <p class="text-muted">@Model.aut_descripcion</p>
+                <div class="col-md-6">
+                    <h2 class="fw-bold">@Model.aut_nombre</h2>
+                    <p class="text-muted">@Model.aut_descripcion</p>
 
-                <!-- Pestañas -->
-                <ul class="nav nav-tabs mb-3" id="detalleTabs" role="tablist">
+                <!-- Pestañas centradas y personalizadas -->
+                <ul class="nav nav-tabs justify-content-center mb-3 custom-tabs" id="detalleTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="detalles-tab" data-bs-toggle="tab" data-bs-target="#detalles" type="button" role="tab" aria-controls="detalles" aria-selected="true">
                             Detalles
@@ -167,9 +184,7 @@
                     </li>
                 </ul>
 
-                <!-- Contenido de las pestañas -->
                 <div class="tab-content" id="detalleTabsContent">
-                    <!-- Detalles -->
                     <div class="tab-pane fade show active" id="detalles" role="tabpanel" aria-labelledby="detalles-tab">
                         <div class="mb-3">
                             <ul class="list-unstyled">
@@ -182,7 +197,6 @@
                         </div>
                     </div>
 
-                    <!-- Productos Similares -->
                     <div class="tab-pane fade" id="similares" role="tabpanel" aria-labelledby="similares-tab">
                         <div class="productos-similares">
                             <ul class="list-group">
@@ -205,7 +219,6 @@
                     </div>
                 </div>
 
-                <!-- Botones -->
                 <div class="d-grid gap-3 mt-4">
                     <button class="btn btn-carrito w-100" onclick="agregarCarrito()">
                         <i class="fa-solid fa-cart-plus me-2"></i> Añadir al carrito
@@ -240,11 +253,10 @@
         this.classList.toggle("zoomed");
     });
     function cargarDetalleAutoparte(id) {
-        // Realiza una solicitud AJAX para obtener el nuevo contenido del modal
         fetch(`/Catalogo/DetalleAutoparte/${id}`)
             .then(response => response.text())
             .then(html => {
-                // Reemplaza el contenido del modal actual
+
                 document.getElementById("modalContent").innerHTML = html;
             })
             .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
