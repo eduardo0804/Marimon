@@ -4,6 +4,7 @@ using Marimon.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Marimon.Models.ViewModels;
 
 namespace Marimon.Controllers
 {
@@ -48,7 +49,30 @@ namespace Marimon.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DetalleAutoparteModal", autoparte); // Vista parcial para el modal
+            var productosSimilares = await _context.Autopartes
+                .Where(a => a.CategoriaId == autoparte.CategoriaId && a.aut_id != id)
+                .Select(a => new AutoparteViewModel
+                {
+                    aut_id = a.aut_id,
+                    aut_nombre = a.aut_nombre,
+                    aut_precio = a.aut_precio,
+                    aut_imagen = a.aut_imagen
+                })
+                .ToListAsync();
+
+            var modelo = new AutoparteViewModel
+            {
+                aut_id = autoparte.aut_id,
+                aut_nombre = autoparte.aut_nombre,
+                aut_descripcion = autoparte.aut_descripcion,
+                aut_especificacion = autoparte.aut_especificacion,
+                aut_precio = autoparte.aut_precio,
+                aut_imagen = autoparte.aut_imagen,
+                CategoriaNombre = autoparte.Categoria.cat_nombre,
+                ProductosSimilares = productosSimilares
+            };
+
+            return PartialView("_DetalleAutoparteModal", modelo);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
