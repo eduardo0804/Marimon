@@ -32,7 +32,9 @@
             max-width: 1000px;
             margin: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative; /* Necesario para posicionar la 'X' correctamente */
         }
+
 
         .autoparte-img {
             width: 100%;
@@ -136,13 +138,13 @@
         }
         
         .custom-tabs .nav-link {
-            color: #212529; /* color negro para inactivos */
+            color: #212529;
             font-weight: 600;
         }
 
         .custom-tabs .nav-link.active {
-            color: #000000 !important; /* color negro para activos */
-            background-color: #f8f9fa; /* un fondo suave */
+            color: #000000 !important;
+            background-color: #f8f9fa;
             border-color: #dee2e6 #dee2e6 #fff;
         }
 
@@ -150,9 +152,10 @@
 </head>
 <body>
 
-<div class="modal-custom" id="modalAutoparte">
-    <div class="modal-content-custom" id="modalContent">
-        <button class="close-btn" onclick="cerrarModal()"></button>
+    <div class="modal-custom" id="modalAutoparte">
+        <div class="modal-content-custom" id="modalContent">
+        <!-- Botón de cierre dentro de la ventana emergente -->
+        <button class="close-btn" onclick="cerrarModal()">×</button>
 
         <div class="row mb-4">
             <div class="col text-center">
@@ -166,9 +169,9 @@
                 <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
             </div>
 
-                <div class="col-md-6">
-                    <h2 class="fw-bold">@Model.aut_nombre</h2>
-                    <p class="text-muted">@Model.aut_descripcion</p>
+            <div class="col-md-6">
+                <h2 class="fw-bold">@Model.aut_nombre</h2>
+                <p class="text-muted">@Model.aut_descripcion</p>
 
                 <!-- Pestañas centradas y personalizadas -->
                 <ul class="nav nav-tabs justify-content-center mb-3 custom-tabs" id="detalleTabs" role="tablist">
@@ -220,9 +223,10 @@
                 </div>
 
                 <div class="d-grid gap-3 mt-4">
-                    <button class="btn btn-carrito w-100" onclick="agregarCarrito()">
-                        <i class="fa-solid fa-cart-plus me-2"></i> Añadir al carrito
-                    </button>
+                    <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post">
+                                    <input type="hidden" name="id" value="@Model.aut_id" />
+                                    <button class="btn btn-carrito w-100" type="submit">Añadir al Carrito</button>
+                                </form>
                     <button class="btn btn-whatsapp w-100">
                         <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
                     </button>
@@ -252,11 +256,11 @@
     document.getElementById("imgAutoparte").addEventListener("click", function () {
         this.classList.toggle("zoomed");
     });
+
     function cargarDetalleAutoparte(id) {
         fetch(`/Catalogo/DetalleAutoparte/${id}`)
             .then(response => response.text())
             .then(html => {
-
                 document.getElementById("modalContent").innerHTML = html;
             })
             .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
