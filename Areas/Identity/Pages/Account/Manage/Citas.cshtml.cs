@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marimon.Data;
+using Marimon.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Marimon.Areas.Identity.Pages.Account.Manage
@@ -28,22 +30,10 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
             _logger = logger;
         }
         public bool UsesExternalLogin { get; set; }
+        public List<Reserva> ReservasUsuario { get; set; }
 
-        private async Task LoadAsync(IdentityUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var email = await _userManager.GetEmailAsync(user);
-            
-            // Verificar si el usuario usa login externo
-            var logins = await _userManager.GetLoginsAsync(user);
-            UsesExternalLogin = logins.Any();
-            
-            // Obtener datos del usuario de la tabla personalizada
-            var userId = user.Id;
-            var usuario = _context.Usuarios.FirstOrDefault(u => u.usu_id == userId);
-
-        }
         public async Task<IActionResult> OnGetAsync()
+        
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -51,7 +41,11 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
                 return NotFound($"No se pudo cargar el usuario con ID '{_userManager.GetUserId(User)}'.");
             }
 
-            await LoadAsync(user);
+            // Obtener las reservas relacionadas al usuario
+            ReservasUsuario = await _context.Reserva
+                .Where(r => r.UsuarioId == user.Id) // Filtrar por el ID del usuario
+                .Include(r => r.Servicio) // Incluir información del servicio relacionado
+                .ToListAsync();
             return Page();
         }
     }

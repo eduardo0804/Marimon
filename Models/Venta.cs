@@ -20,5 +20,11 @@ namespace Marimon.Models
         // Agregar esta línea 👇
         public ICollection<DetalleVentas> Detalles { get; set; } = new List<DetalleVentas>();
 
+        [NotMapped]
+        public string? AutoParteNombre { get; internal set; }
+        [NotMapped]
+        public decimal AutoPartePrecio { get; internal set; }
+        [NotMapped]
+        public int Cantidad { get; internal set; }
     }
 }

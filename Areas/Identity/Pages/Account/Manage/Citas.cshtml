@@ -22,17 +22,55 @@
                 <span>Mis citas</span>
             </div>
             <div class="sidebar-menu-item exit">
-                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <form asp-area="Identity" asp-page="/Account/Logout"
+                    asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                     <button type="submit">SALIR</button>
                 </form>
             </div>
         </div>
         <div class="profile-details">
-            
             <h2>Mis Citas</h2>
-            
+
+            @if (Model.ReservasUsuario != null && Model.ReservasUsuario.Any())
+            {
+                <table class="table table-striped mt-4">
+                    <thead>
+                        <tr>
+                            <th>ID Cita</th>
+                            <th>Placa</th>
+                            <th>Teléfono</th>
+                            <th>Fecha</th>
+                            <th>Servicio</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var reserva in Model.ReservasUsuario)
+                        {
+                            <tr>
+                                <td>@reserva.res_id</td>
+                                <td>@reserva.res_placa</td>
+                                <td>@reserva.res_telefono</td>
+                                <td>@reserva.res_fecha</td>
+                                <td>@reserva.Servicio?.ser_nombre</td> 
+                                <td>
+                                    <form method="post" asp-page-handler="CancelarCita" asp-route-id="@reserva.res_id">
+                                        <button type="submit" class="btn btn-danger">Eliminar Cita</button>
+                                    </form>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center mt-4" role="alert">
+                    <strong>No se encontraron citas.</strong> Por favor, agenda una cita para continuar.
+                </div>
+            }
         </div>
     </div>
+</div>
 </div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

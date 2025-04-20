@@ -22,15 +22,50 @@
                 <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis Citas</a>
             </div>
             <div class="sidebar-menu-item exit">
-                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <form asp-area="Identity" asp-page="/Account/Logout"
+                    asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                     <button type="submit">SALIR</button>
                 </form>
             </div>
         </div>
-        <div class="profile-details">            
+        <div class="profile-details">
             <h2>Mis Pedidos</h2>
+
+            @if (Model.PedidosUsuario != null && Model.PedidosUsuario.Any())
+            {
+                <table class="table table-striped mt-4">
+                    <thead>
+                        <tr>
+                            <th>ID Pedido</th>
+                            <th>Fecha</th>
+                            <th>Autoparte</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pedido in Model.PedidosUsuario)
+                        {
+                            <tr>
+                                <td>@pedido.ven_id</td>
+                                <td>@pedido.ven_fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@pedido.AutoParteNombre</td>
+                                <td>@pedido.Cantidad</td>
+                                <td>S/. @pedido.AutoPartePrecio</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center mt-4" role="alert">
+                    <strong>No se encontraron Pedidos.</strong> Por favor, realiza una compra antes.
+                </div>
+            }
         </div>
     </div>
+</div>
 </div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
