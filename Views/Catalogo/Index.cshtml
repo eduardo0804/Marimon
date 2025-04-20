@@ -61,17 +61,26 @@
                         <div class="card producto-card h-100 shadow-sm">
                             <div class="p-3 text-center">
                                 <img src="@Url.Content(autoparte.aut_imagen)" class="card-img-top producto-img"
-                                    alt="@autoparte.aut_nombre">
+                                     alt="@autoparte.aut_nombre">
                             </div>
                             <div class="card-body text-center">
                                 <h5 class="card-title">@autoparte.aut_nombre</h5>
-                                <p class="card-text precio">Precio: <strong>S/
-                                        @autoparte.aut_precio.ToString("0.00")</strong></p>
-                                <button class="btn-primary" type="submit">Añadir al Carrito</button>
+                                <p class="card-text precio">
+                                    Precio: <strong>
+                                        S/
+                                        @autoparte.aut_precio.ToString("0.00")
+                                    </strong>
+                                </p>
+                                <!-- Formulario para añadir al carrito -->
+                                <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post">
+                                    <input type="hidden" name="id" value="@autoparte.aut_id" />
+                                    <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 }
+
             </div>
 
             <div class="row mt-4">

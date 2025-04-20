@@ -1,4 +1,13 @@
-﻿<style>
+﻿@using System.Text.Json
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var carritoJson = HttpContextAccessor.HttpContext.Session.GetString("Carrito");
+    var carrito = string.IsNullOrEmpty(carritoJson)
+        ? new List<Autoparte>()
+        : JsonSerializer.Deserialize<List<Autoparte>>(carritoJson);
+}
+<style>
     .link-btn {
         display: block;
         padding: 10px;
@@ -30,48 +39,13 @@
     <div class="offcanvas-body d-flex flex-column p-3">
         <!-- Lista de productos -->
         <div class="list-group list-group-flush border-bottom flex-grow-1 overflow-auto mb-3">
-            <!-- Producto 1 -->
-            <div class="list-group-item bg-dark text-white border-secondary">
-                <div class="d-flex align-items-center">
-                    <img src="https://via.placeholder.com/60" alt="Producto" width="40" height="40" class="rounded me-3">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between">
-                            <strong>BOSCH - 46B20L</strong>
-                            <small>S/376.00</small>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-white-50">1 unidad</small>
-                            <button class="btn btn-sm text-danger p-0">
-                                <svg width="16" height="16" fill="currentColor">
-                                    <path d="M4 4L12 12M4 12L12 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 2 -->
-            <div class="list-group-item bg-dark text-white border-secondary">
-                <div class="d-flex align-items-center">
-                    <img src="https://via.placeholder.com/60" alt="Producto" width="40" height="40" class="rounded me-3">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between">
-                            <strong>ACME - X200</strong>
-                            <small>S/245.50</small>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-white-50">2 unidades</small>
-                            <button class="btn btn-sm text-danger p-0">
-                                <svg width="16" height="16" fill="currentColor">
-                                    <path d="M4 4L12 12M4 12L12 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <ul>
+                @foreach (var item in carrito)
+                {
+                    <li>@item.aut_nombre - Cantidad: @item.aut_cantidad</li>
+                }
+            </ul>
+            
 
         <!-- Resumen -->
         <div class="border-top border-secondary pt-3">
