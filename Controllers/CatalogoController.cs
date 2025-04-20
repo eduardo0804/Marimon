@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Marimon.Models;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
+using Marimon.Models.ViewModels;
 
 namespace Marimon.Controllers
 {

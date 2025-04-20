@@ -82,8 +82,9 @@
                     <div class="col-md-4 col-sm-6 mb-4">
                         <div class="card producto-card h-100 shadow-sm">
                             <div class="p-3 text-center">
-                                <img src="@Url.Content(autoparte.aut_imagen)" class="card-img-top producto-img"
-                                    alt="@autoparte.aut_nombre">
+                                <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" width="180"
+                                     style="cursor:pointer;"
+                                     onclick="cargarDetalleAutoparte(@autoparte.aut_id)" />
                             </div>
                             <div class="card-body text-center">
                                 <h5 class="card-title">@autoparte.aut_nombre</h5>
@@ -93,7 +94,6 @@
                         </div>
                     </div>
                 }
-
             </div>
 
             <!-- Paginación -->
