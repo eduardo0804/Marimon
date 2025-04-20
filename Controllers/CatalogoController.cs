@@ -51,7 +51,30 @@ namespace Marimon.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DetalleAutoparteModal", autoparte); // Vista parcial para el modal
+            var productosSimilares = await _context.Autopartes
+                .Where(a => a.CategoriaId == autoparte.CategoriaId && a.aut_id != id)
+                .Select(a => new AutoparteViewModel
+                {
+                    aut_id = a.aut_id,
+                    aut_nombre = a.aut_nombre,
+                    aut_precio = a.aut_precio,
+                    aut_imagen = a.aut_imagen
+                })
+                .ToListAsync();
+
+            var modelo = new AutoparteViewModel
+            {
+                aut_id = autoparte.aut_id,
+                aut_nombre = autoparte.aut_nombre,
+                aut_descripcion = autoparte.aut_descripcion,
+                aut_especificacion = autoparte.aut_especificacion,
+                aut_precio = autoparte.aut_precio,
+                aut_imagen = autoparte.aut_imagen,
+                CategoriaNombre = autoparte.Categoria.cat_nombre,
+                ProductosSimilares = productosSimilares
+            };
+
+            return PartialView("_DetalleAutoparteModal", modelo);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -69,10 +92,10 @@ namespace Marimon.Controllers
                 return NotFound();
             }
 
-            // Obtener el carrito actual de la sesión
+            // Obtener el carrito actual de la sesi�n
             var carrito = ObtenerCarritoDeSesion();
 
-            // Verificar si el artículo ya está en el carrito
+            // Verificar si el art�culo ya est� en el carrito
             var itemExistente = carrito.FirstOrDefault(c => c.aut_id == id);
             if (itemExistente != null)
             {
@@ -81,7 +104,7 @@ namespace Marimon.Controllers
             }
             else
             {
-                // Agregar un nuevo artículo al carrito
+                // Agregar un nuevo art�culo al carrito
                 carrito.Add(new Autoparte
                 {
                     aut_id = autoparte.aut_id,
@@ -91,10 +114,10 @@ namespace Marimon.Controllers
                 });
             }
 
-            // Guardar el carrito actualizado en la sesión
+            // Guardar el carrito actualizado en la sesi�n
             GuardarCarritoEnSesion(carrito);
 
-            // Redirigir al índice del catálogo o a otra página
+            // Redirigir al �ndice del cat�logo o a otra p�gina
             return RedirectToAction("Index");
         }
 

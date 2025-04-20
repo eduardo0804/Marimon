@@ -1,4 +1,4 @@
-@model Marimon.Models.Autoparte
+@model Marimon.Models.ViewModels.AutoparteViewModel
 
 <!DOCTYPE html>
 <html lang="es">
@@ -101,6 +101,13 @@
             color: #999;
             cursor: pointer;
             font-weight: bold;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            outline: none;
+            z-index: 10;
         }
 
         .close-btn:hover {
@@ -132,57 +139,80 @@
 <body>
 
 <div class="modal-custom" id="modalAutoparte">
-    <div class="modal-content-custom">
-        <div class="d-flex justify-content-end">
-            <span class="close-btn" onclick="cerrarModal()">&times;</span>
-        </div>
+    <div class="modal-content-custom" id="modalContent">
+        <button class="close-btn" onclick="cerrarModal()">×</button>
 
-        <div class="row g-4 align-items-center" style="min-height: 450px;">
-            <!-- Imagen -->
-            <div class="col-md-6 center-vertical text-center">
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6 text-center position-relative">
+                <i class="fa-solid fa-heart favorito-icon position-absolute top-0 end-0 m-3" onclick="agregarFavorito()"></i>
                 <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
             </div>
 
             <!-- Información -->
-            <div class="col-md-6 center-vertical">
-                <div>
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h4 class="mb-0">@Model.aut_nombre</h4>
-                        <div class="favorito-icon" onclick="agregarFavorito()">
-                            <i class="fa-regular fa-heart"></i>
+            <div class="col-md-6">
+                <h2 class="fw-bold">@Model.aut_nombre</h2>
+                <p class="text-muted">@Model.aut_descripcion</p>
+
+                <!-- Pestañas -->
+                <ul class="nav nav-tabs mb-3" id="detalleTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="detalles-tab" data-bs-toggle="tab" data-bs-target="#detalles" type="button" role="tab" aria-controls="detalles" aria-selected="true">
+                            Detalles
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="similares-tab" data-bs-toggle="tab" data-bs-target="#similares" type="button" role="tab" aria-controls="similares" aria-selected="false">
+                            Ver productos similares
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Contenido de las pestañas -->
+                <div class="tab-content" id="detalleTabsContent">
+                    <!-- Detalles -->
+                    <div class="tab-pane fade show active" id="detalles" role="tabpanel" aria-labelledby="detalles-tab">
+                        <div class="mb-3">
+                            <ul class="list-unstyled">
+                                <li><i class="fa-solid fa-circle-check text-danger me-2"></i><strong>Especificación:</strong> @Model.aut_especificacion</li>
+                                <li><i class="fa-solid fa-circle-check text-danger me-2"></i><strong>Categoría:</strong> @Model.CategoriaNombre</li>
+                            </ul>
+                        </div>
+                        <div class="precio mb-4">
+                            <span class="fs-3 fw-bold text-danger">S/ @Model.aut_precio.ToString("0.00")</span>
                         </div>
                     </div>
 
-                    <p class="text-muted">@Model.aut_descripcion</p>
-
-                    <div class="mb-3">
-                        <div class="detalle-item"><strong>Código:</strong>@Model.aut_nombre</div>
-                        <div class="detalle-item"><strong>Marca:</strong>@Model.aut_descripcion</div>
-                        <div class="detalle-item"><strong>Categoría:</strong>@Model.Categoria.cat_nombre</div>
-                        <div class="detalle-item"><strong>Stock:</strong>@Model.aut_id</div>
+                    <!-- Productos Similares -->
+                    <div class="tab-pane fade" id="similares" role="tabpanel" aria-labelledby="similares-tab">
+                        <div class="productos-similares">
+                            <ul class="list-group">
+                                @foreach (var similar in Model.ProductosSimilares)
+                                {
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <img src="@similar.aut_imagen" alt="@similar.aut_nombre" class="img-thumbnail me-3" style="width: 80px; height: 80px;" />
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <a href="javascript:void(0);" onclick="cargarDetalleAutoparte(@similar.aut_id)" class="text-decoration-none text-dark">
+                                                    @similar.aut_nombre
+                                                </a>
+                                            </h6>
+                                            <p class="text-muted mb-0">S/ @similar.aut_precio.ToString("0.00")</p>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="precio mb-4">S/ @Model.aut_precio.ToString("0.00")</div>
-
-                    <!-- Botón Ver Similares -->
-                    <button class="btn btn-outline-secondary mb-3 w-100" onclick="verSimilares()">
-                        <i class="fa-solid fa-box-open me-2"></i> Ver productos similares
+                <!-- Botones -->
+                <div class="d-grid gap-3 mt-4">
+                    <button class="btn btn-carrito w-100" onclick="agregarCarrito()">
+                        <i class="fa-solid fa-cart-plus me-2"></i> Añadir al carrito
                     </button>
-
-                    <!-- Botones iguales -->
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6">
-                            <button class="btn btn-carrito w-100 h-100" style="min-height: 48px;" onclick="agregarCarrito()">
-                                <i class="fa-solid fa-cart-plus me-2"></i> Añadir al carrito
-                            </button>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <button class="btn btn-whatsapp w-100 h-100" style="min-height: 48px;">
-                                <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
-                            </button>
-                        </div>
-                    </div>
-
+                    <button class="btn btn-whatsapp w-100">
+                        <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
+                    </button>
                 </div>
             </div>
         </div>
@@ -209,6 +239,16 @@
     document.getElementById("imgAutoparte").addEventListener("click", function () {
         this.classList.toggle("zoomed");
     });
+    function cargarDetalleAutoparte(id) {
+        // Realiza una solicitud AJAX para obtener el nuevo contenido del modal
+        fetch(`/Catalogo/DetalleAutoparte/${id}`)
+            .then(response => response.text())
+            .then(html => {
+                // Reemplaza el contenido del modal actual
+                document.getElementById("modalContent").innerHTML = html;
+            })
+            .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
+    }
 </script>
 
 </body>
