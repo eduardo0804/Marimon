@@ -340,7 +340,7 @@ h4 {
 
 .form-check-input:checked {
     background-color: #28a745;
-    border-color: #28a745;
+    border-color: d9534f;
 }
 
 .carrito-lateral {
@@ -418,23 +418,23 @@ h4 {
     display: flex;
     width: 100%;
     border-radius: 50px;
-    border: 2px solid rgba(40, 167, 69, 0.5);
+    border: 2px solid #000;
     overflow: hidden;
-    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.12);
+    box-shadow: 0 6px 16px #000;
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(5px);
 }
 
 .search-input-group:hover {
-    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.2);
-    border-color: rgba(40, 167, 69, 0.7);
+    box-shadow: 0 8px 20px #000;
+    border-color: #000;
     transform: translateY(-2px);
 }
 
 .search-input-group:focus-within {
-    box-shadow: 0 10px 25px rgba(40, 167, 69, 0.25);
-    border-color: #28a745;
+    box-shadow: 0 10px 25px #000;
+    border-color: #000;
     transform: translateY(-3px);
 }
 
@@ -473,7 +473,7 @@ h4 {
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: #28a745;
+    color: #000;
     font-size: 18px;
     z-index: 10;
     transition: all 0.3s ease;
@@ -481,7 +481,7 @@ h4 {
 }
 
 .search-input-group:focus-within .search-icon {
-    color: #218838;
+    color: #000;
     transform: translateY(-50%) scale(1.1);
 }
 
@@ -491,7 +491,7 @@ h4 {
     min-width: 100px;
     padding: 0 25px !important;
     font-weight: 600;
-    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    background: linear-gradient(45deg, #000, #000) !important;
     border: none !important;
     color: white;
     font-size: 0.95rem;
@@ -503,8 +503,8 @@ h4 {
 }
 
 .search-btn:hover {
-    background: linear-gradient(45deg, #218838, #1ba87c) !important;
-    box-shadow: 0 0 15px rgba(40, 167, 69, 0.4);
+    background: linear-gradient(45deg, #e62e2d, red) !important;
+    box-shadow: 0 0 15px #000;
 }
 
 .search-btn:active {
@@ -544,7 +544,7 @@ h4 {
 .search-input-group:focus-within + .search-suggestion {
     opacity: 1;
     transform: translateY(3px);
-    color: #28a745;
+    color: #000;
 }
 
 /* Estilo para títulos de productos */
@@ -602,7 +602,7 @@ h2:after {
     position: absolute;
     width: 100px;
     height: 3px;
-    background-color: #28a745;
+    background-color: #d9534f;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
