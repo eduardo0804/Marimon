@@ -53,8 +53,8 @@
 
             <div class="row g-4 align-items-center">
                 <div class="col-md-6 text-center position-relative">
-                    <i class="fa-solid fa-heart favorito-icon position-absolute top-0 end-0 m-3"
-                        onclick="agregarFavorito()"></i>
+                    <i class="fa-solid fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
+                        onclick="agregarFavorito(@Model.aut_id)"></i>
                     <div class="image-container position-relative">
                         <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
                         <i class="fa-solid fa-magnifying-glass zoom-icon position-absolute"
@@ -136,27 +136,6 @@
     <script>
         function cerrarModal() {
             document.getElementById("modalAutoparte").style.display = "none";
-        }
-
-        function agregarFavorito() {
-            const toastEl = document.getElementById('toastFavorito');
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
-        }
-
-        function toggleFavorito() {
-            const icon = document.getElementById("iconFavorito");
-            icon.classList.toggle("favorito-icon-checked");
-
-            // Aquí puedes agregar lógica para guardar el estado (si es necesario) en el servidor
-            // o en el almacenamiento local del navegador, dependiendo de la funcionalidad que desees.
-            if (icon.classList.contains("favorito-icon-checked")) {
-                // Realiza alguna acción si se marca como favorito (por ejemplo, mostrar un mensaje)
-                console.log("Autoparte marcada como favorita.");
-            } else {
-                // Realiza alguna acción si se desmarca como favorito
-                console.log("Autoparte eliminada de favoritos.");
-            }
         }
 
         function cargarDetalleAutoparte(id) {

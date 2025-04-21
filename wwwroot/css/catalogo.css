@@ -45,21 +45,38 @@ body {
     font-size: 28px;
     color: #e63946;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: all 0.3s ease;
+    z-index: 10;
 }
 
 .favorito-icon:hover {
+    transform: scale(1.1);
     color: #d32f2f;
 }
 
 .favorito-icon-checked {
     color: #d32f2f;
-    /* Cambia el color cuando está marcado */
+    animation: heartBeat 0.3s ease-in-out;
 }
 
-.favorito-icon-checked:hover {
-    color: #b71c1c;
-    /* Cambia el color al pasar el ratón cuando está marcado */
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.toast {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+.toast-body {
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .precio2 {
@@ -624,16 +641,17 @@ h2:after {
     margin-bottom: 20px;
 }
 
-.producto-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none;
-    border-radius: 15px;
-    overflow: hidden;
+.producto-card .producto-imagen {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+    transition: transform 0.3s ease;
 }
 
-.producto-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+.producto-card:hover .producto-imagen {
+    transform: scale(1.05);
 }
 
 .producto-img {
@@ -672,22 +690,26 @@ h2:after {
 }
 
 .btn-primary {
-    background-color: #000;
-    border: none;
-    border-radius: 50px;
-    padding: 10px 20px;
-    color: white;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    width: 80%;
-    display: block;
-    margin: 0 auto;
+    background-color: #000 !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 20px !important;
+    color: white !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    width: 80% !important;
+    display: block !important;
+    margin: 0 auto !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .btn-primary:hover {
-    background-color: #333;
+    background-color: #666 !important; /* Cambia a gris */
+    color: white !important;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: none;
 }
 
 .pagination {
