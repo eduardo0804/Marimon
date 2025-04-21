@@ -228,9 +228,9 @@
                             <input type="hidden" name="id" value="@Model.aut_id" />
                             <button class="btn btn-carrito w-100" type="submit">Añadir al Carrito</button>
                         </form>
-                        <button class="btn btn-whatsapp w-100">
+                        <a href="https://wa.me/51958243995?text=@Uri.EscapeDataString($"Hola, estoy interesado en la autoparte: {Model.aut_nombre} con precio S/ {Model.aut_precio.ToString("0.00")}. ¿Podrían brindarme más información?")" target="_blank" class="btn btn-whatsapp w-100" style="text-decoration: none; display: inline-block; text-align: center;">
                             <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
