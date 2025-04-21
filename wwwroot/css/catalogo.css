@@ -1,3 +1,247 @@
+body {
+    font-family: 'Nunito', sans-serif;
+}
+
+.modal-custom {
+    display: block;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
+    overflow: auto;
+    padding: 60px 20px;
+}
+
+.modal-content-custom {
+    background-color: #ffffff;
+    border-radius: 25px;
+    padding: 40px;
+    max-width: 1000px;
+    margin: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.autoparte-img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: contain;
+    border-radius: 20px;
+    transition: transform 0.3s ease, transform-origin 0.3s ease;
+    cursor: zoom-in;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.autoparte-img.zoomed {
+    transform: scale(2);
+    cursor: zoom-out;
+    transition: transform 0.3s ease, transform-origin 0.3s ease;
+}
+
+.favorito-icon {
+    font-size: 28px;
+    color: #e63946;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.favorito-icon:hover {
+    color: #d32f2f;
+}
+
+.favorito-icon-checked {
+    color: #d32f2f;
+    /* Cambia el color cuando está marcado */
+}
+
+.favorito-icon-checked:hover {
+    color: #b71c1c;
+    /* Cambia el color al pasar el ratón cuando está marcado */
+}
+
+.precio2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #212529;
+    margin-top: 20px;
+}
+
+.btn-whatsapp,
+.btn-carrito {
+    border-radius: 40px;
+    padding: 10px 24px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.btn-whatsapp {
+    background-color: #25D366;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background-color: #1ebd5a;
+}
+
+.btn-carrito {
+    background-color: #e63946;
+    color: white;
+}
+
+.btn-carrito:hover {
+    background-color: #c62828;
+}
+
+.close-btn {
+    font-size: 34px;
+    color: #999;
+    cursor: pointer;
+    font-weight: bold;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    outline: none;
+    z-index: 10;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+h4 {
+    font-weight: 700;
+}
+
+.detalle-item {
+    margin-bottom: 12px;
+}
+
+.detalle-item strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #343a40;
+}
+
+.custom-tabs .nav-link {
+    color: #212529;
+    font-weight: 600;
+}
+
+.custom-tabs .nav-link.active {
+    color: #000000 !important;
+    background-color: #f8f9fa;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.zoom-icon {
+    font-size: 24px;
+    color: #333;
+    bottom: 10px;
+    right: 10px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.zoom-icon:hover {
+    color: #007bff;
+}
+
+.autoparte-img.zoomed {
+    transform: scale(3);
+    cursor: zoom-out;
+    transition: transform 0.3s ease, transform-origin 0.3s ease;
+}
+
+.zoom-modal {
+    display: none;
+    position: fixed;
+    z-index: 1101;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    justify-content: center;
+    align-items: center;
+}
+
+.zoom-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    text-align: center;
+}
+
+.zoom-content img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.cerrar-zoom {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.cerrar-zoom:hover {
+    color: #d9534f;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#contenidoModal {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.cerrar-modal:hover {
+    color: #d9534f;
+}
 .catalogo-container {
     font-family: 'Nunito', sans-serif;
     padding: 30px 0;
