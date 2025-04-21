@@ -91,12 +91,7 @@
                                     @Model.CategoriaNombre</li>
                             </ul>
                             <div class="precio2 mb-4">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="stock-status @GetStockColor(@Model.aut_cantidad)">
-                                        En Stock
-                                    </span>
-                                    <span class="text-muted mb-0">S/ @Model.aut_precio.ToString("0.00")</span>
-                                </div>
+                                <span class="fs-3 fw-bold text-danger">S/ @Model.aut_precio.ToString("0.00")</span>
                             </div>
                         </div>
 
@@ -113,12 +108,7 @@
                                                     onclick="cargarDetalleAutoparte(@similar.aut_id)"
                                                     class="text-decoration-none text-dark">@similar.aut_nombre</a>
                                             </h6>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="stock-status @GetStockColor(similar.aut_cantidad)">
-                                                    En Stock
-                                                </span>
-                                                <span class="text-muted mb-0">S/ @similar.aut_precio.ToString("0.00")</span>
-                                            </div>
+                                            <p class="text-muted mb-0">S/ @similar.aut_precio.ToString("0.00")</p>
                                         </div>
                                     </li>
                                 }
@@ -139,7 +129,15 @@
             </div>
         </div>
     </div>
-
+    
+    @functions {
+    public string GetStockColor(int stock)
+    {
+        if (stock > 20) return "text-success";
+        if (stock > 10) return "text-warning";
+        return "text-danger";
+    }
+}
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
