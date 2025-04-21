@@ -120,7 +120,7 @@ namespace Marimon.Controllers
 
             // Guardar el carrito actualizado en la sesi�n
             GuardarCarritoEnSesion(carrito);
-
+            TempData["MensajeCarrito"] = "Autoparte añadida al Carrito";
             // Redirigir al �ndice del cat�logo o a otra p�gina
             return RedirectToAction("Index");
         }

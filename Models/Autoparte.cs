@@ -18,7 +18,6 @@ namespace Marimon.Models
         public string aut_imagen { get; set; }  = string.Empty;
         public int CategoriaId { get; set; } 
 
-
         [ForeignKey("CategoriaId")]
         public Categoria? Categoria { get; set; }
         
