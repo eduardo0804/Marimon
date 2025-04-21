@@ -59,6 +59,7 @@ namespace Marimon.Controllers
                     aut_id = a.aut_id,
                     aut_nombre = a.aut_nombre,
                     aut_precio = a.aut_precio,
+                    aut_cantidad = a.aut_cantidad,
                     aut_imagen = a.aut_imagen
                 })
                 .ToListAsync();
@@ -70,6 +71,7 @@ namespace Marimon.Controllers
                 aut_descripcion = autoparte.aut_descripcion,
                 aut_especificacion = autoparte.aut_especificacion,
                 aut_precio = autoparte.aut_precio,
+                aut_cantidad = autoparte.aut_cantidad,
                 aut_imagen = autoparte.aut_imagen,
                 CategoriaNombre = autoparte.Categoria.cat_nombre,
                 ProductosSimilares = productosSimilares
@@ -120,7 +122,7 @@ namespace Marimon.Controllers
 
             // Guardar el carrito actualizado en la sesi�n
             GuardarCarritoEnSesion(carrito);
-            TempData["MensajeCarrito"] = "Autoparte añadida al Carrito";
+
             // Redirigir al �ndice del cat�logo o a otra p�gina
             return RedirectToAction("Index");
         }
