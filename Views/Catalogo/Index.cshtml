@@ -13,7 +13,7 @@
 <div class="container catalogo-container">
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <h2>Catálogo de Repuestos</h2>
+            <h2>Catálogo de Autopartes</h2>
         </div>
     </div>
 
@@ -112,38 +112,62 @@
             .then(html => {
                 document.getElementById("contenidoModal").innerHTML = '<button class="cerrar-modal" onclick="cerrarModal()">×</button>' + html;
                 document.getElementById("modalAutoparte").style.display = "block";
+                const zoomModal = document.getElementById("zoomModal");
+                if (zoomModal) zoomModal.style.display = "none";
+                inicializarZoom(); 
             });
     }
+    document.getElementById("zoomModal").style.display = "flex";
+    document.getElementById("zoomModal").style.display = "none";
 
-    function cerrarModal() {
-        document.getElementById("modalAutoparte").style.display = "none";
-    }
-
-    function agregarFavorito() {
-    const toastEl = document.getElementById('toastFavorito');
-    const toast = new bootstrap.Toast(toastEl, {
-        autohide: true,
-        delay: 3000
-    });
-    toast.show();
-}
-
-    function agregarCarrito() {
-        alert("Autoparte añadida al carrito.");
-    }
-
-    function verSimilares() {
-        alert("Mostrando productos similares...");
-    }
-    function toggleZoom(src) {
+    function abrirZoomModal(imagenSrc) {
         const zoomModal = document.getElementById("zoomModal");
         const zoomedImage = document.getElementById("zoomedImage");
-        zoomedImage.src = src;
-        zoomModal.style.display = "flex";
-    }
+        if (!zoomModal || !zoomedImage) return;
 
+        zoomModal.style.display = "flex";
+        zoomedImage.src = imagenSrc;
+        zoomedImage.style.transform = "scale(1)";
+        let zoomActivo = false;
+
+        zoomedImage.onmousemove = null;
+        zoomedImage.onmousedown = null;
+        zoomedImage.onmouseleave = null;
+
+        zoomedImage.onmousemove = function (e) {
+            if (!zoomActivo) return;
+            const rect = zoomedImage.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            zoomedImage.style.transformOrigin = `${x}% ${y}%`;
+        };
+
+        zoomedImage.onmousedown = function () {
+            if (!zoomActivo) {
+                zoomedImage.style.transform = "scale(2)";
+                zoomActivo = true;
+            } else {
+                zoomedImage.style.transform = "scale(1)";
+                zoomActivo = false;
+            }
+        };
+
+        zoomedImage.onmouseleave = function () {
+            zoomedImage.style.transform = "scale(1)";
+            zoomActivo = false;
+        };
+    }
+    function cerrarModal() {
+        document.getElementById("modalAutoparte").style.display = "none";
+        const zoomModal = document.getElementById("zoomModal");
+        if (zoomModal) zoomModal.style.display = "none";
+    }
     function cerrarZoom() {
         const zoomModal = document.getElementById("zoomModal");
-        zoomModal.style.display = "none";
+        const zoomedImage = document.getElementById("zoomedImage");
+        if (zoomModal && zoomedImage) {
+            zoomModal.style.display = "none";
+            zoomedImage.style.transform = "scale(1)";
+        }
     }
 </script>

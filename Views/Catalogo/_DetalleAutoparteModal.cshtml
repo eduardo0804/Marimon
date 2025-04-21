@@ -37,7 +37,7 @@
         <div class="modal-content-custom" id="modalContent">
             <button class="close-btn" onclick="cerrarModal()">×</button>
 
-            <div id="zoomModal" class="zoom-modal">
+            <div id="zoomModal" class="zoom-modal" style="display: none;">
                 <div class="zoom-content">
                     <button class="cerrar-zoom" onclick="cerrarZoom()">×</button>
                     <img id="zoomedImage" src="" alt="Zoom Autoparte" />
@@ -58,7 +58,7 @@
                     <div class="image-container position-relative">
                         <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
                         <i class="fa-solid fa-magnifying-glass zoom-icon position-absolute"
-                            onclick="toggleZoom('@Model.aut_imagen')"></i>
+                            onclick="abrirZoomModal('@Model.aut_imagen')"></i>
                     </div>
                 </div>
 
@@ -136,6 +136,8 @@
     <script>
         function cerrarModal() {
             document.getElementById("modalAutoparte").style.display = "none";
+            const zoomModal = document.getElementById("zoomModal");
+            if (zoomModal) zoomModal.style.display = "none";
         }
 
         function cargarDetalleAutoparte(id) {
@@ -145,20 +147,6 @@
                     document.getElementById("modalContent").innerHTML = html;
                 })
                 .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
-        }
-
-        // Zoom de imagen
-        function toggleZoom() {
-            const img = document.getElementById("imgAutoparte");
-            const isZoomed = img.classList.contains("zoomed");
-
-            if (isZoomed) {
-                img.classList.remove("zoomed");
-                img.style.transformOrigin = "center center";
-            } else {
-                img.classList.add("zoomed");
-                img.style.transformOrigin = "center center";
-            }
         }
     </script>
 </body>
