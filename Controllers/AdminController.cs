@@ -387,7 +387,7 @@ namespace Marimon.Controllers
 
             _context.Autopartes.Update(autoparte);
             await _context.SaveChangesAsync();
-
+            TempData["EditMessage"] = "La autoparte se actualizó correctamente.";
             return RedirectToAction("ListaAutopartes", "Admin");
         }
 
@@ -415,7 +415,7 @@ namespace Marimon.Controllers
             // Eliminar la autoparte de la base de datos
             _context.Autopartes.Remove(autoparte);
             await _context.SaveChangesAsync();
-
+            TempData["DeleteMessage"] = "La autoparte se eliminó correctamente.";
             return RedirectToAction("ListaAutopartes", "Admin");
         }
     }

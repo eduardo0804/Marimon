@@ -55,7 +55,7 @@
                                 <h5 class="card-title">@autoparte.aut_nombre</h5>
                                 <p class="card-text precio">Precio: <strong>S/
                                         @autoparte.aut_precio.ToString("0.00")</strong></p>
-                                <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post">
+                                <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post" onsubmit="mostrarToast()">
                                     <input type="hidden" name="id" value="@autoparte.aut_id" />
                                     <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
                                 </form>
@@ -90,7 +90,7 @@
         <div class="d-flex">
             <div class="toast-body">
                 <i class="fas fa-check-circle me-2"></i>
-                <span id="toastMessage">Autoparte agregada a favoritos</span>
+                <span id="toastMessage">Autoparte añadida al Carrito</span>
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
         </div>
@@ -157,11 +157,18 @@
             zoomActivo = false;
         };
     }
+
     function cerrarModal() {
         document.getElementById("modalAutoparte").style.display = "none";
         const zoomModal = document.getElementById("zoomModal");
         if (zoomModal) zoomModal.style.display = "none";
     }
+
+    function mostrarToast() {
+        var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
+        toast.show();
+    }
+
     function cerrarZoom() {
         const zoomModal = document.getElementById("zoomModal");
         const zoomedImage = document.getElementById("zoomedImage");
