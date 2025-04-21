@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Marimon.Models
 {
-    [Table("t_usuario")]
+    [Table("Usuario")]
     public class Usuario
     {
         [Key, ForeignKey("IdentityUser")] // Esto indica que es clave foránea también

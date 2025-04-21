@@ -27,7 +27,6 @@ public class ApplicationDbContext : IdentityDbContext
     
 
     public DbSet<Autoparte> Autopartes { get; set; }
-
     public DbSet<Categoria> Categorias { get; set; } 
     public DbSet<Boleta> Boleta { get; set; } 
     public DbSet<Factura> Factura { get; set; } 
