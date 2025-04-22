@@ -325,21 +325,22 @@ namespace Marimon.Controllers
                 return View(autoparte);
             }
         }
+
         [HttpGet]
-        public IActionResult Editar(int id)
+        public async Task<IActionResult> Editar(int id)
         {
-            var autoparte = _context.Autopartes.Find(id);
+            var autoparte = await _context.Autopartes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.aut_id == id);
+
             if (autoparte == null)
             {
                 return NotFound();
             }
 
-            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
-
+            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre", autoparte.CategoriaId);
             return PartialView("_EditarAutoparte", autoparte);
         }
-
-
         [HttpPost]
         public async Task<IActionResult> Editar(Autoparte autoparte, IFormFile imagen)
         {
@@ -355,18 +356,54 @@ namespace Marimon.Controllers
 
             if (imagen != null && imagen.Length > 0)
             {
-                var fileName = Path.GetFileNameWithoutExtension(imagen.FileName);
-                var fileExtension = Path.GetExtension(imagen.FileName);
-                var uniqueFileName = fileName + "_" + Guid.NewGuid().ToString() + fileExtension;
+                // Subir la nueva imagen a Firebase Storage
+                var bucket = "marimonapp.appspot.com";
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
 
-                var imagePath = Path.Combine(_hostingEnvironment.WebRootPath, "images", uniqueFileName);
-
-                using (var stream = new FileStream(imagePath, FileMode.Create))
+                var credJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS");
+                if (string.IsNullOrEmpty(credJson))
                 {
-                    await imagen.CopyToAsync(stream);
+                    throw new Exception("No se encontró la variable de entorno FIREBASE_CREDENTIALS.");
                 }
 
-                autoparte.aut_imagen = "/images/" + uniqueFileName;
+                var credential = GoogleCredential.FromJson(credJson)
+                    .CreateScoped("https://www.googleapis.com/auth/devstorage.full_control");
+
+                var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
+
+                using (var httpClient = new HttpClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+                    using (var stream = imagen.OpenReadStream())
+                    {
+                        var url = $"https://storage.googleapis.com/upload/storage/v1/b/{bucket}/o?uploadType=media&name=autopartes/{uniqueFileName}";
+                        var content = new StreamContent(stream);
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(imagen.ContentType);
+
+                        var response = await httpClient.PostAsync(url, content);
+                        response.EnsureSuccessStatusCode();
+
+                        var publicUrl = $"https://storage.googleapis.com/{bucket}/autopartes/{uniqueFileName}";
+                        autoparte.aut_imagen = publicUrl;
+                    }
+
+                    // Eliminar la imagen anterior de Firebase Storage si existe
+                    if (!string.IsNullOrEmpty(autoparteExistente.aut_imagen))
+                    {
+                        var oldImageName = autoparteExistente.aut_imagen.Split('/').Last();
+                        var deleteUrl = $"https://storage.googleapis.com/storage/v1/b/{bucket}/o/autopartes%2F{oldImageName}";
+
+                        var deleteRequest = new HttpRequestMessage(HttpMethod.Delete, deleteUrl);
+                        deleteRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+                        var deleteResponse = await httpClient.SendAsync(deleteRequest);
+                        if (!deleteResponse.IsSuccessStatusCode)
+                        {
+                            _logger.LogWarning($"No se pudo eliminar la imagen anterior: {autoparteExistente.aut_imagen}");
+                        }
+                    }
+                }
             }
             else
             {
@@ -374,8 +411,10 @@ namespace Marimon.Controllers
                 autoparte.aut_imagen = autoparteExistente.aut_imagen;
             }
 
+            // Actualizar los datos de la autoparte
             _context.Autopartes.Update(autoparte);
             await _context.SaveChangesAsync();
+
             TempData["EditMessage"] = "La autoparte se actualizó correctamente.";
             return RedirectToAction("ListaAutopartes", "Admin");
         }
