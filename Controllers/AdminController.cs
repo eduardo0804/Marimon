@@ -31,16 +31,16 @@ namespace Marimon.Controllers
         public ActionResult Entradas()
         {
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
-            
+
             // Cargar la lista de entradas para mostrar en la tabla
             var listaEntradas = _context.Entradas
                 .Include(e => e.Autoparte)
                 .OrderByDescending(e => e.ent_id)
                 .Take(10)  // Limitar a las últimas 20 entradas
                 .ToList();
-                
+
             ViewBag.ListaEntradas = listaEntradas;
-            
+
             return View("~/Views/Flujos/Entradas.cshtml");
         }
 
@@ -53,10 +53,10 @@ namespace Marimon.Controllers
                 // Usar una clase auxiliar en lugar de un tipo anónimo
                 var productos = _context.Autopartes
                     .Where(p => p.CategoriaId == categoriaId)
-                    .Select(p => new ProductoDTO 
-                    { 
-                        aut_id = p.aut_id, 
-                        aut_nombre = p.aut_nombre ?? string.Empty 
+                    .Select(p => new ProductoDTO
+                    {
+                        aut_id = p.aut_id,
+                        aut_nombre = p.aut_nombre ?? string.Empty
                     })
                     .ToList();
 
@@ -68,7 +68,7 @@ namespace Marimon.Controllers
                 return Json(errorResponse);
             }
         }
-        
+
         // Clase DTO para evitar tipos anónimos
         public class ProductoDTO
         {
@@ -80,7 +80,7 @@ namespace Marimon.Controllers
         [HttpPost]
         public IActionResult RegistrarEntrada(int AutoparteId, int ent_cantidad, string ent_proveedor = "")
         {
-            
+
             try
             {
                 // Validar entradas
@@ -134,14 +134,14 @@ namespace Marimon.Controllers
         public ActionResult Salidas()
         {
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
-            
+
             // Cargar la lista de entradas para mostrar en la tabla
             var listaSalidas = _context.Salida
                 .Include(e => e.Autoparte)
                 .OrderByDescending(e => e.sal_id)
                 .Take(10)  // Limitar a las últimas 20 entradas
                 .ToList();
-                
+
             ViewBag.ListaSalidas = listaSalidas;
             return View("~/Views/Flujos/Salida.cshtml");
         }
@@ -281,9 +281,14 @@ namespace Marimon.Controllers
                 var bucket = "marimonapp.appspot.com";
                 var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
 
-                // Ruta relativa al archivo de credenciales
-                var credPath = Path.Combine(_hostingEnvironment.ContentRootPath,"wwwroot", "firebase", "marimonapp-firebase-adminsdk.json");
-                var credential = GoogleCredential.FromFile(credPath)
+                // Ruta variable de entorno para las credenciales de Firebase
+                var credJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS");
+                if (string.IsNullOrEmpty(credJson))
+                {
+                    throw new Exception("No se encontró la variable de entorno FIREBASE_CREDENTIALS.");
+                }
+
+                var credential = GoogleCredential.FromJson(credJson)
                     .CreateScoped("https://www.googleapis.com/auth/devstorage.full_control");
 
                 var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
