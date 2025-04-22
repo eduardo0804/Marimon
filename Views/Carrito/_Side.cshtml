@@ -8,6 +8,7 @@
         : JsonSerializer.Deserialize<List<Autoparte>>(carritoJson);
 
     decimal subtotal = 0;
+    int cantidadTotal = carrito.Sum(x => x.aut_cantidad);
 }
 
 <style>
@@ -34,7 +35,7 @@
             <svg class="bi me-2" width="24" height="24" fill="#E42229">
                 <use xlink:href="#cart"></use>
             </svg>
-            MI CARRITO
+            MI CARRITO (@cantidadTotal)
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
