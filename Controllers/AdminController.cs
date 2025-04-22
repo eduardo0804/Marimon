@@ -1,4 +1,5 @@
-﻿using Marimon.Data;
+﻿using Google.Apis.Auth.OAuth2;
+using Marimon.Data;
 using Marimon.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -275,62 +276,45 @@ namespace Marimon.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Autoparte autoparte, IFormFile imagen)
         {
-            var autoparteExistente = await _context.Autopartes
-            .FirstOrDefaultAsync(a => a.aut_nombre == autoparte.aut_nombre);
-
-            // Verificar que el archivo haya sido enviado y tenga contenido
-            if (imagen == null || imagen.Length == 0)
-            {
-                ModelState.AddModelError("imagen", "La imagen es obligatoria.");
-            }
-
-            // Aquí imprimimos el estado del ModelState
-            if (!ModelState.IsValid)
-            {
-                foreach (var error in ModelState)
-                {
-                    foreach (var subError in error.Value.Errors)
-                    {
-                        Console.WriteLine($"Error en campo '{error.Key}': {subError.ErrorMessage}");
-                    }
-                }
-                ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
-                return View(autoparte);
-            }
-
             try
             {
-                // Procesar la imagen: asigna un nombre y guarda en wwwroot/uploads
-                var nombreArchivo = Path.GetFileName(imagen.FileName);
-                var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                var bucket = "marimonapp.appspot.com";
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
 
-                if (!Directory.Exists(rutaCarpeta))
+                // Ruta relativa al archivo de credenciales
+                var credPath = Path.Combine(_hostingEnvironment.ContentRootPath,"wwwroot", "firebase", "marimonapp-firebase-adminsdk.json");
+                var credential = GoogleCredential.FromFile(credPath)
+                    .CreateScoped("https://www.googleapis.com/auth/devstorage.full_control");
+
+                var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
+
+                using (var httpClient = new HttpClient())
                 {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-                    Directory.CreateDirectory(rutaCarpeta);
+                    using (var stream = imagen.OpenReadStream())
+                    {
+                        var url = $"https://storage.googleapis.com/upload/storage/v1/b/{bucket}/o?uploadType=media&name=autopartes/{uniqueFileName}";
+                        var content = new StreamContent(stream);
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(imagen.ContentType);
+
+                        var response = await httpClient.PostAsync(url, content);
+                        response.EnsureSuccessStatusCode();
+
+                        // URL pública de la imagen
+                        var publicUrl = $"https://storage.googleapis.com/{bucket}/autopartes/{uniqueFileName}";
+                        autoparte.aut_imagen = publicUrl;
+                    }
                 }
-
-                var rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
-
-                using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-                {
-                    await imagen.CopyToAsync(stream);
-                }
-
-                // Asignar la ruta relativa de la imagen al modelo
-                autoparte.aut_imagen = "/uploads/" + nombreArchivo;
-                
-                // Guardar el modelo en la base de datos
                 _context.Autopartes.Add(autoparte);
                 await _context.SaveChangesAsync();
-                Console.WriteLine("=> Autoparte guardada exitosamente en la base de datos.");
-
                 TempData["SuccessMessage"] = "La autoparte se registró correctamente.";
 
                 return Content("<script>window.parent.location.href = '/Admin/ListaAutopartes';</script>", "text/html");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al registrar la autoparte");
                 ModelState.AddModelError("", $"Error al registrar la autoparte: {ex.Message}");
                 ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
                 return View(autoparte);
