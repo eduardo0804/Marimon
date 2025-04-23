@@ -1,5 +1,7 @@
 @model Marimon.Models.Autoparte
 
+<link href="/css/styleReEdi.css" rel="stylesheet" type="text/css">
+
 <div class="container mt-4" style="max-width: 400px;">
     <h3 class="text-center" style="color: #E42229;">Editar autoparte</h3>
 
@@ -7,49 +9,60 @@
         <!-- Campo oculto para el ID -->
         <input type="hidden" asp-for="aut_id" />
 
-        <div class="form-group mt-3">
+        <div class="form-floating mb-3">
+            <input asp-for="aut_nombre" class="form-control" id="aut_nombre" placeholder="Nombre" required />
             <label for="aut_nombre">Nombre <span class="text-danger">*</span></label>
-            <input asp-for="aut_nombre" class="form-control" required />
         </div>
-
-        <div class="form-group mt-3">
+        
+        <div class="form-floating mb-3">
+            <textarea asp-for="aut_descripcion" class="form-control" id="aut_descripcion" placeholder="Descripción" style="height: 100px" required></textarea>
             <label for="aut_descripcion">Descripción <span class="text-danger">*</span></label>
-            <textarea asp-for="aut_descripcion" class="form-control" rows="2" required></textarea>
         </div>
-
-        <div class="form-group mt-3">
+        
+        <div class="form-floating mb-3">
+            <textarea asp-for="aut_especificacion" class="form-control" id="aut_especificacion" placeholder="Especificaciones" style="height: 100px" required></textarea>
             <label for="aut_especificacion">Especificaciones <span class="text-danger">*</span></label>
-            <textarea asp-for="aut_especificacion" class="form-control" rows="2" required></textarea>
         </div>
-
-        <div class="form-row mt-3 d-flex gap-2">
-            <div class="form-group w-50">
-                <label for="aut_precio">Precio <span class="text-danger">*</span></label>
-                <input asp-for="aut_precio" class="form-control" step="0.01" required />
-            </div>
+        
+        <div class="form-floating mb-3">
+            <input asp-for="aut_precio" class="form-control" id="aut_precio" placeholder="Precio" step="0.01" min="0" required />
+            <label for="aut_precio">Precio (S/) <span class="text-danger">*</span></label>
         </div>
-
-        <div class="form-group">
-            <label for="imagen">Imagen (Dejar vacío si no se desea cambiar)</label>
-            <input type="file" class="form-control" name="imagen" id="imagen" />
-            @if (!string.IsNullOrEmpty(Model.aut_imagen))
-            {
-                <div class="mt-2">
-                    <img src="@Model.aut_imagen" alt="Imagen autoparte" class="img-thumbnail" width="150" />
+        
+        <div class="mb-3">
+            <label for="imagen" class="form-label">Imagen <span class="text-danger">*</span></label>
+            <div class="file-upload-wrapper">
+                <input type="file" class="file-upload-input" name="imagen" id="imagen" required />
+                <div class="file-upload-text">
+                    <i class="fas fa-cloud-upload-alt me-2"></i>
+                    <span id="file-name">Seleccionar archivo</span>
                 </div>
-            }
+            </div>
+            <div id="imagePreview" class="mt-2 d-none">
+                <p class="image-label">Vista previa:</p>
+                <div class="image-preview-container">
+                    <img id="preview" src="#" alt="Vista previa" class="current-image-preview" />
+                    <button type="button" id="removeImage" class="btn-remove-image">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
             <span class="text-danger">@Html.ValidationMessage("imagen", null, new { @class = "text-danger" })</span>
         </div>
-
-        <div class="form-group mt-3">
-            <label for="CategoriaId">Categoría <span class="text-danger">*</span></label>
-            <select asp-for="CategoriaId" class="form-control" asp-items="@(ViewBag.Categorias as SelectList)" required>
+        
+        <div class="form-floating mb-4">
+            <select asp-for="CategoriaId" class="form-select" id="CategoriaId" asp-items="ViewBag.Categorias" required>
                 <option value="">-- Selecciona una categoría --</option>
             </select>
+            <label for="CategoriaId">Categoría <span class="text-danger">*</span></label>
         </div>
-
+        
         <div class="text-center mt-4">
-            <button type="submit">Guardar cambios</button>
+            <button type="submit" class="btn-submit">
+                <span>Editar Autoparte</span>
+                <i class="fas fa-save ms-2"></i>
+            </button>
         </div>
     </form>
 </div>
+
