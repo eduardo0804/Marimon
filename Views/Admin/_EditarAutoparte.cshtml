@@ -1,13 +1,11 @@
 @model Marimon.Models.Autoparte
-
 <link href="/css/styleReEdi.css" rel="stylesheet" type="text/css">
 
 <div class="container mt-4" style="max-width: 400px;">
-
     <form asp-controller="Admin" asp-action="Editar" method="post" enctype="multipart/form-data">
         <!-- Campo oculto para el ID -->
         <input type="hidden" asp-for="aut_id" />
-
+        
         <div class="form-floating mb-3">
             <input asp-for="aut_nombre" class="form-control" id="aut_nombre" placeholder="Nombre" required />
             <label for="aut_nombre">Nombre <span class="text-danger">*</span></label>
@@ -29,23 +27,26 @@
         </div>
         
         <div class="mb-3">
-            <label for="imagen" class="form-label">Imagen <span class="text-danger">*</span></label>
+            <label for="imagen" class="form-label">Imagen</label>
             <div class="file-upload-wrapper">
-                <input type="file" class="file-upload-input" name="imagen" id="imagen" required />
+                <input type="file" class="file-upload-input" name="imagen" id="imagen" />
                 <div class="file-upload-text">
                     <i class="fas fa-cloud-upload-alt me-2"></i>
-                    <span id="file-name">Seleccionar archivo</span>
+                    <span id="file-name">Seleccionar nueva imagen</span>
                 </div>
             </div>
-            <div id="imagePreview" class="mt-2 d-none">
-                <p class="image-label">Vista previa:</p>
-                <div class="image-preview-container">
-                    <img id="preview" src="#" alt="Vista previa" class="current-image-preview" />
-                    <button type="button" id="removeImage" class="btn-remove-image">
-                        <i class="fas fa-times"></i>
-                    </button>
+            <span class="text-muted small">Deja este campo vacío si no deseas cambiar la imagen actual</span>
+            
+            <!-- Mostrar la imagen actual si existe -->
+            @if (!string.IsNullOrEmpty(Model.aut_imagen))
+            {
+                <div class="mt-3 current-image-section">
+                    <p class="image-label">Imagen actual:</p>
+                    <div class="image-preview-container">
+                        <img src="/images/autopartes/@Model.aut_imagen" alt="Imagen actual" class="current-image-preview" />
+                    </div>
                 </div>
-            </div>
+            }
             <span class="text-danger">@Html.ValidationMessage("imagen", null, new { @class = "text-danger" })</span>
         </div>
         
@@ -65,3 +66,19 @@
     </form>
 </div>
 
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('imagen');
+            const fileNameLabel = document.getElementById('file-name');
+            
+            // Cuando se selecciona un nuevo archivo
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    fileNameLabel.textContent = file.name;
+                }
+            });
+        });
+    </script>
+}
