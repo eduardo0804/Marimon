@@ -25,20 +25,21 @@ namespace Marimon.Controllers
         // GET: Catalogo/Index
         public async Task<IActionResult> Index(string buscar)
         {
-            var autopartes = await _context.Autopartes
+            var autopartesQuery = _context.Autopartes
                 .Include(a => a.Categoria)
                 .OrderBy(a => a.aut_id)
-                .ToListAsync();
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(buscar))
             {
-                autopartes = autopartes
-                    .Where(a => a.aut_nombre.Contains(buscar))
-                    .ToList();
+                autopartesQuery = autopartesQuery
+                    .Where(a => EF.Functions.ILike(a.aut_nombre, $"%{buscar}%"));
             }
 
+            var autopartes = await autopartesQuery.ToListAsync();
             return View(autopartes);
         }
+
 
         // GET: Catalogo/DetalleAutoparte/5
         public async Task<IActionResult> DetalleAutoparte(int id)
