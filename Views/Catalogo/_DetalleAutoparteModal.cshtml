@@ -49,7 +49,7 @@
                     @* <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
                         onclick="agregarFavorito(this, @Model.aut_id)"></i> *@
                         <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
-                            onclick="agregarFavorito()"></i>
+                            onclick="agregarFavorito(this)"></i></i>
                     <div class="image-container position-relative">
                         <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
                         <i class="fa-solid fa-magnifying-glass zoom-icon position-absolute"
@@ -147,6 +147,17 @@
             if (zoomModal) zoomModal.style.display = "none";
         }    
 
+        function agregarFavorito(icon){
+            if (icon.classList.contains('fa-regular')) {
+                icon.classList.remove('fa-regular');
+                icon.classList.add('fa-solid');
+            } else {
+                icon.classList.remove('fa-solid');
+                icon.classList.add('fa-regular');
+            }
+            var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
+            toast.show();
+        }
         function cargarDetalleAutoparte(id) {
             fetch(`/Catalogo/DetalleAutoparte/${id}`)
                 .then(response => response.text())
@@ -155,6 +166,7 @@
                 })
                 .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
         }
+        
     </script>
 </body>
 

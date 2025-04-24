@@ -174,7 +174,14 @@
         toast.show();
     }
 
-    function agregarFavorito(){
+    function agregarFavorito(icon){
+        if (icon.classList.contains('fa-regular')) {
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+        } else {
+            icon.classList.remove('fa-solid');
+            icon.classList.add('fa-regular');
+        }
         var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
         toast.show();
     }
