@@ -15,6 +15,13 @@
     <link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
 
 </head>
+<style>
+    .scrollable-container {
+        max-height: 200px; /* Ajusta la altura para mostrar solo 2 productos */
+        overflow-y: auto; /* Habilita la barra de desplazamiento vertical */
+        padding-right: 10px; /* Espacio para evitar que el contenido se superponga con la barra */
+    }
+</style>
 
 <body>
 
@@ -96,24 +103,27 @@
                         </div>
 
                         <div class="tab-pane fade" id="similares" role="tabpanel" aria-labelledby="similares-tab">
-                            <ul class="list-group">
-                                @foreach (var similar in Model.ProductosSimilares)
-                                {
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <img src="@similar.aut_imagen" alt="@similar.aut_nombre" class="img-thumbnail me-3"
-                                            style="width: 80px; height: 80px;" />
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">
-                                                <a href="javascript:void(0);"
-                                                    onclick="cargarDetalleAutoparte(@similar.aut_id)"
-                                                    class="text-decoration-none text-dark">@similar.aut_nombre</a>
-                                            </h6>
-                                            <p class="text-muted mb-0">S/ @similar.aut_precio.ToString("0.00")</p>
-                                        </div>
-                                    </li>
-                                }
-                            </ul>
+                            <div class="scrollable-container">
+                                <ul class="list-group">
+                                    @foreach (var similar in Model.ProductosSimilares)
+                                    {
+                                        <li class="list-group-item d-flex align-items-center">
+                                            <img src="@similar.aut_imagen" alt="@similar.aut_nombre" class="img-thumbnail me-3"
+                                                 style="width: 80px; height: 80px;" />
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">
+                                                    <a href="javascript:void(0);"
+                                                       onclick="cargarDetalleAutoparte(@similar.aut_id)"
+                                                       class="text-decoration-none text-dark">@similar.aut_nombre</a>
+                                                </h6>
+                                                <p class="text-muted mb-0">S/ @similar.aut_precio.ToString("0.00")</p>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
                         </div>
+
                     </div>
 
                     <div class="d-grid gap-3 mt-4">
