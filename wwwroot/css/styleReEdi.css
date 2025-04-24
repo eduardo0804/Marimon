@@ -146,3 +146,32 @@
     transform: translateY(1px);
     box-shadow: 0 2px 3px rgba(212, 32, 37, 0.3);
 }
+.current-image-section {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.image-label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.current-image-preview {
+    max-width: 100%;
+    max-height: 180px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: block;
+    margin: 0 auto;
+}
+
+.current-image-preview:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
