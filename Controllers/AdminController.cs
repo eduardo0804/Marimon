@@ -240,7 +240,7 @@ namespace Marimon.Controllers
 
                 await _context.SaveChangesAsync(); // Guardar todo
 
-                TempData["Mensaje"] = $"Se han registrado {sal_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
+                TempData["Mensaje"] = $"Se han registrado la salida de {sal_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
                 return RedirectToAction("Salidas");  // FIXED: Changed to redirect to Salidas instead of returning Ok
             }
             catch (Exception ex)

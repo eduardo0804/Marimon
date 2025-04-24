@@ -60,8 +60,8 @@
 
             <div class="row g-4 align-items-center">
                 <div class="col-md-6 text-center position-relative">
-                    <i class="fa-solid fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
-                        onclick="agregarFavorito(@Model.aut_id)"></i>
+                    <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
+                        onclick="agregarFavorito(this, @Model.aut_id)"></i>
                     <div class="image-container position-relative">
                         <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
                         <i class="fa-solid fa-magnifying-glass zoom-icon position-absolute"
@@ -129,7 +129,9 @@
                     <div class="d-grid gap-3 mt-4">
                         <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post">
                             <input type="hidden" name="id" value="@Model.aut_id" />
-                            <button class="btn btn-carrito w-100" type="submit">Añadir al Carrito</button>
+                            <button class="btn btn-carrito w-100" type="submit" style="background-color: #000; color: #fff; border: none;">
+                                Añadir al Carrito
+                            </button>
                         </form>
                         <a href="https://wa.me/51953761813?text=@Uri.EscapeDataString($"Hola, estoy interesado en la autoparte: {Model.aut_nombre} con precio S/ {Model.aut_precio.ToString("0.00")}. ¿Podrían brindarme más información?")" target="_blank" class="btn btn-whatsapp w-100" style="text-decoration: none; display: inline-block; text-align: center;">
                             <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
@@ -156,7 +158,7 @@
             document.getElementById("modalAutoparte").style.display = "none";
             const zoomModal = document.getElementById("zoomModal");
             if (zoomModal) zoomModal.style.display = "none";
-        }
+        }    
 
         function cargarDetalleAutoparte(id) {
             fetch(`/Catalogo/DetalleAutoparte/${id}`)
