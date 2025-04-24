@@ -58,7 +58,7 @@
 
                                 @if (autoparte.aut_cantidad > 0)
                                 {
-                                    <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post" onsubmit="mostrarToast('Autoparte añadida al Carrito')">
+                                    <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post" onsubmit="mostrarToast()">
                                         <input type="hidden" name="id" value="@autoparte.aut_id" />
                                         <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
                                     </form>
@@ -76,6 +76,19 @@
     </div>
 </div>
 
+<!-- Alerta Carrito-->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="toastCarrito" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>
+                <span id="toastMessage">La autoparte fue agregada al Carrito.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+    </div>
+</div>
+
 <!-- Alerta Favorito-->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
     <div id="toastFavorito" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -89,20 +102,6 @@
     </div>
 </div>
 
-<!-- TOAST: Alerta de éxito al agregar a Favoritos -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
-        <div id="agregarFavorito" class="toast align-items-center text-white bg-success border-0" role="alert"
-            aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <strong>Favorito:</strong> La autoparte fue agregada correctamente a tus favoritos.
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Cerrar"></button>
-            </div>
-        </div>
-    </div>
-    
 <!-- Modal -->
 <div id="modalAutoparte" class="modal">
     <div id="contenidoModal">
@@ -171,24 +170,12 @@
     }
 
     function mostrarToast() {
-        var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
+        var toast = new bootstrap.Toast(document.getElementById("toastCarrito"));
         toast.show();
     }
 
-    function agregarFavorito(icon) {
-        if (icon.classList.contains('fa-regular')) {
-            icon.classList.remove('fa-regular');
-            icon.classList.add('fa-solid');
-        } else {
-            icon.classList.remove('fa-solid');
-            icon.classList.add('fa-regular');
-        }
-
-        const toastEl = document.getElementById('toastFavorito');
-        const toast = new bootstrap.Toast(toastEl, {
-            autohide: true,
-            delay: 3000
-        });
+    function agregarFavorito(){
+        var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
         toast.show();
     }
 
