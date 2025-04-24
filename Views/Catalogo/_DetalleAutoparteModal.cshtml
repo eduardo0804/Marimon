@@ -119,7 +119,9 @@
                     <div class="d-grid gap-3 mt-4">
                         <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post">
                             <input type="hidden" name="id" value="@Model.aut_id" />
-                            <button class="btn btn-carrito w-100" type="submit">Añadir al Carrito</button>
+                            <button class="btn btn-carrito w-100" type="submit" style="background-color: #000; color: #fff; border: none;">
+                                Añadir al Carrito
+                            </button>
                         </form>
                         <a href="https://wa.me/51953761813?text=@Uri.EscapeDataString($"Hola, estoy interesado en la autoparte: {Model.aut_nombre} con precio S/ {Model.aut_precio.ToString("0.00")}. ¿Podrían brindarme más información?")" target="_blank" class="btn btn-whatsapp w-100" style="text-decoration: none; display: inline-block; text-align: center;">
                             <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
