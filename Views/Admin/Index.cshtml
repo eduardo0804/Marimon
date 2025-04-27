@@ -1,51 +1,282 @@
 ﻿@{
     Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Módulo de Autopartes - Administración";
 }
-<!-- Contenido principal -->
-<main class="container my-4">
-    <div class="row g-4">
-        <!-- Consultar Autopartes -->
-        <div class="col-md-6">
-            <div class="card text-center">
-                <img src="~/images/car.jpg" class="card-img-top" alt="Consultar Autopartes">
-                <div class="card-body bg-dark text-white">
-                    <h5 class="card-title">CONSULTAR AUTOPARTES</h5>
-                </div>
-            </div>
-        </div>
-        <!-- Autopartes -->
-        <div class="col-md-6">
-            <div class="card text-center">
-                <img src="~/images/car-parts.jpg" class="card-img-top" alt="Autopartes">
-                <div class="card-body bg-dark text-white">
-                    <h5 class="card-title">AUTOPARTES</h5>
-                </div>
-            </div>
-        </div>
-        <!-- Flujo de Autopartes -->
-        <div class="col-md-6">
-            <div class="card text-center">
-                <div class="row g-0">
-                    <div class="col-6">
-                        <img src="~/images/entradas.jpg" class="img-fluid" alt="Entradas">
+
+<div class="admin-container">
+    <!-- Contenido principal -->
+    <main class="modulo-content">
+        <div class="modulo-grid">
+            <!-- Consultar Autopartes -->
+            <a href="@Url.Action("ConsultarAutoparte", "Admin")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/auto.png" alt="Consultar Autopartes">
                     </div>
-                    <div class="col-6">
-                        <img src="~/images/salidas.jpg" class="img-fluid" alt="Salidas">
+                    <div class="card-footer">
+                        <span>CONSULTAR AUTOPARTES</span>
                     </div>
                 </div>
-                <div class="card-body bg-dark text-white">
-                    <h5 class="card-title">FLUJO DE AUTOPARTES</h5>
+            </a>
+
+            <!-- Autopartes -->
+            <a href="@Url.Action("ListaAutopartes", "Admin")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/autopartes.png" alt="Autopartes">
+                    </div>
+                    <div class="card-footer">
+                        <span>AUTOPARTES</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Flujo de Autopartes -->
+            <div class="modulo-item">
+                <div class="card-content flujo-section">
+                    <a href="@Url.Action("Entradas", "Admin")" class="flujo-column-link">
+                        <div class="flujo-column">
+                            <div class="flujo-item">
+                                <img src="~/images/entrada.png" alt="Entradas" class="small-icon">
+                            </div>
+                            <div class="flujo-badge-container">
+                                <span class="flujo-badge entrada">ENTRADAS</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="@Url.Action("Salidas", "Admin")" class="flujo-column-link">
+                        <div class="flujo-column">
+                            <div class="flujo-item">
+                                <img src="~/images/salida.png" alt="Salidas" class="small-icon">
+                            </div>
+                            <div class="flujo-badge-container">
+                                <span class="flujo-badge salida">SALIDAS</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="card-footer">
+                    <span class="flujo-text">FLUJO DE AUTOPARTES</span>
                 </div>
             </div>
-        </div>
-        <!-- Reportes -->
-        <div class="col-md-6">
-            <div class="card text-center">
-                <img src="~/images/reports.jpg" class="card-img-top" alt="Reportes">
-                <div class="card-body bg-dark text-white">
-                    <h5 class="card-title">REPORTES</h5>
+
+            <!-- Reportes -->
+            <a href="@Url.Action("Reportes", "Admin")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/estadistica.png" alt="Reportes">
+                    </div>
+                    <div class="card-footer">
+                        <span>REPORTES</span>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
-    </div>
-</main>
+    </main>
+</div>
+
+<!-- Estilos en la misma página -->
+<style>
+    /* Estilos básicos */
+    .admin-container {
+        max-width: 1750px;
+        width: 100%;
+        margin: 0 auto;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 50px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+    }
+
+    /* Header */
+    .modulo-header {
+        width: 100%;
+    }
+
+    .modulo-title-bar {
+        background-color: #d42025;
+        color: white;
+        padding: 15px 25px;
+        text-align: left;
+    }
+
+    .modulo-title {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    /* Contenido principal */
+    .modulo-content {
+        padding: 40px;
+    }
+
+    .modulo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 30px;
+    }
+
+    .modulo-item {
+        border-radius: 0;
+        overflow: hidden;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .modulo-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .modulo-item-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .card-content {
+        background-color: #f8f9fa;
+        height: 220px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+    }
+
+    .card-content img {
+        max-width: 80%;
+        max-height: 80%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .modulo-item:hover .card-content img {
+        transform: scale(1.05);
+    }
+
+    /* Estilo para la sección de flujo */
+    .flujo-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 220px;
+        background-color: #f8f9fa;
+        padding: 15px;
+    }
+    
+    .flujo-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        transition: all 0.3s ease;
+        border-radius: 20px;
+        position: relative;
+        padding: 15px 0;
+    }
+
+    .flujo-column-link {
+        width: 48%;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .flujo-column:hover {
+        background-color: #f0f0f0;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+    }
+    
+    .flujo-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 120px;
+        width: 100%;
+    }
+    
+    .flujo-badge-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .small-icon {
+        max-width: 60%;
+        max-height: 60%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .flujo-column:hover .small-icon {
+        transform: scale(1.1);
+    }
+    
+    .flujo-badge {
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .flujo-column:hover .flujo-badge {
+        transform: scale(1.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .entrada {
+        background-color: #007bff;
+    }
+    
+    .salida {
+        background-color: #d42025;
+    }
+
+    .card-footer {
+        background-color: #1c1c1c;
+        color: white;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .flujo-text {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    /* Footer de las tarjetas */
+    .card-footer span {
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Footer principal */
+    .modulo-footer {
+        background-color: #d42025;
+        color: white;
+        padding: 15px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modulo-footer a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .modulo-footer a:hover {
+        text-decoration: underline;
+    }
+</style>

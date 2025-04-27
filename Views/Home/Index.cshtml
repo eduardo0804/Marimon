@@ -3,6 +3,43 @@
 }
 <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 
+<style>
+    .success-message {
+    bottom: 20px;
+    right: 20px;
+    position: fixed;
+    z-index: 1050;
+    max-width: 300px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.success-message .btn-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.success-message.hide {
+    opacity: 0;
+    transform: translateY(20px);
+}
+</style>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success success-message position-fixed" role="alert">
+        <strong>Éxito</strong>: @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
+    </div>
+}
+
 <div class="container">
     <!-- Slider Section -->
     <div class="slider-container">
@@ -105,5 +142,15 @@
         </div>
     </div>
 </div>
-
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const successMessage = document.querySelector(".success-message");
+        if (successMessage) {
+            setTimeout(() => {
+                successMessage.classList.add("hide");
+                setTimeout(() => successMessage.remove(), 500);
+            }, 10000);
+        }
+    });
+</script>
 <script src="~/js/home.js" asp-append-version="true"></script>

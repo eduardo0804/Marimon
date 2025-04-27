@@ -17,10 +17,13 @@ namespace Marimon.Areas.Identity.Pages.Account
     public class ConfirmEmailModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public ConfirmEmailModel(UserManager<IdentityUser> userManager)
+
+        public ConfirmEmailModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -35,17 +38,25 @@ namespace Marimon.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("/Index");
             }
-
+            
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
 
-            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-            var result = await _userManager.ConfirmEmailAsync(user, code);
-            StatusMessage = result.Succeeded ? "Gracias. Tu correo electrónico ha sido confirmado con éxito." : "Error al confirmar tu correo electrónico.";
-            return Page();
+            var decodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            var result = await _userManager.ConfirmEmailAsync(user, decodedCode);
+            if (!result.Succeeded)
+            {
+                return Page();
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // Redirigir a la página Home
+            return RedirectToAction("Index", "Home");
         }
+        
     }
 }
