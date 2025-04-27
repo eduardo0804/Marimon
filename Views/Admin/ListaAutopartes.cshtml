@@ -6,6 +6,7 @@
 
 }
 
+<link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
 
 <div class="container py-4">
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -19,7 +20,25 @@
                 La autoparte se registró correctamente.
             </div>
         </div>
-
+        <div id="editToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-warning text-white">
+                <strong class="me-auto">Edición Exitosa</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                La autoparte se actualizo correctamente.
+            </div>
+        </div>
+        <div id="deleteToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">Eliminación</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                La autoparte se eliminó correctamente.
+            </div>
+        </div>
         <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header bg-danger text-white">
                 <strong class="me-auto">Error</strong>
@@ -128,9 +147,9 @@
                 <div class="image-container">
                   <img src="@item.aut_imagen" alt="Imagen" class="table-image" />
                   <div class="image-overlay">
-                    <a href="@item.aut_imagen" target="_blank" class="image-zoom">
-                      <i class="fas fa-search-plus"></i>
-                    </a>
+                    @* <a href="@item.aut_imagen" target="_blank" class="image-zoom"> *@
+                    @*   <i class="fas fa-search-plus"></i> *@
+                    @* </a> *@
                   </div>
                 </div>
               }
@@ -176,462 +195,7 @@
     </div>
   </div>
 </div>
-<style>
-    /* Estilos básicos */
-    .admin-container {
-        max-width: 1500px;
-        margin: 0 auto;
-        background-color: #fff;
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
 
-    /* Header */
-    .modulo-header {
-        width: 100%;
-    }
-
-    .modulo-title-bar {
-        background-color: #d42025;
-        color: white;
-        padding: 15px 25px;
-        text-align: left;
-    }
-
-    .modulo-title {
-        margin: 0;
-        font-size: 24px;
-        font-weight: 600;
-    }
-
-    .table-container {
-  margin-top: 20px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  background-color: #ffffff;
-}
-
-.modern-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.modern-table thead {
-  background-color: #212529;
-  color: white;
-}
-
-.modern-table th {
-  padding: 16px;
-  text-align: center;
-  font-weight: 600;
-  border: none;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.modern-table tbody tr {
-  border-bottom: 1px solid #eaeaea;
-  transition: all 0.3s ease;
-}
-
-.modern-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.modern-table tbody tr:hover {
-  background-color: #f8f9fa;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
-}
-
-.modern-table td {
-  padding: 16px;
-  text-align: center;
-  vertical-align: middle;
-  border: none;
-  transition: all 0.3s ease;
-}
-
-/* Contenedor de descripción con hover tooltip */
-.td-description {
-  position: relative;
-  max-width: 200px;
-}
-
-.description-content {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
-}
-
-.description-tooltip {
-  visibility: hidden;
-  width: 300px;
-  background-color: #333;
-  color: #fff;
-  text-align: left;
-  border-radius: 6px;
-  padding: 10px;
-  position: absolute;
-  z-index: 100;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.3s, visibility 0.3s;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  font-size: 14px;
-  white-space: normal;
-}
-
-.description-tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #333 transparent transparent transparent;
-}
-
-.td-description:hover .description-tooltip {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* Estilos para imágenes en la tabla */
-.image-container {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  margin: 0 auto;
-  overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.table-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: all 0.3s ease;
-}
-
-.image-container:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.image-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.image-container:hover .image-overlay {
-  opacity: 1;
-}
-
-.image-zoom {
-  color: white;
-  font-size: 18px;
-  background-color: rgba(0, 0, 0, 0.6);
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.2s ease;
-}
-
-.image-zoom:hover {
-  transform: scale(1.1);
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.no-image {
-  color: #aaa;
-  font-style: italic;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
-
-/* Estilos para botones de acción */
-.actions-cell {
-  min-width: 100px;
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.btn-action {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.btn-edit {
-  background-color: #5a5a5a; /* Gris medio oscuro */
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.btn-edit:hover {
-  background-color: #000000; /* Negro */
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.btn-delete {
-  background-color: #dc3545;
-}
-
-.btn-delete:hover {
-  background-color: #c82333;
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-}
-
-.delete-form {
-  margin: 0;
-}
-
-/* Botones del modal de confirmación */
-.btn-cancel {
-  padding: 8px 20px;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-cancel:hover {
-  background-color: #5a6268;
-}
-
-.btn-confirm-delete {
-  padding: 8px 20px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-confirm-delete:hover {
-  background-color: #c82333;
-}
-    /* estilo botones */
-    .btn-registrar {
-        background-color: #d42025;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 16px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(212, 32, 37, 0.2);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-registrar::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.7s ease;
-    }
-
-    .btn-registrar:hover {
-        background-color: #b81920;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(212, 32, 37, 0.3);
-    }
-
-    .btn-registrar:hover::before {
-        left: 100%;
-    }
-
-    .btn-registrar:active {
-        transform: translateY(1px);
-        box-shadow: 0 2px 3px rgba(212, 32, 37, 0.3);
-    }
-
-    /* Contenido principal */
-    .modulo-content {
-        padding: 20px;
-    }
-
-    .modulo-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-gap: 20px;
-    }
-
-    .modulo-item {
-        border-radius: 0;
-        overflow: hidden;
-        background-color: #fff;
-    }
-
-    .card-content {
-        background-color: #f8f9fa;
-        height: 200px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 15px;
-    }
-
-    .card-content img {
-        max-width: 80%;
-        max-height: 80%;
-        object-fit: contain;
-    }
-
-    /* Estilo para la sección de flujo */
-    .flujo-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 200px;
-        background-color: #f8f9fa;
-    }
-
-    .flujo-column {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 48%;
-    }
-
-    .flujo-item {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 15px;
-        height: 180px;
-    }
-
-    .flujo-badge-container {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .small-icon {
-        max-width: 60%;
-        max-height: 60%;
-        object-fit: contain;
-    }
-
-    .flujo-badge {
-        padding: 5px 15px;
-        border-radius: 15px;
-        font-size: 12px;
-        font-weight: bold;
-        color: white;
-        transform: translateY(-30px);
-    }
-
-    .entrada {
-        background-color: #007bff;
-    }
-
-    .salida {
-        background-color: #d42025;
-    }
-
-    .card-footer {
-        background-color: #1c1c1c;
-        color: white;
-        padding: 12px;
-        text-align: center;
-    }
-
-    .flujo-text {
-        font-weight: 600;
-        font-size: 15px;
-    }
-
-    /* Footer de las tarjetas */
-    .card-footer {
-        background-color: #1c1c1c;
-        color: white;
-        padding: 12px;
-        text-align: center;
-    }
-
-    .card-footer span {
-        font-weight: 600;
-        font-size: 15px;
-    }
-
-    /* Footer principal */
-    .modulo-footer {
-        background-color: #d42025;
-        color: white;
-        padding: 15px 25px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .modulo-footer a {
-        color: white;
-        text-decoration: none;
-    }
-
-    .modulo-footer a:hover {
-        text-decoration: underline;
-    }
-</style>
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -652,67 +216,84 @@
         }
         $(document).ready(function () {
             @if (TempData["SuccessMessage"] != null)
-                {
-                    <text>
-                        const successToast = new bootstrap.Toast(document.getElementById('successToast'));
-                        successToast.show();
-                    </text>
+            {
+                <text>
+                    const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+                    successToast.show();
+                </text>
             }
 
-                @if (TempData["Error"] != null)
-                {
-                    <text>
-                        document.getElementById('errorToastMessage').innerText = '@TempData["Error"]';
-                        const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
-                        errorToast.show();
-                    </text>
+            @if (TempData["EditMessage"] != null) // Agregar la condición para el toast de edición
+            {
+                <text>
+                    const editToast = new bootstrap.Toast(document.getElementById('editToast'));
+                    editToast.show();
+                </text>
+            }
+
+            @if (TempData["DeleteMessage"] != null)
+            {
+                <text>
+                    const deleteToast = new bootstrap.Toast(document.getElementById('deleteToast'));
+                    deleteToast.show();
+                </text>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                    document.getElementById('errorToastMessage').innerText = '@TempData["Error"]';
+                    const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                    errorToast.show();
+                </text>
             }
         });
 
+
         function confirmDelete(button) {
-  const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-  const deleteForm = button.closest('form');
-  
-  // Mostrar el modal
-  deleteModal.show();
-  
-  // Configurar el botón de confirmación
-  document.querySelector('.btn-confirm-delete').onclick = function() {
-    deleteForm.submit();
-    deleteModal.hide();
-  };
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        const deleteForm = button.closest('form');
+        
+        // Mostrar el modal
+        deleteModal.show();
+        
+        // Configurar el botón de confirmación
+        document.querySelector('.btn-confirm-delete').onclick = function() {
+          deleteForm.submit();
+          deleteModal.hide();
+        };
 }
 
-// Añadir efectos de ripple a los botones de acción
-document.querySelectorAll('.btn-action').forEach(button => {
-  button.addEventListener('mousedown', function(e) {
-    const x = e.clientX - e.target.getBoundingClientRect().left;
-    const y = e.clientY - e.target.getBoundingClientRect().top;
-    
-    const ripple = document.createElement('span');
-    ripple.className = 'ripple';
-    ripple.style.left = `${x}px`;
-    ripple.style.top = `${y}px`;
-    
-    this.appendChild(ripple);
-    
-    setTimeout(() => {
-      ripple.remove();
-    }, 600);
-  });
-});
+    // Añadir efectos de ripple a los botones de acción
+    document.querySelectorAll('.btn-action').forEach(button => {
+      button.addEventListener('mousedown', function(e) {
+        const x = e.clientX - e.target.getBoundingClientRect().left;
+        const y = e.clientY - e.target.getBoundingClientRect().top;
+        
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
 
 // Añadir tooltip para las imágenes que están recortadas
-document.querySelectorAll('.td-description').forEach(cell => {
-  const content = cell.querySelector('.description-content');
-  const tooltip = cell.querySelector('.description-tooltip');
-  
-  if (content.offsetWidth < content.scrollWidth) {
-    tooltip.style.display = 'block';
-  } else {
-    tooltip.style.display = 'none';
-  }
-});
+    document.querySelectorAll('.td-description').forEach(cell => {
+      const content = cell.querySelector('.description-content');
+      const tooltip = cell.querySelector('.description-tooltip');
+      
+      if (content.offsetWidth < content.scrollWidth) {
+        tooltip.style.display = 'block';
+      } else {
+        tooltip.style.display = 'none';
+      }
+    });
     </script>
 
 }

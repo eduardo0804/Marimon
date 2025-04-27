@@ -1,3 +1,4 @@
+
 <style>
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -207,11 +208,10 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="productos-carrito">
+            <tbody id="productos-carrito"></tbody>
                 <!-- Aquí se mostrarán los productos del carrito -->
             </tbody>
         </table>
-
         <div class="resumen" >
             <p><strong>Subtotal:</strong> S/ <span id="subtotal">0</span></p>
             <p><strong>Total:</strong> S/ <span id="total">0</span></p>
@@ -221,7 +221,19 @@
 
     <script>
         // Obtenemos los productos del carrito desde localStorage
-        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        const carrito = [
+            @foreach (var item in Model)
+            {
+                <text>
+                {
+                    nombre: "@item.aut_nombre",
+                    precio: @item.aut_precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture),
+                    cantidad: @item.aut_cantidad,
+                    imagen: "@Url.Content(item.aut_imagen)"
+                },
+                </text>
+            }
+        ];
         const productosCarrito = document.getElementById('productos-carrito');
         let subtotal = 0;
 

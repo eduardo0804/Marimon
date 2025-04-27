@@ -12,8 +12,7 @@ namespace Marimon.Models
 
         public string ser_nombre { get; set; }
         public string ser_descripcion { get; set; }
-        public string ser_img1 { get; set; }
-        public string ser_img2 { get; set; }
+        public string ser_imagen { get; set; }
 
         public virtual ICollection<Reserva> Reservas { get; set; }
     }
