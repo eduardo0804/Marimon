@@ -93,23 +93,45 @@ namespace Marimon.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
+            
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("Usuario conectado.");
+                    
+                    // Obtener el usuario actual y sus roles
+                    var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                    var roles = await _signInManager.UserManager.GetRolesAsync(user);
+                    
+                    // Redireccionar según el rol
+                    if (roles.Contains("ventas"))
+                    {
+                        return RedirectToAction("Index", "Ventas", new { area = "" });
+                    }
+                    else if (roles.Contains("servicio"))
+                    {
+                        return RedirectToAction("Index", "Servicio", new { area = "" });
+                    }
+                    else if (roles.Contains("gerente"))
+                    {
+                        return RedirectToAction("Index", "Gerente", new { area = "" });
+                    }
+                    
+                    // Si no tiene un rol específico o tiene otro rol, redirige a la página por defecto
                     return LocalRedirect(returnUrl);
                 }
+                
                 if (result.RequiresTwoFactor)
                 {
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
                 }
+                
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("Cuenta de usuario bloqueada.");
@@ -121,7 +143,7 @@ namespace Marimon.Areas.Identity.Pages.Account
                     return Page();
                 }
             }
-
+            
             // If we got this far, something failed, redisplay form
             return Page();
         }
