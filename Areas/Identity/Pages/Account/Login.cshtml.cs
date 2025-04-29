@@ -21,11 +21,13 @@ namespace Marimon.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly RoleManager<IdentityRole> _roleManager; 
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, RoleManager<IdentityRole> roleManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _roleManager = roleManager;
         }
 
         /// <summary>
@@ -110,15 +112,15 @@ namespace Marimon.Areas.Identity.Pages.Account
                     var roles = await _signInManager.UserManager.GetRolesAsync(user);
                     
                     // Redireccionar según el rol
-                    if (roles.Contains("ventas"))
+                    if (roles.Contains("Personal_Ventas"))
                     {
                         return RedirectToAction("Index", "Ventas", new { area = "" });
                     }
-                    else if (roles.Contains("servicio"))
+                    else if (roles.Contains("Personal_Servicio"))
                     {
                         return RedirectToAction("Index", "Servicio", new { area = "" });
                     }
-                    else if (roles.Contains("gerente"))
+                    else if (roles.Contains("Gerente_Operacion"))
                     {
                         return RedirectToAction("Index", "Gerente", new { area = "" });
                     }

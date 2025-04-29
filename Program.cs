@@ -72,6 +72,20 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
     .SetApplicationName("Marimon");
 var app = builder.Build();
+//asignación roles
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    string[] roles = { "Gerente_Operacion","Personal_Servicio","Personal_Ventas", "Cliente" }; // Agrega aquí los roles que necesites
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
 // Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
