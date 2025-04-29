@@ -28,6 +28,16 @@ namespace Marimon.Controllers
             return View(servicios);
         }
 
+        public IActionResult Detalle(int id)
+        {
+            var servicio = _context.Servicio.Find(id);
+            if (servicio == null)
+            {
+                return NotFound();
+            }
+            return View("Servicio", servicio);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
