@@ -188,7 +188,6 @@ namespace Marimon.Controllers
                 // Paso 2: Crear el método de pago (en efectivo)
                 var metodoPago = new MetodoPago
                 {
-                    pag_importe = (sal_cantidad * autoparte.aut_precio).ToString(), // Calcular el importe
                     pag_metodo = "Efectivo",
                     pag_fecha = DateOnly.FromDateTime(DateTime.Now),
                 };
@@ -210,7 +209,7 @@ namespace Marimon.Controllers
                 {
                     VentaId = venta.ven_id,  // Relacionar con la venta ya guardada
                     AutoParteId = AutoparteId,
-                    det_cantidad = sal_cantidad.ToString()
+                    det_cantidad = sal_cantidad,
                 };
                 _context.DetalleVentas.Add(detalleVenta);
                 await _context.SaveChangesAsync(); // Guardar y generar el ID de detalleVenta
@@ -218,7 +217,7 @@ namespace Marimon.Controllers
                 // Paso 5: Crear el comprobante (Boleta)
                 var comprobante = new Comprobante
                 {
-                    com_nombre = "Boleta",  // Definir el tipo de comprobante
+                    tipo_comprobante = "Boleta",  // Definir el tipo de comprobante
                     VentaId = venta.ven_id   // Relacionar con la venta ya guardada
                 };
                 _context.Comprobante.Add(comprobante);
