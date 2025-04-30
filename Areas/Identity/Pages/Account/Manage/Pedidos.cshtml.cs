@@ -66,10 +66,10 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
                 metodoPago => metodoPago.pag_id,
                 (vcdap, metodoPago) => new { vcdap, metodoPago }
             )
-            .Where(x =>
-                _context.Boleta.Any(b => b.UsuarioId == user.Id && b.bol_id == x.vcdap.vcd.vc.comprobante.BoletaId) ||
-                _context.Factura.Any(f => f.UsuarioId == user.Id && f.fac_id == x.vcdap.vcd.vc.comprobante.FacturaId)
-            )
+            // .Where(x =>
+            //     _context.Boleta.Any(b => b.UsuarioId == user.Id && b.bol_id == x.vcdap.vcd.vc.comprobante.BoletaId) ||
+            //     _context.Factura.Any(f => f.UsuarioId == user.Id && f.fac_id == x.vcdap.vcd.vc.comprobante.FacturaId)
+            // )
             .Select(x => new Venta
             {
                 ven_id = x.vcdap.vcd.vc.venta.ven_id,
