@@ -26,6 +26,30 @@ namespace Marimon.Controllers
         }
 
 
+        public async Task<IActionResult> Index()
+        {
+            var identityUserId = _userManager.GetUserId(User);
+
+            if (identityUserId == null)
+            {
+                return RedirectToAction("Login", "Account"); // o muestra un mensaje
+            }
+
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
+
+            if (usuario == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var carrito = await _context.Carritos
+                .Include(c => c.CarritoAutopartes)
+                    .ThenInclude(ca => ca.Autoparte)
+                .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
+
+            return View(carrito ?? new Carrito { CarritoAutopartes = new List<CarritoAutoparte>() });
+        }
+
         // M�todo para mostrar el sidebar del carrito
         public async Task<IActionResult> Side()
         {

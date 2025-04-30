@@ -1,0 +1,104 @@
+@model Marimon.Models.Carrito
+
+<link rel="stylesheet" href="~/css/indexCarrito.css" asp-append-version="true" />
+
+<body>
+    <div class="container">
+        <h1>Carrito</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Autoparte</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="productos-carrito">
+                <!-- Aquí se mostrarán los productos del carrito -->
+            </tbody>
+        </table>
+
+        <div class="resumen" >
+            <p><strong>Subtotal:</strong> S/ <span id="subtotal">0</span></p>
+            <p><strong>Total:</strong> S/ <span id="total">0</span></p>
+            <a href="/checkout" class="btn-finalizar">Finalizar Compra</a>
+        </div>
+    </div>
+
+    <script>
+        // Obtenemos los productos del carrito desde localStorage
+        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        const productosCarrito = document.getElementById('productos-carrito');
+        let subtotal = 0;
+
+        // Si no hay productos en el carrito, mostramos un mensaje
+        if (carrito.length === 0) {
+            productosCarrito.innerHTML = "<tr><td colspan='5'>No tienes productos en tu carrito.</td></tr>";
+        }
+
+        // Mostramos los productos del carrito
+        carrito.forEach(item => {
+            const totalItem = item.precio * item.cantidad;
+            subtotal += totalItem;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><img src="${item.imagen}" alt="${item.nombre}" width="50px"> ${item.nombre}</td>
+                <td>S/ ${item.precio.toFixed(2)}</td>
+                <td>
+                    <div class="cantidad-control">
+                        <button class="decrease-btn" data-nombre="${item.nombre}">-</button>
+                        <span>${item.cantidad}</span>
+                        <button class="increase-btn" data-nombre="${item.nombre}">+</button>
+                    </div>
+                </td>
+                <td>S/ ${totalItem.toFixed(2)}</td>
+                <td><span class="remove-btn" data-nombre="${item.nombre}">×</span></td>
+            `;
+            productosCarrito.appendChild(row);
+        });
+
+        // Mostrar el subtotal y total
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('total').textContent = subtotal.toFixed(2);
+
+        // Función para eliminar un producto del carrito
+        document.addEventListener('click', (e) => {
+            // Eliminar producto
+            if (e.target.classList.contains('remove-btn')) {
+                const nombreProducto = e.target.dataset.nombre;
+                // Filtramos el carrito para eliminar el producto
+                const carritoActualizado = carrito.filter(item => item.nombre !== nombreProducto);
+                localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
+                window.location.reload();  // Recargamos la página para reflejar los cambios
+            }
+
+            // Aumentar cantidad de producto
+            if (e.target.classList.contains('increase-btn')) {
+                const nombreProducto = e.target.dataset.nombre;
+                const producto = carrito.find(item => item.nombre === nombreProducto);
+                if (producto) {
+                    producto.cantidad++;
+                    // Actualizar el carrito en localStorage
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+                    window.location.reload();  // Recargamos la página para reflejar los cambios
+                }
+            }
+
+            // Disminuir cantidad de producto
+            if (e.target.classList.contains('decrease-btn')) {
+                const nombreProducto = e.target.dataset.nombre;
+                const producto = carrito.find(item => item.nombre === nombreProducto);
+                if (producto && producto.cantidad > 1) {
+                    producto.cantidad--;
+                    // Actualizar el carrito en localStorage
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+                    window.location.reload();  // Recargamos la página para reflejar los cambios
+                }
+            }
+        });
+    </script>
+</body>
