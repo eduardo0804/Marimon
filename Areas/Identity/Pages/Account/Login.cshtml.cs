@@ -106,27 +106,21 @@ namespace Marimon.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("Usuario conectado.");
-                    
-                    // Obtener el usuario actual y sus roles
+
                     var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
                     var roles = await _signInManager.UserManager.GetRolesAsync(user);
-                    
-                    // Redireccionar según el rol
+
                     if (roles.Contains("Personal_Ventas"))
-                    {
-                        return RedirectToAction("Index", "Ventas", new { area = "" });
-                    }
-                    else if (roles.Contains("Personal_Servicio"))
-                    {
-                        return RedirectToAction("Index", "Servicio", new { area = "" });
-                    }
-                    else if (roles.Contains("Gerente_Operacion"))
-                    {
+                        return RedirectToAction("Index", "Personal_Ventas", new { area = "" });
+
+                    if (roles.Contains("Personal_Servicio"))
+                        return RedirectToAction("Index", "Personal_Servicio", new { area = "" });
+
+                    if (roles.Contains("Gerente_Operacion"))
                         return RedirectToAction("Index", "Gerente", new { area = "" });
-                    }
-                    
-                    // Si no tiene un rol específico o tiene otro rol, redirige a la página por defecto
-                    return LocalRedirect(returnUrl);
+
+                    // Todos los demás (Clientes) van a Home
+                    return RedirectToAction("Index", "Home", new { area = "" });
                 }
                 
                 if (result.RequiresTwoFactor)
