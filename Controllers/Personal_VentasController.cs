@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Marimon.Controllers
 {
-    public class ServicioController : Controller
+    public class Personal_VentasController : Controller
     {
-        private readonly ILogger<ServicioController> _logger;
+        private readonly ILogger<Personal_VentasController> _logger;
 
-        public ServicioController(ILogger<ServicioController> logger)
+        public Personal_VentasController(ILogger<Personal_VentasController> logger)
         {
             _logger = logger;
         }
