@@ -11,18 +11,14 @@ namespace Marimon.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int com_id { get; set; }
-        public string? com_nombre { get; set; }
-
-        public int? FacturaId { get; set; }
-        [ForeignKey("FacturaId")]
-        public Factura? Factura { get; set; }
-        public int? BoletaId { get; set; }
-        [ForeignKey("BoletaId")]
-        public Boleta? Boleta { get; set; }
+        public string tipo_comprobante { get; set; } 
         public int VentaId { get; set; }
 
         [ForeignKey("VentaId")]
         public Venta? Venta { get; set; }
+
+        ICollection<Boleta>? Boletas { get; set; } = new List<Boleta>();
+        ICollection<Factura>? Facturas { get; set; } = new List<Factura>();
 
     }
 }

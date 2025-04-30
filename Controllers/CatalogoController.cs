@@ -37,7 +37,23 @@ namespace Marimon.Controllers
             }
 
             var autopartes = await autopartesQuery.ToListAsync();
-            return View(autopartes);
+
+            // Obtener el ID del usuario autenticado (ajusta según tu lógica)
+            var usuarioId = User.Identity.Name;
+
+            var carrito = await _context.Carritos
+                .Include(c => c.CarritoAutopartes)
+                .ThenInclude(cp => cp.Autoparte)
+                .ThenInclude(a => a.Categoria)
+                .FirstOrDefaultAsync(c => c.UsuarioId == usuarioId);
+
+            var model = new CatalogoViewModel
+            {
+                Autopartes = autopartes,
+                Carrito = carrito
+            };
+            ViewBag.Carrito = carrito;
+            return View(model);        
         }
 
 
@@ -87,59 +103,6 @@ namespace Marimon.Controllers
             return View("Error");
         }
 
-        public IActionResult AgregarAlCarrito(int id)
-        {
-            // Buscar la autoparte en la base de datos
-            var autoparte = _context.Autopartes.FirstOrDefault(a => a.aut_id == id);
-            if (autoparte == null)
-            {
-                return NotFound();
-            }
 
-            // Obtener el carrito actual de la sesi�n
-            var carrito = ObtenerCarritoDeSesion();
-
-            // Verificar si el art�culo ya est� en el carrito
-            var itemExistente = carrito.FirstOrDefault(c => c.aut_id == id);
-            if (itemExistente != null)
-            {
-                // Incrementar la cantidad si ya existe
-                itemExistente.aut_cantidad++;
-            }
-            else
-            {
-                Console.WriteLine($"Imagen guardada en carrito: {autoparte.aut_imagen}");
-
-                // Agregar un nuevo art�culo al carrito
-                carrito.Add(new Autoparte
-                {
-                    aut_id = autoparte.aut_id,
-                    aut_imagen = autoparte.aut_imagen,
-                    aut_nombre = autoparte.aut_nombre,
-                    aut_precio = autoparte.aut_precio,
-                    aut_cantidad = 1
-                });
-            }
-
-            // Guardar el carrito actualizado en la sesi�n
-            GuardarCarritoEnSesion(carrito);
-
-            // Redirigir al �ndice del cat�logo o a otra p�gina
-            return RedirectToAction("Index");
-        }
-
-        public List<Autoparte> ObtenerCarritoDeSesion()
-        {
-            var carritoJson = HttpContext.Session.GetString("Carrito");
-            return string.IsNullOrEmpty(carritoJson)
-                ? new List<Autoparte>()
-                : JsonSerializer.Deserialize<List<Autoparte>>(carritoJson);
-        }
-
-        private void GuardarCarritoEnSesion(List<Autoparte> carrito)
-        {
-            var carritoJson = JsonSerializer.Serialize(carrito);
-            HttpContext.Session.SetString("Carrito", carritoJson);
-        }
     }
 }

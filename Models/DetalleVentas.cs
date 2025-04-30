@@ -11,7 +11,11 @@ namespace Marimon.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int det_id { get; set; }
-        public string? det_cantidad { get; set; }
+        public int det_cantidad { get; set; }
+
+        public decimal det_subtotal { 
+            get { return det_cantidad*Autoparte.aut_precio; }
+        }
         public int VentaId { get; set; }
         public int AutoParteId { get; set; }
 

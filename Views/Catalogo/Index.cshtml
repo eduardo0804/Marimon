@@ -1,4 +1,4 @@
-@model List<Marimon.Models.Autoparte>
+@model Marimon.Models.CatalogoViewModel
 
 @{
     ViewData["Title"] = "Catálogo - AUTOMOTRIZ MARIMON S.A.C";
@@ -40,64 +40,77 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="row justify-content-center">
-                @foreach (var autoparte in Model)
+                @foreach (var autoparte in Model.Autopartes)
                 {
                     <div class="col-md-4 col-sm-6 mb-4">
                         <div class="card producto-card h-100 shadow-sm">
                             <div class="p-3 text-center">
-                                <img src="@autoparte.aut_imagen" 
-                                    alt="@autoparte.aut_nombre" 
-                                    class="producto-imagen"
-                                    style="cursor:pointer;" 
-                                    onclick="cargarDetalleAutoparte(@autoparte.aut_id)" />
+                                <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="producto-imagen"
+                                    style="cursor:pointer;" onclick="cargarDetalleAutoparte(@autoparte.aut_id)" />
                             </div>
                             <div class="card-body text-center">
                                 <h5 class="card-title">@autoparte.aut_nombre</h5>
-                                <p class="card-text precio">Precio: <strong>S/
-                                    @autoparte.aut_precio.ToString("0.00")</strong></p>
-
-                                @if (autoparte.aut_cantidad > 0)
+                                <p class="card-text precio">Precio:
+                                    <strong>S/@autoparte.aut_precio.ToString("0.00")</strong></p>
+                                @if (User.Identity.IsAuthenticated)
                                 {
-                                    <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post" onsubmit="mostrarToast()">
-                                        <input type="hidden" name="id" value="@autoparte.aut_id" />
-                                        <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
-                                    </form>
+                                    @if (autoparte.aut_cantidad > 0)
+                                    {
+                                        <form asp-controller="Carrito" asp-action="AñadirAlCarrito" method="post"
+                                            onsubmit="mostrarToast()">
+                                            <input type="hidden" name="autoparteId" value="@autoparte.aut_id" />
+                                            <input type="hidden" name="cantidad" value="1" min="1" class="form-control" />
+                                            <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-secondary" disabled>Agotado</button>
+                                    }
                                 }
                                 else
                                 {
-                                    <button class="btn btn-secondary" disabled>Agotado</button>
+                                    <div class="alert alert-warning">
+                                        Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir productos a la
+                                        cesta.
+                                    </div>
                                 }
                             </div>
                         </div>
                     </div>
                 }
-            </div>  
+
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Alerta Carrito-->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
-    <div id="toastCarrito" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="toastCarrito" class="toast align-items-center text-white bg-success border-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body">
                 <i class="fas fa-check-circle me-2"></i>
                 <span id="toastMessage">La autoparte fue agregada al Carrito.</span>
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Cerrar"></button>
         </div>
     </div>
 </div>
 
 <!-- Alerta Favorito-->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
-    <div id="toastFavorito" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="toastFavorito" class="toast align-items-center text-white bg-success border-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body">
                 <i class="fas fa-check-circle me-2"></i>
                 <span id="toastMessage">La autoparte fue agregada correctamente a tus favoritos.</span>
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Cerrar"></button>
         </div>
     </div>
 </div>
@@ -119,7 +132,7 @@
                 document.getElementById("modalAutoparte").style.display = "block";
                 const zoomModal = document.getElementById("zoomModal");
                 if (zoomModal) zoomModal.style.display = "none";
-                inicializarZoom(); 
+                inicializarZoom();
             });
     }
     document.getElementById("zoomModal").style.display = "flex";
@@ -174,7 +187,7 @@
         toast.show();
     }
 
-    function agregarFavorito(icon){
+    function agregarFavorito(icon) {
         if (icon.classList.contains('fa-regular')) {
             icon.classList.remove('fa-regular');
             icon.classList.add('fa-solid');

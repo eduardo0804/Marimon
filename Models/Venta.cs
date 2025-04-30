@@ -17,6 +17,12 @@ namespace Marimon.Models
         [ForeignKey("MetodoPagoId")]
         public MetodoPago? MetodoPago { get; set; }
 
+        public string UsuarioId { get; set; }
+
+        [ForeignKey("UsuarioId")]
+        public Usuario? Usuario { get; set; }
+
+        public decimal Total {get; set; }
         // Agregar esta línea 👇
         public ICollection<DetalleVentas> Detalles { get; set; } = new List<DetalleVentas>();
 
