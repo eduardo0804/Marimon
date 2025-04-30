@@ -39,4 +39,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Venta> Venta { get; set; } 
     public DbSet<Servicio> Servicio { get; set; }
     public DbSet<Reserva> Reserva { get; set; }
+    public DbSet<Carrito> Carritos { get; set; }
+    public DbSet<CarritoAutoparte> CarritoAutopartes { get; set; } = null!; 
 }

@@ -1,4 +1,4 @@
-@model List<Marimon.Models.Autoparte>
+@model Marimon.Models.CatalogoViewModel
 
 @{
     ViewData["Title"] = "Catálogo - AUTOMOTRIZ MARIMON S.A.C";
@@ -40,7 +40,7 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="row justify-content-center">
-                @foreach (var autoparte in Model)
+                @foreach (var autoparte in Model.Autopartes)
                 {
                     <div class="col-md-4 col-sm-6 mb-4">
                         <div class="card producto-card h-100 shadow-sm">
@@ -50,15 +50,16 @@
                             </div>
                             <div class="card-body text-center">
                                 <h5 class="card-title">@autoparte.aut_nombre</h5>
-                                <p class="card-text precio">Precio: <strong>S/
-                                        @autoparte.aut_precio.ToString("0.00")</strong></p>
+                                <p class="card-text precio">Precio:
+                                    <strong>S/@autoparte.aut_precio.ToString("0.00")</strong></p>
                                 @if (User.Identity.IsAuthenticated)
                                 {
                                     @if (autoparte.aut_cantidad > 0)
                                     {
-                                        <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post"
+                                        <form asp-controller="Carrito" asp-action="AñadirAlCarrito" method="post"
                                             onsubmit="mostrarToast()">
-                                            <input type="hidden" name="id" value="@autoparte.aut_id" />
+                                            <input type="hidden" name="autoparteId" value="@autoparte.aut_id" />
+                                            <input type="hidden" name="cantidad" value="1" min="1" class="form-control" />
                                             <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
                                         </form>
                                     }
@@ -70,13 +71,15 @@
                                 else
                                 {
                                     <div class="alert alert-warning">
-                                    Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir productos a la cesta.
+                                        Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir productos a la
+                                        cesta.
                                     </div>
                                 }
                             </div>
                         </div>
                     </div>
                 }
+
             </div>
         </div>
     </div>

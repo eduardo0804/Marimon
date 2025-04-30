@@ -19,7 +19,7 @@ namespace Marimon.Models
             get { return CarritoAutopartes.Sum(c => c.car_subtotal); }
         }
         
-        public List<CarritoAutoparte> CarritoAutopartes { get; set; } = new List<CarritoAutoparte>();
+        public ICollection<CarritoAutoparte> CarritoAutopartes { get; set; } = new List<CarritoAutoparte>();
 
     }
 }
