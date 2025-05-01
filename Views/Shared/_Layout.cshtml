@@ -18,7 +18,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <style>
-
     body {
         display: flex;
         flex-direction: column;
@@ -58,6 +57,7 @@
         font-weight: 800;
     }
 </style>
+
 <body>
     <header>
         <div class="contenedor-menu">
@@ -66,17 +66,19 @@
             <input type="radio" name="slider" id="close-btn">
             <label for="menu-btn" class="menu-btn botones"><i class="fa-solid fa-bars"></i></label>
             <label for="close-btn" class="close-btn botones"><i class="fa-solid fa-xmark"></i></label>
-            
+
             <!-- Logo centrado -->
             <div class="logo-contenedor">
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="logo"><img src="~/images/logo_marimon.png" alt="Logo" style="width: 140px;"></a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="logo"><img
+                        src="~/images/logo_marimon.png" alt="Logo" style="width: 140px;"></a>
             </div>
-            
+
             <!-- Carrito a la derecha -->
             <div class="carrito-movil-container">
-                <a asp-controller="Carrito" asp-action="Index" class="cart-icon-movil"><i class="fa-solid fa-cart-shopping"></i></a>
+                <a asp-controller="Carrito" asp-action="Index" class="cart-icon-movil"><i
+                        class="fa-solid fa-cart-shopping"></i></a>
             </div>
-            
+
             <!-- Menú principal centrado -->
             <nav class="primer_menu">
                 <a asp-area="" asp-controller="Home" asp-action="Index">INICIO</a>
@@ -84,16 +86,7 @@
                 <div class="dropdown">
                     <a asp-area="" asp-controller="Servicios" asp-action="Index" class="desktop-item">SERVICIOS</a>
                     <ul class="drop-menu">
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="1">Mantenimiento y Frenos</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="2">Diagnóstico y Scanner</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="3">Mecatrónica y Electrónica</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="4">Sistema de Refrigeración</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="5">Aire Acondicionado</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="6">Planchado y Pintura</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="6">Servicio de Planchado y Pintura automotriz</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="7">Conversión a GLP en Lima</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="8">Conversión a GNV en Lima</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="9">Auxilio Mecánico</a></li>
+                        @await Component.InvokeAsync("ServiciosMenu")
                     </ul>
                 </div>
                 <a asp-area="" asp-controller="Catalogo" asp-action="Index">CATÁLOGOS</a>
@@ -106,26 +99,16 @@
             <!-- Menú móvil -->
             <nav class="movil_menu">
                 <label for="close-btn" class="botones close-btn-inside"><i class="fa-solid fa-xmark"></i></label>
-                
+
                 <a asp-area="" asp-controller="Home" asp-action="Index">INICIO</a>
                 <!-- Dropdown SERVICIOS móvil -->
                 <div class="dropdown-movil">
                     <input type="checkbox" id="showServicios-movil">
                     <label for="showServicios-movil">SERVICIOS <i class="fa-solid fa-chevron-down"></i></label>
                     <ul class="drop-menu-movil">
-                        <li><a href="#">Mantenimiento y Frenos</a></li>
-                        <li><a asp-area="" asp-controller="Servicios" asp-action="Servicio">Diagnóstico y Scanner</a></li>
-                        <li><a href="#">Mecatrónica y Electrónica</a></li>
-                        <li><a href="#">Sistema de Refrigeración</a></li>
-                        <li><a href="#">Aire Acondicionado</a></li>
-                        <li><a href="#">Planchado y Pintura</a></li>
-                        <li><a href="#">Servicio de Planchado y Pintura automotriz</a></li>
-                        <li><a href="#">Conversión a GLP en Lima</a></li>
-                        <li><a href="#">Conversión a GNV en Lima</a></li>
-                        <li><a href="#">Auxilio Mecánico</a></li>
+                        @await Component.InvokeAsync("ServiciosMenu")
                     </ul>
                 </div>
-            
                 <a asp-area="" asp-controller="Catalogo" asp-action="Index">CATÁLOGOS</a>
                 <a asp-area="" asp-controller="Nosotros" asp-action="Index">NOSOTROS</a>
 
@@ -196,7 +179,8 @@
         <!-- Parte inferior -->
         <div class="bottom">
             <div class="bottom-content">
-                <div>Copyright &#169; 2025 <a asp-controller="Home" asp-action="Index" style="color: white; text-decoration: none;">Marimon</a></div>
+                <div>Copyright &#169; 2025 <a asp-controller="Home" asp-action="Index"
+                        style="color: white; text-decoration: none;">Marimon</a></div>
                 <div><a href="#">Términos y Condiciones</a></div>
                 <div>Developed by <strong>Equipo Scrum</strong></div>
             </div>
@@ -208,4 +192,5 @@
     <!--<script src="~/js/site.js" asp-append-version="true"></script> -->
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
