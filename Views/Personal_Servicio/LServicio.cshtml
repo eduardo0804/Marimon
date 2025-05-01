@@ -29,6 +29,7 @@
                         <th>ID</th>
                         <th>Imagen</th>
                         <th>Nombre del Servicio</th>
+                        <th>Descripción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,13 +52,14 @@
                                     }
                                 </td>
                                 <td class="fw-bold">@servicio.ser_nombre</td>
+                                <td>@servicio.ser_descripcion</td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="4" class="text-center">No hay servicios registrados.</td>
+                            <td colspan="3" class="text-center">No hay servicios registrados.</td>
                         </tr>
                     }
                 </tbody>

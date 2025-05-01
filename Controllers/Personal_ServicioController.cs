@@ -82,7 +82,7 @@ namespace Marimon.Controllers
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "El servicio se registró correctamente.";
 
-                return Content("<script>window.parent.location.href = '/Personal_Servicio/LServicio';</script>", "text/html");
+                return Content("<script>window.parent.location.href = '/Personal_Servicio/CServicio';</script>", "text/html");
             }
             catch (Exception ex)
             {
