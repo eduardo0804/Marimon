@@ -5,13 +5,17 @@ using System.Security.Claims;
 using System.Text.Json;
 using Marimon.Data;
 using Marimon.Models;
+using Marimon.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+
+
 namespace Marimon.Controllers
 {
+
     public class CarritoController : Controller
     {
         private readonly ILogger<CarritoController> _logger;
@@ -160,41 +164,40 @@ namespace Marimon.Controllers
         // }
 
         [HttpPost]
-        public async Task<IActionResult> ActualizarCantidad(int carritoId, int productoId, int nuevaCantidad)
+        public async Task<IActionResult> ActualizarCantidad([FromBody] ActualizarCantidadRequest request)
         {
             var carrito = await _context.Carritos
-                .Include(c => c.CarritoAutopartes)
-                .FirstOrDefaultAsync(c => c.car_id == carritoId);
+                .Include(c => c.CarritoAutopartes).ThenInclude(ca => ca.Autoparte)
+                .FirstOrDefaultAsync(c => c.car_id == request.CarritoId);
 
-            if (carrito == null) return NotFound();
+            if (carrito == null)
+                return NotFound(new { Message = "Carrito no encontrado", request.CarritoId });
 
-            // Buscar CarritoAutoparte por su Id, no por el AutoparteId
-            var carritoAutoparte = carrito.CarritoAutopartes.FirstOrDefault(ca => ca.carAut_id == productoId);  // Cambié .AutoparteId a .Id
+            var carritoAutoparte = carrito.CarritoAutopartes.FirstOrDefault(ca => ca.carAut_id == request.ProductoId);
+            if (carritoAutoparte == null)
+                return NotFound(new { Message = "CarritoAutoparte no encontrado", request.ProductoId });
 
-            if (carritoAutoparte != null)
-            {
-                carritoAutoparte.car_cantidad = nuevaCantidad;
-                carritoAutoparte.car_subtotal = carritoAutoparte.Autoparte.aut_precio * nuevaCantidad;
+            carritoAutoparte.car_cantidad = request.NuevaCantidad;
+            carritoAutoparte.car_subtotal = carritoAutoparte.Autoparte.aut_precio * request.NuevaCantidad;
 
-                await _context.SaveChangesAsync();
-            }
+            await _context.SaveChangesAsync();
 
-            // Obtener el total actualizado
-            var total = carrito.car_total;  // Usamos el método car_total para calcular el total
-            return Json(new { total });
+            return Json(new { subtotal = carritoAutoparte.car_subtotal, total = carrito.car_total });
         }
+
 
         // Acción para eliminar un producto del carrito
         [HttpPost]
-        public async Task<IActionResult> EliminarProducto(int carritoId, int productoId)
+        public async Task<IActionResult> EliminarProducto([FromBody] EliminarProductoRequest request)
         {
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
-                .FirstOrDefaultAsync(c => c.car_id == carritoId);
+                .FirstOrDefaultAsync(c => c.car_id == request.CarritoId);
 
-            if (carrito == null) return NotFound();
+            if (carrito == null) return NotFound(new { message = "Carrito no encontrado", request.CarritoId });
 
-            var carritoAutoparte = carrito.CarritoAutopartes.FirstOrDefault(ca => ca.AutoparteId == productoId);
+            var carritoAutoparte = carrito.CarritoAutopartes
+                .FirstOrDefault(ca => ca.AutoparteId == request.ProductoId);
 
             if (carritoAutoparte != null)
             {
@@ -205,6 +208,7 @@ namespace Marimon.Controllers
             var total = carrito.CarritoAutopartes.Sum(ca => ca.car_subtotal);
             return Json(new { total });
         }
+
 
     }
 }

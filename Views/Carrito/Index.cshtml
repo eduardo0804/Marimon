@@ -32,9 +32,9 @@
                             <button class="increase-btn" data-producto-id="@item.carAut_id">+</button>
                         </div>
                     </td>
-                    <td class="subtotal" id="subtotal-@autoparte.aut_id">S/ @item.car_subtotal.ToString("0.00")</td>
+                    <td class="subtotal" id="subtotal-@item.carAut_id">S/ @item.car_subtotal.ToString("0.00")</td>
                     <td>
-                        <span class="remove-btn" data-producto-id="@autoparte.aut_id">×</span>
+                        <span class="remove-btn" data-producto-id="@item.carAut_id">×</span>
                     </td>
                 </tr>
             }
@@ -46,82 +46,86 @@
         <a href="/checkout" class="btn-finalizar">Finalizar Compra</a>
     </div>
 </div>
-
 <script>
     // Recalcular el total de todos los productos
     function calcularTotal() {
         let total = 0;
-
-        // Iterar sobre todos los subtotales
         const subtotales = document.querySelectorAll('.subtotal');
         subtotales.forEach(subtotal => {
             total += parseFloat(subtotal.textContent.replace('S/ ', ''));
         });
-
-        // Actualizar el total en la interfaz
         document.getElementById('total').textContent = total.toFixed(2);
     }
 
-    // Escuchar clics de aumento y disminución de cantidad
-    document.addEventListener('click', async (e) => {
-        // Verificar si el botón clickeado es de disminuir o aumentar
+    // Aumentar/disminuir cantidad
+    document.addEventListener('click', (e) => {
         if (e.target.classList.contains('decrease-btn') || e.target.classList.contains('increase-btn')) {
-            const productoId = e.target.dataset.productoId; // Obtener el ID del producto/carAut_id
+            const carritoId = @Model.car_id; // Asumiendo que esto es un valor dinámico
+            const productoId = e.target.dataset.productoId;
             const cantidadSpan = document.getElementById('cantidad-' + productoId);
             let nuevaCantidad;
 
-            // Determinar si aumentar o disminuir la cantidad
             if (e.target.classList.contains('decrease-btn')) {
-                nuevaCantidad = Math.max(1, parseInt(cantidadSpan.textContent) - 1); // No permitir que la cantidad sea menor que 1
-            } else if (e.target.classList.contains('increase-btn')) {
+                nuevaCantidad = Math.max(1, parseInt(cantidadSpan.textContent) - 1);
+            } else {
                 nuevaCantidad = parseInt(cantidadSpan.textContent) + 1;
             }
 
-            cantidadSpan.textContent = nuevaCantidad; // Actualizar la cantidad en el frontend
+            console.log("carritoId:", carritoId);
+            console.log("productoId:", productoId);
+            console.log("nuevaCantidad:", nuevaCantidad);
 
-            // Enviar la solicitud para actualizar la cantidad en el servidor
-            const response = await fetch('/Carrito/ActualizarCantidad', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ carritoId: @Model.car_id, productoId, nuevaCantidad })
+            cantidadSpan.textContent = nuevaCantidad;
+
+            // Usar AJAX para enviar la solicitud
+            $.ajax({
+                url: '@Url.Action("ActualizarCantidad", "Carrito")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ carritoId, productoId, nuevaCantidad }),
+                success: function (data) {
+                    // Actualizar subtotal
+                    if (data.subtotal !== undefined) {
+                        document.getElementById('subtotal-' + productoId).textContent = 'S/ ' + data.subtotal.toFixed(2);
+                    }
+
+                    // Recalcular total
+                    calcularTotal();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al actualizar la cantidad", error);
+                }
             });
-
-            const data = await response.json();
-
-            // Asegúrate de que el servidor devuelve el subtotal correcto
-            // Actualizar el subtotal de este producto en la interfaz
-            document.getElementById('subtotal-' + productoId).textContent = 'S/ ' + (data.subtotal).toFixed(2);
-
-            // Recalcular el total del carrito (esto debería ser una función que recalcule el total)
-            calcularTotal();
         }
     });
 
     // Eliminar producto
-    document.addEventListener('click', async (e) => {
+    document.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-btn')) {
+            const carritoId = @Model.car_id;
             const productoId = e.target.dataset.productoId;
 
-            const response = await fetch('/Carrito/EliminarProducto', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ carritoId: @Model.car_id, productoId })
+            $.ajax({
+                url: '/Carrito/EliminarProducto',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ carritoId, productoId }),
+                success: function (data) {
+                    if (data.success) {
+                        document.getElementById('producto-' + productoId).remove();
+                        calcularTotal();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al eliminar el producto", error);
+                }
             });
-
-            const data = await response.json();
-            if (data.success) {
-                // Eliminar el producto de la lista
-                document.getElementById('producto-' + productoId).remove();
-
-                // Recalcular el total
-                calcularTotal();
-            }
         }
     });
 
-    // Inicializar el total cuando se carga la página
+    // Inicializar
     document.addEventListener('DOMContentLoaded', function () {
         calcularTotal();
     });
-
 </script>
+
