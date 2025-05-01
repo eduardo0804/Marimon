@@ -1,0 +1,96 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Finaliza tu compra";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <img src="~/images/marimon-logo.png" alt="Marimon Logo" class="img-fluid" style="max-width: 150px;">
+        <h2 class="mt-3 fw-bold text-primary">Finaliza tu compra</h2>
+        <div class="text-success mt-2 d-flex justify-content-center align-items-center gap-2">
+            <i class="bi bi-shield-check fs-4"></i>
+            <span class="fw-semibold">Compra Segura</span>
+        </div>
+    </div>
+
+    <div class="card shadow-lg border-0 p-4 rounded-4 bg-white">
+        <form>
+            <!-- Tipo de comprobante -->
+            <div class="mb-4 text-center">
+                <div class="form-label fw-semibold fs-5">Tipo de Comprobante</div>
+                <div class="d-flex justify-content-center gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipoComprobante" id="boleta" checked>
+                        <label class="form-check-label" for="boleta">Boleta</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipoComprobante" id="factura">
+                        <label class="form-check-label" for="factura">Factura</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos del cliente -->
+            <div class="card p-4 border-0 shadow-sm rounded-4 mb-4 bg-light">
+                <h5 class="mb-3 text-primary"><i class="bi bi-person-fill me-2"></i>Datos Personales</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" placeholder="Nombre *" required>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" placeholder="Apellidos *" required>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select">
+                            <option selected disabled>Tipo de documento *</option>
+                            <option>DNI</option>
+                            <option>Carnet de Extranjería</option>
+                            <option>Pasaporte</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" placeholder="N° de documento *">
+                    </div>
+                    <div class="col-12">
+                        <input type="email" class="form-control" placeholder="Correo electrónico *">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos de empresa -->
+            <div class="card p-4 border-0 shadow-sm rounded-4 mb-4 bg-warning bg-opacity-10">
+                <h5 class="mb-3 text-warning"><i class="bi bi-building me-2"></i>Datos de Facturación</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <input type="text" class="form-control" placeholder="Razón Social">
+                    </div>
+                    <div class="col-12">
+                        <input type="text" class="form-control" placeholder="N° de R.U.C.">
+                    </div>
+                    <div class="col-12">
+                        <input type="text" class="form-control" placeholder="Dirección fiscal o comercial">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entrega en tienda -->
+            <div class="card p-4 border-success border-2 rounded-4 mb-4 shadow-sm bg-success bg-opacity-10">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-geo-alt-fill text-success fs-4 me-2"></i>
+                    <h5 class="m-0 fw-bold text-success">Entrega en Tienda</h5>
+                </div>
+                <p class="mb-0 ps-4 text-dark">Recojo disponible en: <strong>Tienda Marimon - Av. Principal 123, Lima</strong></p>
+            </div>
+
+            <!-- Botón -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-danger btn-lg px-5 rounded-pill shadow">
+                    <i class="bi bi-cart-check-fill me-2"></i>REALIZAR EL PEDIDO
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
