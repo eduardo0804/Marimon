@@ -11,43 +11,39 @@
         <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
     </div>
 }
+
 <div class="container-fluid px-0">
-    <div class="row bg-danger text-white py-2">
-        <div class="col-12">
-            <h2 class="mb-0 text-center" style="font-weight: bold;">REGISTRO DE NUEVO SERVICIO</h2>
-        </div>
-    </div>
-    <div class="row align-items-center my-4 px-4">
+    <div class="row align-items-center bg-white py-4 px-4">
         <div class="col-md-3 text-center">
-            <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FServicios%2Fservicios-marimon-02.jpg?alt=media&token=c30ee586-a8e0-4ac0-be4e-cfa9a9adc4d7.jpg"
-                alt="Servicios" class="img-fluid" style="max-height: 220px;" />
+            <img src="/images/auto-rojo.png" alt="Auto" class="img-fluid" style="max-height: 200px;" />
         </div>
-        <div class="col-md-6">
-            <p class="fs-4 fw-bold mb-2">
-                Administra y organiza los servicios automotrices registrados. Registra nuevos servicios para mantener tu
-                catálogo actualizado y ofrecer una mejor experiencia a tus clientes.
+        <div class="col-md-9">
+            <h2 class="fw-bold">Resgritro de Nuevo Servicio</></h2>
+            <p class="fs-5 text-muted">
+                Administra y organiza los servicios automotrices registrados. Registra nuevos servicios para mantener tu catálogo actualizado y ofrecer una mejor experencia a tus clientes.
             </p>
-            <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#modalCrearServicio">
+            <button class="btn btn-danger text-white fw-bold" data-bs-toggle="modal" data-bs-target="#modalCrearServicio">
                 <i class="fa fa-plus"></i> Agregar Servicio
             </button>
         </div>
     </div>
-    <div class="modal fade" id="modalCrearServicio" tabindex="-1" aria-labelledby="modalCrearServicioLabel"
-        aria-hidden="true">
+
+    <div class="modal fade" id="modalCrearServicio" tabindex="-1" aria-labelledby="modalCrearServicioLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 @await Html.PartialAsync("CrearForm", new Marimon.Models.Servicio())
             </div>
         </div>
     </div>
-    <div class="row px-4">
+
+    <div class="row px-4 mt-4">
         <div class="col-12">
-            <table class="table table-bordered table-striped align-middle">
+            <table class="table table-bordered align-middle">
                 <thead class="bg-black text-white">
                     <tr>
                         <th>ID</th>
                         <th>Imagen</th>
-                        <th>Nombre del Servicio</th>
+                        <th>Nombre</th>
                         <th>Descripción</th>
                     </tr>
                 </thead>
@@ -61,13 +57,13 @@
                                 <td>
                                     @if (!string.IsNullOrEmpty(servicio.ser_imagen))
                                     {
-                                        <img src="@servicio.ser_imagen" alt="Imagen Servicio"
-                                            style="max-width: 60px; max-height: 60px;" />
+                                        <img src="@servicio.ser_imagen" alt="Imagen Servicio" style="max-width: 60px; max-height: 60px;" />
                                     }
                                     else
                                     {
                                         <div class="bg-light border text-center" style="width:60px;height:60px;line-height:60px;">
-                                            Sin<br />img</div>
+                                            Sin<br />img
+                                        </div>
                                     }
                                 </td>
                                 <td class="fw-bold">@servicio.ser_nombre</td>
@@ -78,7 +74,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="3" class="text-center">No hay servicios registrados.</td>
+                            <td colspan="4" class="text-center">No hay servicios registrados.</td>
                         </tr>
                     }
                 </tbody>
