@@ -1,0 +1,26 @@
+@model Marimon.Models.Servicio
+
+<form asp-action="CServicio" asp-controller="Personal_Servicio" enctype="multipart/form-data" method="post">
+    <div class="modal-header">
+        <h5 class="modal-title">Registrar Servicio</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <label for="ser_nombre" class="form-label">Nombre del Servicio</label>
+            <input asp-for="ser_nombre" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="ser_descripcion" class="form-label">Descripción</label>
+            <textarea asp-for="ser_descripcion" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="imagen" class="form-label">Imagen</label>
+            <input type="file" name="imagen" class="form-control" accept="image/*" required />
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Registrar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    </div>
+</form>

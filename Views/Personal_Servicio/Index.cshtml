@@ -1,7 +1,78 @@
 @{
-    Layout = "~/Views/Shared/_LayoutServicio.cshtml";
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Módulo de Servicios - Administración";
 }
 
-<div>
-    Vista servicios automotriz
+<link href="/css/styleAdmin.css" rel="stylesheet" type="text/css">
+
+<div class="admin-container">
+    <!-- Contenido principal -->
+    <main class="modulo-content">
+        <div class="modulo-grid">
+            <!-- Listar Servicios -->
+            <a href="@Url.Action("LServicio", "Personal_Servicio")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/listar.png" alt="Listar Servicios">
+                    </div>
+                    <div class="card-footer">
+                        <span>LISTAR SERVICIOS</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Listar y agregar servicios en la misma vista -->
+            <a href="@Url.Action("CServicio", "Personal_Servicio")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/listar.png" alt="Servicios">
+                    </div>
+                    <div class="card-footer">
+                        <span>SERVICIOS</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Gestionar Servicio -->
+            <div class="modulo-item">
+                <div class="card-content flujo-section">
+                    <a href="@Url.Action("MServicio", "Personal_Servicio")" class="flujo-column-link">
+                        <div class="flujo-column">
+                            <div class="flujo-item">
+                                <img src="~/images/editar.png" alt="Modificar" class="small-icon">
+                            </div>
+                            <div class="flujo-badge-container">
+                                <span class="flujo-badge entrada">MODIFICAR</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="@Url.Action("EServicio", "Personal_Servicio")" class="flujo-column-link">
+                        <div class="flujo-column">
+                            <div class="flujo-item">
+                                <img src="~/images/eliminar.png" alt="Eliminar" class="small-icon">
+                            </div>
+                            <div class="flujo-badge-container">
+                                <span class="flujo-badge salida">ELIMINAR</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="card-footer">
+                    <span class="flujo-text">GESTIÓN DE SERVICIOS</span>
+                </div>
+            </div>
+
+            <!-- Reportes -->
+            <a href="@Url.Action("Reportes", "Personal_Servicio")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/estadistica.png" alt="Reportes">
+                    </div>
+                    <div class="card-footer">
+                        <span>REPORTES DE SERVICIOS</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </main>
 </div>
