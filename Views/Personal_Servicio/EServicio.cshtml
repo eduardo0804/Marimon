@@ -4,17 +4,11 @@
 }
 
 <link href="/css/personalservicio.css" rel="stylesheet" type="text/css">
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success success-message position-fixed" role="alert">
-        <strong>Éxito</strong>: @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
-    </div>
-}
+
 <div class="container-fluid px-0">
     <div class="row bg-danger text-white py-2">
         <div class="col-12">
-            <h2 class="mb-0 text-center" style="font-weight: bold;">ACTUALIZACIÓN DE SERVICIOS</h2>
+            <h2 class="mb-0 text-center" style="font-weight: bold;">GESTIÓN DE SERVICIOS</h2>
         </div>
     </div>
     <div class="row align-items-center my-4 px-4">
@@ -23,7 +17,7 @@
         </div>
         <div class="col-md-6">
             <p class="fs-4 fw-bold mb-2">
-                Administra los servicios automotrices disponibles. Aquí puedes consultar o modificar servicios según sea necesario.
+                Administra y elimina los servicios automotrices registrados. Confirma antes de realizar cualquier acción.
             </p>
         </div>
     </div>
@@ -61,8 +55,8 @@
                                 <td class="fw-bold">@servicio.ser_nombre</td>
                                 <td>@servicio.ser_descripcion</td>
                                 <td>
-                                    <button class="btn btn-primary btn-sm" onclick="loadEditModal(@servicio.ser_id)">
-                                        <i class="bi bi-pencil-fill"></i> Modificar
+                                    <button class="btn btn-primary btn-sm" onclick="confirmDelete(@servicio.ser_id)">
+                                        <i class="fa fa-trash"></i> Eliminar
                                     </button>
                                 </td>
                             </tr>
@@ -80,37 +74,34 @@
     </div>
 </div>
 
-<!-- Modal para editar servicio -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" id="modalContentEdit">
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que deseas eliminar este servicio? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-<script>
-    function loadEditModal(id) {
-        const url = '@Url.Action("Editar", "Personal_Servicio")' + '?id=' + id;
-        fetch(url)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('modalContentEdit').innerHTML = html;
-                const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-                editModal.show();
-            })
-            .catch(error => console.error('Error al cargar el modal:', error));
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const successMessage = document.querySelector(".success-message");
-        if (successMessage) {
-            setTimeout(() => {
-                successMessage.classList.add("hide");
-                setTimeout(() => successMessage.remove(), 500);
-            }, 10000);
+@section Scripts {
+    <script>
+        function confirmDelete(id) {
+            const deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = '/Personal_Servicio/Eliminar/' + id;
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteModal.show();
         }
-    });
-</script>
-<script src="~/js/home.js" asp-append-version="true"></script>
+    </script>
+}

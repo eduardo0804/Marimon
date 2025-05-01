@@ -33,7 +33,7 @@ namespace Marimon.Controllers
         }
         public IActionResult CServicio()
         {
-            var servicios = _context.Servicio.ToList(); 
+            var servicios = _context.Servicio.ToList();
             return View("CServicio", servicios);
         }
 
@@ -96,7 +96,7 @@ namespace Marimon.Controllers
             var personalServicio = _context.Servicio.ToList();
             return View(personalServicio);
         }
-        
+
         public IActionResult Editar(int id)
         {
             var servicio = _context.Servicio.FirstOrDefault(s => s.ser_id == id);
@@ -171,7 +171,33 @@ namespace Marimon.Controllers
         }
         public IActionResult EServicio()
         {
-            return View();
+            var personalServicio = _context.Servicio.ToList();
+            return View(personalServicio);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Eliminar(int id)
+        {
+            try
+            {
+                var servicio = _context.Servicio.FirstOrDefault(s => s.ser_id == id);
+                if (servicio == null)
+                {
+                    TempData["ErrorMessage"] = "El servicio no existe.";
+                    return RedirectToAction("EServicio");
+                }
+
+                _context.Servicio.Remove(servicio);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "El servicio se eliminó correctamente.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar el servicio");
+                TempData["ErrorMessage"] = "Ocurrió un error al intentar eliminar el servicio.";
+            }
+
+            return RedirectToAction("EServicio");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
