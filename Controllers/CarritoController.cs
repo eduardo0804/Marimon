@@ -114,6 +114,7 @@ namespace Marimon.Controllers
                 if (carritoProducto != null)
                 {
                     carritoProducto.car_cantidad += cantidad;
+                    carritoProducto.car_subtotal = carritoProducto.car_cantidad * autoparte.aut_precio;
                 }
                 else
                 {
@@ -121,6 +122,7 @@ namespace Marimon.Controllers
                     {
                         AutoparteId = autoparteId,
                         car_cantidad = cantidad,
+                        car_subtotal = cantidad * autoparte.aut_precio,
                         Autoparte = autoparte,
                     });
                 }
@@ -142,19 +144,66 @@ namespace Marimon.Controllers
             return View("Error!");
         }
 
-        [HttpGet]
-        public IActionResult GetCarritoCount()
+        // [HttpGet]
+        // public IActionResult GetCarritoCount()
+        // {
+        //     // Obtener el ID del usuario actual
+        //     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //     // Asegúrate de que el modelo 'Carrito' usa 'UsuarioId' en lugar de 'UserId'
+        //     var count = _context.CarritoAutopartes
+        //                         .Include(cp => cp.Carrito) // Asegúrate de incluir el carrito para acceder a 'UsuarioId'
+        //                         .Where(cp => cp.Carrito.UsuarioId == userId) // Cambiar 'UserId' por 'UsuarioId'
+        //                         .Sum(cp => cp.car_cantidad);
+
+        //     return Json(new { count });
+        // }
+
+        [HttpPost]
+        public async Task<IActionResult> ActualizarCantidad(int carritoId, int productoId, int nuevaCantidad)
         {
-            // Obtener el ID del usuario actual
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var carrito = await _context.Carritos
+                .Include(c => c.CarritoAutopartes)
+                .FirstOrDefaultAsync(c => c.car_id == carritoId);
 
-            // Asegúrate de que el modelo 'Carrito' usa 'UsuarioId' en lugar de 'UserId'
-            var count = _context.CarritoAutopartes
-                                .Include(cp => cp.Carrito) // Asegúrate de incluir el carrito para acceder a 'UsuarioId'
-                                .Where(cp => cp.Carrito.UsuarioId == userId) // Cambiar 'UserId' por 'UsuarioId'
-                                .Sum(cp => cp.car_cantidad);
+            if (carrito == null) return NotFound();
 
-            return Json(new { count });
+            // Buscar CarritoAutoparte por su Id, no por el AutoparteId
+            var carritoAutoparte = carrito.CarritoAutopartes.FirstOrDefault(ca => ca.carAut_id == productoId);  // Cambié .AutoparteId a .Id
+
+            if (carritoAutoparte != null)
+            {
+                carritoAutoparte.car_cantidad = nuevaCantidad;
+                carritoAutoparte.car_subtotal = carritoAutoparte.Autoparte.aut_precio * nuevaCantidad;
+
+                await _context.SaveChangesAsync();
+            }
+
+            // Obtener el total actualizado
+            var total = carrito.car_total;  // Usamos el método car_total para calcular el total
+            return Json(new { total });
+        }
+
+        // Acción para eliminar un producto del carrito
+        [HttpPost]
+        public async Task<IActionResult> EliminarProducto(int carritoId, int productoId)
+        {
+            var carrito = await _context.Carritos
+                .Include(c => c.CarritoAutopartes)
+                .FirstOrDefaultAsync(c => c.car_id == carritoId);
+
+            if (carrito == null) return NotFound();
+
+            var carritoAutoparte = carrito.CarritoAutopartes.FirstOrDefault(ca => ca.AutoparteId == productoId);
+
+            if (carritoAutoparte != null)
+            {
+                carrito.CarritoAutopartes.Remove(carritoAutoparte);
+                await _context.SaveChangesAsync();
+            }
+
+            var total = carrito.CarritoAutopartes.Sum(ca => ca.car_subtotal);
+            return Json(new { total });
         }
 
     }

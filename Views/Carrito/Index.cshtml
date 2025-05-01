@@ -2,103 +2,126 @@
 
 <link rel="stylesheet" href="~/css/indexCarrito.css" asp-append-version="true" />
 
-<body>
-    <div class="container">
-        <h1>Carrito</h1>
+<div class="container">
+    <h1>Carrito</h1>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Autoparte</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th></th>
+    <table>
+        <thead>
+            <tr>
+                <th>Autoparte</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="productos-carrito">
+            @foreach (var item in Model.CarritoAutopartes)
+            {
+                var autoparte = item.Autoparte;
+                <tr id="producto-@item.carAut_id">
+                    <td>
+                        <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" width="50px">
+                        @autoparte.aut_nombre
+                    </td>
+                    <td>S/ @autoparte.aut_precio.ToString("0.00")</td>
+                    <td>
+                        <div class="cantidad-control">
+                            <button class="decrease-btn" data-producto-id="@item.carAut_id">-</button>
+                            <span id="cantidad-@item.carAut_id">@item.car_cantidad</span>
+                            <button class="increase-btn" data-producto-id="@item.carAut_id">+</button>
+                        </div>
+                    </td>
+                    <td class="subtotal" id="subtotal-@autoparte.aut_id">S/ @item.car_subtotal.ToString("0.00")</td>
+                    <td>
+                        <span class="remove-btn" data-producto-id="@autoparte.aut_id">×</span>
+                    </td>
                 </tr>
-            </thead>
-            <tbody id="productos-carrito">
-                <!-- Aquí se mostrarán los productos del carrito -->
-            </tbody>
-        </table>
+            }
+        </tbody>
+    </table>
 
-        <div class="resumen" >
-            <p><strong>Subtotal:</strong> S/ <span id="subtotal">0</span></p>
-            <p><strong>Total:</strong> S/ <span id="total">0</span></p>
-            <a href="/checkout" class="btn-finalizar">Finalizar Compra</a>
-        </div>
+    <div class="resumen">
+        <p><strong>Total:</strong> S/ <span id="total">@Model.car_total.ToString("0.00")</span></p>
+        <a href="/checkout" class="btn-finalizar">Finalizar Compra</a>
     </div>
+</div>
 
-    <script>
-        // Obtenemos los productos del carrito desde localStorage
-        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-        const productosCarrito = document.getElementById('productos-carrito');
-        let subtotal = 0;
+<script>
+    // Recalcular el total de todos los productos
+    function calcularTotal() {
+        let total = 0;
 
-        // Si no hay productos en el carrito, mostramos un mensaje
-        if (carrito.length === 0) {
-            productosCarrito.innerHTML = "<tr><td colspan='5'>No tienes productos en tu carrito.</td></tr>";
-        }
-
-        // Mostramos los productos del carrito
-        carrito.forEach(item => {
-            const totalItem = item.precio * item.cantidad;
-            subtotal += totalItem;
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><img src="${item.imagen}" alt="${item.nombre}" width="50px"> ${item.nombre}</td>
-                <td>S/ ${item.precio.toFixed(2)}</td>
-                <td>
-                    <div class="cantidad-control">
-                        <button class="decrease-btn" data-nombre="${item.nombre}">-</button>
-                        <span>${item.cantidad}</span>
-                        <button class="increase-btn" data-nombre="${item.nombre}">+</button>
-                    </div>
-                </td>
-                <td>S/ ${totalItem.toFixed(2)}</td>
-                <td><span class="remove-btn" data-nombre="${item.nombre}">×</span></td>
-            `;
-            productosCarrito.appendChild(row);
+        // Iterar sobre todos los subtotales
+        const subtotales = document.querySelectorAll('.subtotal');
+        subtotales.forEach(subtotal => {
+            total += parseFloat(subtotal.textContent.replace('S/ ', ''));
         });
 
-        // Mostrar el subtotal y total
-        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-        document.getElementById('total').textContent = subtotal.toFixed(2);
+        // Actualizar el total en la interfaz
+        document.getElementById('total').textContent = total.toFixed(2);
+    }
 
-        // Función para eliminar un producto del carrito
-        document.addEventListener('click', (e) => {
-            // Eliminar producto
-            if (e.target.classList.contains('remove-btn')) {
-                const nombreProducto = e.target.dataset.nombre;
-                // Filtramos el carrito para eliminar el producto
-                const carritoActualizado = carrito.filter(item => item.nombre !== nombreProducto);
-                localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
-                window.location.reload();  // Recargamos la página para reflejar los cambios
-            }
+    // Escuchar clics de aumento y disminución de cantidad
+    document.addEventListener('click', async (e) => {
+        // Verificar si el botón clickeado es de disminuir o aumentar
+        if (e.target.classList.contains('decrease-btn') || e.target.classList.contains('increase-btn')) {
+            const productoId = e.target.dataset.productoId; // Obtener el ID del producto/carAut_id
+            const cantidadSpan = document.getElementById('cantidad-' + productoId);
+            let nuevaCantidad;
 
-            // Aumentar cantidad de producto
-            if (e.target.classList.contains('increase-btn')) {
-                const nombreProducto = e.target.dataset.nombre;
-                const producto = carrito.find(item => item.nombre === nombreProducto);
-                if (producto) {
-                    producto.cantidad++;
-                    // Actualizar el carrito en localStorage
-                    localStorage.setItem('carrito', JSON.stringify(carrito));
-                    window.location.reload();  // Recargamos la página para reflejar los cambios
-                }
-            }
-
-            // Disminuir cantidad de producto
+            // Determinar si aumentar o disminuir la cantidad
             if (e.target.classList.contains('decrease-btn')) {
-                const nombreProducto = e.target.dataset.nombre;
-                const producto = carrito.find(item => item.nombre === nombreProducto);
-                if (producto && producto.cantidad > 1) {
-                    producto.cantidad--;
-                    // Actualizar el carrito en localStorage
-                    localStorage.setItem('carrito', JSON.stringify(carrito));
-                    window.location.reload();  // Recargamos la página para reflejar los cambios
-                }
+                nuevaCantidad = Math.max(1, parseInt(cantidadSpan.textContent) - 1); // No permitir que la cantidad sea menor que 1
+            } else if (e.target.classList.contains('increase-btn')) {
+                nuevaCantidad = parseInt(cantidadSpan.textContent) + 1;
             }
-        });
-    </script>
-</body>
+
+            cantidadSpan.textContent = nuevaCantidad; // Actualizar la cantidad en el frontend
+
+            // Enviar la solicitud para actualizar la cantidad en el servidor
+            const response = await fetch('/Carrito/ActualizarCantidad', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ carritoId: @Model.car_id, productoId, nuevaCantidad })
+            });
+
+            const data = await response.json();
+
+            // Asegúrate de que el servidor devuelve el subtotal correcto
+            // Actualizar el subtotal de este producto en la interfaz
+            document.getElementById('subtotal-' + productoId).textContent = 'S/ ' + (data.subtotal).toFixed(2);
+
+            // Recalcular el total del carrito (esto debería ser una función que recalcule el total)
+            calcularTotal();
+        }
+    });
+
+    // Eliminar producto
+    document.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('remove-btn')) {
+            const productoId = e.target.dataset.productoId;
+
+            const response = await fetch('/Carrito/EliminarProducto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ carritoId: @Model.car_id, productoId })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                // Eliminar el producto de la lista
+                document.getElementById('producto-' + productoId).remove();
+
+                // Recalcular el total
+                calcularTotal();
+            }
+        }
+    });
+
+    // Inicializar el total cuando se carga la página
+    document.addEventListener('DOMContentLoaded', function () {
+        calcularTotal();
+    });
+
+</script>
