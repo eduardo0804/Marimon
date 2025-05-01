@@ -217,9 +217,6 @@ namespace Marimon.Controllers
             }
         }
 
-        public IActionResult Comprobantes()
-        {
-            return View("~/Views/Comprobantes/Index.cshtml");
-        }
+        
     }
 }
