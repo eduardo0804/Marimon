@@ -116,3 +116,17 @@ footer {
   opacity: 0;
   transform: translateY(20px);
 }
+.btn-primary {
+    background-color: #E42229 !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 20px !important;
+    color: white !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+    display: block !important;
+    margin: 0 auto !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
