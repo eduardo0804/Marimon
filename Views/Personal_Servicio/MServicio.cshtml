@@ -4,11 +4,17 @@
 }
 
 <link href="/css/personalservicio.css" rel="stylesheet" type="text/css">
-
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success success-message position-fixed" role="alert">
+        <strong>Éxito</strong>: @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
+    </div>
+}
 <div class="container-fluid px-0">
     <div class="row bg-danger text-white py-2">
         <div class="col-12">
-            <h2 class="mb-0 text-center" style="font-weight: bold;">LISTA DE SERVICIOS</h2>
+            <h2 class="mb-0 text-center" style="font-weight: bold;">ACTUALIZACIÓN DE SERVICIOS</h2>
         </div>
     </div>
     <div class="row align-items-center my-4 px-4">
@@ -17,7 +23,7 @@
         </div>
         <div class="col-md-6">
             <p class="fs-4 fw-bold mb-2">
-                Consulta nuestra lista de servicios automotrices disponibles, pensados para el cuidado, mantenimiento y reparación de tu vehículo
+                Administra los servicios automotrices disponibles. Aquí puedes consultar o modificar servicios según sea necesario.
             </p>
         </div>
     </div>
@@ -95,4 +101,15 @@
             })
             .catch(error => console.error('Error al cargar el modal:', error));
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const successMessage = document.querySelector(".success-message");
+        if (successMessage) {
+            setTimeout(() => {
+                successMessage.classList.add("hide");
+                setTimeout(() => successMessage.remove(), 500);
+            }, 10000);
+        }
+    });
 </script>
+<script src="~/js/home.js" asp-append-version="true"></script>
