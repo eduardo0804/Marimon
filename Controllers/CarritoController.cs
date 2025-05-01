@@ -190,27 +190,36 @@ namespace Marimon.Controllers
         [HttpPost]
         public async Task<IActionResult> EliminarProducto([FromBody] EliminarProductoRequest request)
         {
-            var carrito = await _context.Carritos
-                .Include(c => c.CarritoAutopartes)
-                .FirstOrDefaultAsync(c => c.car_id == request.CarritoId);
-
-            if (carrito == null) return NotFound(new { message = "Carrito no encontrado", request.CarritoId });
-
-            var carritoAutoparte = carrito.CarritoAutopartes
-                .FirstOrDefault(ca => ca.AutoparteId == request.ProductoId);
-
-            if (carritoAutoparte != null)
+            try
             {
-                carrito.CarritoAutopartes.Remove(carritoAutoparte);
-                await _context.SaveChangesAsync();
-            }
+                var carrito = await _context.Carritos
+                    .Include(c => c.CarritoAutopartes)
+                    .FirstOrDefaultAsync(c => c.car_id == request.CarritoId);
 
-            var total = carrito.CarritoAutopartes.Sum(ca => ca.car_subtotal);
-            return Json(new { total });
+                if (carrito == null)
+                    return NotFound(new { message = "Carrito no encontrado", request.CarritoId });
+
+                var carritoAutoparte = carrito.CarritoAutopartes
+                    .FirstOrDefault(ca => ca.carAut_id == request.ProductoId);
+
+                if (carritoAutoparte != null)
+                {
+                    carrito.CarritoAutopartes.Remove(carritoAutoparte);
+                    await _context.SaveChangesAsync();
+                }
+
+                return Json(new { total = carrito.car_total });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar producto del carrito");
+                return StatusCode(500, "Error interno del servidor");
+            }
         }
 
-        public IActionResult Comprobantes(){
+        public IActionResult Comprobantes()
+        {
             return View("~/Views/Comprobantes/Index.cshtml");
-            }
+        }
     }
 }

@@ -102,22 +102,20 @@
     // Eliminar producto
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-btn')) {
-            const carritoId = @Model.car_id;
             const productoId = e.target.dataset.productoId;
+            const carritoId = @Model.car_id;
 
             $.ajax({
-                url: '/Carrito/EliminarProducto',
+                url: '@Url.Action("EliminarProducto", "Carrito")',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ carritoId, productoId }),
+                data: JSON.stringify({ CarritoId: carritoId, ProductoId: productoId }),
                 success: function (data) {
-                    if (data.success) {
-                        document.getElementById('producto-' + productoId).remove();
-                        calcularTotal();
-                    }
+                    document.getElementById('producto-' + productoId).remove();
+                    document.getElementById('total').textContent = data.total.toFixed(2);
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error al eliminar el producto", error);
+                    console.error('Error al eliminar producto:', error);
                 }
             });
         }
@@ -128,4 +126,3 @@
         calcularTotal();
     });
 </script>
-
