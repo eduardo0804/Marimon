@@ -209,6 +209,8 @@ namespace Marimon.Controllers
             return Json(new { total });
         }
 
-
+        public IActionResult Comprobantes(){
+            return View("~/Views/Comprobantes/Index.cshtml");
+            }
     }
 }
