@@ -1,3 +1,4 @@
+@model Marimon.Models.Usuario
 @{
     Layout = null;
     ViewData["Title"] = "Finaliza tu compra";
@@ -49,16 +50,17 @@
     }
 </style>
 
-    <div class="container my-5">
-        <div class="row align-items-center mb-4">
-            <div class="col-md-6 text-start">
-                <h2 class="fw-bold text-dark">Finaliza tu Compra</h2>
-            </div>
-            <div class="col-md-6 text-end text-success d-flex align-items-center justify-content-end gap-2">
-                <i class="bi bi-shield-check fs-4"></i>
-                <span class="fw-semibold">Compra Segura</span>
-            </div>
-    </div>
+<div class="container my-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6 text-start">
+            <h2 class="fw-bold text-dark">Finaliza tu Compra</h2>
+        </div>
+        <div class="col-md-6 text-end text-success d-flex align-items-center justify-content-end gap-2">
+            <i class="bi bi-shield-check fs-4"></i>
+            <span class="fw-semibold">Compra Segura</span>
+        </div>
+            
+    </div>
 
     <div class="mb-4">
         <form>
@@ -79,15 +81,18 @@
             <div class="row mb-4">
                 <div class="col-md-6 mb-3">
                     <label for="nombre" class="form-label fw-semibold">Nombre *</label>
-                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="nombre" placeholder="Ingrese su nombre">
+                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                        id="nombre" name="usu_nombre" placeholder="Ingrese su nombre" value="@Model.usu_nombre" readonly>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="apellidos" class="form-label fw-semibold">Apellidos *</label>
-                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="apellidos" placeholder="Ingrese sus apellidos">
+                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                        id="apellidos" name="usu_apellido" placeholder="Ingrese sus apellidos" value="@Model.usu_apellido" readonly>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="tipoDocumento" class="form-label fw-semibold">Tipo de documento *</label>
-                    <select class="form-select form-select-lg shadow-sm rounded-3 border-secondary-subtle" id="tipoDocumento">
+                    <select class="form-select form-select-lg shadow-sm rounded-3 border-secondary-subtle"
+                        id="tipoDocumento">
                         <option selected disabled>Seleccione</option>
                         <option>DNI</option>
                         <option>Carnet de Extranjería</option>
@@ -96,26 +101,31 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="numeroDocumento" class="form-label fw-semibold">N° de documento *</label>
-                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="numeroDocumento" placeholder="Ingrese su número de documento">
+                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                        id="numeroDocumento" placeholder="Ingrese su número de documento">
                 </div>
                 <div class="col-12 mb-3">
                     <label for="correo" class="form-label fw-semibold">Correo electrónico *</label>
-                    <input type="email" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="correo" placeholder="ejemplo@correo.com">
+                    <input type="email" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                        id="correo" name="usu_correo" placeholder="ejemplo@correo.com" value="@Model.usu_correo" readonly>
                 </div>
             </div>
 
             <div class="row mb-4">
                 <div class="col-12 mb-3">
                     <label for="razonSocial" class="form-label fw-semibold">Razón Social</label>
-                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="razonSocial" placeholder="Ingrese razón social">
+                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                        id="razonSocial" placeholder="Ingrese razón social">
                 </div>
                 <div class="col-12 mb-3">
                     <label for="ruc" class="form-label fw-semibold">N° de R.U.C.</label>
-                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="ruc" placeholder="Ingrese número de RUC">
+                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                        id="ruc" placeholder="Ingrese número de RUC">
                 </div>
                 <div class="col-12 mb-3">
                     <label for="direccion" class="form-label fw-semibold">Dirección fiscal o comercial</label>
-                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="direccion" placeholder="Ingrese dirección">
+                    <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                        id="direccion" placeholder="Ingrese dirección">
                 </div>
             </div>
 
@@ -124,7 +134,8 @@
                     <i class="bi bi-geo-alt-fill text-success fs-4 me-2"></i>
                     <h5 class="m-0 fw-bold text-success">Entrega en Tienda</h5>
                 </div>
-                <p class="mb-0 ps-4 text-dark">Recojo disponible en: <strong>Tienda Marimon - Av. Principal 123, Lima</strong></p>
+                <p class="mb-0 ps-4 text-dark">Recojo disponible en: <strong>Tienda Marimon - Av. Principal 123,
+                        Lima</strong></p>
             </div>
 
             <div class="text-center">
@@ -154,9 +165,9 @@
     function actualizarCampos() {
         const esBoleta = boletaRadio.checked;
 
-        campos.nombre.disabled = false;
-        campos.apellidos.disabled = false;
-        campos.correo.disabled = false;
+        campos.nombre.disabled = true;
+        campos.apellidos.disabled = true;
+        campos.correo.disabled = true;
 
         campos.tipoDocumento.disabled = !esBoleta;
         campos.numeroDocumento.disabled = !esBoleta;
@@ -166,6 +177,7 @@
         campos.direccion.disabled = esBoleta;
     }
 
+    
     boletaRadio.addEventListener('change', actualizarCampos);
     facturaRadio.addEventListener('change', actualizarCampos);
     window.addEventListener('DOMContentLoaded', actualizarCampos);
