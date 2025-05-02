@@ -12,8 +12,9 @@ namespace Marimon.Models
 		public string res_placa { get; set; }
 		public string res_telefono { get; set; }
 		public DateTime res_fecha { get; set; }
+        public TimeSpan res_hora { get; set; }
 
-		public string UsuarioId { get; set; }
+        public string UsuarioId { get; set; }
 
         [ForeignKey("UsuarioId")]
         public Usuario? Usuario { get; set; }

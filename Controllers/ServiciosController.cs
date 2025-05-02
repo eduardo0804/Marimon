@@ -33,7 +33,10 @@ namespace Marimon.Controllers
 
         public async Task<IActionResult> Detalle(int id)
         {
-            var servicio = _context.Servicio.Find(id);
+            var servicio = await _context.Servicio
+                .Include(s => s.Reservas) // Incluye las reservas relacionadas
+                .FirstOrDefaultAsync(s => s.ser_id == id);
+
             if (servicio == null)
             {
                 return NotFound();
@@ -59,11 +62,22 @@ namespace Marimon.Controllers
             ViewBag.Nombre = nombre;
             ViewBag.Apellido = apellido;
 
+            // Pasar las reservas al ViewBag
+            ViewBag.Reservas = servicio.Reservas.Select(r => new
+            {
+                Fecha = r.res_fecha.ToString("dd/MM/yyyy"),
+                Hora = r.res_hora.ToString(@"hh\:mm"),
+                Placa = r.res_placa,
+                Telefono = r.res_telefono
+            }).ToList();
+
             return View("Servicio", servicio);
         }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reservar(int ser_id, string placa, string telefono, DateTime fecha)
+        public async Task<IActionResult> Reservar(int ser_id, string placa, string telefono, DateTime fecha, TimeSpan hora)
         {
             if (!User.Identity.IsAuthenticated)
                 return Unauthorized();
@@ -81,6 +95,7 @@ namespace Marimon.Controllers
                 res_placa = placa,
                 res_telefono = telefono,
                 res_fecha = fecha.ToUniversalTime(),
+                res_hora = hora, // Capturar la hora
                 UsuarioId = usuario.usu_id,
                 ser_id = ser_id
             };
@@ -91,6 +106,7 @@ namespace Marimon.Controllers
             TempData["ReservaExitosa"] = true;
             return RedirectToAction("Detalle", new { id = ser_id });
         }
+
         public IActionResult DescargarICS(string titulo, string descripcion, string location, DateTime fecha)
         {
             var fechaInicio = fecha.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");

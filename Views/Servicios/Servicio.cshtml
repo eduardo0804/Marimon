@@ -130,6 +130,24 @@
                         <div class="col-lg-6 col-md-12" data-aos="fade-up">
                             <div class="p-4 rounded-4 shadow-lg bg-white">
                                 <h4 class="text-center mb-4 text-danger">Reserva tu Servicio</h4>
+                                @if (ViewBag.Reservas != null && ((IEnumerable<dynamic>)ViewBag.Reservas).Any())
+                                {
+                                    <h3>Reservas realizadas:</h3>
+                                    <ul>
+                                        @foreach (var reserva in (IEnumerable<dynamic>)ViewBag.Reservas)
+                                        {
+                                            <li>
+                                                Fecha: @reserva.Fecha
+												Hora: @reserva.Hora
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <p>No hay reservas para este servicio.</p>
+                                }
+
                                 <form asp-action="Reservar" asp-controller="Servicios" method="post" class="row g-3"
                                     id="formulario">
                                     @Html.AntiForgeryToken()
@@ -157,6 +175,10 @@
                                     <div class="col-sm-6">
                                         <label for="fecha" class="form-label">Fecha*</label>
                                         <input type="date" class="form-control" id="fecha" name="fecha" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="hora" class="form-label">Hora*</label>
+                                        <input type="time" class="form-control" id="hora" name="hora" required>
                                     </div>
                                     <div class="col-sm-6 d-flex align-items-end ">
                                         <button type="submit" class="btn btn-danger w-100 btn-lg"
