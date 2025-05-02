@@ -1,3 +1,4 @@
+@model IEnumerable<Marimon.Models.Servicio>
 @{
     ViewBag.Title = "Servicios";
     ViewBag.FullWidthLayout = true;
@@ -5,8 +6,10 @@
 }
 <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" href="~/css/home.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-@model IEnumerable<Marimon.Models.Servicio>
 <style>
     .container {
         padding: 0 !important;
@@ -15,180 +18,141 @@
         max-width: 100% !important;
         box-sizing: border-box !important;
     }
-
-    .slider-container {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-        padding: 0 45px;
-    }
-
-    .slider {
-        display: flex;
-        transition: transform 0.5s ease-in-out;
-    }
-
-    .slide {
-        width: 256px;
-        height: 280px;
-        margin: 0 15px;
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-
-    .arrows {
-        position: absolute;
-        top: 50%;
-        left: 20px;
-        right: 20px;
-        display: flex;
-        justify-content: space-between;
-        width: calc(100% - 40px);
-        transform: translateY(-50%);
-    }
-
-    .arrows button {
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        cursor: pointer;
-    }
-
-    .btn {
-        display: flex;
-        color: #000000;
-        font-size: 26px;
-        padding: 0.25rem 0.5rem;
-    }
 </style>
 
 <body>
     <div style="padding-top: 20px;">
-        <div class="container-fluid d-flex align-items-center"
-            style="background: #000000; padding: 10px; margin: 0; border-radius: 0;">
-            <div class="row w-100">
-                <div class="col-md-6 d-flex justify-content-center align-items-center" style="padding: 0;">
-                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fservicios-marimon-02.jpg?alt=media&amp;token=c82b9eac-83e4-42e6-aae0-814d5cc6bc45.png"
-                        alt="Servicios Marimon" class="img-fluid" style="border-radius: 0; height:80%;">
-                </div>
-                <div class="col-md-6 d-flex align-items-center"
-                    style="padding-left: 10px; border-left: 5px solid white; margin-top: 10px;">
-                    <div>
-                        <h2 class="fw-bold text-white">Hola somos Marimon y
-                            traemos las mejores soluciones a sus vehículos</h2>
-                        <p class="text-white mb-3">Tincidunt laoreet leo, adipiscing taciti tempor. Primis senectus
-                            sapien, risus donec ad fusce augue interdum.</p>
-                        <div class="d-flex justify-content-center">
-                            <a class="btn btn-light btn-sm fw-bold rounded-pill" href="#">Ver servicios</a>
-                        </div>
+        <div class="hero-section">
+            <div class="container">
+                <div class="row hero-row align-items-center">
+                    <div class="col-md-6 d-flex justify-content-center">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fservicios-marimon-02.jpg?alt=media&amp;token=c82b9eac-83e4-42e6-aae0-814d5cc6bc45.png"
+                            alt="Servicios Marimon" class="hero-img" />
+                    </div>
+                    <div class="col-md-6 hero-content">
+                        <h1 class="hero-title">Hola somos Marimon y<br>traemos las mejores soluciones a sus vehículos
+                        </h1>
+                        <div class="hero-underline"></div>
+                        <h3 class="hero-subtitle" style="color:#fff; font-weight:400; margin-bottom:18px;">
+                            Tu tranquilidad es nuestro compromiso: soluciones rápidas, seguras y con la mejor tecnología
+                            para tu auto.
+                        </h3>
+                        <p>Confía en nuestro equipo de expertos para mantener tu vehículo siempre en óptimas condiciones
+                            y listo para cualquier reto.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 
     <div class="container-xxl py-5">
-    <div class="row justify-content-center text-center mb-5">
-        <div class="col-lg-8">
-            <h2 class="fw-bold" data-aos="fade-up">¿Cuál es nuestro Procedimiento?</h2>
-        </div>
-    </div>
-    <!-- Pasos -->
-    <div class="row gy-4 row-cols-1 row-cols-md-2 row-cols-xl-5">
-        <!-- Paso 1 -->
-        <div class="col step" data-step="0" data-aos="fade-up" data-aos-delay="100">
-            <div class="card border-0 shadow-sm text-center h-100 p-3" style="background-color: #ffffff; border-radius: 10px;">
-                <div class="card-body">
-                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image.png?alt=media&token=cd7b240e-1dc3-4b6f-a2f0-b90620001add.png" 
-                         alt="Escuchamos" class="mb-3" width="80">
-                    <h4 class="fw-bold">Escuchamos y Atendemos</h4>
-                    <p class="text-muted">
-                        <i class="fa-duotone fa-solid fa-check"></i>
-                        Escuchamos todos los inconvenientes que tienen nuestros clientes frente a su vehículo.
-                    </p>
-                </div>
+        <div class="row justify-content-center text-center mb-5">
+            <div class="col-lg-8">
+                <h2 class="fw-bold" data-aos="fade-up">¿Cuál es nuestro Procedimiento?</h2>
             </div>
         </div>
-        <!-- Paso 2 -->
-        <div class="col step" data-step="1" data-aos="fade-up" data-aos-delay="200">
-            <div class="card border-0 shadow-sm text-center h-100 p-3" style="background-color: #ffffff; border-radius: 10px;">
-                <div class="card-body">
-                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-1.png?alt=media&token=c164c118-ff0c-433a-80c7-b0b2b2ec666b.png" 
-                         alt="Analizamos" class="mb-3" width="80">
-                    <h4 class="fw-bold">Analizamos</h4>
-                    <p class="text-muted">
-                        <i class="fa-duotone fa-solid fa-check"></i>
-                        El asesor asigna a los técnicos especializados de acuerdo a los inconvenientes presentados por el cliente.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- Paso 3 -->
-        <div class="col step" data-step="2" data-aos="fade-up" data-aos-delay="300">
-            <div class="card border-0 shadow-sm text-center h-100 p-3" style="background-color: #ffffff; border-radius: 10px;">
-                <div class="card-body">
-                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-2.png?alt=media&token=a8ff5a75-7e15-4031-ada5-751a793d95f2.png" 
-                         alt="Cotizamos" class="mb-3" width="80">
-                    <h4 class="fw-bold">Cotizamos</h4>
-                    <p class="text-muted">
-                        <i class="fa-duotone fa-solid fa-check"></i>
-                        De acuerdo a las pruebas realizadas, el asesor realiza la cotización.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- Paso 4 -->
-        <div class="col step" data-step="3" data-aos="fade-up" data-aos-delay="400">
-            <div class="card border-0 shadow-sm text-center h-100 p-3" style="background-color: #ffffff; border-radius: 10px;">
-                <div class="card-body">
-                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-3.png?alt=media&token=ff84c240-0f32-45c1-bb7e-c219e430e687.png" 
-                         alt="Seguimiento" class="mb-3" width="80">
-                    <h4 class="fw-bold">Seguimiento</h4>
-                    <p class="text-muted">
-                        <i class="fa-duotone fa-solid fa-check"></i>
-                        Se procede a realizar el trabajo y se establece una fecha límite de entrega.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- Paso 5 -->
-        <div class="col step" data-step="4" data-aos="fade-up" data-aos-delay="500">
-            <div class="card border-0 shadow-sm text-center h-100 p-3" style="background-color: #ffffff; border-radius: 10px;">
-                <div class="card-body">
-                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-4.png?alt=media&token=121b653d-5a08-4ac0-932c-7232fa0da153.png" 
-                         alt="Entrega" class="mb-3" width="80">
-                    <h4 class="fw-bold">Entrega</h4>
-                    <p class="text-muted">
-                        <i class="fa-duotone fa-solid fa-check"></i>
-                        Después de realizar las pruebas correspondientes, se entrega el vehículo al cliente.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <div class="container ms-xxl-3" style="background: #D42025; height: 352px; padding-bottom: 8px;">
-        <h1 style="color: rgb(255,255,255); font-weight: bold; text-align: center;">Nuestros Servicios</h1>
-        <div class="slider-container">
-            <div class="slider">
-                @foreach (var servicio in Model)
-                {
-                    <div class="slide">
-                        <img src="@servicio.ser_imagen" alt="@servicio.ser_nombre" width="259" height="194">
-                        <p style="color: rgb(255,255,255); font-weight: bold;">@servicio.ser_nombre</p>
+        <!-- Pasos -->
+        <div class="row gy-4 row-cols-1 row-cols-md-2 row-cols-xl-5">
+            <!-- Paso 1 -->
+            <div class="col step" data-step="0" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow-sm text-center h-100 p-3"
+                    style="background-color: #ffffff; border-radius: 10px;">
+                    <div class="card-body">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image.png?alt=media&token=cd7b240e-1dc3-4b6f-a2f0-b90620001add.png"
+                            alt="Escuchamos" class="mb-3" width="80">
+                        <h4 class="fw-bold">Escuchamos y Atendemos</h4>
+                        <p class="text-muted">
+                            <i class="fa-duotone fa-solid fa-check"></i>
+                            Escuchamos todos los inconvenientes que tienen nuestros clientes frente a su vehículo.
+                        </p>
                     </div>
-                }
+                </div>
             </div>
-            <div class="arrows">
-                <button id="prev"><</button>
-                <button id="next">></button>
+            <!-- Paso 2 -->
+            <div class="col step" data-step="1" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow-sm text-center h-100 p-3"
+                    style="background-color: #ffffff; border-radius: 10px;">
+                    <div class="card-body">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-1.png?alt=media&token=c164c118-ff0c-433a-80c7-b0b2b2ec666b.png"
+                            alt="Analizamos" class="mb-3" width="80">
+                        <h4 class="fw-bold">Analizamos</h4>
+                        <p class="text-muted">
+                            <i class="fa-duotone fa-solid fa-check"></i>
+                            El asesor asigna a los técnicos especializados de acuerdo a los inconvenientes presentados
+                            por el cliente.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Paso 3 -->
+            <div class="col step" data-step="2" data-aos="fade-up" data-aos-delay="300">
+                <div class="card border-0 shadow-sm text-center h-100 p-3"
+                    style="background-color: #ffffff; border-radius: 10px;">
+                    <div class="card-body">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-2.png?alt=media&token=a8ff5a75-7e15-4031-ada5-751a793d95f2.png"
+                            alt="Cotizamos" class="mb-3" width="80">
+                        <h4 class="fw-bold">Cotizamos</h4>
+                        <p class="text-muted">
+                            <i class="fa-duotone fa-solid fa-check"></i>
+                            De acuerdo a las pruebas realizadas, el asesor realiza la cotización.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Paso 4 -->
+            <div class="col step" data-step="3" data-aos="fade-up" data-aos-delay="400">
+                <div class="card border-0 shadow-sm text-center h-100 p-3"
+                    style="background-color: #ffffff; border-radius: 10px;">
+                    <div class="card-body">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-3.png?alt=media&token=ff84c240-0f32-45c1-bb7e-c219e430e687.png"
+                            alt="Seguimiento" class="mb-3" width="80">
+                        <h4 class="fw-bold">Seguimiento</h4>
+                        <p class="text-muted">
+                            <i class="fa-duotone fa-solid fa-check"></i>
+                            Se procede a realizar el trabajo y se establece una fecha límite de entrega.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Paso 5 -->
+            <div class="col step" data-step="4" data-aos="fade-up" data-aos-delay="500">
+                <div class="card border-0 shadow-sm text-center h-100 p-3"
+                    style="background-color: #ffffff; border-radius: 10px;">
+                    <div class="card-body">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-4.png?alt=media&token=121b653d-5a08-4ac0-932c-7232fa0da153.png"
+                            alt="Entrega" class="mb-3" width="80">
+                        <h4 class="fw-bold">Entrega</h4>
+                        <p class="text-muted">
+                            <i class="fa-duotone fa-solid fa-check"></i>
+                            Después de realizar las pruebas correspondientes, se entrega el vehículo al cliente.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slider-bg">
+        <h1 class="slider-title">Nuestros Servicios</h1>
+        <div class="slider-container2">
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                    @foreach (var servicio in Model)
+                    {
+                        <div class="swiper-slide">
+                            <a asp-controller="Servicios" asp-action="Detalle" asp-route-id="@servicio.ser_id"
+                                style="display:block; width:100%; height:100%;">
+                                <img src="@servicio.ser_imagen" alt="@servicio.ser_nombre" class="slide-image" />
+                                <div class="slide-content">
+                                    <div class="slide-title">@servicio.ser_nombre</div>
+                                    <div class="slide-underline"></div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
             </div>
         </div>
     </div>
@@ -196,30 +160,32 @@
     @* <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fasdsa.png?alt=media&token=fd6bcbec-8bdf-4971-bde3-52be968274e1"
         style="float:right; width: 100%; height: 100%;"> *@
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 </body>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
-    AOS.init();
-
-    const slider = document.querySelector('.slider');
-    const slides = document.querySelectorAll('.slide');
-    const prevButton = document.getElementById('prev');
-    const nextButton = document.getElementById('next');
-
-    let currentIndex = 0;
-
-    function updateSlider() {
-        slider.style.transform = `translateX(${-currentIndex * 256}px)`;
-    }
-
-    nextButton.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % slides.length;
-        updateSlider();
+    document.addEventListener('DOMContentLoaded', function () {
+        AOS.init({ once: true });
     });
-
-    prevButton.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-        updateSlider();
+    var totalSlides = @Model.Count();
+    var swiper = new Swiper('.swiper', {
+        loop: true,
+        centeredSlides: true,
+        slidesPerView: 1,
+        spaceBetween: 8,
+        speed: 900,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        autoplay: {
+            delay: 15000,
+            disableOnInteraction: false
+        },
+        breakpoints: {
+            0: { slidesPerView: 1, spaceBetween: 8, centeredSlides: true },
+            600: { slidesPerView: 2, spaceBetween: 12, centeredSlides: false },
+            992: { slidesPerView: 3, spaceBetween: 20, centeredSlides: false },
+            1200: { slidesPerView: 4, spaceBetween: 30, centeredSlides: false }
+        }
     });
 </script>
