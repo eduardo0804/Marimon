@@ -30,7 +30,21 @@
         </div>
         <div class="profile-details">
             <h2>Mis Citas</h2>
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success success-message position-fixed" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove();"></button>
+                </div>
+            }
 
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-success success-message position-fixed" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove();"></button>
+                </div>
+            }
             @if (Model.ReservasUsuario != null && Model.ReservasUsuario.Any())
             {
                 <table class="table table-striped mt-4">
@@ -40,6 +54,7 @@
                             <th>Placa</th>
                             <th>Teléfono</th>
                             <th>Fecha</th>
+                            <th>Hora</th>
                             <th>Servicio</th>
                             <th></th>
                         </tr>
@@ -51,7 +66,8 @@
                                 <td>@reserva.res_id</td>
                                 <td>@reserva.res_placa</td>
                                 <td>@reserva.res_telefono</td>
-                                <td>@reserva.res_fecha</td>
+                                <td>@reserva.res_fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@reserva.res_hora</td>
                                 <td>@reserva.Servicio?.ser_nombre</td> 
                                 <td>
                                     <form method="post" asp-page-handler="CancelarCita" asp-route-id="@reserva.res_id">
@@ -74,4 +90,16 @@
 </div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const successMessage = document.querySelector(".success-message");
+        if (successMessage) {
+            setTimeout(() => {
+                successMessage.classList.add("hide");
+                setTimeout(() => successMessage.remove(), 500);
+            }, 10000);
+        }
+    });
+    </script>
+<script src="~/js/home.js" asp-append-version="true"></script>
 }
