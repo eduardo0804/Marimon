@@ -17,9 +17,12 @@
 </head>
 <style>
     .scrollable-container {
-        max-height: 200px; /* Ajusta la altura para mostrar solo 2 productos */
-        overflow-y: auto; /* Habilita la barra de desplazamiento vertical */
-        padding-right: 10px; /* Espacio para evitar que el contenido se superponga con la barra */
+        max-height: 200px;
+        /* Ajusta la altura para mostrar solo 2 productos */
+        overflow-y: auto;
+        /* Habilita la barra de desplazamiento vertical */
+        padding-right: 10px;
+        /* Espacio para evitar que el contenido se superponga con la barra */
     }
 </style>
 
@@ -48,8 +51,8 @@
                 <div class="col-md-6 text-center position-relative">
                     @* <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
                         onclick="agregarFavorito(this, @Model.aut_id)"></i> *@
-                        <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
-                            onclick="agregarFavorito(this)"></i></i>
+                    <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
+                        onclick="agregarFavorito(this)"></i></i>
                     <div class="image-container position-relative">
                         <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
                         <i class="fa-solid fa-magnifying-glass zoom-icon position-absolute"
@@ -95,13 +98,13 @@
                                     @foreach (var similar in Model.ProductosSimilares)
                                     {
                                         <li class="list-group-item d-flex align-items-center">
-                                            <img src="@similar.aut_imagen" alt="@similar.aut_nombre" class="img-thumbnail me-3"
-                                                 style="width: 80px; height: 80px;" />
+                                            <img src="@similar.aut_imagen" alt="@similar.aut_nombre"
+                                                class="img-thumbnail me-3" style="width: 80px; height: 80px;" />
                                             <div class="flex-grow-1">
                                                 <h6 class="mb-1">
                                                     <a href="javascript:void(0);"
-                                                       onclick="cargarDetalleAutoparte(@similar.aut_id)"
-                                                       class="text-decoration-none text-dark">@similar.aut_nombre</a>
+                                                        onclick="cargarDetalleAutoparte(@similar.aut_id)"
+                                                        class="text-decoration-none text-dark">@similar.aut_nombre</a>
                                                 </h6>
                                                 <p class="text-muted mb-0">S/ @similar.aut_precio.ToString("0.00")</p>
                                             </div>
@@ -114,13 +117,32 @@
                     </div>
 
                     <div class="d-grid gap-3 mt-4">
-                        <form asp-controller="Catalogo" asp-action="AgregarAlCarrito" method="post">
-                            <input type="hidden" name="id" value="@Model.aut_id" />
-                            <button class="btn btn-carrito w-100" type="submit" style="background-color: #000; color: #fff; border: none;">
-                                Añadir al Carrito
-                            </button>
-                        </form>
-                        <a href="https://wa.me/51953761813?text=@Uri.EscapeDataString($"Hola, estoy interesado en la autoparte: {Model.aut_nombre} con precio S/ {Model.aut_precio.ToString("0.00")}. ¿Podrían brindarme más información?")" target="_blank" class="btn btn-whatsapp w-100" style="text-decoration: none; display: inline-block; text-align: center;">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @if (@Model.aut_cantidad > 0)
+                            {
+                                <form asp-controller="Carrito" asp-action="AñadirAlCarrito" method="post"
+                                    onsubmit="mostrarToast()">
+                                    <input type="hidden" name="autoparteId" value="@Model.aut_id" />
+                                    <input type="hidden" name="cantidad" value="1" min="1" class="form-control" />
+                                    <button class="btn btn-primary" type="submit">Añadir al Carrito</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary" disabled>Agotado</button>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir productos a la
+                                cesta.
+                            </div>
+                        }
+                        <a href="https://wa.me/51953761813?text=@Uri.EscapeDataString($"Hola, estoy interesado en la autoparte: {Model.aut_nombre} con precio S/ {Model.aut_precio.ToString("0.00")}. ¿Podrían brindarme más información?")"
+                            target="_blank" class="btn btn-whatsapp w-100"
+                            style="text-decoration: none; display: inline-block; text-align: center;">
                             <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
                         </a>
                     </div>
@@ -128,15 +150,15 @@
             </div>
         </div>
     </div>
-    
+
     @functions {
-    public string GetStockColor(int stock)
-    {
-        if (stock > 20) return "text-success";
-        if (stock > 10) return "text-warning";
-        return "text-danger";
+        public string GetStockColor(int stock)
+        {
+            if (stock > 20) return "text-success";
+            if (stock > 10) return "text-warning";
+            return "text-danger";
+        }
     }
-}
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -145,9 +167,9 @@
             document.getElementById("modalAutoparte").style.display = "none";
             const zoomModal = document.getElementById("zoomModal");
             if (zoomModal) zoomModal.style.display = "none";
-        }    
+        }
 
-        function agregarFavorito(icon){
+        function agregarFavorito(icon) {
             if (icon.classList.contains('fa-regular')) {
                 icon.classList.remove('fa-regular');
                 icon.classList.add('fa-solid');
@@ -166,7 +188,7 @@
                 })
                 .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
         }
-        
+
     </script>
 </body>
 
