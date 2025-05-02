@@ -190,7 +190,9 @@
             // Datos para el evento
             const titulo = 'Reserva Marimon';
             const descripcion = 'Servicio: @Model.ser_nombre';
-            const location = 'Marimon Taller';
+            const location = 'Jr. Gral. Felipe Santiago Salaverry 44, Lima 15022, Perú';
+
+            // Usa la fecha seleccionada en el formulario o pásala desde el backend
             // Usa la fecha seleccionada en el formulario o pásala desde el backend
             const fecha = new Date(document.getElementById('fecha')?.value || Date.now());
             const fechaInicio = fecha.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
