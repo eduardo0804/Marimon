@@ -25,8 +25,41 @@
         left: 40px;
         transform: translateY(-50%);
     }
-</style>
 
+    .success-message {
+        bottom: 20px;
+        right: 20px;
+        position: fixed;
+        z-index: 1050;
+        max-width: 300px;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .success-message .btn-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .success-message.hide {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+</style>
+@if (TempData["ReservaExitosa"] != null)
+{
+    <div class="alert alert-success success-message position-fixed" role="alert">
+        <strong>Éxito</strong>: ¡Reserva realizada con éxito!
+        <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
+    </div>
+}
 <!-- Banner Superior -->
 <div class="container-fluid full-width-banner p-0 position-relative" style="height: 320px; overflow: hidden;">
     <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
@@ -77,30 +110,33 @@
                         <div class="col-lg-6 col-md-12" data-aos="fade-up">
                             <div class="p-4 rounded-4 shadow-lg bg-white">
                                 <h4 class="text-center mb-4 text-danger">Reserva tu Servicio</h4>
-                                <form class="row g-3" id="formulario">
+                                <form asp-action="Reservar" asp-controller="Servicios" method="post" class="row g-3"
+                                    id="formulario">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="ser_id" value="@Model.ser_id" />
                                     <div class="col-sm-6">
                                         <label for="nombre" class="form-label">Nombre*</label>
-                                        <input type="text" class="form-control" id="nombre" placeholder="Tu nombre"
-                                            value="@ViewBag.Nombre" required readonly>
+                                        <input type="text" class="form-control" id="nombre" value="@ViewBag.Nombre"
+                                            readonly>
                                     </div>
                                     <div class="col-sm-6">
                                         <label for="apellido" class="form-label">Apellido*</label>
-                                        <input type="text" class="form-control" id="apellido" placeholder="Tu apellido"
-                                            value="@ViewBag.Apellido" required readonly>
+                                        <input type="text" class="form-control" id="apellido" value="@ViewBag.Apellido"
+                                            readonly>
                                     </div>
                                     <div class="col-sm-6">
                                         <label for="placa" class="form-label">Placa*</label>
-                                        <input type="text" class="form-control" id="placa" placeholder="ABC123"
-                                            required>
+                                        <input type="text" class="form-control" id="placa" name="placa"
+                                            placeholder="ABC123" required>
                                     </div>
                                     <div class="col-sm-6">
                                         <label for="telefono" class="form-label">Número de Teléfono*</label>
-                                        <input type="tel" class="form-control" id="telefono" placeholder="+51 900000000"
-                                            required>
+                                        <input type="tel" class="form-control" id="telefono" name="telefono"
+                                            placeholder="+51 900000000" required>
                                     </div>
                                     <div class="col-sm-6">
                                         <label for="fecha" class="form-label">Fecha*</label>
-                                        <input type="date" class="form-control" id="fecha" required>
+                                        <input type="date" class="form-control" id="fecha" name="fecha" required>
                                     </div>
                                     <div class="col-sm-6 d-flex align-items-end ">
                                         <button type="submit" class="btn btn-danger w-100 btn-lg"
@@ -119,4 +155,13 @@
 </div>
 <script>
     AOS.init({ once: true });
+    document.addEventListener("DOMContentLoaded", function () {
+        const successMessage = document.querySelector(".success-message");
+        if (successMessage) {
+            setTimeout(() => {
+                successMessage.classList.add("hide");
+                setTimeout(() => successMessage.remove(), 500);
+            }, 10000);
+        }
+    });
 </script>

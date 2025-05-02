@@ -11,7 +11,7 @@ namespace Marimon.Models
 		public int res_id { get; set; }
 		public string res_placa { get; set; }
 		public string res_telefono { get; set; }
-		public string res_fecha { get; set; }
+		public DateTime res_fecha { get; set; }
 
 		public string UsuarioId { get; set; }
 
