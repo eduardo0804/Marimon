@@ -86,9 +86,21 @@ namespace Marimon.Controllers
                     det_cantidad = item.car_cantidad
                 };
                 _context.DetalleVentas.Add(detalle);
-            }
 
-            await _context.SaveChangesAsync();
+                // 🔽 Reducir stock de autoparte
+                var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
+                if (autoparte != null)
+                {
+                    if (autoparte.aut_cantidad < item.car_cantidad)
+                    {
+                        return BadRequest($"Stock insuficiente para la autoparte {autoparte.aut_nombre}.");
+                    }
+
+                    autoparte.aut_cantidad -= item.car_cantidad;
+                    _context.Autopartes.Update(autoparte);
+                }
+            }
+            await _context.SaveChangesAsync(); // Guardar los detalles de venta
 
             // 5. Crear el comprobante
             var comprobante = new Comprobante
@@ -97,6 +109,20 @@ namespace Marimon.Controllers
                 VentaId = venta.ven_id
             };
             _context.Comprobante.Add(comprobante);
+            await _context.SaveChangesAsync();
+
+            // 🔽 5.1 Crear las salidas a partir de los detalles de venta
+            foreach (var item in carrito.CarritoAutopartes)
+            {
+                var salida = new Salida
+                {
+                    sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
+                    sal_cantidad = item.car_cantidad,
+                    ComprobanteId = comprobante.com_id,
+                    AutoparteId = item.AutoparteId
+                };
+                _context.Salida.Add(salida);
+            }
             await _context.SaveChangesAsync();
 
             // 6. Crear Boleta o Factura
@@ -127,9 +153,9 @@ namespace Marimon.Controllers
 
             await _context.SaveChangesAsync();
 
-            // // 7. Limpiar el carrito si lo deseas
-            // _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
-            // await _context.SaveChangesAsync();
+            //7. Limpiar el carrito si lo deseas
+            _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
+            await _context.SaveChangesAsync();
 
             return Ok("Venta y comprobante registrados correctamente.");
         }
