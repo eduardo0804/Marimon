@@ -38,11 +38,35 @@ namespace Marimon.Controllers
         {
             var identityUserId = _userManager.GetUserId(User);
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
+
             if (usuario == null)
             {
-                return RedirectToAction("Login", "Account"); // o muestra un mensaje
+                return RedirectToAction("Login", "Account");
             }
-            return View(usuario);
+
+            var carrito = await _context.Carritos
+                .Include(c => c.CarritoAutopartes)
+                    .ThenInclude(cp => cp.Autoparte)
+                .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
+
+            if (carrito == null || !carrito.CarritoAutopartes.Any())
+            {
+                return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
+            }
+
+            // Convertir los elementos del carrito a CarritoItem
+            var carritoItems = carrito.CarritoAutopartes.Select(item => new Carrito.CarritoItem
+            {
+                Nombre = item.Autoparte.aut_nombre,
+                PrecioUnitario = item.Autoparte.aut_precio,
+                Cantidad = item.car_cantidad,
+                ImagenUrl = item.Autoparte.aut_imagen
+            }).ToList();
+
+            // Crear el tuple 
+            var modelo = new Tuple<Usuario, List<Carrito.CarritoItem>>(usuario, carritoItems);
+
+            return View(modelo);
         }
 
         [HttpPost]
