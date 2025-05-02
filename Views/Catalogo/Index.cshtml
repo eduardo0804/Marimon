@@ -10,6 +10,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
 
+
 <div class="container catalogo-container">
     <div class="row mb-4">
         <div class="col-12 text-center">
@@ -35,6 +36,12 @@
             </div>
         </div>
     </div>
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="d-flex justify-content-center mb-4">       
+                @ViewBag.Mensaje
+        </div>
+    }
 
     <!-- Productos -->
     <div class="row justify-content-center">
@@ -51,7 +58,8 @@
                             <div class="card-body text-center">
                                 <h5 class="card-title">@autoparte.aut_nombre</h5>
                                 <p class="card-text precio">Precio:
-                                    <strong>S/@autoparte.aut_precio.ToString("0.00")</strong></p>
+                                    <strong>S/@autoparte.aut_precio.ToString("0.00")</strong>
+                                </p>
                                 @if (User.Identity.IsAuthenticated)
                                 {
                                     @if (autoparte.aut_cantidad > 0)
