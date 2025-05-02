@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Drawing;
+using System.IO;
 
 
 namespace Marimon.Controllers
@@ -25,7 +27,7 @@ namespace Marimon.Controllers
 
         private readonly IConverter _converter;
 
-         private readonly IEmailSenderWithAttachments _emailSender; // Cambio aquí
+        private readonly IEmailSenderWithAttachments _emailSender; // Cambio aquí
 
 
 
@@ -36,10 +38,10 @@ namespace Marimon.Controllers
             _userManager = userManager;
             _context = context;
             _emailSender = emailSender;
-        }   
+        }
 
 
-        
+
         public async Task<IActionResult> Index()
         {
             var identityUserId = _userManager.GetUserId(User);
@@ -196,7 +198,7 @@ namespace Marimon.Controllers
             // Generar el PDF
             var htmlContent = GenerateComprobanteHtml(comprobante);
             var pdfBytes = ConvertHtmlToPdf(htmlContent);
-            
+
             // Obtener el correo del usuario para enviar el comprobante
             var user = await _userManager.FindByIdAsync(usuario.usu_id);
             if (user != null && !string.IsNullOrEmpty(user.Email))
@@ -236,7 +238,7 @@ namespace Marimon.Controllers
                         $"{tipoComprobante.ToLower()}_{comprobante.com_id}.pdf",
                         "application/pdf"
                     );
-                    
+
                     _logger.LogInformation($"Comprobante enviado por correo a {user.Email}");
                 }
                 catch (Exception ex)
@@ -263,7 +265,6 @@ namespace Marimon.Controllers
                 .Include(c => c.Facturas)
                 .FirstOrDefault(c => c.com_id == comprobante.com_id);
 
-
             if (comprobanteCompleto == null || comprobanteCompleto.Venta == null)
                 return "<p>Error: Comprobante no válido.</p>";
 
@@ -275,393 +276,415 @@ namespace Marimon.Controllers
                 .Include(dv => dv.Autoparte)
                 .ToList();
 
-            // Iniciar HTML
-            var htmlContent = $@"
-    <!DOCTYPE html>
-    <html lang='es'>
-    <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>Comprobante Electrónico - Marimon</title>
-        <style>
-            /* Paleta de colores y variables */
-            :root {{
-                --primary-red: #e62020;
-                --red-hover: #c51818;
-                --red-light: #ff6b6b;
-                --dark-black: #121212;
-                --gray-dark: #333333;
-                --gray-medium: #777777;
-                --gray-light: #f1f1f1;
-                --white: #ffffff;
-            }}
-            
-            /* Estilos generales */
-            * {{
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }}
-            
-            body {{
-                font-family: 'Helvetica Neue', Arial, sans-serif;
-                color: var(--dark-black);
-                background-color: var(--white);
-                line-height: 1.6;
-                -webkit-font-smoothing: antialiased;
-            }}
-            
-            /* Contenedor principal */
-            .receipt-container {{
-                max-width: 800px;
-                margin: 0 auto;
-                background: var(--white);
-                border-radius: 8px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-                overflow: hidden;
-                position: relative;
-            }}
-            
-            /* Cinta roja superior */
-            .top-ribbon {{
-                height: 15px;
-                background: linear-gradient(90deg, var(--primary-red) 0%, var(--red-light) 50%, var(--primary-red) 100%);
-                margin-bottom: 0;
-            }}
-            
-            /* Encabezado */
-            .receipt-header {{
-                background-color: var(--dark-black);
-                color: var(--white);
-                padding: 25px 30px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                position: relative;
-            }}
-            
-            /* Contenedor del logo */
-            .logo-container {{
-                display: flex;
-                align-items: center;
-            }}
-            
-            .logo-container img {{
-                height: 60px;
-                width: auto;
-                margin-right: 15px;
-                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-            }}
-            
-            .company-name {{
-                font-size: 26px;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: 2px;
-                color: var(--white);
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            }}
-            
-            /* Título del comprobante */
-            .receipt-title {{
-                font-size: 20px;
-                font-weight: 700;
-                background-color: var(--primary-red);
-                color: var(--white);
-                padding: 10px 20px;
-                border-radius: 4px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                margin-left: 20px;
-            }}
-            
-            /* Contenido principal */
-            .receipt-content {{
-                padding: 30px;
-            }}
-            
-            /* Información de comprobante */
-            .receipt-info {{
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 30px;
-                margin-bottom: 30px;
-                background-color: var(--gray-light);
-                padding: 20px;
-                border-radius: 8px;
-                position: relative;
-            }}
-            
-            .receipt-info::before {{
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                width: 6px;
-                background-color: var(--primary-red);
-                border-top-left-radius: 8px;
-                border-bottom-left-radius: 8px;
-            }}
-            
-            .receipt-info-column {{
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-            }}
-            
-            .receipt-info-item {{
-                display: flex;
-                align-items: baseline;
-                font-size: 15px;
-            }}
-            
-            .receipt-info-item strong {{
-                color: var(--primary-red);
-                font-weight: 600;
-                min-width: 180px;
-                display: inline-block;
-            }}
-            
-            /* Sección de detalles de compra */
-            .purchase-details {{
-                margin: 30px 0;
-            }}
-            
-            .section-title {{
-                font-size: 20px;
-                color: var(--dark-black);
-                margin-bottom: 20px;
-                border-bottom: 3px solid var(--primary-red);
-                padding-bottom: 8px;
-                display: inline-block;
-                position: relative;
-            }}
-            
-            /* Tabla de productos */
-            table {{
-                width: 100%;
-                border-collapse: collapse;
-                margin: 20px 0;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-                font-size: 15px;
-            }}
-            
-            thead {{
-                background: linear-gradient(90deg, var(--dark-black) 0%, var(--gray-dark) 100%);
-                color: var(--white);
-            }}
-            
-            th {{
-                padding: 15px;
-                text-align: left;
-                font-weight: 600;
-                text-transform: uppercase;
-                font-size: 14px;
-                letter-spacing: 0.5px;
-            }}
-            
-            td {{
-                padding: 15px;
-                border-bottom: 1px solid var(--gray-light);
-            }}
-            
-            tr:nth-child(even) {{
-                background-color: var(--gray-light);
-            }}
-            
-            tr:hover {{
-                background-color: rgba(230, 32, 32, 0.05);
-            }}
-            
-            /* Fila de total */
-            .total-row {{
-                font-weight: bold;
-                font-size: 18px;
-                background-color: var(--white) !important;
-            }}
-            
-            .total-row td {{
-                padding: 20px 15px;
-                border-top: 2px solid var(--primary-red);
-                border-bottom: none;
-            }}
-            
-            .total-row .total-label {{
-                text-align: right;
-                color: var(--dark-black);
-            }}
-            
-            .total-row .total-value {{
-                color: var(--primary-red);
-                font-size: 20px;
-                font-weight: 700;
-            }}
-            
-            /* Pie de página */
-            .receipt-footer {{
-                margin-top: 40px;
-                padding: 25px 30px;
-                text-align: center;
-                background-color: var(--gray-light);
-                color: var(--gray-medium);
-                font-size: 14px;
-                border-top: 1px solid #ddd;
-                position: relative;
-            }}
-            
-            /* Sello y códigos */
-            .receipt-stamp {{
-                text-align: center;
-                margin: 25px 0;
-                opacity: 0.6;
-            }}
-            
-            .barcode {{
-                text-align: center;
-                margin: 30px 0 15px;
-            }}
-            
-            .barcode-img {{
-                max-width: 90%;
-                height: 40px;
-                filter: grayscale(100%);
-                opacity: 0.8;
-            }}
-            
-            .document-id {{
-                text-align: center;
-                font-size: 12px;
-                color: var(--gray-medium);
-                letter-spacing: 1px;
-                font-family: monospace;
-            }}
-            
-            /* Cinta roja inferior */
-            .bottom-ribbon {{
-                height: 15px;
-                background: linear-gradient(90deg, var(--primary-red) 0%, var(--red-light) 50%, var(--primary-red) 100%);
-                margin-top: 0;
-            }}
-            
-            /* Estilos de impresión */
-            @media print {{
-                body {{
-                    background-color: var(--white);
-                }}
-                
-                .receipt-container {{
-                    box-shadow: none;
-                    border: none;
-                    max-width: 100%;
-                }}
-                
-                .top-ribbon, .bottom-ribbon {{
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
-                }}
-                
-                table {{
-                    box-shadow: none;
-                }}
-            }}
-        </style>
-    </head>
-    <body>
-        <div class='receipt-container'>
-            <div class='top-ribbon'></div>
-            
-            <div class='receipt-header'>
-                <div class='logo-container'>
-                    <img src='https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png' />
-                    <div class='company-name'></div>
-                </div>
-                <div class='receipt-title'>Comprobante Electrónico</div>
-            </div>
-            
-            <div class='receipt-content'>
-                <div class='receipt-info'>
-                    <div class='receipt-info-column'>
-                        <div class='receipt-info-item'><strong>Tipo de comprobante:</strong> {comprobanteCompleto.tipo_comprobante}</div>
-                        <div class='receipt-info-item'><strong>Fecha:</strong> {venta.ven_fecha}</div>
-                        <div class='receipt-info-item'><strong>Venta ID:</strong> {venta.ven_id}</div>
-                    </div>
-                    <div class='receipt-info-column'>";
+            // Obtener el usuario para datos de cliente
+            var usuario = _context.Usuarios.FirstOrDefault(u => u.usu_id == venta.UsuarioId);
 
-            // Datos específicos según tipo
-            if (comprobanteCompleto.tipo_comprobante.ToLower() == "boleta" && comprobanteCompleto.Boletas.Any())
-            {
-                var boleta = comprobanteCompleto.Boletas.First();
-                htmlContent += $@"
-                        <div class='receipt-info-item'><strong>ID Boleta:</strong> {boleta.bol_id}</div>
-                        <div class='receipt-info-item'><strong>Número de Identificación:</strong> {boleta.num_identificacion}</div>";
-            }
-            else if (comprobanteCompleto.tipo_comprobante.ToLower() == "factura" && comprobanteCompleto.Facturas.Any())
+            // Generar número de comprobante formatado
+            string numeroComprobante = $"{(comprobanteCompleto.tipo_comprobante.ToLower() == "factura" ? "F" : "B")}001-{comprobanteCompleto.com_id.ToString("0000000")}";
+
+            // Fecha actual formateada
+            string fechaEmision = DateTime.Now.ToString("dd/MM/yyyy");
+
+            // Calcular IGV (18%)
+            decimal subtotal = Math.Round(venta.Total / 1.18m, 2);
+            decimal igv = Math.Round(venta.Total - subtotal, 2);
+
+            // Iniciar HTML para el comprobante
+            var htmlContent = $@"
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Comprobante Electrónico - Marimon</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }}
+        
+        .container {{
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #000;
+            padding: 15px;
+        }}
+        
+        .header {{
+            margin-bottom: 20px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 10px;
+        }}
+        
+        .header-content {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }}
+        
+        .logo-section {{
+            width: 65%;
+        }}
+        
+        .logo {{
+            max-width: 180px;
+            margin-bottom: 10px;
+        }}
+        
+        .document-section {{
+            width: 30%;
+            text-align: center;
+            border: 2px solid #000;
+            padding: 10px;
+        }}
+        
+        .document-title {{
+            font-weight: bold;
+            font-size: 16px;
+            margin: 5px 0;
+        }}
+        
+        .document-number {{
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px 0;
+        }}
+        
+        .client-info {{
+            display: flex;
+            margin-bottom: 20px;
+        }}
+        
+        .client-info-label {{
+            font-weight: bold;
+            width: 150px;
+        }}
+        
+        .invoice-meta {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }}
+        
+        .invoice-meta td {{
+            border: 1px solid #000;
+            padding: 5px 10px;
+        }}
+        
+        .items-table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }}
+        
+        .items-table th, .items-table td {{
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }}
+        
+        .items-table th {{
+            background-color: #f2f2f2;
+        }}
+        
+        .items-table .description {{
+            text-align: left;
+        }}
+        
+        .totals-table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }}
+        
+        .totals-table td {{
+            padding: 5px 10px;
+            text-align: right;
+        }}
+        
+        .qr-section {{
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }}
+        
+        .qr-box {{
+            width: 120px;
+            height: 120px;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+        
+        .qr-info {{
+            margin-left: 20px;
+        }}
+        
+        .observations {{
+            margin-top: 20px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-size: 11px;
+        }}
+        
+        .center {{
+            text-align: center;
+        }}
+        
+        .right {{
+            text-align: right;
+        }}
+        
+        .amount-in-words {{
+            font-style: italic;
+            margin: 10px 0;
+            border-bottom: 1px solid #000;
+            padding-bottom: 10px;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <div class='header-content'>
+                <div class='logo-section'>
+                    <img src='https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png' alt='Logo Marimon' class='logo'/>
+                    <p>AV. SAN AURELIO N 888 INT B URB AZCARRUNZ - SAN JUAN DE LURIGANCHO - LIMA, LIMA</p>
+                    <p>Teléfono: +51 986418904</p>
+                </div>
+                <div class='document-section'>
+                    <p>RUC: 10403771975</p>
+                    <p class='document-title'>{comprobanteCompleto.tipo_comprobante.ToUpper()} ELECTRÓNICA</p>
+                    <p class='document-number'>{numeroComprobante}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class='client-info'>
+            <div>";
+            // Datos de cliente según tipo de comprobante
+            if (comprobanteCompleto.tipo_comprobante.ToLower() == "factura" && comprobanteCompleto.Facturas.Any())
             {
                 var factura = comprobanteCompleto.Facturas.First();
                 htmlContent += $@"
-                        <div class='receipt-info-item'><strong>Razón Social:</strong> {factura.fac_razonsocial}</div>
-                        <div class='receipt-info-item'><strong>RUC:</strong> {factura.fac_ruc}</div>
-                        <div class='receipt-info-item'><strong>Dirección:</strong> {factura.fac_direccion}</div>";
+                <p><span class='client-info-label'>SEÑOR(es):</span> {factura.fac_razonsocial}</p>
+                <p><span class='client-info-label'>RUC No:</span> {factura.fac_ruc}</p>
+                <p><span class='client-info-label'>RAZÓN SOCIAL:</span> {factura.fac_razonsocial}</p>
+                <p><span class='client-info-label'>DIRECCIÓN:</span> {factura.fac_direccion}</p>";
+            }
+            else if (comprobanteCompleto.tipo_comprobante.ToLower() == "boleta" && comprobanteCompleto.Boletas.Any())
+            {
+                var boleta = comprobanteCompleto.Boletas.First();
+                htmlContent += $@"
+                <p><span class='client-info-label'>SEÑOR(es):</span> {usuario?.usu_nombre} {usuario?.usu_apellido}</p>
+                <p><span class='client-info-label'>DNI No:</span> {boleta.num_identificacion}</p>
+                ";
             }
 
             htmlContent += $@"
-                    </div>
-                </div>
-                
-                <div class='purchase-details'>
-                    <h3 class='section-title'>Detalles de la compra</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Autoparte</th>
-                                <th>Cantidad</th>
-                                <th>Precio Unitario</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>";
+            </div>
+        </div>
+        
+        <table class='invoice-meta'>
+            <tr>
+                <td>Nro INTERNO</td>
+                <td>FECHA EMISIÓN</td>
+                <td>FECHA VENCIMIENTO</td>
+                <td>CONDICIONES</td>
+                <td>GUÍA REMISIÓN</td>
+            </tr>
+            <tr>
+                <td>{venta.ven_id}</td>
+                <td>{fechaEmision}</td>
+                <td>{fechaEmision}</td>
+                <td>CONTADO</td>
+                <td></td>
+            </tr>
+        </table>
+        
+        <table class='items-table'>
+            <thead>
+                <tr>
+                    <th>Cant.</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Pre. Unit.</th>
+                    <th>Sub Total</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>";
 
+            // Detalles de productos
             foreach (var detalle in detallesVenta)
             {
                 var autoparte = detalle.Autoparte;
-                var subtotal = autoparte.aut_precio * detalle.det_cantidad;
+                decimal precioUnitario = Math.Round(autoparte.aut_precio / 1.18m, 2);
+                decimal subTotalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2);
+                decimal totalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2);
 
                 htmlContent += $@"
-                            <tr>
-                                <td>{autoparte.aut_nombre}</td>
-                                <td>{detalle.det_cantidad}</td>
-                                <td>{autoparte.aut_precio:C}</td>
-                                <td>{subtotal:C}</td>
-                            </tr>";
+                <tr>
+                    <td>{detalle.det_cantidad}</td>
+                    <td>{autoparte.aut_id}</td>
+                    <td class='description'>{autoparte.aut_nombre}</td>
+                    <td class='right'>{precioUnitario:N2}</td>
+                    <td class='right'>{subTotalItem:N2}</td>
+                    <td class='right'>{totalItem:N2}</td>
+                </tr>";
             }
 
+            // Convertir a palabras (ejemplo básico)
+            string montoEnPalabras = ConvertirNumeroALetras((double)venta.Total) + " CON " +
+                                     ((int)((venta.Total - Math.Truncate(venta.Total)) * 100)).ToString("00") + "/100 Soles";
+
             htmlContent += $@"
-                            <tr class='total-row'>
-                                <td colspan='3' class='total-label'><strong>Total:</strong></td>
-                                <td class='total-value'>{venta.Total:C}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>               
-                
-                <div class='receipt-footer'>
-                    Este comprobante es generado electrónicamente y no requiere firma o sello.
-                    <div class='receipt-stamp'>
-                        MARIMON AUTOPARTES © {DateTime.Now.Year}
-                    </div>
-                </div>
+            </tbody>
+        </table>
+        
+        <p class='amount-in-words'>SON: {montoEnPalabras}</p>
+        
+        <table class='totals-table'>
+            <tr>
+                <td>SUB TOTAL</td>
+                <td>S/</td>
+                <td>{venta.Total:N2}</td>
+            </tr>
+          
+            <tr>
+                <td><strong>IMPORTE TOTAL</strong></td>
+                <td><strong>S/</strong></td>
+                <td><strong>{venta.Total:N2}</strong></td>
+            </tr>
+        </table>
+        
+        <div class='qr-section'>
+            <div style='flex-grow: 1; padding-left: 20px;'>
+                <p style='margin-top: 0;'><strong>Representación impresa de la {comprobanteCompleto.tipo_comprobante} electrónica</strong></p>
+                <p>Autorizado mediante resolución Nro:</p>
             </div>
-            
-            <div class='bottom-ribbon'></div>
         </div>
-    </body>
-    </html>";
+            
+        <div class='observations'>
+            El {comprobanteCompleto.tipo_comprobante} numero {numeroComprobante}, ha sido aceptada | Hash : djX1dU9cIagNcDqUHUo71ua0vkc=
+        </div>
+    </div>
+</body>
+</html>";
 
             return htmlContent;
+        }
+
+        /// <summary>
+        /// Convierte un número a su expresión en letras
+        /// </summary>
+        private string ConvertirNumeroALetras(double valor)
+        {
+            string Num2Text = "";
+            valor = Math.Truncate(valor);
+            if (valor == 0) Num2Text = "CERO";
+            else if (valor == 1) Num2Text = "UNO";
+            else if (valor == 2) Num2Text = "DOS";
+            else if (valor == 3) Num2Text = "TRES";
+            else if (valor == 4) Num2Text = "CUATRO";
+            else if (valor == 5) Num2Text = "CINCO";
+            else if (valor == 6) Num2Text = "SEIS";
+            else if (valor == 7) Num2Text = "SIETE";
+            else if (valor == 8) Num2Text = "OCHO";
+            else if (valor == 9) Num2Text = "NUEVE";
+            else if (valor == 10) Num2Text = "DIEZ";
+            else if (valor == 11) Num2Text = "ONCE";
+            else if (valor == 12) Num2Text = "DOCE";
+            else if (valor == 13) Num2Text = "TRECE";
+            else if (valor == 14) Num2Text = "CATORCE";
+            else if (valor == 15) Num2Text = "QUINCE";
+            else if (valor < 20) Num2Text = "DIECI" + ConvertirNumeroALetras(valor - 10);
+            else if (valor == 20) Num2Text = "VEINTE";
+            else if (valor < 30) Num2Text = "VEINTI" + ConvertirNumeroALetras(valor - 20);
+            else if (valor == 30) Num2Text = "TREINTA";
+            else if (valor == 40) Num2Text = "CUARENTA";
+            else if (valor == 50) Num2Text = "CINCUENTA";
+            else if (valor == 60) Num2Text = "SESENTA";
+            else if (valor == 70) Num2Text = "SETENTA";
+            else if (valor == 80) Num2Text = "OCHENTA";
+            else if (valor == 90) Num2Text = "NOVENTA";
+            else if (valor < 100)
+            {
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 10) * 10) + " Y " + ConvertirNumeroALetras(valor % 10);
+            }
+            else if (valor == 100) Num2Text = "CIEN";
+            else if (valor < 200) Num2Text = "CIENTO " + ConvertirNumeroALetras(valor - 100);
+            else if ((valor == 200) || (valor == 300) || (valor == 400) || (valor == 600) || (valor == 800))
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 100)) + "CIENTOS";
+            else if (valor == 500) Num2Text = "QUINIENTOS";
+            else if (valor == 700) Num2Text = "SETECIENTOS";
+            else if (valor == 900) Num2Text = "NOVECIENTOS";
+            else if (valor < 1000)
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 100) * 100) + " " + ConvertirNumeroALetras(valor % 100);
+            else if (valor == 1000) Num2Text = "MIL";
+            else if (valor < 2000) Num2Text = "MIL " + ConvertirNumeroALetras(valor % 1000);
+            else if (valor < 1000000)
+            {
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 1000)) + " MIL";
+                if ((valor % 1000) > 0) Num2Text += " " + ConvertirNumeroALetras(valor % 1000);
+            }
+            else if (valor == 1000000) Num2Text = "UN MILLON";
+            else if (valor < 2000000) Num2Text = "UN MILLON " + ConvertirNumeroALetras(valor % 1000000);
+            else if (valor < 1000000000000)
+            {
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 1000000)) + " MILLONES";
+                if ((valor % 1000000) > 0) Num2Text += " " + ConvertirNumeroALetras(valor % 1000000);
+            }
+            return Num2Text;
+        }
+
+        /// <summary>
+        /// Genera un código QR para el comprobante
+        /// </summary>
+        private string GenerateQRCode(Comprobante comprobante, Venta venta)
+        {
+            // Nota: Para implementar esto correctamente, necesitarás agregar la librería QRCoder a tu proyecto
+            // Instalar vía NuGet: Install-Package QRCoder
+
+            try
+            {
+                // Datos que irán en el QR según formato SUNAT
+                string qrData = $"10403771975|" +  // RUC de la empresa
+                              $"{comprobante.tipo_comprobante}|" +  // Tipo de documento
+                              $"F001-{comprobante.com_id.ToString("0000000")}|" +  // Número de comprobante
+                              $"{venta.Total}|" +  // Monto total
+                              $"{DateTime.Now.ToString("yyyy-MM-dd")}";  // Fecha de emisión
+
+                // Si tienes la librería QRCoder, descomenta este código:
+                /*
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(qrData, QRCodeGenerator.ECCLevel.Q);
+                QRCode qrCode = new QRCode(qrCodeData);
+
+                using (Bitmap qrBitmap = qrCode.GetGraphic(20))
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        qrBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        byte[] byteImage = ms.ToArray();
+                        return "data:image/png;base64," + Convert.ToBase64String(byteImage);
+                    }
+                }
+                */
+
+                // Mientras tanto, usamos un QR estático de ejemplo
+                return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHQAAAB0CAYAAABUmhYnAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAO2SURBVHhe7ZzdbQIxEEa9QAE0QB9UQB/0QR80QSMIKXs5S/ZHiJKJDYxn7Mv3SMdK9ica3tmVj92c4HQ6fS2qqmrRNJQWTUNp0TSUFk1DadE0lBZNQ2nRNJQWTUNp0TSUFk1DadE0lBZNQ2nRNJQWTUNp0TSUFk1DadE0lBZNQ2nRNJQWTUNp0TSUFk1DadE0lBZNQ2nRNJQWTUNp0TSUFk1DadE0lBZNQ2nRNJSSod+fJw/y9PJ4Rr38eJGsofbwuJLhQTp/KRwvFBxaJXm9pfoJkDS0DZzPLxAcPIgHlsYG2wObNDTK78AXCvzVnARPGhrl1+cNCLfzCnSZuXMz6XK7wBcLDi1gZWA4NlS53ZcpGTq4XG4XdwsO3o8NVm6XlzK0PrhebnS5zyvxo9wuL2XowHK5UWAvsGxomJDlShn6d7nR34fHNFdC0tDB7XKj+NHupkO5f7OShg6cLnfvgUlDB6fL3XNgylDBcblRlrjcPQcmDRX2HnjXcncdmDZU2HrgnQfeeWDaUGHrgXceuPGgbKiw5cA7D9x8UNpQ4daDdh649aDCpqHCrQduO2jHQZVNQ4VbD7zzwF0HFTYNFbYcuPOgnQdVNg8Vthx414G7DipsGipcc+C+g+66vP+w5gkMQ4VrD7z7wGua8LRmCRxDhb0G3tqEpzVL4BgqXHvgEQOvbcLTmiVwDBU8Bx75N1h7WrMEnqGC58AjBl7ThKc1S+AZKlw88MAmnK1ZAs9QwWvgUU04W7MErqHCpYGHNuFszRK4hgoeA49owdmaJfANFS4NPLAJb2uWwDdU8Bh4RAvO1iyBc6hw7sADm/C2Zgl8QwWPgUe04G3NEvwxVPAYeEQL3tYsgXOocG7goU34W7MEzqGCx8AjWvC2Zgm8QwWPgUe04G3NErwxVLh34F4t+FuzBN6hgsfAI1rwt2YZBDRU8Bi4VwsR1iyDgIYK9ww8oIUYa5ZBQEMFj4F7tRBhzTKIaKjgMXCvFiKsWQYRDRU8Bu7VQoQ1yyCkoYLHwL1aiLBmGUQ0VPAYuFcLEdYsg5CGCvcM3L+FGGuWQUhDBY+B+7cQY80yCGmo4DFw/xZirFkGMQ0VPAbu30KMNcsgpqGCx8D9W4ixZhnnhgpbDWzbQpQ1y7g0VNhqYNsWoqxZxntDha0Gtm0hypplvDdU2Gpg2xairFnGpaHCVgPbthBlzbIIaqiw1cC2LURZs6yChgoeDWzVQpw1y9JQWjQNpUXTUFo0DaVF01BaNA2lRdNQWjQNpUXTUFo0DaVF01BSjl8/cj1+fFRMvAAAAABJRU5ErkJggg==";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error generando QR: {ex.Message}");
+                return "";
+            }
         }
 
 

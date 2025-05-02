@@ -26,17 +26,25 @@ namespace Marimon.Controllers
         public async Task<IActionResult> Index(string buscar)
         {
             var autopartesQuery = _context.Autopartes
-                .Include(a => a.Categoria)
-                .OrderBy(a => a.aut_id)
-                .AsQueryable();
+            .Include(a => a.Categoria)
+            .OrderBy(a => a.aut_id);
+
+            List<Autoparte> autopartes;
 
             if (!string.IsNullOrEmpty(buscar))
             {
-                autopartesQuery = autopartesQuery
-                    .Where(a => EF.Functions.ILike(a.aut_nombre, $"%{buscar}%"));
-            }
+                var textoBusqueda = NormalizarTexto(buscar);
 
-            var autopartes = await autopartesQuery.ToListAsync();
+                // Trae los datos a memoria y luego filtra
+                autopartes = await autopartesQuery.ToListAsync();
+                autopartes = autopartes
+                    .Where(a => NormalizarTexto(a.aut_nombre).Contains(textoBusqueda))
+                    .ToList();
+            }
+            else
+            {
+                autopartes = await autopartesQuery.ToListAsync();
+            }
 
             // Obtener el ID del usuario autenticado (ajusta según tu lógica)
             var usuarioId = User.Identity.Name;
@@ -53,9 +61,24 @@ namespace Marimon.Controllers
                 Carrito = carrito
             };
             ViewBag.Carrito = carrito;
-            return View(model);        
+            return View(model);
         }
+        private static string NormalizarTexto(string texto)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return string.Empty;
 
+            var normalized = texto.ToLower().Normalize(System.Text.NormalizationForm.FormD);
+            var sb = new System.Text.StringBuilder();
+
+            foreach (var c in normalized)
+            {
+                var uc = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (uc != System.Globalization.UnicodeCategory.NonSpacingMark)
+                    sb.Append(c);
+            }
+            return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
 
         // GET: Catalogo/DetalleAutoparte/5
         public async Task<IActionResult> DetalleAutoparte(int id)
