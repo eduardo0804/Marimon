@@ -7,10 +7,13 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using Marimon.Data;
 using Marimon.Models;
+using Marimon.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+
 
 namespace Marimon.Controllers
 {
@@ -22,18 +25,21 @@ namespace Marimon.Controllers
 
         private readonly IConverter _converter;
 
+         private readonly IEmailSenderWithAttachments _emailSender; // Cambio aquí
 
 
-        public ComprobanteController(ApplicationDbContext context, ILogger<ComprobanteController> logger, UserManager<IdentityUser> userManager, IConverter converter)
+
+        public ComprobanteController(ApplicationDbContext context, ILogger<ComprobanteController> logger, UserManager<IdentityUser> userManager, IConverter converter, IEmailSenderWithAttachments emailSender)
         {
             _converter = converter;
             _logger = logger;
             _userManager = userManager;
             _context = context;
-        }
+            _emailSender = emailSender;
+        }   
 
 
-
+        
         public async Task<IActionResult> Index()
         {
             var identityUserId = _userManager.GetUserId(User);
@@ -188,8 +194,61 @@ namespace Marimon.Controllers
             await _context.SaveChangesAsync();
 
             // Generar el PDF
-            var htmlContent = GenerateComprobanteHtml(comprobante); // Función que creas para generar el HTML de comprobante
+            var htmlContent = GenerateComprobanteHtml(comprobante);
             var pdfBytes = ConvertHtmlToPdf(htmlContent);
+            
+            // Obtener el correo del usuario para enviar el comprobante
+            var user = await _userManager.FindByIdAsync(usuario.usu_id);
+            if (user != null && !string.IsNullOrEmpty(user.Email))
+            {
+                try
+                {
+                    // Crear el correo con el PDF como adjunto
+                    var nombreCompleto = usuario.usu_nombre + " " + usuario.usu_apellido;
+                    var emailHtmlBody = $@"
+                    <html>
+                    <body style='font-family: Arial, sans-serif; line-height: 1.6;'>
+                        <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;'>
+                            <div style='text-align: center; margin-bottom: 20px;'>
+                                <img src='https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png' alt='Marimon Logo' style='max-width: 200px;' />
+                            </div>
+                            <h2 style='color: #e62020;'>¡Gracias por tu compra!</h2>
+                            <p>Hola <strong>{nombreCompleto}</strong>,</p>
+                            <p>Adjunto encontrarás tu comprobante de compra en formato PDF. Este documento sirve como constancia oficial de tu adquisición en Marimon Autopartes.</p>
+                            <p>Si tienes alguna pregunta sobre tu compra, no dudes en contactarnos respondiendo a este correo o llamando a nuestro servicio de atención al cliente.</p>
+                            <p>¡Gracias por confiar en nosotros!</p>
+                            <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #777; font-size: 0.9em;'>
+                                <p>Marimon Autopartes</p>
+                                <p>Teléfono: (01) 123-4567</p>
+                                <p>Email: ventas@marimonperu.com</p>
+                                <p>Web: <a href='https://marimonperu.com'>marimonperu.com</a></p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>";
+
+                    // Aquí está el cambio: utilizamos el método con soporte para adjuntos
+                    await _emailSender.SendEmailWithAttachmentAsync(
+                        user.Email,
+                        $"Tu {tipoComprobante} de compra - Marimon Autopartes",
+                        emailHtmlBody,
+                        pdfBytes,
+                        $"{tipoComprobante.ToLower()}_{comprobante.com_id}.pdf",
+                        "application/pdf"
+                    );
+                    
+                    _logger.LogInformation($"Comprobante enviado por correo a {user.Email}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error al enviar el comprobante por correo: {ex.Message}");
+                    // Continuar aunque falle el envío
+                }
+            }
+            else
+            {
+                _logger.LogWarning($"No se pudo enviar el comprobante por correo. Usuario ID: {usuario.usu_id}");
+            }
 
             // Retornar el PDF
             return File(pdfBytes, "application/pdf", "comprobante.pdf");

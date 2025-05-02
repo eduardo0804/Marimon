@@ -59,7 +59,9 @@ builder.Services.AddAuthentication()
 
 // Configuración del servicio de email
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddTransient<IEmailSender, EmailSenderWithAttachments>();
+// Registrar la implementación extendida como IEmailSenderWithAttachments
+builder.Services.AddTransient<IEmailSenderWithAttachments, EmailSenderWithAttachments>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
