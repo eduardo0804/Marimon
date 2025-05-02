@@ -92,7 +92,32 @@
         </div>
     </div>
 </div>
-
+<!-- Botones de Navegación -->
+<div class="row mt-4 mb-4">
+    <div class="col-12 d-flex justify-content-center">
+        <nav aria-label="Navegación de páginas">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link"
+                        href="@Url.Action("Index", "Catalogo", new { pagina = ViewBag.PaginaActual > 1 ? ViewBag.PaginaActual - 1 : 1, buscar = Context.Request.Query["buscar"] })"
+                        aria-label="Anterior">
+                        <span aria-hidden="true">&laquo; Anterior</span>
+                        <span class="sr-only">Anterior</span>
+                    </a>
+                </li>
+               
+                <li class="page-item">
+                    <a class="page-link"
+                        href="@Url.Action("Index", "Catalogo", new { pagina = (ViewBag.PaginaActual ?? 1) + 1, buscar = Context.Request.Query["buscar"] })"
+                        aria-label="Siguiente">
+                        <span aria-hidden="true">&raquo; Siguiente</span>
+                        <span class="sr-only">Siguiente</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
 <!-- Alerta Carrito-->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
     <div id="toastCarrito" class="toast align-items-center text-white bg-success border-0" role="alert"
