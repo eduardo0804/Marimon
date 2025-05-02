@@ -33,7 +33,7 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
         public List<Reserva> ReservasUsuario { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
-        
+
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -47,6 +47,39 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
                 .Include(r => r.Servicio) // Incluir información del servicio relacionado
                 .ToListAsync();
             return Page();
+        }
+        public async Task<IActionResult> OnPostCancelarCitaAsync(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"No se pudo cargar el usuario con ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            // Buscar la reserva por ID y verificar que pertenezca al usuario actual
+            var reserva = await _context.Reserva
+                .FirstOrDefaultAsync(r => r.res_id == id && r.UsuarioId == user.Id);
+
+            if (reserva == null)
+            {
+                TempData["Error"] = "No se encontró la cita especificada o no tienes permiso para eliminarla.";
+                return RedirectToPage();
+            }
+
+            try
+            {
+                _context.Reserva.Remove(reserva);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "La cita se eliminó correctamente.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar la reserva {ReservaId}", id);
+                TempData["Error"] = "Ocurrió un error al eliminar la cita. Por favor, intenta nuevamente.";
+            }
+
+            return RedirectToPage();
         }
     }
 }
