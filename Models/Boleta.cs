@@ -16,5 +16,7 @@ namespace Marimon.Models
         [ForeignKey("ComprobanteId")]
         public Comprobante? Comprobante { get; set; }
 
+        public string num_identificacion { get; set; } 
+
     }
 }

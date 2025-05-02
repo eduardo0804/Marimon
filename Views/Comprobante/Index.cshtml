@@ -59,7 +59,6 @@
             <i class="bi bi-shield-check fs-4"></i>
             <span class="fw-semibold">Compra Segura</span>
         </div>
-            
     </div>
 
     <div class="mb-4">
@@ -175,9 +174,14 @@
         campos.razonSocial.disabled = esBoleta;
         campos.ruc.disabled = esBoleta;
         campos.direccion.disabled = esBoleta;
+
+        // Limpiar campos tipo documento y número si se selecciona factura
+        if (!esBoleta) {
+            campos.tipoDocumento.selectedIndex = 0;
+            campos.numeroDocumento.value = '';
+        }
     }
 
-    
     boletaRadio.addEventListener('change', actualizarCampos);
     facturaRadio.addEventListener('change', actualizarCampos);
     window.addEventListener('DOMContentLoaded', actualizarCampos);

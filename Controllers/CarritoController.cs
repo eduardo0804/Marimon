@@ -186,7 +186,6 @@ namespace Marimon.Controllers
         }
 
 
-        // Acción para eliminar un producto del carrito
         [HttpPost]
         public async Task<IActionResult> EliminarProducto([FromBody] EliminarProductoRequest request)
         {
@@ -208,7 +207,16 @@ namespace Marimon.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                return Json(new { total = carrito.car_total });
+                // Verificar si el carrito quedó vacío
+                if (!carrito.CarritoAutopartes.Any())
+                {
+                    _context.Carritos.Remove(carrito);
+                    await _context.SaveChangesAsync();
+
+                    return Json(new { total = 0, carritoEliminado = true });
+                }
+
+                return Json(new { total = carrito.car_total, carritoEliminado = false });
             }
             catch (Exception ex)
             {
@@ -216,7 +224,5 @@ namespace Marimon.Controllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-
-        
     }
 }
