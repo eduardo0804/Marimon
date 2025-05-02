@@ -1,45 +1,66 @@
 @model IEnumerable<Marimon.Models.Servicio>
+
 @{
-    Layout = "~/Views/Shared/_LayoutServicio.cshtml";
+    ViewData["Title"] = "Registrar Servicio";
+    Layout = "_LayoutAdmin";
 }
-<link href="/css/personalservicio.css" rel="stylesheet" type="text/css">
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success success-message position-fixed" role="alert">
-        <strong>Éxito</strong>: @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
+<link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
+
+<div class="container py-4">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success text-white">
+                    <strong class="me-auto">Éxito</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    @TempData["SuccessMessage"]
+                </div>
+            </div>
+        }
     </div>
-}
 
-<div class="container-fluid px-0">
-    <div class="row align-items-center bg-white py-4 px-4">
-        <div class="col-md-3 text-center">
-            <img src="/images/auto-rojo.png" alt="Auto" class="img-fluid" style="max-height: 200px;" />
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6 text-center">
+            <img src="~/images/auto-rojo.png" alt="Auto" class="img-fluid" style="max-height: 200px;" />
         </div>
-        <div class="col-md-9">
-            <h2 class="fw-bold">Resgritro de Nuevo Servicio</></h2>
-            <p class="fs-5 text-muted">
-                Administra y organiza los servicios automotrices registrados. Registra nuevos servicios para mantener tu catálogo actualizado y ofrecer una mejor experencia a tus clientes.
+        <div class="col-md-6">
+            <h2 class="fw-bold">Registro de Nuevo Servicio</h2>
+            <p class="text-muted">
+                Administra y organiza los servicios automotrices registrados. Registra nuevos servicios para mantener tu catálogo actualizado y ofrecer una mejor experiencia a tus clientes.
             </p>
-            <button class="btn btn-danger text-white fw-bold" data-bs-toggle="modal" data-bs-target="#modalCrearServicio">
-                <i class="fa fa-plus"></i> Agregar Servicio
-            </button>
         </div>
     </div>
 
+    <div class="mb-3">
+        <button class="btn-registrar" data-bs-toggle="modal" data-bs-target="#modalCrearServicio">
+            <i class="fas fa-plus-circle me-2"></i>Agregar Servicio
+        </button>
+    </div>
+
+    <!-- Modal para crear servicio -->
     <div class="modal fade" id="modalCrearServicio" tabindex="-1" aria-labelledby="modalCrearServicioLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                @await Html.PartialAsync("CrearForm", new Marimon.Models.Servicio())
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Servicio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    @await Html.PartialAsync("CrearForm", new Marimon.Models.Servicio())
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row px-4 mt-4">
-        <div class="col-12">
-            <table class="table table-bordered align-middle">
-                <thead class="bg-black text-white">
+    <!-- Tabla de servicios -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
                     <tr>
                         <th>ID</th>
                         <th>Imagen</th>
@@ -52,22 +73,24 @@
                     {
                         foreach (var servicio in Model)
                         {
-                            <tr>
-                                <td>@servicio.ser_id</td>
-                                <td>
+                            <tr class="table-row">
+                                <td data-label="ID">@servicio.ser_id</td>
+                                <td data-label="Imagen">
                                     @if (!string.IsNullOrEmpty(servicio.ser_imagen))
                                     {
-                                        <img src="@servicio.ser_imagen" alt="Imagen Servicio" style="max-width: 60px; max-height: 60px;" />
+                                        <div class="image-container">
+                                            <img src="@servicio.ser_imagen" alt="Imagen Servicio" class="table-image" />
+                                        </div>
                                     }
                                     else
                                     {
-                                        <div class="bg-light border text-center" style="width:60px;height:60px;line-height:60px;">
-                                            Sin<br />img
-                                        </div>
+                                        <span class="no-image"><i class="fas fa-image"></i> Sin imagen</span>
                                     }
                                 </td>
-                                <td class="fw-bold">@servicio.ser_nombre</td>
-                                <td>@servicio.ser_descripcion</td>
+                                    <td data-label="Nombre" class="fw-bold text-wrap">@servicio.ser_nombre</td>
+                                        <td data-label="Descripción" class="text-wrap">
+                                        @servicio.ser_descripcion
+                                    </td>
                             </tr>
                         }
                     }
@@ -83,15 +106,27 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const successMessage = document.querySelector(".success-message");
-        if (successMessage) {
-            setTimeout(() => {
-                successMessage.classList.add("hide");
-                setTimeout(() => successMessage.remove(), 500);
-            }, 10000);
-        }
-    });
-</script>
-<script src="~/js/home.js" asp-append-version="true"></script>
+@section Scripts {
+    <script>
+        // Añadir tooltip para las descripciones largas
+        document.querySelectorAll('.td-description').forEach(cell => {
+            const content = cell.querySelector('.description-content');
+            const tooltip = cell.querySelector('.description-tooltip');
+            
+            if (content && tooltip && content.offsetWidth < content.scrollWidth) {
+                tooltip.style.display = 'block';
+            } else if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Ocultar automáticamente la notificación después de 10 segundos
+        setTimeout(() => {
+            const toast = document.querySelector('.toast');
+            if (toast) {
+                const bsToast = bootstrap.Toast.getOrCreateInstance(toast);
+                bsToast.hide();
+            }
+        }, 10000);
+    </script>
+}

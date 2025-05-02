@@ -18,6 +18,11 @@ header {
   position: relative;
 }
 
+.text-wrap {
+  white-space: normal !important;
+  word-break: break-word;
+}
+
 /* Logo */
 .logo-contenedor {
   display: flex;
