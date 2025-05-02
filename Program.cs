@@ -6,7 +6,12 @@ using Marimon.Services;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Http; // Necesario para SameSiteMode
+using Microsoft.AspNetCore.Http;
+using DinkToPdf.Contracts;
+using DinkToPdf;
+using System.Runtime.Loader;
+using System.Reflection;
+using Marimon.Helpers; // Necesario para SameSiteMode
 
 var builder = WebApplication.CreateBuilder(args);
 // Configuración de PostgreSQL
@@ -66,7 +71,13 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Necesario para que no lo bloquee la política de cookies
 });
 
+// Configura DinkToPdf converter con el DLL cargado
+var context = new CustomAssemblyLoadContext();
+var path = Path.Combine(AppContext.BaseDirectory, "libwkhtmltox.dll");
+context.LoadUnmanagedLibrary(path);
 
+// Registra el converter como singleton (para inyectar en controladores si quieres)
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 // Protección de datos persistente en carpeta del contenedor
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))

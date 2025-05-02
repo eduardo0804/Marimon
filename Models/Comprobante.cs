@@ -17,8 +17,8 @@ namespace Marimon.Models
         [ForeignKey("VentaId")]
         public Venta? Venta { get; set; }
 
-        ICollection<Boleta>? Boletas { get; set; } = new List<Boleta>();
-        ICollection<Factura>? Facturas { get; set; } = new List<Factura>();
+        public ICollection<Boleta>? Boletas { get; set; } = new List<Boleta>();
+        public ICollection<Factura>? Facturas { get; set; } = new List<Factura>();
 
     }
 }

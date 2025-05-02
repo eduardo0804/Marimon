@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Marimon.Data;
 using Marimon.Models;
 using Microsoft.AspNetCore.Identity;
@@ -18,14 +20,18 @@ namespace Marimon.Controllers
         private readonly ILogger<ComprobanteController> _logger;
         private readonly UserManager<IdentityUser> _userManager;
 
+        private readonly IConverter _converter;
 
 
-        public ComprobanteController(ApplicationDbContext context, ILogger<ComprobanteController> logger, UserManager<IdentityUser> userManager)
+
+        public ComprobanteController(ApplicationDbContext context, ILogger<ComprobanteController> logger, UserManager<IdentityUser> userManager, IConverter converter)
         {
-            _context = context;
-            _userManager = userManager;
+            _converter = converter;
             _logger = logger;
+            _userManager = userManager;
+            _context = context;
         }
+
 
 
         public async Task<IActionResult> Index()
@@ -157,7 +163,129 @@ namespace Marimon.Controllers
             _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
             await _context.SaveChangesAsync();
 
-            return Ok("Venta y comprobante registrados correctamente.");
+            // Generar el PDF
+            var htmlContent = GenerateComprobanteHtml(comprobante); // Función que creas para generar el HTML de comprobante
+            var pdfBytes = ConvertHtmlToPdf(htmlContent);
+
+            // Retornar el PDF
+            return File(pdfBytes, "application/pdf", "comprobante.pdf");
+        }
+
+        private string GenerateComprobanteHtml(Comprobante comprobante)
+        {
+            // Cargar comprobante con relaciones necesarias
+            var comprobanteCompleto = _context.Comprobante
+                .Include(c => c.Venta)
+                .Include(c => c.Boletas)
+                .Include(c => c.Facturas)
+                .FirstOrDefault(c => c.com_id == comprobante.com_id);
+
+
+            if (comprobanteCompleto == null || comprobanteCompleto.Venta == null)
+                return "<p>Error: Comprobante no válido.</p>";
+
+            var venta = comprobanteCompleto.Venta;
+
+            // Obtener detalles de venta
+            var detallesVenta = _context.DetalleVentas
+                .Where(dv => dv.VentaId == venta.ven_id)
+                .Include(dv => dv.Autoparte)
+                .ToList();
+
+            // Iniciar HTML
+            var htmlContent = $@"
+                <html>
+                <head>
+                    <title>Comprobante de Pago</title>
+                    <link rel='stylesheet' href='/css/comprobante.css' />
+                </head>
+                <header class='comprobante-info'>
+                    <img src='/images/logo_marimon.png' alt='Logo de la Empresa' />
+                    <h1>Comprobante Electrónico - Marimon</h1>
+                </header>
+                <body>
+                    <p><strong>Tipo de comprobante:</strong> {comprobanteCompleto.tipo_comprobante}</p>
+                    <p><strong>Fecha:</strong> {venta.ven_fecha}</p>
+                    <p><strong>Venta ID:</strong> {venta.ven_id}</p>";
+
+                        // Datos específicos según tipo
+                        if (comprobanteCompleto.tipo_comprobante.ToLower() == "boleta" && comprobanteCompleto.Boletas.Any())
+                        {
+                            var boleta = comprobanteCompleto.Boletas.First();
+                            htmlContent += $@"
+                    <p><strong>ID Boleta:</strong> {boleta.bol_id}</p>
+                    <p><strong>Número de Identificación:</strong> {boleta.num_identificacion}</p>";
+                        }
+                        else if (comprobanteCompleto.tipo_comprobante.ToLower() == "factura" && comprobanteCompleto.Facturas.Any())
+                        {
+                            var factura = comprobanteCompleto.Facturas.First();
+                            htmlContent += $@"
+                    <p><strong>Razón Social:</strong> {factura.fac_razonsocial}</p>
+                    <p><strong>RUC:</strong> {factura.fac_ruc}</p>
+                    <p><strong>Dirección:</strong> {factura.fac_direccion}</p>";
+                        }
+
+                        // Tabla de productos
+                        htmlContent += $@"
+                    <h3>Detalles de la compra:</h3>
+                    <table border='1' cellpadding='5'>
+                        <thead>
+                            <tr>
+                                <th>Autoparte</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
+
+                        foreach (var detalle in detallesVenta)
+                        {
+                            var autoparte = detalle.Autoparte;
+                            var subtotal = autoparte.aut_precio * detalle.det_cantidad;
+
+                            htmlContent += $@"
+                        <tr>
+                            <td>{autoparte.aut_nombre}</td>
+                            <td>{detalle.det_cantidad}</td>
+                            <td>{autoparte.aut_precio:C}</td>
+                            <td>{subtotal:C}</td>
+                        </tr>";
+                        }
+
+                        htmlContent += $@"
+                        </tbody>
+                    </table>
+                    <p><strong>Total:</strong> {venta.Total:C}</p>
+                    <footer>
+                    Este comprobante es generado electrónicamente y no requiere firma o sello.
+                </footer>
+                </body>
+                </html>";
+            return htmlContent;
+        }
+
+
+
+        private byte[] ConvertHtmlToPdf(string htmlContent)
+        {
+
+            var doc = new HtmlToPdfDocument()
+            {
+                GlobalSettings = {
+            ColorMode = ColorMode.Color,
+            Orientation = Orientation.Portrait,
+            PaperSize = PaperKind.A4
+        },
+                Objects = {
+            new ObjectSettings() {
+                HtmlContent = htmlContent,
+                WebSettings = { DefaultEncoding = "utf-8" }
+            }
+        }
+            };
+
+            return _converter.Convert(doc);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
