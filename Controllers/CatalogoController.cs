@@ -24,58 +24,46 @@ namespace Marimon.Controllers
         }
 
         // GET: Catalogo/Index
-        public async Task<IActionResult> Index(string buscar)
+        public IActionResult Index(string buscar, int pagina = 1)
         {
-            var autopartesQuery = _context.Autopartes
-                .Include(a => a.Categoria)
-                .OrderBy(a => a.aut_id)
-                .AsQueryable();
+            const int PaginasPorPagina = 12;  // Número de autopartes por página
 
+            // Consulta base para las autopartes
+            var autopartesQuery = _context.Autopartes.AsQueryable();
+
+            // Filtro por búsqueda
             if (!string.IsNullOrEmpty(buscar))
             {
-                var normalizado = buscar.ToLower().Normalize(NormalizationForm.FormD);
-                var sb = new StringBuilder();
-
-                foreach (var c in normalizado)
-                {
-                    if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-                        sb.Append(c);
-                }
-
-                normalizado = sb.ToString();
-
                 autopartesQuery = autopartesQuery
-                    .Where(a => EF.Functions.ILike(
-                        ApplicationDbContext.Unaccent(a.aut_nombre),
-                        $"%{normalizado}%"
-                    ));
+                    .Where(a => EF.Functions.ILike(ApplicationDbContext.Unaccent(a.aut_nombre), $"%{buscar}%"));
             }
 
-            // Verificar si no hay resultados
-            if (!autopartesQuery.Any())
-            {
-                // Aquí se puede poner el mensaje de "No se encontró ninguna autoparte"
-                ViewBag.Mensaje = "No se encontró ninguna autoparte";
-            }
+            // Obtener el total de registros
+            var totalAutopartes = autopartesQuery.Count();
 
-            var autopartes = await autopartesQuery.ToListAsync();
+            // Obtener las autopartes para la página actual
+            var autopartes = autopartesQuery
+                .Skip((pagina - 1) * PaginasPorPagina)
+                .Take(PaginasPorPagina)
+                .ToList();
 
-            // Obtener el ID del usuario autenticado (ajusta según tu lógica)
-            var usuarioId = User.Identity.Name;
+            // Calcular cuántas páginas hay
+            var totalPaginas = (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
 
-            var carrito = await _context.Carritos
-                .Include(c => c.CarritoAutopartes)
-                .ThenInclude(cp => cp.Autoparte)
-                .ThenInclude(a => a.Categoria)
-                .FirstOrDefaultAsync(c => c.UsuarioId == usuarioId);
+            // Obtener el carrito (esto puede depender de tu implementación, por ejemplo, desde la sesión o la base de datos)
+            var carrito = _context.Carritos.FirstOrDefault(c => c.UsuarioId == User.Identity.Name); // Ejemplo de cómo obtener el carrito
 
-            var model = new CatalogoViewModel
+            // Crear el modelo para la vista
+            var viewModel = new CatalogoViewModel
             {
                 Autopartes = autopartes,
-                Carrito = carrito
+                Carrito = carrito,
+                PaginaActual = pagina,
+                TotalPaginas = totalPaginas,
+                Buscar = buscar
             };
-            ViewBag.Carrito = carrito;
-            return View(model);
+
+            return View(viewModel);
         }
 
 
