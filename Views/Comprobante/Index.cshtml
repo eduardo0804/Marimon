@@ -49,29 +49,28 @@
         opacity: 0.7;
     }
 </style>
-
-<div class="container my-5">
-    <div class="row align-items-center mb-4">
-        <div class="col-md-6 text-start">
-            <h2 class="fw-bold text-dark">Finaliza tu Compra</h2>
+<form action="@Url.Action("RegistrarComprobante", "Comprobante")" method="post">
+    <div class="container my-5">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-6 text-start">
+                <h2 class="fw-bold text-dark">Finaliza tu Compra</h2>
+            </div>
+            <div class="col-md-6 text-end text-success d-flex align-items-center justify-content-end gap-2">
+                <i class="bi bi-shield-check fs-4"></i>
+                <span class="fw-semibold">Compra Segura</span>
+            </div>
         </div>
-        <div class="col-md-6 text-end text-success d-flex align-items-center justify-content-end gap-2">
-            <i class="bi bi-shield-check fs-4"></i>
-            <span class="fw-semibold">Compra Segura</span>
-        </div>
-    </div>
 
-    <div class="mb-4">
-        <form>
+        <div class="mb-4">
             <div class="card p-4 shadow-sm bg-light rounded-4 border-0 mb-4">
                 <div class="form-label fw-semibold fs-4 text-center mb-3">Seleccione el Tipo de Comprobante</div>
                 <div class="d-flex justify-content-center gap-5">
                     <div class="form-check form-check-lg">
-                        <input class="form-check-input fs-4" type="radio" name="tipoComprobante" id="boleta" checked>
+                        <input class="form-check-input fs-4" type="radio" name="tipoComprobante" value="boleta" id="boleta" checked>
                         <label class="form-check-label fs-5 ms-2" for="boleta">Boleta</label>
                     </div>
                     <div class="form-check form-check-lg">
-                        <input class="form-check-input fs-4" type="radio" name="tipoComprobante" id="factura">
+                        <input class="form-check-input fs-4" type="radio" name="tipoComprobante" value="factura" id="factura">
                         <label class="form-check-label fs-5 ms-2" for="factura">Factura</label>
                     </div>
                 </div>
@@ -81,12 +80,14 @@
                 <div class="col-md-6 mb-3">
                     <label for="nombre" class="form-label fw-semibold">Nombre *</label>
                     <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                        id="nombre" name="usu_nombre" placeholder="Ingrese su nombre" value="@Model.usu_nombre" readonly>
+                        id="nombre" name="usu_nombre" placeholder="Ingrese su nombre" value="@Model.usu_nombre"
+                        readonly>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="apellidos" class="form-label fw-semibold">Apellidos *</label>
                     <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                        id="apellidos" name="usu_apellido" placeholder="Ingrese sus apellidos" value="@Model.usu_apellido" readonly>
+                        id="apellidos" name="usu_apellido" placeholder="Ingrese sus apellidos"
+                        value="@Model.usu_apellido" readonly>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="tipoDocumento" class="form-label fw-semibold">Tipo de documento *</label>
@@ -101,12 +102,13 @@
                 <div class="col-md-6 mb-3">
                     <label for="numeroDocumento" class="form-label fw-semibold">N° de documento *</label>
                     <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                        id="numeroDocumento" placeholder="Ingrese su número de documento">
+                        id="numeroDocumento" name="num_identificacion" placeholder="Ingrese su número de documento">
                 </div>
                 <div class="col-12 mb-3">
                     <label for="correo" class="form-label fw-semibold">Correo electrónico *</label>
                     <input type="email" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                        id="correo" name="usu_correo" placeholder="ejemplo@correo.com" value="@Model.usu_correo" readonly>
+                        id="correo" name="usu_correo" placeholder="ejemplo@correo.com" value="@Model.usu_correo"
+                        readonly>
                 </div>
             </div>
 
@@ -114,17 +116,17 @@
                 <div class="col-12 mb-3">
                     <label for="razonSocial" class="form-label fw-semibold">Razón Social</label>
                     <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                        id="razonSocial" placeholder="Ingrese razón social">
+                        id="razonSocial" name="=fac_razonsocial" placeholder="Ingrese razón social">
                 </div>
                 <div class="col-12 mb-3">
                     <label for="ruc" class="form-label fw-semibold">N° de R.U.C.</label>
                     <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                        id="ruc" placeholder="Ingrese número de RUC">
+                        id="ruc" name="fac_ruc" placeholder="Ingrese número de RUC">
                 </div>
                 <div class="col-12 mb-3">
                     <label for="direccion" class="form-label fw-semibold">Dirección fiscal o comercial</label>
                     <input type="text" class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                        id="direccion" placeholder="Ingrese dirección">
+                        id="direccion" name="fac_direccion" placeholder="Ingrese dirección">
                 </div>
             </div>
 
@@ -142,10 +144,9 @@
                     <i class="bi bi-cart-check-fill me-2"></i>REALIZAR EL PEDIDO
                 </button>
             </div>
-        </form>
+        </div>
     </div>
-</div>
-
+</form>
 <script>
     const boletaRadio = document.getElementById('boleta');
     const facturaRadio = document.getElementById('factura');
