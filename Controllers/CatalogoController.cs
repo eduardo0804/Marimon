@@ -8,7 +8,8 @@ using Marimon.Models;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using Marimon.Models.ViewModels;
-
+using System.Globalization;
+using System.Text;
 namespace Marimon.Controllers
 {
     public class CatalogoController : Controller
@@ -32,8 +33,29 @@ namespace Marimon.Controllers
 
             if (!string.IsNullOrEmpty(buscar))
             {
+                var normalizado = buscar.ToLower().Normalize(NormalizationForm.FormD);
+                var sb = new StringBuilder();
+
+                foreach (var c in normalizado)
+                {
+                    if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                        sb.Append(c);
+                }
+
+                normalizado = sb.ToString();
+
                 autopartesQuery = autopartesQuery
-                    .Where(a => EF.Functions.ILike(a.aut_nombre, $"%{buscar}%"));
+                    .Where(a => EF.Functions.ILike(
+                        ApplicationDbContext.Unaccent(a.aut_nombre),
+                        $"%{normalizado}%"
+                    ));
+            }
+
+            // Verificar si no hay resultados
+            if (!autopartesQuery.Any())
+            {
+                // Aquí se puede poner el mensaje de "No se encontró ninguna autoparte"
+                ViewBag.Mensaje = "No se encontró ninguna autoparte";
             }
 
             var autopartes = await autopartesQuery.ToListAsync();
@@ -53,7 +75,7 @@ namespace Marimon.Controllers
                 Carrito = carrito
             };
             ViewBag.Carrito = carrito;
-            return View(model);        
+            return View(model);
         }
 
 
