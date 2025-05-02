@@ -8,7 +8,65 @@ body {
         pointer-events: none;
     }
 }
+.pagination .page-item .page-link {
+    color: #333;
+    background-color: #fff;
+    border-color: #dee2e6;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
 
+.pagination .page-item .page-link:hover {
+    color: #fff;
+    background-color: #333;
+    border-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    border-radius: 30px;
+    min-width: 150px;
+    text-align: center;
+    margin: 0 10px;
+}
+
+.pagination .page-item:first-child .page-link {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+.pagination .page-item:last-child .page-link {
+    background-color: #000;
+    color: white;
+}
+
+.pagination .page-item:last-child .page-link:hover {
+    background-color: #333;
+}
+
+/* Efecto de transición suave */
+.page-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.page-link:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: -100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.page-link:hover:after {
+    left: 100%;
+}
 .modal-custom {
     display: block;
     position: fixed;
