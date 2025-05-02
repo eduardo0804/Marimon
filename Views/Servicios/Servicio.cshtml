@@ -60,6 +60,26 @@
         <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
     </div>
 }
+<!-- Modal de Calendario -->
+<div class="modal fade" id="calendarioModal" tabindex="-1" aria-labelledby="calendarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendarioModalLabel">¡Reserva exitosa!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>¿Deseas agregar tu cita a tu calendario?</p>
+                <a id="googleCalendarLink" href="#" target="_blank" class="btn btn-success mb-2 w-100">
+                    Agregar a Google Calendar
+                </a>
+                <a id="icsDownloadLink" href="#" class="btn btn-primary w-100">
+                    Descargar evento (.ics)
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Banner Superior -->
 <div class="container-fluid full-width-banner p-0 position-relative" style="height: 320px; overflow: hidden;">
     <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
@@ -162,6 +182,39 @@
                 successMessage.classList.add("hide");
                 setTimeout(() => successMessage.remove(), 500);
             }, 10000);
+
+            // Mostrar modal de calendario después de la reserva exitosa
+            var calendarioModal = new bootstrap.Modal(document.getElementById('calendarioModal'));
+            calendarioModal.show();
+
+            // Datos para el evento
+            const titulo = 'Reserva Marimon';
+            const descripcion = 'Servicio: @Model.ser_nombre';
+            const location = 'Marimon Taller';
+            // Usa la fecha seleccionada en el formulario o pásala desde el backend
+            const fecha = new Date(document.getElementById('fecha')?.value || Date.now());
+            const fechaInicio = fecha.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            const fechaFin = new Date(fecha.getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+            // Google Calendar link
+            const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&dates=${fechaInicio}/${fechaFin}&details=${encodeURIComponent(descripcion)}&location=${encodeURIComponent(location)}`;
+            document.getElementById('googleCalendarLink').href = googleUrl;
+
+            // ICS download link
+            const icsContent = `BEGIN:VCALENDAR
+            VERSION:2.0
+            BEGIN:VEVENT
+            SUMMARY:${titulo}
+            DESCRIPTION:${descripcion}
+            LOCATION:${location}
+            DTSTART:${fechaInicio}
+            DTEND:${fechaFin}
+            END:VEVENT
+            END:VCALENDAR`;
+
+            const blob = new Blob([icsContent], { type: 'text/calendar' });
+            document.getElementById('icsDownloadLink').href = URL.createObjectURL(blob);
+            document.getElementById('icsDownloadLink').download = "reserva.ics";
         }
     });
 </script>

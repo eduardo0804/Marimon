@@ -91,6 +91,24 @@ namespace Marimon.Controllers
             TempData["ReservaExitosa"] = true;
             return RedirectToAction("Detalle", new { id = ser_id });
         }
+        public IActionResult DescargarICS(string titulo, string descripcion, string location, DateTime fecha)
+        {
+            var fechaInicio = fecha.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+            var fechaFin = fecha.AddHours(1).ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+            var ics = $@"BEGIN:VCALENDAR
+            VERSION:2.0
+            BEGIN:VEVENT
+            SUMMARY:{titulo}
+            DESCRIPTION:{descripcion}
+            LOCATION:{location}
+            DTSTART:{fechaInicio}
+            DTEND:{fechaFin}
+            END:VEVENT
+            END:VCALENDAR";
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(ics);
+            return File(bytes, "text/calendar", "reserva.ics");
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
