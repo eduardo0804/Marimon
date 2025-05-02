@@ -19,7 +19,7 @@
             @foreach (var item in Model.CarritoAutopartes)
             {
                 var autoparte = item.Autoparte;
-                <tr id="producto-@item.carAut_id">
+                <tr id="producto-@item.carAut_id" data-stock="@item.Autoparte.aut_cantidad">
                     <td>
                         <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" width="50px">
                         @autoparte.aut_nombre
@@ -43,7 +43,8 @@
 
     <div class="resumen">
         <p><strong>Total:</strong> S/ <span id="total">@Model.car_total.ToString("0.00")</span></p>
-        <a href="/checkout" class="btn-finalizar">Finalizar Compra</a>
+        <a href="#" id="btn-finalizar" class="btn-finalizar">Finalizar Compra</a>
+        <p id="mensaje-error" style="color:red;"></p>
     </div>
 </div>
 <script>
@@ -118,6 +119,31 @@
                     console.error('Error al eliminar producto:', error);
                 }
             });
+        }
+    });
+    document.getElementById('btn-finalizar').addEventListener('click', function (e) {
+        e.preventDefault(); // Evita la redirección directa
+
+        let hayError = false;
+        let mensaje = "";
+
+        document.querySelectorAll('#productos-carrito tr').forEach(row => {
+            const stock = parseInt(row.dataset.stock);
+            const cantidad = parseInt(row.querySelector('span[id^="cantidad-"]').innerText);
+
+            if (cantidad > stock) {
+                const nombre = row.querySelector('td').innerText.trim();
+                mensaje += `Cantidad de '${nombre}' supera el stock disponible.\n`;
+                hayError = true;
+            }
+        });
+
+        const mensajeError = document.getElementById('mensaje-error');
+        if (hayError) {
+            mensajeError.innerText = mensaje;
+        } else {
+            // Redirigir solo si todo está bien
+            window.location.href = '/Comprobante';
         }
     });
 
