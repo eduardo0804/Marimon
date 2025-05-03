@@ -15,6 +15,8 @@ namespace Marimon.Models
         public string? usu_nombrePerfil { get; set; }
         public string? usu_numIdentificacion { get; set; }
         public string? usu_correo { get; set; }
+
+        ICollection<Venta> Ventas { get; set; } = new List<Venta>();
         // Propiedad de navegación
         public IdentityUser IdentityUser { get; set; }
     }

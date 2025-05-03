@@ -1,307 +1,153 @@
+@model Marimon.Models.Carrito
 
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f9f9f9;
-        margin: 0;
-        padding: 0;
-        color: #333;
-    }
+<!-- Estilos Bootstrap y Font Awesome -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="~/css/indexCarrito.css" asp-append-version="true" />
 
-    .container {
-        max-width: 1100px;
-        margin: 40px auto;
-        padding: 30px;
-        background-color: #fff;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        border-radius: 8px;
-    }
+<div class="container my-5">
+    <h1 class="text-center mb-5 fw-bold text-dark">
+        <i class="fas fa-shopping-cart me-2"></i>Tu Carrito
+    </h1>
 
-    h1 {
-        text-align: center;
-        font-size: 2.5rem;
-        margin-bottom: 30px;
-        color: #d11a2a;
-    }
-
-    .alert-success {
-        background-color: #eafbe6;
-        color: #228b22;
-        padding: 15px 20px;
-        border-radius: 6px;
-        border-left: 6px solid #57d957;
-        margin-bottom: 25px;
-        font-size: 15px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 30px;
-    }
-
-    th, td {
-        text-align: center;
-        padding: 15px;
-        vertical-align: middle;
-    }
-
-    th {
-        font-weight: 600;
-        border-bottom: 2px solid #e0e0e0;
-        background-color: #fafafa;
-        color: #555;
-    }
-
-    td img {
-        width: 60px;
-        margin-right: 10px;
-        border-radius: 4px;
-    }
-
-    td {
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .cantidad-control {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .cantidad-control button {
-        background-color: #eee;
-        border: none;
-        padding: 6px 12px;
-        cursor: pointer;
-        font-size: 16px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-    }
-
-    .cantidad-control button:hover {
-        background-color: #ccc;
-    }
-
-    .cantidad-control span {
-        margin: 0 12px;
-        font-size: 16px;
-        font-weight: 500;
-    }
-
-    .remove-btn {
-        color: #d11a2a;
-        font-size: 22px;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-    }
-
-    .remove-btn:hover {
-        transform: scale(1.2);
-    }
-
-    .cupon-container {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-    }
-
-    .cupon-container input[type="text"] {
-        flex: 1;
-        padding: 10px 12px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 15px;
-    }
-
-    .cupon-container button {
-        background-color: #d11a2a;
-        color: #fff;
-        border: none;
-        padding: 10px 22px;
-        cursor: pointer;
-        font-weight: bold;
-        border-radius: 5px;
-        transition: background-color 0.2s ease;
-    }
-
-    .cupon-container button:hover {
-        background-color: #b91524;
-    }
-
-    .resumen {
-        text-align: right;
-        font-size: 16px;
-    }
-
-    .resumen-2{
-        text-align: center;
-        font-size: 16px;
-    }
-
-    .resumen p {
-        margin: 8px 0;
-    }
-
-    .resumen .total {
-        font-size: 22px;
-        font-weight: bold;
-        color: #d11a2a;
-    }
-
-    .btn-finalizar {
-        display: inline-block;
-        background-color: #d11a2a;
-        color: white;
-        padding: 14px 32px;
-        text-decoration: none;
-        font-weight: bold;
-        border-radius: 5px;
-        margin-top: 20px;
-        transition: background-color 0.2s ease;
-    }
-
-    .btn-finalizar:hover {
-        background-color: #b91524;
-    }
-
-    /* Estilos de los botones de cantidad */
-    .cantidad-control {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .cantidad-control button {
-        background-color: #eee;
-        border: none;
-        padding: 6px 12px;
-        cursor: pointer;
-        font-size: 16px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-    }
-
-    .cantidad-control button:hover {
-        background-color: #ccc;
-    }
-
-    .cantidad-control span {
-        margin: 0 12px;
-        font-size: 16px;
-        font-weight: 500;
-    }
-</style>
-
-<body>
-    <div class="container">
-        <h1>Carrito</h1>
-
-        <table>
-            <thead>
+    <div class="table-responsive rounded shadow-sm border">
+        <table class="table table-hover text-center align-middle mb-0">
+            <thead class="table-dark text-white">
                 <tr>
-                    <th>Producto</th>
+                    <th>Autoparte</th>
                     <th>Precio</th>
                     <th>Cantidad</th>
                     <th>Total</th>
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="productos-carrito"></tbody>
-                <!-- Aquí se mostrarán los productos del carrito -->
+            <tbody id="productos-carrito">
+                @foreach (var item in Model.CarritoAutopartes)
+                {
+                    var autoparte = item.Autoparte;
+                    <tr id="producto-@item.carAut_id" data-stock="@autoparte.aut_cantidad">
+                        <td class="d-flex align-items-center gap-3 justify-content-center">
+                            <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" width="60" class="rounded shadow-sm border">
+                            <span class="fw-semibold">@autoparte.aut_nombre</span>
+                        </td>
+                        <td class="text-nowrap">S/ @autoparte.aut_precio.ToString("0.00")</td>
+                        <td>
+                            <div class="btn-group cantidad-control">
+                                <button class="btn btn-outline-secondary decrease-btn" data-producto-id="@item.carAut_id">-</button>
+                                <span id="cantidad-@item.carAut_id" class="px-3 fw-bold">@item.car_cantidad</span>
+                                <button class="btn btn-outline-secondary increase-btn" data-producto-id="@item.carAut_id">+</button>
+                            </div>
+                        </td>
+                        <td class="subtotal fw-bold text-dark" id="subtotal-@item.carAut_id">S/ @item.car_subtotal.ToString("0.00")</td>
+                        <td>
+                            <button class="btn btn-outline-danger remove-btn" data-producto-id="@item.carAut_id" title="Eliminar">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
-        <div class="resumen" >
-            <p><strong>Subtotal:</strong> S/ <span id="subtotal">0</span></p>
-            <p><strong>Total:</strong> S/ <span id="total">0</span></p>
-            <a href="/checkout" class="btn-finalizar">Finalizar Compra</a>
-        </div>
     </div>
 
-    <script>
-        // Obtenemos los productos del carrito desde localStorage
-        const carrito = [
-            @foreach (var item in Model)
-            {
-                <text>
-                {
-                    nombre: "@item.aut_nombre",
-                    precio: @item.aut_precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture),
-                    cantidad: @item.aut_cantidad,
-                    imagen: "@Url.Content(item.aut_imagen)"
-                },
-                </text>
-            }
-        ];
-        const productosCarrito = document.getElementById('productos-carrito');
-        let subtotal = 0;
+    <div class="resumen mt-5 p-4 bg-white border rounded shadow-sm">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <p class="fs-4 fw-bold text-dark mb-2">Total: S/ <span id="total">@Model.car_total.ToString("0.00")</span></p>
+            <a href="#" id="btn-finalizar" class="btn btn-dark btn-lg shadow">
+                <i class="fas fa-check-circle me-2"></i>Finalizar Compra
+            </a>
+        </div>
+        <p id="mensaje-error" class="text-danger mt-3 fw-semibold text-end"></p>
+    </div>
+</div>
 
-        // Si no hay productos en el carrito, mostramos un mensaje
-        if (carrito.length === 0) {
-            productosCarrito.innerHTML = "<tr><td colspan='5'>No tienes productos en tu carrito.</td></tr>";
+<!-- Funcionalidad JavaScript (igual que antes) -->
+<script>
+    function calcularTotal() {
+        let total = 0;
+        document.querySelectorAll('.subtotal').forEach(sub => {
+            total += parseFloat(sub.textContent.replace('S/ ', '')) || 0;
+        });
+        document.getElementById('total').textContent = total.toFixed(2);
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('decrease-btn') || e.target.classList.contains('increase-btn')) {
+            const carritoId = @Model.car_id;
+            const productoId = e.target.dataset.productoId;
+            const cantidadSpan = document.getElementById('cantidad-' + productoId);
+            let cantidadActual = parseInt(cantidadSpan.textContent);
+            let nuevaCantidad = cantidadActual;
+
+            if (e.target.classList.contains('decrease-btn')) {
+                nuevaCantidad = Math.max(1, cantidadActual - 1);
+            } else {
+                nuevaCantidad = cantidadActual + 1;
+            }
+
+            cantidadSpan.textContent = nuevaCantidad;
+
+            $.ajax({
+                url: '@Url.Action("ActualizarCantidad", "Carrito")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ carritoId, productoId, nuevaCantidad }),
+                success: function (data) {
+                    if (data.subtotal !== undefined) {
+                        document.getElementById('subtotal-' + productoId).textContent = 'S/ ' + data.subtotal.toFixed(2);
+                        calcularTotal();
+                    }
+                },
+                error: function () {
+                    console.error("Error al actualizar la cantidad.");
+                }
+            });
         }
 
-        // Mostramos los productos del carrito
-        carrito.forEach(item => {
-            const totalItem = item.precio * item.cantidad;
-            subtotal += totalItem;
+        if (e.target.closest('.remove-btn')) {
+            const btn = e.target.closest('.remove-btn');
+            const productoId = btn.dataset.productoId;
+            const carritoId = @Model.car_id;
 
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><img src="${item.imagen}" alt="${item.nombre}" width="50px"> ${item.nombre}</td>
-                <td>S/ ${item.precio.toFixed(2)}</td>
-                <td>
-                    <div class="cantidad-control">
-                        <button class="decrease-btn" data-nombre="${item.nombre}">-</button>
-                        <span>${item.cantidad}</span>
-                        <button class="increase-btn" data-nombre="${item.nombre}">+</button>
-                    </div>
-                </td>
-                <td>S/ ${totalItem.toFixed(2)}</td>
-                <td><span class="remove-btn" data-nombre="${item.nombre}">×</span></td>
-            `;
-            productosCarrito.appendChild(row);
+            $.ajax({
+                url: '@Url.Action("EliminarProducto", "Carrito")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ CarritoId: carritoId, ProductoId: productoId }),
+                success: function (data) {
+                    document.getElementById('producto-' + productoId).remove();
+                    document.getElementById('total').textContent = data.total.toFixed(2);
+                },
+                error: function () {
+                    console.error("Error al eliminar producto.");
+                }
+            });
+        }
+    });
+
+    document.getElementById('btn-finalizar').addEventListener('click', function (e) {
+        e.preventDefault();
+        let hayError = false;
+        let mensaje = "";
+
+        document.querySelectorAll('#productos-carrito tr').forEach(row => {
+            const stock = parseInt(row.dataset.stock);
+            const cantidad = parseInt(row.querySelector('span[id^="cantidad-"]').textContent);
+            if (cantidad > stock) {
+                const nombre = row.querySelector('td span').innerText.trim();
+                mensaje += `Cantidad de '${nombre}' supera el stock disponible.\n`;
+                hayError = true;
+            }
         });
 
-        // Mostrar el subtotal y total
-        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-        document.getElementById('total').textContent = subtotal.toFixed(2);
+        const mensajeError = document.getElementById('mensaje-error');
+        if (hayError) {
+            mensajeError.textContent = mensaje;
+        } else {
+            mensajeError.textContent = "";
+            window.location.href = '/Comprobante';
+        }
+    });
 
-        // Función para eliminar un producto del carrito
-        document.addEventListener('click', (e) => {
-            // Eliminar producto
-            if (e.target.classList.contains('remove-btn')) {
-                const nombreProducto = e.target.dataset.nombre;
-                // Filtramos el carrito para eliminar el producto
-                const carritoActualizado = carrito.filter(item => item.nombre !== nombreProducto);
-                localStorage.setItem('carrito', JSON.stringify(carritoActualizado));
-                window.location.reload();  // Recargamos la página para reflejar los cambios
-            }
-
-            // Aumentar cantidad de producto
-            if (e.target.classList.contains('increase-btn')) {
-                const nombreProducto = e.target.dataset.nombre;
-                const producto = carrito.find(item => item.nombre === nombreProducto);
-                if (producto) {
-                    producto.cantidad++;
-                    // Actualizar el carrito en localStorage
-                    localStorage.setItem('carrito', JSON.stringify(carrito));
-                    window.location.reload();  // Recargamos la página para reflejar los cambios
-                }
-            }
-
-            // Disminuir cantidad de producto
-            if (e.target.classList.contains('decrease-btn')) {
-                const nombreProducto = e.target.dataset.nombre;
-                const producto = carrito.find(item => item.nombre === nombreProducto);
-                if (producto && producto.cantidad > 1) {
-                    producto.cantidad--;
-                    // Actualizar el carrito en localStorage
-                    localStorage.setItem('carrito', JSON.stringify(carrito));
-                    window.location.reload();  // Recargamos la página para reflejar los cambios
-                }
-            }
-        });
-    </script>
-</body>
+    document.addEventListener('DOMContentLoaded', calcularTotal);
+</script>

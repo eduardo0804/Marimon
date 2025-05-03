@@ -186,7 +186,20 @@
             </div>
         </div>
     </footer>
-    @await Html.PartialAsync("~/Views/Carrito/_Side.cshtml")
+    <div id="carritoSide">
+        <span>Cargando carrito...</span>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/Carrito/Side')
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("carritoSide").innerHTML = html;
+                });
+        });
+    </script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!--<script src="~/js/site.js" asp-append-version="true"></script> -->

@@ -11,11 +11,12 @@ namespace Marimon.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int bol_id { get; set; }
+        public int ComprobanteId { get; set; }
 
-        public string UsuarioId { get; set; }
+        [ForeignKey("ComprobanteId")]
+        public Comprobante? Comprobante { get; set; }
 
-        [ForeignKey("UsuarioId")]
-        public Usuario? Usuario { get; set; }
+        public string num_identificacion { get; set; } 
 
     }
 }

@@ -8,7 +8,8 @@ using Marimon.Models;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using Marimon.Models.ViewModels;
-
+using System.Globalization;
+using System.Text;
 namespace Marimon.Controllers
 {
     public class CatalogoController : Controller
@@ -23,21 +24,46 @@ namespace Marimon.Controllers
         }
 
         // GET: Catalogo/Index
-        public async Task<IActionResult> Index(string buscar)
+        public IActionResult Index(string buscar, int pagina = 1)
         {
-            var autopartesQuery = _context.Autopartes
-                .Include(a => a.Categoria)
-                .OrderBy(a => a.aut_id)
-                .AsQueryable();
+            const int PaginasPorPagina = 12;  // Número de autopartes por página
 
+            // Consulta base para las autopartes
+            var autopartesQuery = _context.Autopartes.AsQueryable();
+
+            // Filtro por búsqueda
             if (!string.IsNullOrEmpty(buscar))
             {
                 autopartesQuery = autopartesQuery
-                    .Where(a => EF.Functions.ILike(a.aut_nombre, $"%{buscar}%"));
+                    .Where(a => EF.Functions.ILike(ApplicationDbContext.Unaccent(a.aut_nombre), $"%{buscar}%"));
             }
 
-            var autopartes = await autopartesQuery.ToListAsync();
-            return View(autopartes);
+            // Obtener el total de registros
+            var totalAutopartes = autopartesQuery.Count();
+
+            // Obtener las autopartes para la página actual
+            var autopartes = autopartesQuery
+                .Skip((pagina - 1) * PaginasPorPagina)
+                .Take(PaginasPorPagina)
+                .ToList();
+
+            // Calcular cuántas páginas hay
+            var totalPaginas = (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
+
+            // Obtener el carrito (esto puede depender de tu implementación, por ejemplo, desde la sesión o la base de datos)
+            var carrito = _context.Carritos.FirstOrDefault(c => c.UsuarioId == User.Identity.Name); // Ejemplo de cómo obtener el carrito
+
+            // Crear el modelo para la vista
+            var viewModel = new CatalogoViewModel
+            {
+                Autopartes = autopartes,
+                Carrito = carrito,
+                PaginaActual = pagina,
+                TotalPaginas = totalPaginas,
+                Buscar = buscar
+            };
+
+            return View(viewModel);
         }
 
 
@@ -87,59 +113,6 @@ namespace Marimon.Controllers
             return View("Error");
         }
 
-        public IActionResult AgregarAlCarrito(int id)
-        {
-            // Buscar la autoparte en la base de datos
-            var autoparte = _context.Autopartes.FirstOrDefault(a => a.aut_id == id);
-            if (autoparte == null)
-            {
-                return NotFound();
-            }
 
-            // Obtener el carrito actual de la sesi�n
-            var carrito = ObtenerCarritoDeSesion();
-
-            // Verificar si el art�culo ya est� en el carrito
-            var itemExistente = carrito.FirstOrDefault(c => c.aut_id == id);
-            if (itemExistente != null)
-            {
-                // Incrementar la cantidad si ya existe
-                itemExistente.aut_cantidad++;
-            }
-            else
-            {
-                Console.WriteLine($"Imagen guardada en carrito: {autoparte.aut_imagen}");
-
-                // Agregar un nuevo art�culo al carrito
-                carrito.Add(new Autoparte
-                {
-                    aut_id = autoparte.aut_id,
-                    aut_imagen = autoparte.aut_imagen,
-                    aut_nombre = autoparte.aut_nombre,
-                    aut_precio = autoparte.aut_precio,
-                    aut_cantidad = 1
-                });
-            }
-
-            // Guardar el carrito actualizado en la sesi�n
-            GuardarCarritoEnSesion(carrito);
-
-            // Redirigir al �ndice del cat�logo o a otra p�gina
-            return RedirectToAction("Index");
-        }
-
-        public List<Autoparte> ObtenerCarritoDeSesion()
-        {
-            var carritoJson = HttpContext.Session.GetString("Carrito");
-            return string.IsNullOrEmpty(carritoJson)
-                ? new List<Autoparte>()
-                : JsonSerializer.Deserialize<List<Autoparte>>(carritoJson);
-        }
-
-        private void GuardarCarritoEnSesion(List<Autoparte> carrito)
-        {
-            var carritoJson = JsonSerializer.Serialize(carrito);
-            HttpContext.Session.SetString("Carrito", carritoJson);
-        }
     }
 }
