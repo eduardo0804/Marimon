@@ -1,7 +1,7 @@
 ﻿@{
     Layout = null;
     var path = Context.Request.Path.Value.ToLower();
-    var mostrarFlecha = !(path == "/admin");
+    var mostrarFlecha = !(path == "/admin" || path == "/admin/");
 }
 
 <!DOCTYPE html>
@@ -51,8 +51,11 @@
             <!-- Título centrado -->
             <h1 class="titulo-centro" style="margin: 0; font-size: 22px; font-weight: bold;">MODULO DE AUTOPARTES</h1>
             <!-- Cerrar Sesión -->
-            <a href="@Url.Action("Index", "Home")"
-                style="color: white; font-weight: bold; text-decoration: none;">Cerrar Sesión</a>
+            <form asp-area="Identity" asp-page="/Account/Logout"
+                asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button
+                    style="color: white; font-weight: bold; text-decoration: none; background-color: transparent; border: none;">Cerrar Sesión</button>
+            </form>
         </div>
     </header>
 
