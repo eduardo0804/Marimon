@@ -31,7 +31,7 @@ namespace Marimon.Controllers
 // GET: AdminController
         public ActionResult Index()
         {
-            return View("~/Views/Flujos/Entradas.cshtml");
+            return View("~/Views/Admin/Index.cshtml");
         }
 
         // GET: Admin/Entradas - Página de entrada de productos
