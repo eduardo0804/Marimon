@@ -42,29 +42,43 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
             }
 
             PedidosUsuario = await _context.Venta
-                .Where(v => v.UsuarioId == user.Id)
-                .Join(
-                    _context.DetalleVentas,
-                    venta => venta.ven_id,
-                    detalle => detalle.VentaId,
-                    (venta, detalle) => new { venta, detalle }
-                )
-                .Join(
-                    _context.Autopartes,
-                    vd => vd.detalle.AutoParteId,
-                    autoParte => autoParte.aut_id,
-                    (vd, autoParte) => new { vd, autoParte }
-                )
-                .Select(x => new Venta
-                {
-                    ven_id = x.vd.venta.ven_id,
-                    ven_fecha = x.vd.venta.ven_fecha,
-                    AutoParteNombre = x.autoParte.aut_nombre,
-                    AutoPartePrecio = x.autoParte.aut_precio,
-                    Cantidad = Convert.ToInt32(x.vd.detalle.det_cantidad),
-                })
-                .ToListAsync();
-
+            .Join(
+                _context.Comprobante, //tabla comprobante
+                venta => venta.ven_id,
+                comprobante => comprobante.VentaId,
+                (venta, comprobante) => new { venta, comprobante }
+            )
+            .Join(
+                _context.DetalleVentas, //tabla detalle ventas
+                vc => vc.venta.ven_id,
+                detalle => detalle.VentaId,
+                (vc, detalle) => new { vc, detalle }
+            )
+            .Join(
+                _context.Autopartes, //tabla autopartes
+                vcd => vcd.detalle.AutoParteId,
+                autoParte => autoParte.aut_id,
+                (vcd, autoParte) => new { vcd, autoParte }
+            )
+            .Join(
+                _context.MetodoPago, //tabla metodo pago
+                vcdap => vcdap.vcd.vc.venta.MetodoPagoId,
+                metodoPago => metodoPago.pag_id,
+                (vcdap, metodoPago) => new { vcdap, metodoPago }
+            )
+            // .Where(x =>
+            //     _context.Boleta.Any(b => b.UsuarioId == user.Id && b.bol_id == x.vcdap.vcd.vc.comprobante.BoletaId) ||
+            //     _context.Factura.Any(f => f.UsuarioId == user.Id && f.fac_id == x.vcdap.vcd.vc.comprobante.FacturaId)
+            // )
+            .Select(x => new Venta
+            {
+                ven_id = x.vcdap.vcd.vc.venta.ven_id,
+                ven_fecha = x.vcdap.vcd.vc.venta.ven_fecha,
+                AutoParteNombre = x.vcdap.autoParte.aut_nombre,
+                AutoPartePrecio = x.vcdap.autoParte.aut_precio,
+                Cantidad = Convert.ToInt32(x.vcdap.vcd.detalle.det_cantidad),
+            })
+            .ToListAsync();
             return Page();
         }
     }

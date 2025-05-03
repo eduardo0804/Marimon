@@ -12,11 +12,16 @@ public class ApplicationDbContext : IdentityDbContext
         : base(options)
     {
     }
+
+    public static string Unaccent(string input) => throw new NotSupportedException();
     public DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.HasDbFunction(typeof(ApplicationDbContext).GetMethod(nameof(Unaccent))!)
+            .HasName("unaccent");
 
         builder.Entity<Usuario>()
             .HasOne<IdentityUser>(u => u.IdentityUser)
@@ -39,4 +44,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Venta> Venta { get; set; } 
     public DbSet<Servicio> Servicio { get; set; }
     public DbSet<Reserva> Reserva { get; set; }
+    public DbSet<Carrito> Carritos { get; set; }
+    public DbSet<CarritoAutoparte> CarritoAutopartes { get; set; } = null!; 
 }

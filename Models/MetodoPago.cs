@@ -11,7 +11,6 @@ namespace Marimon.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int pag_id { get; set; }
-        public string? pag_importe { get; set; }
         public string? pag_metodo { get; set; }
          public DateOnly pag_fecha { get; set; }
 

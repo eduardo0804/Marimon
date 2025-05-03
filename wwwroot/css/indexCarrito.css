@@ -1,0 +1,192 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #d11a2a;
+}
+
+.alert-success {
+    background-color: #eafbe6;
+    color: #228b22;
+    padding: 15px 20px;
+    border-radius: 6px;
+    border-left: 6px solid #57d957;
+    margin-bottom: 25px;
+    font-size: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+th, td {
+    text-align: center;
+    padding: 15px;
+    vertical-align: middle;
+}
+
+th {
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+    background-color: #fafafa;
+    color: #555;
+}
+
+td img {
+    width: 60px;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+td {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cantidad-control button {
+    background-color: #eee;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.cantidad-control button:hover {
+    background-color: #ccc;
+}
+
+.cantidad-control span {
+    margin: 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.remove-btn {
+    color: #d11a2a;
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.remove-btn:hover {
+    transform: scale(1.2);
+}
+
+.cupon-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.cupon-container input[type="text"] {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.cupon-container button {
+    background-color: #d11a2a;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.cupon-container button:hover {
+    background-color: #b91524;
+}
+
+.resumen {
+    text-align: right;
+    font-size: 16px;
+}
+
+.resumen-2{
+    text-align: center;
+    font-size: 16px;
+}
+
+.resumen p {
+    margin: 8px 0;
+}
+
+.resumen .total {
+    font-size: 22px;
+    font-weight: bold;
+    color: #d11a2a;
+}
+
+.btn-finalizar {
+    display: inline-block;
+    background-color: #d11a2a;
+    color: white;
+    padding: 14px 32px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 20px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-finalizar:hover {
+    background-color: #b91524;
+}
+
+/* Estilos de los botones de cantidad */
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cantidad-control button {
+    background-color: #eee;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.cantidad-control button:hover {
+    background-color: #ccc;
+}
+
+.cantidad-control span {
+    margin: 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+}
