@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Marimon.Data;
 using Marimon.Models;
+using Google.Apis.Auth.OAuth2;
 
 namespace Marimon.Controllers
 {
@@ -16,20 +17,24 @@ namespace Marimon.Controllers
     {
         private readonly ILogger<Personal_VentasController> _logger;
         private readonly ApplicationDbContext _context;
+                private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public Personal_VentasController(ILogger<Personal_VentasController> logger, ApplicationDbContext context)
+
+        public Personal_VentasController(ApplicationDbContext context, ILogger<Personal_VentasController> logger, IWebHostEnvironment hostingEnvironment)
         {
-            _logger = logger;
             _context = context;
+            _logger = logger;
+            _hostingEnvironment = hostingEnvironment;
         }
 
-        public IActionResult Index()
+
+// GET: AdminController
+        public ActionResult Index()
         {
-            // Redireccionar directamente a la vista de Entradas
-            return RedirectToAction("Entradas");
+            return View("~/Views/Flujos/Entradas.cshtml");
         }
 
-        // GET: Personal_Ventas/Entradas - Página de entrada de productos
+        // GET: Admin/Entradas - Página de entrada de productos
         public ActionResult Entradas()
         {
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
@@ -38,7 +43,7 @@ namespace Marimon.Controllers
             var listaEntradas = _context.Entradas
                 .Include(e => e.Autoparte)
                 .OrderByDescending(e => e.ent_id)
-                .Take(10)  // Limitar a las últimas 10 entradas
+                .Take(10)  // Limitar a las últimas 20 entradas
                 .ToList();
 
             ViewBag.ListaEntradas = listaEntradas;
@@ -78,10 +83,11 @@ namespace Marimon.Controllers
             public string aut_nombre { get; set; } = string.Empty;
         }
 
-        // POST: Personal_Ventas/RegistrarEntrada - Procesar entrada de productos
+        // POST: Admin/RegistrarEntrada - Procesar entrada de productos
         [HttpPost]
         public IActionResult RegistrarEntrada(int AutoparteId, int ent_cantidad, string ent_proveedor = "")
         {
+
             try
             {
                 // Validar entradas
@@ -131,7 +137,7 @@ namespace Marimon.Controllers
             }
         }
 
-        // GET: Personal_Ventas/Salidas - Página de salida de productos
+        // GET: Admin/Salidas - Página de salida de productos
         public ActionResult Salidas()
         {
             ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
@@ -140,14 +146,14 @@ namespace Marimon.Controllers
             var listaSalidas = _context.Salida
                 .Include(e => e.Autoparte)
                 .OrderByDescending(e => e.sal_id)
-                .Take(10)  // Limitar a las últimas 10 entradas
+                .Take(10)  // Limitar a las últimas 20 entradas
                 .ToList();
 
             ViewBag.ListaSalidas = listaSalidas;
             return View("~/Views/Flujos/Salida.cshtml");
         }
 
-        // POST: Personal_Ventas/RegistrarSalida - Procesar salida de productos
+        // POST: Admin/RegistrarSalida - Procesar salida de productos
         [HttpPost]
         public async Task<IActionResult> RegistrarSalida(int AutoparteId, int sal_cantidad)
         {
@@ -157,13 +163,13 @@ namespace Marimon.Controllers
                 if (AutoparteId <= 0)
                 {
                     TempData["Error"] = "Debe seleccionar un producto válido.";
-                    return RedirectToAction("Salidas");
+                    return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
                 }
 
                 if (sal_cantidad <= 0)
                 {
                     TempData["Error"] = "La cantidad debe ser mayor a 0.";
-                    return RedirectToAction("Salidas");
+                    return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
                 }
 
                 // Buscar la autoparte correspondiente
@@ -171,12 +177,12 @@ namespace Marimon.Controllers
                 if (autoparte == null)
                 {
                     TempData["Error"] = "No se encontró el producto seleccionado.";
-                    return RedirectToAction("Salidas");
+                    return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
                 }
                 else if (autoparte.aut_cantidad < sal_cantidad)
                 {
                     TempData["Error"] = "No hay suficiente inventario para realizar la salida.";
-                    return RedirectToAction("Salidas");
+                    return RedirectToAction("Salidas");  // FIXED: Changed to "Salidas"
                 }
 
                 // Validar stock disponible
@@ -189,7 +195,6 @@ namespace Marimon.Controllers
                 // Paso 2: Crear el método de pago (en efectivo)
                 var metodoPago = new MetodoPago
                 {
-                    pag_importe = (sal_cantidad * autoparte.aut_precio).ToString(), // Calcular el importe
                     pag_metodo = "Efectivo",
                     pag_fecha = DateOnly.FromDateTime(DateTime.Now),
                 };
@@ -211,7 +216,7 @@ namespace Marimon.Controllers
                 {
                     VentaId = venta.ven_id,  // Relacionar con la venta ya guardada
                     AutoParteId = AutoparteId,
-                    det_cantidad = sal_cantidad.ToString()
+                    det_cantidad = sal_cantidad,
                 };
                 _context.DetalleVentas.Add(detalleVenta);
                 await _context.SaveChangesAsync(); // Guardar y generar el ID de detalleVenta
@@ -219,7 +224,7 @@ namespace Marimon.Controllers
                 // Paso 5: Crear el comprobante (Boleta)
                 var comprobante = new Comprobante
                 {
-                    com_nombre = "Boleta",  // Definir el tipo de comprobante
+                    tipo_comprobante = "Boleta",  // Definir el tipo de comprobante
                     VentaId = venta.ven_id   // Relacionar con la venta ya guardada
                 };
                 _context.Comprobante.Add(comprobante);
@@ -235,27 +240,217 @@ namespace Marimon.Controllers
                 };
                 _context.Salida.Add(salida);
 
-                // Actualizar cantidad de inventario
+                // ADDED: Update inventory quantity
                 autoparte.aut_cantidad -= sal_cantidad;
                 _context.Autopartes.Update(autoparte);
 
                 await _context.SaveChangesAsync(); // Guardar todo
 
                 TempData["Mensaje"] = $"Se han registrado la salida de {sal_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
-                return RedirectToAction("Salidas");
+                return RedirectToAction("Salidas");  // FIXED: Changed to redirect to Salidas instead of returning Ok
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error al registrar salida: {ex.Message}");
-                TempData["Error"] = "Error al registrar la salida: " + ex.Message;
+                TempData["Error"] = "Error al registrar la salida: " + ex.Message;  // FIXED: Changed "entrada" to "salida"
                 return RedirectToAction("Salidas");
             }
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+
+        //AUTOPARTE - CRUD
+
+        // GET: Admin/ListaAutopartes
+        public async Task<IActionResult> ListaAutopartes()
         {
-            return View("Error!");
+            var autopartes = await _context.Autopartes
+                .Include(a => a.Categoria)  // Cargar la categoría relacionada
+                .OrderBy(a => a.aut_id) // Aquí defines el orden
+                .ToListAsync();
+
+            return View(autopartes);
+        }
+        public IActionResult Create()
+        {
+            ViewBag.Title = "Registrar Autoparte";
+            ViewBag.ButtonText = "Registrar";
+            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
+            return PartialView("Create"); // Asegúrate de que sea una vista parcial
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Autoparte autoparte, IFormFile imagen)
+        {
+            try
+            {
+                var bucket = "marimonapp.appspot.com";
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
+
+                // Ruta variable de entorno para las credenciales de Firebase
+                var credJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS");
+                if (string.IsNullOrEmpty(credJson))
+                {
+                    throw new Exception("No se encontró la variable de entorno FIREBASE_CREDENTIALS.");
+                }
+
+                var credential = GoogleCredential.FromJson(credJson)
+                    .CreateScoped("https://www.googleapis.com/auth/devstorage.full_control");
+
+                var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
+
+                using (var httpClient = new HttpClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+                    using (var stream = imagen.OpenReadStream())
+                    {
+                        var url = $"https://storage.googleapis.com/upload/storage/v1/b/{bucket}/o?uploadType=media&name=autopartes/{uniqueFileName}";
+                        var content = new StreamContent(stream);
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(imagen.ContentType);
+
+                        var response = await httpClient.PostAsync(url, content);
+                        response.EnsureSuccessStatusCode();
+
+                        // URL pública de la imagen
+                        var publicUrl = $"https://storage.googleapis.com/{bucket}/autopartes/{uniqueFileName}";
+                        autoparte.aut_imagen = publicUrl;
+                    }
+                }
+                _context.Autopartes.Add(autoparte);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "La autoparte se registró correctamente.";
+
+                return Content("<script>window.parent.location.href = '/Admin/ListaAutopartes';</script>", "text/html");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar la autoparte");
+                ModelState.AddModelError("", $"Error al registrar la autoparte: {ex.Message}");
+                ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
+                return View(autoparte);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Editar(int id)
+        {
+            var autoparte = await _context.Autopartes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.aut_id == id);
+
+            if (autoparte == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre", autoparte.CategoriaId);
+            return PartialView("_EditarAutoparte", autoparte);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Editar(Autoparte autoparte, IFormFile imagen)
+        {
+            // Recuperar la autoparte existente desde la base de datos
+            var autoparteExistente = await _context.Autopartes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.aut_id == autoparte.aut_id);
+
+            if (autoparteExistente == null)
+            {
+                return NotFound();
+            }
+
+            if (imagen != null && imagen.Length > 0)
+            {
+                // Subir la nueva imagen a Firebase Storage
+                var bucket = "marimonapp.appspot.com";
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
+
+                var credJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS");
+                if (string.IsNullOrEmpty(credJson))
+                {
+                    throw new Exception("No se encontró la variable de entorno FIREBASE_CREDENTIALS.");
+                }
+
+                var credential = GoogleCredential.FromJson(credJson)
+                    .CreateScoped("https://www.googleapis.com/auth/devstorage.full_control");
+
+                var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
+
+                using (var httpClient = new HttpClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+                    using (var stream = imagen.OpenReadStream())
+                    {
+                        var url = $"https://storage.googleapis.com/upload/storage/v1/b/{bucket}/o?uploadType=media&name=autopartes/{uniqueFileName}";
+                        var content = new StreamContent(stream);
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(imagen.ContentType);
+
+                        var response = await httpClient.PostAsync(url, content);
+                        response.EnsureSuccessStatusCode();
+
+                        var publicUrl = $"https://storage.googleapis.com/{bucket}/autopartes/{uniqueFileName}";
+                        autoparte.aut_imagen = publicUrl;
+                    }
+
+                    // Eliminar la imagen anterior de Firebase Storage si existe
+                    if (!string.IsNullOrEmpty(autoparteExistente.aut_imagen))
+                    {
+                        var oldImageName = autoparteExistente.aut_imagen.Split('/').Last();
+                        var deleteUrl = $"https://storage.googleapis.com/storage/v1/b/{bucket}/o/autopartes%2F{oldImageName}";
+
+                        var deleteRequest = new HttpRequestMessage(HttpMethod.Delete, deleteUrl);
+                        deleteRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+                        var deleteResponse = await httpClient.SendAsync(deleteRequest);
+                        if (!deleteResponse.IsSuccessStatusCode)
+                        {
+                            _logger.LogWarning($"No se pudo eliminar la imagen anterior: {autoparteExistente.aut_imagen}");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Mantener la imagen anterior si no se sube una nueva
+                autoparte.aut_imagen = autoparteExistente.aut_imagen;
+            }
+
+            // Actualizar los datos de la autoparte
+            _context.Autopartes.Update(autoparte);
+            await _context.SaveChangesAsync();
+
+            TempData["EditMessage"] = "La autoparte se actualizó correctamente.";
+            return RedirectToAction("ListaAutopartes", "Admin");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var autoparte = await _context.Autopartes.FindAsync(id);
+
+            if (autoparte == null)
+            {
+                return NotFound();
+            }
+
+            // Eliminar la imagen del servidor si existe
+            if (!string.IsNullOrEmpty(autoparte.aut_imagen))
+            {
+                var rutaImagen = Path.Combine(_hostingEnvironment.WebRootPath, autoparte.aut_imagen.TrimStart('/'));
+
+                if (System.IO.File.Exists(rutaImagen))
+                {
+                    System.IO.File.Delete(rutaImagen);
+                }
+            }
+
+            // Eliminar la autoparte de la base de datos
+            _context.Autopartes.Remove(autoparte);
+            await _context.SaveChangesAsync();
+            TempData["DeleteMessage"] = "La autoparte se eliminó correctamente.";
+            return RedirectToAction("ListaAutopartes", "Admin");
         }
     }
 }
