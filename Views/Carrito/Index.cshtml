@@ -1,153 +1,243 @@
 @model Marimon.Models.Carrito
 
-<!-- Estilos Bootstrap y Font Awesome -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="~/css/indexCarrito.css" asp-append-version="true" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Carrito de Compras | Marimon</title>
 
-<div class="container my-5">
-    <h1 class="text-center mb-5 fw-bold text-dark">
-        <i class="fas fa-shopping-cart me-2"></i>Tu Carrito
-    </h1>
+    <!-- Estilos elegantes -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="~/css/indexCarrito.css" asp-append-version="true">
 
-    <div class="table-responsive rounded shadow-sm border">
-        <table class="table table-hover text-center align-middle mb-0">
-            <thead class="table-dark text-white">
-                <tr>
-                    <th>Autoparte</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="productos-carrito">
-                @foreach (var item in Model.CarritoAutopartes)
-                {
-                    var autoparte = item.Autoparte;
-                    <tr id="producto-@item.carAut_id" data-stock="@autoparte.aut_cantidad">
-                        <td class="d-flex align-items-center gap-3 justify-content-center">
-                            <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" width="60" class="rounded shadow-sm border">
-                            <span class="fw-semibold">@autoparte.aut_nombre</span>
-                        </td>
-                        <td class="text-nowrap">S/ @autoparte.aut_precio.ToString("0.00")</td>
-                        <td>
-                            <div class="btn-group cantidad-control">
-                                <button class="btn btn-outline-secondary decrease-btn" data-producto-id="@item.carAut_id">-</button>
-                                <span id="cantidad-@item.carAut_id" class="px-3 fw-bold">@item.car_cantidad</span>
-                                <button class="btn btn-outline-secondary increase-btn" data-producto-id="@item.carAut_id">+</button>
-                            </div>
-                        </td>
-                        <td class="subtotal fw-bold text-dark" id="subtotal-@item.carAut_id">S/ @item.car_subtotal.ToString("0.00")</td>
-                        <td>
-                            <button class="btn btn-outline-danger remove-btn" data-producto-id="@item.carAut_id" title="Eliminar">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
 
-    <div class="resumen mt-5 p-4 bg-white border rounded shadow-sm">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-            <p class="fs-4 fw-bold text-dark mb-2">Total: S/ <span id="total">@Model.car_total.ToString("0.00")</span></p>
-            <a href="#" id="btn-finalizar" class="btn btn-dark btn-lg shadow">
-                <i class="fas fa-check-circle me-2"></i>Finalizar Compra
-            </a>
+</head>
+
+<body>
+    <div class="container ">
+        <div class="page-header text-center">
+            <h1 class="fw-bold mb-3">
+                <i class="fas fa-shopping-cart me-2"></i>Tu Carrito de Compras
+            </h1>
+            <p class="text-muted">Revisa y gestiona los productos que has seleccionado</p>
         </div>
-        <p id="mensaje-error" class="text-danger mt-3 fw-semibold text-end"></p>
+
+        @if (Model.CarritoAutopartes.Any())
+        {
+            <div class="cart-table mb-5">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Producto</th>
+                            <th>Precio Unitario</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="productos-carrito">
+                        @foreach (var item in Model.CarritoAutopartes)
+                        {
+                            var autoparte = item.Autoparte;
+                            <tr id="producto-@item.carAut_id" data-stock="@autoparte.aut_cantidad" class="cart-item">
+                                <td class="text-start">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="product-img me-3">
+                                        <div>
+                                            <div class="product-name">@autoparte.aut_nombre</div>
+                                            <small class="text-muted">Código: @autoparte.aut_id</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="price">S/ @autoparte.aut_precio.ToString("0.00")</td>
+                                <td>
+                                    <div class="quantity-control">
+                                        <button class="quantity-btn decrease-btn" data-producto-id="@item.carAut_id">-</button>
+                                        <span id="cantidad-@item.carAut_id" class="quantity-input">@item.car_cantidad</span>
+                                        <button class="quantity-btn increase-btn" data-producto-id="@item.carAut_id">+</button>
+                                    </div>
+                                </td>
+                                <td class="subtotal price" id="subtotal-@item.carAut_id">S/ @item.car_subtotal.ToString("0.00")</td>
+                                <td>
+                                    <button class="remove-btn" data-producto-id="@item.carAut_id" title="Eliminar">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="summary-card">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <h5 class="text-muted mb-2">Total del Carrito</h5>
+                        <div class="total-amount">S/ <span id="total">@Model.car_total.ToString("0.00")</span></div>
+                    </div>
+                    <div>
+                        <button id="btn-finalizar" class="checkout-btn">
+                            <i class="fas fa-check-circle me-2"></i>Finalizar Compra
+                        </button>
+                    </div>
+                </div>
+                <p id="mensaje-error" class="error-message mt-3 mb-0 text-end"></p>
+            </div>
+        }
+        else
+        {
+            <div class="empty-cart bg-white rounded shadow-sm">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3 class="mb-3">Tu carrito está vacío</h3>
+                <p class="text-muted mb-4">Aún no has agregado ningún producto a tu carrito de compras.</p>
+                <a href="/" class="btn btn-dark px-4">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a la tienda
+                </a>
+            </div>
+        }
     </div>
-</div>
 
-<!-- Funcionalidad JavaScript (igual que antes) -->
-<script>
-    function calcularTotal() {
-        let total = 0;
-        document.querySelectorAll('.subtotal').forEach(sub => {
-            total += parseFloat(sub.textContent.replace('S/ ', '')) || 0;
-        });
-        document.getElementById('total').textContent = total.toFixed(2);
-    }
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('decrease-btn') || e.target.classList.contains('increase-btn')) {
-            const carritoId = @Model.car_id;
-            const productoId = e.target.dataset.productoId;
-            const cantidadSpan = document.getElementById('cantidad-' + productoId);
-            let cantidadActual = parseInt(cantidadSpan.textContent);
-            let nuevaCantidad = cantidadActual;
+    <script>
+        // Función para formatear números como moneda
+        function formatCurrency(amount) {
+            return 'S/ ' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
 
-            if (e.target.classList.contains('decrease-btn')) {
-                nuevaCantidad = Math.max(1, cantidadActual - 1);
-            } else {
-                nuevaCantidad = cantidadActual + 1;
-            }
+        // Función para calcular el total del carrito
+        function calcularTotal() {
+            let total = 0;
+            document.querySelectorAll('.subtotal').forEach(sub => {
+                total += parseFloat(sub.textContent.replace('S/ ', '').replace(/,/g, '')) || 0;
+            });
+            document.getElementById('total').textContent = total.toFixed(2);
+        }
 
-            cantidadSpan.textContent = nuevaCantidad;
+        // Eventos para los botones de cantidad
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('decrease-btn') || e.target.classList.contains('increase-btn')) {
+                const carritoId = @Model.car_id;
+                const productoId = e.target.dataset.productoId;
+                const cantidadSpan = document.getElementById('cantidad-' + productoId);
+                let cantidadActual = parseInt(cantidadSpan.textContent);
+                let nuevaCantidad = cantidadActual;
 
-            $.ajax({
-                url: '@Url.Action("ActualizarCantidad", "Carrito")',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ carritoId, productoId, nuevaCantidad }),
-                success: function (data) {
-                    if (data.subtotal !== undefined) {
-                        document.getElementById('subtotal-' + productoId).textContent = 'S/ ' + data.subtotal.toFixed(2);
-                        calcularTotal();
+                if (e.target.classList.contains('decrease-btn')) {
+                    nuevaCantidad = Math.max(1, cantidadActual - 1);
+                } else {
+                    nuevaCantidad = cantidadActual + 1;
+                }
+
+                cantidadSpan.textContent = nuevaCantidad;
+
+                $.ajax({
+                    url: '@Url.Action("ActualizarCantidad", "Carrito")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ carritoId, productoId, nuevaCantidad }),
+                    success: function (data) {
+                        if (data.subtotal !== undefined) {
+                            document.getElementById('subtotal-' + productoId).textContent = formatCurrency(data.subtotal);
+                            calcularTotal();
+                        }
+                    },
+                    error: function () {
+                        console.error("Error al actualizar la cantidad.");
                     }
-                },
-                error: function () {
-                    console.error("Error al actualizar la cantidad.");
-                }
-            });
-        }
+                });
+            }
 
-        if (e.target.closest('.remove-btn')) {
-            const btn = e.target.closest('.remove-btn');
-            const productoId = btn.dataset.productoId;
-            const carritoId = @Model.car_id;
+            // Eliminar producto del carrito
+            if (e.target.closest('.remove-btn')) {
+                const btn = e.target.closest('.remove-btn');
+                const productoId = btn.dataset.productoId;
+                const carritoId = @Model.car_id;
+                const productoRow = document.getElementById('producto-' + productoId);
 
-            $.ajax({
-                url: '@Url.Action("EliminarProducto", "Carrito")',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ CarritoId: carritoId, ProductoId: productoId }),
-                success: function (data) {
-                    document.getElementById('producto-' + productoId).remove();
-                    document.getElementById('total').textContent = data.total.toFixed(2);
-                },
-                error: function () {
-                    console.error("Error al eliminar producto.");
-                }
-            });
-        }
-    });
+                // Animación de eliminación
+                productoRow.style.transition = 'all 0.3s ease';
+                productoRow.style.opacity = '0';
+                productoRow.style.transform = 'translateX(-50px)';
 
-    document.getElementById('btn-finalizar').addEventListener('click', function (e) {
-        e.preventDefault();
-        let hayError = false;
-        let mensaje = "";
+                setTimeout(() => {
+                    $.ajax({
+                        url: '@Url.Action("EliminarProducto", "Carrito")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ CarritoId: carritoId, ProductoId: productoId }),
+                        success: function (data) {
+                            productoRow.remove();
+                            document.getElementById('total').textContent = data.total.toFixed(2);
 
-        document.querySelectorAll('#productos-carrito tr').forEach(row => {
-            const stock = parseInt(row.dataset.stock);
-            const cantidad = parseInt(row.querySelector('span[id^="cantidad-"]').textContent);
-            if (cantidad > stock) {
-                const nombre = row.querySelector('td span').innerText.trim();
-                mensaje += `Cantidad de '${nombre}' supera el stock disponible.\n`;
-                hayError = true;
+                            // Si no quedan productos, mostrar el carrito vacío
+                            if (document.querySelectorAll('#productos-carrito tr').length === 0) {
+                                location.reload();
+                            }
+                        },
+                        error: function () {
+                            productoRow.style.opacity = '1';
+                            productoRow.style.transform = 'translateX(0)';
+                            console.error("Error al eliminar producto.");
+                        }
+                    });
+                }, 300);
             }
         });
 
-        const mensajeError = document.getElementById('mensaje-error');
-        if (hayError) {
-            mensajeError.textContent = mensaje;
-        } else {
-            mensajeError.textContent = "";
-            window.location.href = '/Comprobante';
-        }
-    });
+        // Finalizar compra
+        document.getElementById('btn-finalizar')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            let hayError = false;
+            let mensaje = "";
 
-    document.addEventListener('DOMContentLoaded', calcularTotal);
-</script>
+            document.querySelectorAll('#productos-carrito tr').forEach(row => {
+                const stock = parseInt(row.dataset.stock);
+                const cantidad = parseInt(row.querySelector('span[id^="cantidad-"]').textContent);
+                if (cantidad > stock) {
+                    const nombre = row.querySelector('.product-name').innerText.trim();
+                    mensaje += `• La cantidad de "${nombre}" (${cantidad}) supera el stock disponible (${stock}).\n`;
+                    hayError = true;
+
+                    // Resaltar la fila con error
+                    row.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+                    setTimeout(() => {
+                        row.style.backgroundColor = '';
+                    }, 2000);
+                }
+            });
+
+            const mensajeError = document.getElementById('mensaje-error');
+            if (hayError) {
+                mensajeError.innerHTML = '<strong>Error en stock:</strong><br>' + mensaje.replace(/\n/g, '<br>');
+            } else {
+                mensajeError.textContent = "";
+                // Animación del botón antes de redirigir
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+                this.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = '/Comprobante';
+                }, 1000);
+            }
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Formatear todos los precios
+            document.querySelectorAll('.price').forEach(el => {
+                el.textContent = formatCurrency(el.textContent.replace('S/ ', ''));
+            });
+
+            calcularTotal();
+        });
+    </script>
+</body>
+</html>
