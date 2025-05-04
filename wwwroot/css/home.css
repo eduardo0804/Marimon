@@ -287,6 +287,11 @@
   .feature {
     flex-basis: 48%;
   }
+
+  .btn-lg {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -304,50 +309,57 @@
   margin: 0 auto;
   display: flex;
   justify-content: center;
-  padding-right: 40px; 
+  padding-right: 40px;
 }
+
 .hero-img {
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   max-width: 80%;
   height: auto;
 }
+
 .hero-title {
   color: #fff;
   font-weight: bold;
-  font-size: 2rem; 
+  font-size: 2rem;
   margin-bottom: 10px;
   text-shadow: 0 2px 8px #000;
   position: relative;
 }
+
 .hero-underline {
-  width: 70%;              
+  width: 70%;
   height: 4px;
   background: #D42025;
   margin: 12px auto 12px auto;
   border-radius: 2px;
 }
+
 .hero-subtitle {
   color: #fff;
   font-weight: 400;
   margin-bottom: 12px;
   font-size: 1.1rem;
 }
+
 .hero-content p {
   font-size: 0.98rem;
   margin-bottom: 0;
 }
+
 .hero-content {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;      
-  text-align: center; 
+  align-items: center;
+  text-align: center;
   height: 8%;
   color: #eee;
   font-size: 1.15rem;
   font-family: 'Montserrat', Arial, sans-serif;
 }
+
 .slider-bg {
   background: #D42025;
   padding: 32px 0 24px 0;
@@ -458,20 +470,75 @@
   font-weight: 900 !important;
   text-shadow: 0 0 2px #d42025;
 }
+
 @media (max-width: 768px) {
   .hero-content {
     padding: 24px 18px 18px 18px;
     align-items: center;
     text-align: center;
   }
+
   .hero-section {
     padding: 24px 0;
     border-radius: 18px;
   }
+
   .hero-title::after {
-    margin: 6px 0 0 0; /* Reduce el espacio entre título y subtítulo */
+    margin: 6px 0 0 0;
+    /* Reduce el espacio entre título y subtítulo */
   }
+
   .hero-img {
     max-width: 95%;
   }
+}
+
+.bg-black {
+  background-color: #000 !important;
+}
+
+.banner-text {
+  position: absolute;
+  top: 50%;
+  left: 40px;
+  transform: translateY(-50%);
+}
+
+.success-message {
+  bottom: 20px;
+  right: 20px;
+  position: fixed;
+  z-index: 1050;
+  max-width: 300px;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.success-message .btn-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.success-message.hide {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.btn-ver-reservas:active,
+.btn-ver-reservas:focus,
+.btn-ver-reservas.show {
+  background-color: #D42025 !important;
+  color: white !important;
+  border-color: #D42025 !important;
+}
+
+.iti {
+  width: 100%;
 }

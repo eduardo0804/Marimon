@@ -84,6 +84,21 @@ namespace Marimon.Controllers
             if (usuario == null)
                 return Unauthorized();
 
+            var fechaReserva = fecha.Date + hora;
+            var ahora = DateTime.Now;
+            var hoy = ahora.Date;
+
+            if (fechaReserva.Date <= hoy)
+            {
+                TempData["ErrorReserva"] = "Solo puedes reservar para días posteriores al actual.";
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
+            if (fechaReserva <= ahora.AddHours(1))
+            {
+                TempData["ErrorReserva"] = "Solo puedes reservar con al menos 1 hora de anticipación.";
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
+
             var reserva = new Reserva
             {
                 res_placa = placa,
