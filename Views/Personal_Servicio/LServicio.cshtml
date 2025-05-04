@@ -12,7 +12,8 @@
             <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header bg-success text-white">
                     <strong class="me-auto">Éxito</strong>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
                     @TempData["SuccessMessage"]
@@ -23,12 +24,21 @@
 
     <div class="row align-items-center mb-4">
         <div class="col-md-4 text-center">
-            <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FServicios%2Fservicios-marimon-02.jpg?alt=media&token=c30ee586-a8e0-4ac0-be4e-cfa9a9adc4d7.jpg" alt="Servicios" class="img-fluid" style="max-height: 200px;" />
+            <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FServicios%2Fservicios-marimon-02.jpg?alt=media&token=c30ee586-a8e0-4ac0-be4e-cfa9a9adc4d7.jpg"
+                alt="Servicios" class="img-fluid" style="max-height: 200px;" />
         </div>
         <div class="col-md-8">
-            <h2 class="fw-bold">Lista de Servicios</></h2>
-            <p class="text-muted">Revisa y administra los servicios automotrices registrados. Mantén actualizada la información para ofrecer un mejor servicio a los clientes.</p>
+            <h2 class="fw-bold">Lista de Servicios</>
+            </h2>
+            <p class="text-muted">Revisa y administra los servicios automotrices registrados. Mantén actualizada la
+                información para ofrecer un mejor servicio a los clientes.</p>
         </div>
+    </div>
+
+    <div class="mb-3"></div>
+        <button class="btn-registrar" data-bs-toggle="modal" data-bs-target="#modalCrearServicio">
+            <i class="fas fa-plus-circle me-2"></i>Agregar Servicio
+        </button>
     </div>
 
     <div class="table-container">
@@ -40,6 +50,7 @@
                         <th>Imagen</th>
                         <th>Nombre</th>
                         <th>Descripción</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,6 +74,18 @@
                                 </td>
                                 <td data-label="Nombre" class="fw-bold text-wrap">@servicio.ser_nombre</td>
                                 <td data-label="Descripción" class="text-wrap">@servicio.ser_descripcion</td>
+                                <td data-label="Acciones" class="text-center">
+                                    <div class="d-inline-flex gap-2">
+                                        <button class="btn btn-dark rounded-circle p-2 shadow-sm" title="Modificar"
+                                            onclick="loadEditModal(@servicio.ser_id)">
+                                            <i class="bi bi-pencil-square text-white"></i>
+                                        </button>
+                                        <button class="btn btn-danger rounded-circle p-2 shadow-sm" title="Eliminar"
+                                            onclick="confirmDelete(@servicio.ser_id)">
+                                            <i class="bi bi-trash3-fill text-white"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         }
                     }
@@ -77,9 +100,80 @@
         </div>
     </div>
 </div>
+<!-- Modal para confirmar eliminación -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que deseas eliminar este servicio? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar servicio -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modalContentEdit"></div>
+    </div>
+</div>
+
+<!-- Modal para crear servicio -->
+<div class="modal fade" id="modalCrearServicio" tabindex="-1" aria-labelledby="modalCrearServicioLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Servicio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("CrearForm", new Marimon.Models.Servicio())
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
+        // Añadir tooltip para las descripciones largas
+        document.querySelectorAll('.td-description').forEach(cell => {
+            const content = cell.querySelector('.description-content');
+            const tooltip = cell.querySelector('.description-tooltip');
+            
+            if (content && tooltip && content.offsetWidth < content.scrollWidth) {
+                tooltip.style.display = 'block';
+            } else if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        });
+        function loadEditModal(id) {
+            const url = '@Url.Action("Editar", "Personal_Servicio")' + '?id=' + id;
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('modalContentEdit').innerHTML = html;
+                    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                    editModal.show();
+                })
+                .catch(error => console.error('Error al cargar el modal:', error));
+        }
+        function confirmDelete(id) {
+            const deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = '/Personal_Servicio/Eliminar/' + id;
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteModal.show();
+        }
         setTimeout(() => {
             const toast = document.querySelector('.toast');
             if (toast) {

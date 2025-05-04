@@ -82,7 +82,7 @@ namespace Marimon.Controllers
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "El servicio se registró correctamente.";
 
-                return Content("<script>window.parent.location.href = '/Personal_Servicio/CServicio';</script>", "text/html");
+                return Content("<script>window.parent.location.href = '/Personal_Servicio/LServicio';</script>", "text/html");
             }
             catch (Exception ex)
             {
@@ -160,7 +160,7 @@ namespace Marimon.Controllers
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "El servicio se actualizó correctamente.";
 
-                return RedirectToAction("MServicio");
+                return RedirectToAction("LServicio");
             }
             catch (Exception ex)
             {
@@ -197,7 +197,7 @@ namespace Marimon.Controllers
                 TempData["ErrorMessage"] = "Ocurrió un error al intentar eliminar el servicio.";
             }
 
-            return RedirectToAction("EServicio");
+            return RedirectToAction("LServicio");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
