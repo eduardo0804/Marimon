@@ -18,6 +18,52 @@
         max-width: 100% !important;
         box-sizing: border-box !important;
     }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        opacity: 0.9;
+    }
+
+    /* Arrow positioning - adjust as needed */
+    .swiper-button-prev {
+        left: 15px;
+    }
+
+    .swiper-button-next {
+        right: 15px;
+    }
+
+    /* Arrow hover effects */
+    .swiper-button-next:hover,
+    .swiper-button-prev:hover {
+        background-color: #e63946;
+        /* Your site's red */
+        transform: scale(1.1);
+        opacity: 1;
+        box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4);
+    }
+
+    /* Arrow size and appearance */
+    .swiper-button-next:after,
+    .swiper-button-prev:after {
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+    }
+
+
+
+    .swiper-button-next:hover,
+    .swiper-button-prev:hover {
+        animation: pulse 1.5s infinite;
+    }
 </style>
 
 <body>
