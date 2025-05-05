@@ -1,0 +1,100 @@
+@model Marimon.ViewModel.ServicioReservaViewModel
+@{
+    ViewData["Title"] = "Consultar Servicios";
+    Layout = "~/Views/Shared/_LayoutServicio.cshtml";
+    var servicioSeleccionado = Context.Request.Query["nombreServicio"].ToString();
+}
+<link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
+
+<div class="container mt-4">
+    <h2>Filtros</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="servicioSelect">Selecciona un Servicio:</label>
+                <select class="form-control" id="servicioSelect">
+                    <option value="">Seleccionar</option>
+                    @foreach (var servicio in Model.Servicios)
+                    {
+                        <option value="@servicio.ser_nombre">@servicio.ser_nombre</option>
+                    }
+                </select> 
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="fechaDesde">Desde:</label>
+                <input type="date" id="fechaDesde" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="fechaHasta">Hasta:</label>
+                <input type="date" id="fechaHasta" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" onclick="filtrarReservas()">Filtrar</button>
+        </div>
+    </div>
+
+    <div class="table-responsive mt-4">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>PLACA</th>
+                    <th>FECHA</th>
+                    <th>HORA</th>
+                    <th>SERVICIO</th>
+                    <th>USUARIO</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model?.Reservas != null && Model.Reservas.Any())
+                {
+                    @foreach (var reserva in Model.Reservas)
+                    {
+                        <tr class="table-row">
+                            <td data-label="ID">@reserva.res_id</td>
+                            <td data-label="Nombre" class="fw-bold text-wrap">@reserva.res_placa</td>
+                            <td data-label="Descripción" class="text-wrap">@reserva.res_fecha</td>
+                            <td data-label="Descripción" class="text-wrap">@reserva.res_hora</td>
+                            <td data-label="Descripción" class="text-wrap">@reserva.Servicio?.ser_nombre</td>
+                            <td data-label="Descripción" class="text-wrap">@reserva.Usuario?.usu_nombre</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No hay servicios registrados.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function filtrarReservas() {
+        var servicio = document.getElementById("servicioSelect").value;
+        var desde = document.getElementById("fechaDesde").value;
+        var hasta = document.getElementById("fechaHasta").value;
+
+        if (desde && hasta && new Date(desde) > new Date(hasta)) {
+            alert("La fecha 'Hasta' debe ser mayor o igual a la fecha 'Desde'.");
+            return;
+        }
+
+        // Construye la URL con los parámetros
+        var url = '@Url.Action("ConsultarServicios", "Personal_Servicio")' + '?';
+
+        if (servicio) url += 'nombreServicio=' + encodeURIComponent(servicio) + '&';
+        if (desde) url += 'fechaDesde=' + desde + '&';
+        if (hasta) url += 'fechaHasta=' + hasta;
+
+        // Redirecciona
+        window.location.href = url;
+    }
+</script>

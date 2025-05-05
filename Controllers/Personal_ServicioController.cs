@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Marimon.Data;
 using Marimon.Models;
+using Marimon.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Marimon.Controllers
@@ -91,6 +93,40 @@ namespace Marimon.Controllers
                 return View("CrearForm", servicio);
             }
         }
+
+        public IActionResult ConsultarServicios(string? nombreServicio, DateTime? fechaDesde, DateTime? fechaHasta)
+        {
+            var reservas = _context.Reserva
+                .Include(r => r.Servicio)
+                .Include(r => r.Usuario)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(nombreServicio))
+                reservas = reservas.Where(r => r.Servicio.ser_nombre == nombreServicio);
+
+            if (fechaDesde.HasValue)
+            {
+                var desdeUtc = DateTime.SpecifyKind(fechaDesde.Value, DateTimeKind.Utc);
+                reservas = reservas.Where(r => r.res_fecha >= desdeUtc);
+            }
+
+            if (fechaHasta.HasValue)
+            {
+                var hastaUtc = DateTime.SpecifyKind(fechaHasta.Value, DateTimeKind.Utc);
+                reservas = reservas.Where(r => r.res_fecha <= hastaUtc);
+            }
+
+            var viewModel = new ServicioReservaViewModel
+            {
+                Servicios = _context.Servicio.ToList(),
+                Reservas = reservas.ToList()
+            };
+
+            return View(viewModel);
+        }
+
+
+
         public IActionResult MServicio()
         {
             var personalServicio = _context.Servicio.ToList();
