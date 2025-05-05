@@ -4,89 +4,390 @@
     ViewData["Title"] = "Consultar Servicios";
     Layout = "~/Views/Shared/_LayoutServicio.cshtml";
 }
-@* <link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css"> *@
 
 <style>
-    .filtros-box {
-        background-color: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* Modernized styles */
+    :root {
+        --primary-color: #FF0000;
+        --secondary-color: #f8f9fa;
+        --accent-color: #4a90e2;
+        --text-color: #333;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
     }
 
-    .filtros-box label {
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+        background-color: #f5f7fa;
+    }
+
+    .page-header {
+        text-align: center;
+        padding-bottom: 1rem;
+        position: relative;
+    }
+
+    .page-header h2 {
+        font-weight: 600;
+        color: var(--primary-color);
+        display: inline-block;
+        position: relative;
+    }
+
+    .page-header h2:after {
+        content: '';
+        position: absolute;
+        width: 60%;
+        height: 3px;
+        background-color: var(--primary-color);
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    /* Filter Panel Styles */
+    .filter-panel {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        height: 100%;
+        border-top: 4px solid var(--primary-color);
+    }
+
+    .filter-panel h5 {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .services-container {
+        max-height: 150px;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .services-container.expanded {
+        max-height: 1000px;
+    }
+
+    .service-checkbox {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        padding: 0.35rem 0.5rem;
+        border-radius: 4px;
+        transition: var(--transition);
+    }
+
+    .service-checkbox:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .service-checkbox input[type="checkbox"] {
+        margin-right: 0.75rem;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+    }
+
+    .service-checkbox label {
+        font-size: 0.95rem;
+        margin-bottom: 0;
+        cursor: pointer;
+    }
+
+    .show-more-btn {
+        color: var(--accent-color);
+        background: none;
+        border: none;
+        padding: 0.5rem 0;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+        border-top: 1px solid #eee;
+        margin-top: 0.5rem;
+    }
+
+    .show-more-btn:hover {
+        text-decoration: underline;
+    }
+
+    .show-more-btn i {
+        margin-left: 0.25rem;
+        font-size: 0.8rem;
+        transition: var(--transition);
+    }
+
+    .show-more-btn:hover i {
+        transform: translateY(2px);
+    }
+
+    .date-filter label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .date-filter input {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: var(--transition);
+        background-color: #f9f9f9;
+    }
+
+    .date-filter input:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        outline: none;
+        background-color: white;
+    }
+
+    .filter-btn {
+        width: 100%;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .filter-btn i {
+        margin-right: 0.5rem;
+    }
+
+    .filter-btn:hover {
+        background-color: #d00000;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table Container Styles */
+    .table-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        border-top: 4px solid var(--primary-color);
+    }
+
+    .table-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table-header h5 {
+        color: var(--primary-color);
         font-weight: 600;
     }
 
-    .filtros-box .form-check {
-        margin-bottom: 8px;
+    .table-header .input-group {
+        max-width: 300px;
     }
 
-    .filtros-box .form-control {
-        border-radius: 4px;
+    .table-header .form-control {
+        border-radius: 4px 0 0 4px;
+        border-right: none;
     }
 
-    .filtros-box button {
-        border-radius: 4px;
-        font-weight: bold;
+    .table-header .btn {
+        border-radius: 0 4px 4px 0;
+        border-color: #ddd;
     }
 
-    .modern-table {
+    .table-scroll-container {
+        overflow-y: auto;
+        max-height: 600px;
+        flex-grow: 1;
+    }
+
+    /* Table Styles */
+    .services-table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: white;
     }
 
-    .modern-table th,
-    .modern-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
+    .services-table th {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem;
         text-align: left;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 1;
     }
 
-    .modern-table th {
-        background-color: #f2f2f2;
-        font-weight: bold;
+    .services-table th:first-child {
+        border-top-left-radius: 4px;
     }
 
-    .modern-table .table-row:hover {
-        background-color: #f9f9f9;
+    .services-table th:last-child {
+        border-top-right-radius: 4px;
+    }
+
+    .services-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .services-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .services-table tr {
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .services-table tr:hover {
+        background-color: rgba(74, 144, 226, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .badge::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+
+    .badge-pendiente {
+        background-color: #fff4d9;
+        color: #8a6d00;
+    }
+
+    .badge-pendiente::before {
+        background-color: #ffc107;
+    }
+
+    .badge-confirmada {
+        background-color: #e6f4ff;
+        color: #0062cc;
+    }
+
+    .badge-confirmada::before {
+        background-color: #007bff;
+    }
+
+    .badge-cancelada {
+        background-color: #ffeaed;
+        color: #b21e2c;
+    }
+
+    .badge-cancelada::before {
+        background-color: #dc3545;
+    }
+
+    .badge-completada {
+        background-color: #e8f6ed;
+        color: #1e7e34;
+    }
+
+    .badge-completada::before {
+        background-color: #28a745;
     }
 </style>
 
-<div class="container mt-4">
-    <h2>Consultar Servicios</h2>
+<div class="container-fluid mt-4">
+    <div class="page-header text-center mb-4">
+        <h2>Consultar Servicios</h2>
+    </div>
 
     <div class="row">
-        <!-- Filtros a la izquierda -->
-        <div class="col-md-4">
-            <div class="filtros-box">
-                <label>Selecciona Servicios:</label>
-                <div class="form-group border rounded p-2 mb-3" style="max-height: 200px; overflow-y: auto;">
-                    @foreach (var servicio in Model.Servicios)
-                    {
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="servicios" value="@servicio.ser_nombre"
-                                id="chk_@servicio.ser_nombre" @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ?
-                                                                                          "checked" : "") />
-                        <label class="form-check-label" for="chk_@servicio.ser_nombre">@servicio.ser_nombre</label>
+        <!-- Filters panel (Left side) -->
+        <div class="col-lg-3">
+            <div class="filter-panel">
+                <h5 class="border-bottom pb-2 mb-3">Filtros de Búsqueda</h5>
+                
+                <div class="services-section">
+                    <p class="fw-bold mb-2">Selecciona Servicios:</p>
+                    <div class="services-container" id="servicesContainer">
+                        @{
+                            var displayedServices = Model.Servicios.Take(3).ToList();
+                            var remainingServices = Model.Servicios.Skip(3).ToList();
+                        }
+
+                        @foreach (var servicio in displayedServices)
+                        {
+                            <div class="service-checkbox">
+                                <input class="form-check-input" type="checkbox" name="servicios" 
+                                       value="@servicio.ser_nombre" id="chk_@servicio.ser_nombre"
+                                       @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ? "checked" : "") />
+                                <label for="chk_@servicio.ser_nombre">@servicio.ser_nombre</label>
+                            </div>
+                        }
+
+                        <div class="hidden-services" style="display: none;">
+                            @foreach (var servicio in remainingServices)
+                            {
+                                <div class="service-checkbox">
+                                    <input class="form-check-input" type="checkbox" name="servicios" 
+                                          value="@servicio.ser_nombre" id="chk_@servicio.ser_nombre"
+                                          @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ? "checked" : "") />
+                                    <label for="chk_@servicio.ser_nombre">@servicio.ser_nombre</label>
+                                </div>
+                            }
+                        </div>
                     </div>
-                                        }
+                    
+                    @if (remainingServices.Any())
+                    {
+                        <button type="button" class="show-more-btn" id="showMoreBtn">
+                            Ver más servicios <i class="fas fa-chevron-down"></i>
+                        </button>
+                    }
                 </div>
 
-                <div class="mb-3">
-                    <label for="fechaDesde">Desde:</label>
-                    <input type="date" id="fechaDesde" class="form-control"
-                        value="@Context.Request.Query["fechaDesde"]" />
-                </div>
-                <div class="mb-3">
-                    <label for="fechaHasta">Hasta:</label>
-                    <input type="date" id="fechaHasta" class="form-control"
-                        value="@Context.Request.Query["fechaHasta"]" />
+                <div class="date-filter mt-4">
+                    <p class="fw-bold mb-2">Rango de Fechas:</p>
+                    <div class="mb-3">
+                        <label for="fechaDesde">Desde:</label>
+                        <input type="date" id="fechaDesde" class="form-control"
+                            value="@Context.Request.Query["fechaDesde"]" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaHasta">Hasta:</label>
+                        <input type="date" id="fechaHasta" class="form-control"
+                            value="@Context.Request.Query["fechaHasta"]" />
+                    </div>
                 </div>
 
-                <button class="btn btn-primary w-100" onclick="filtrarReservas()">Filtrar</button>
+                <div class="mt-4">
+                    <button class="filter-btn" onclick="filtrarReservas()">
+                        <i class="fas fa-filter mr-2"></i> Aplicar Filtros
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -117,29 +418,23 @@
                                     <td data-label="Hora">@reserva.res_hora</td>
                                     <td data-label="Servicio">@reserva.Servicio?.ser_nombre</td>
                                     <td data-label="Usuario">@reserva.Usuario?.usu_nombre</td>
-                                    <td data-label="Estado">
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal"
-                                            data-reserva-id="@reserva.res_id" data-estado-actual="@reserva.Estado"
-                                            class="text-decoration-none">
-
-                                            @switch (reserva.Estado)
-                                            {
-                                                case EstadoReserva.Pendiente:
-                                                    <span class="badge bg-warning text-dark">Pendiente</span>
-                                                    break;
-                                                case EstadoReserva.Confirmada:
-                                                    <span class="badge bg-primary">Confirmada</span>
-                                                    break;
-                                                case EstadoReserva.Cancelada:
-                                                    <span class="badge bg-danger">Cancelada</span>
-                                                    break;
-                                                case EstadoReserva.Completada:
-                                                    <span class="badge bg-success">Completada</span>
-                                                    break;
-                                            }
-                                        </a>
+                                    <td>
+                                        @switch (reserva.Estado)
+                                        {
+                                            case EstadoReserva.Pendiente:
+                                                <span class="badge bg-warning text-dark">Pendiente</span>
+                                                break;
+                                            case EstadoReserva.Confirmada:
+                                                <span class="badge bg-primary">Confirmada</span>
+                                                break;
+                                            case EstadoReserva.Cancelada:
+                                                <span class="badge bg-danger">Cancelada</span>
+                                                break;
+                                            case EstadoReserva.Completada:
+                                                <span class="badge bg-success">Completada</span>
+                                                break;
+                                        }
                                     </td>
-
                                 </tr>
                             }
                         }
@@ -156,37 +451,38 @@
     </div>
 </div>
 
-<div class="modal fade" id="cambiarEstadoModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="formCambiarEstado" method="post" asp-controller="Personal_Servicio" asp-action="CambiarEstadoReserva">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="reservaId" id="modalReservaId" />
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel">Cambiar estado de la reserva</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="modalNuevoEstado" class="form-label">Nuevo estado</label>
-                        <select class="form-select" id="modalNuevoEstado" name="nuevoEstado">
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="Confirmada">Confirmada</option>
-                            <option value="Cancelada">Cancelada</option>
-                            <option value="Completada">Completada</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
 <script>
+    // Show/hide additional services
+    document.addEventListener('DOMContentLoaded', function() {
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const hiddenServices = document.querySelector('.hidden-services');
+        const servicesContainer = document.getElementById('servicesContainer');
+        
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', function() {
+                if (hiddenServices.style.display === 'none') {
+                    hiddenServices.style.display = 'block';
+                    showMoreBtn.innerHTML = 'Ver menos servicios <i class="fas fa-chevron-up"></i>';
+                    servicesContainer.classList.add('expanded');
+                } else {
+                    hiddenServices.style.display = 'none';
+                    showMoreBtn.innerHTML = 'Ver más servicios <i class="fas fa-chevron-down"></i>';
+                    servicesContainer.classList.remove('expanded');
+                }
+            });
+        }
+        
+        // Row hover effect with subtle animation
+        const tableRows = document.querySelectorAll('.table-row');
+        tableRows.forEach(row => {
+            row.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                // You can add functionality here to show more details or navigate to a details page
+                console.log('Clicked on service ID:', id);
+            });
+        });
+    });
+
     function filtrarReservas() {
         var checkboxes = document.querySelectorAll('input[name="servicios"]:checked');
         var serviciosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
