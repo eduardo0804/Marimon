@@ -2,83 +2,135 @@
 @{
     ViewData["Title"] = "Consultar Servicios";
     Layout = "~/Views/Shared/_LayoutServicio.cshtml";
-    var servicioSeleccionado = Context.Request.Query["nombreServicio"].ToString();
 }
-<link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
+@* <link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css"> *@
+
+<style>
+    .filtros-box {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .filtros-box label {
+        font-weight: 600;
+    }
+
+    .filtros-box .form-check {
+        margin-bottom: 8px;
+    }
+
+    .filtros-box .form-control {
+        border-radius: 4px;
+    }
+
+    .filtros-box button {
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .modern-table th, .modern-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .modern-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .modern-table .table-row:hover {
+        background-color: #f9f9f9;
+    }
+</style>
 
 <div class="container mt-4">
-    <h2>Filtros</h2>
+    <h2>Consultar Servicios</h2>
+
     <div class="row">
+        <!-- Filtros a la izquierda -->
         <div class="col-md-4">
-            <div class="form-group">
-                <label for="servicioSelect">Selecciona un Servicio:</label>
-                <select class="form-control" id="servicioSelect">
-                    <option value="">Seleccionar</option>
+            <div class="filtros-box">
+                <label>Selecciona Servicios:</label>
+                <div class="form-group border rounded p-2 mb-3" style="max-height: 200px; overflow-y: auto;">
                     @foreach (var servicio in Model.Servicios)
                     {
-                        <option value="@servicio.ser_nombre">@servicio.ser_nombre</option>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="servicios" value="@servicio.ser_nombre" id="chk_@servicio.ser_nombre"
+                                   @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ? "checked" : "") />
+                            <label class="form-check-label" for="chk_@servicio.ser_nombre">@servicio.ser_nombre</label>
+                        </div>
                     }
-                </select> 
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label for="fechaDesde">Desde:</label>
-                <input type="date" id="fechaDesde" class="form-control" />
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label for="fechaHasta">Hasta:</label>
-                <input type="date" id="fechaHasta" class="form-control" />
-            </div>
-        </div>
-        <div class="col-md-2 d-flex align-items-end">
-            <button class="btn btn-primary w-100" onclick="filtrarReservas()">Filtrar</button>
-        </div>
-    </div>
+                </div>
 
-    <div class="table-responsive mt-4">
-        <table class="modern-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>PLACA</th>
-                    <th>FECHA</th>
-                    <th>HORA</th>
-                    <th>SERVICIO</th>
-                    <th>USUARIO</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model?.Reservas != null && Model.Reservas.Any())
-                {
-                    @foreach (var reserva in Model.Reservas)
-                    {
-                        <tr class="table-row">
-                            <td data-label="ID">@reserva.res_id</td>
-                            <td data-label="Nombre" class="fw-bold text-wrap">@reserva.res_placa</td>
-                            <td data-label="Descripción" class="text-wrap">@reserva.res_fecha</td>
-                            <td data-label="Descripción" class="text-wrap">@reserva.res_hora</td>
-                            <td data-label="Descripción" class="text-wrap">@reserva.Servicio?.ser_nombre</td>
-                            <td data-label="Descripción" class="text-wrap">@reserva.Usuario?.usu_nombre</td>
+                <div class="mb-3">
+                    <label for="fechaDesde">Desde:</label>
+                    <input type="date" id="fechaDesde" class="form-control" value="@Context.Request.Query["fechaDesde"]" />
+                </div>
+                <div class="mb-3">
+                    <label for="fechaHasta">Hasta:</label>
+                    <input type="date" id="fechaHasta" class="form-control" value="@Context.Request.Query["fechaHasta"]" />
+                </div>
+
+                <button class="btn btn-primary w-100" onclick="filtrarReservas()">Filtrar</button>
+            </div>
+        </div>
+
+        <!-- Tabla a la derecha -->
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>PLACA</th>
+                            <th>FECHA</th>
+                            <th>HORA</th>
+                            <th>SERVICIO</th>
+                            <th>USUARIO</th>
                         </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="6" class="text-center">No hay servicios registrados.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                    </thead>
+                    <tbody>
+                        @if (Model?.Reservas != null && Model.Reservas.Any())
+                        {
+                            @foreach (var reserva in Model.Reservas)
+                            {
+                                <tr class="table-row">
+                                    <td data-label="ID">@reserva.res_id</td>
+                                    <td data-label="Placa">@reserva.res_placa</td>
+                                    <td data-label="Fecha">@reserva.res_fecha.ToShortDateString()</td>
+                                    <td data-label="Hora">@reserva.res_hora</td>
+                                    <td data-label="Servicio">@reserva.Servicio?.ser_nombre</td>
+                                    <td data-label="Usuario">@reserva.Usuario?.usu_nombre</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">No hay servicios registrados.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     function filtrarReservas() {
-        var servicio = document.getElementById("servicioSelect").value;
+        var checkboxes = document.querySelectorAll('input[name="servicios"]:checked');
+        var serviciosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
         var desde = document.getElementById("fechaDesde").value;
         var hasta = document.getElementById("fechaHasta").value;
 
@@ -87,14 +139,15 @@
             return;
         }
 
-        // Construye la URL con los parámetros
         var url = '@Url.Action("ConsultarServicios", "Personal_Servicio")' + '?';
 
-        if (servicio) url += 'nombreServicio=' + encodeURIComponent(servicio) + '&';
+        if (serviciosSeleccionados.length > 0) {
+            url += 'nombreServicio=' + encodeURIComponent(serviciosSeleccionados.join(',')) + '&';
+        }
+
         if (desde) url += 'fechaDesde=' + desde + '&';
         if (hasta) url += 'fechaHasta=' + hasta;
 
-        // Redirecciona
         window.location.href = url;
     }
 </script>

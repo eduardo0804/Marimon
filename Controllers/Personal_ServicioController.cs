@@ -94,38 +94,51 @@ namespace Marimon.Controllers
             }
         }
 
-        public IActionResult ConsultarServicios(string? nombreServicio, DateTime? fechaDesde, DateTime? fechaHasta)
+        public IActionResult ConsultarServicios(string nombreServicio, string fechaDesde, string fechaHasta)
         {
+            var serviciosSeleccionados = string.IsNullOrEmpty(nombreServicio)
+                ? new List<string>()
+                : nombreServicio.Split(',').ToList();
+
+            // Conversión segura a DateTime con tipo UTC
+            DateTime? fechaInicio = null;
+            DateTime? fechaFin = null;
+
+            if (DateTime.TryParse(fechaDesde, out var desde))
+                fechaInicio = DateTime.SpecifyKind(desde, DateTimeKind.Utc);
+
+            if (DateTime.TryParse(fechaHasta, out var hasta))
+                fechaFin = DateTime.SpecifyKind(hasta, DateTimeKind.Utc);
+
             var reservas = _context.Reserva
                 .Include(r => r.Servicio)
                 .Include(r => r.Usuario)
-                .AsQueryable();
+                .Select(r => new Reserva
+                {
+                    res_id = r.res_id,
+                    res_placa = r.res_placa,
+                    res_fecha = r.res_fecha,
+                    res_hora = r.res_hora,
+                    Servicio = r.Servicio,
+                    Usuario = r.Usuario
+                    // res_detalle omitido a propósito
+                })
+                .Where(r =>
+                    (serviciosSeleccionados.Count == 0 || serviciosSeleccionados.Contains(r.Servicio.ser_nombre)) &&
+                    (!fechaInicio.HasValue || r.res_fecha >= fechaInicio.Value) &&
+                    (!fechaFin.HasValue || r.res_fecha <= fechaFin.Value)
+                )
+                .ToList();
 
-            if (!string.IsNullOrEmpty(nombreServicio))
-                reservas = reservas.Where(r => r.Servicio.ser_nombre == nombreServicio);
-
-            if (fechaDesde.HasValue)
-            {
-                var desdeUtc = DateTime.SpecifyKind(fechaDesde.Value, DateTimeKind.Utc);
-                reservas = reservas.Where(r => r.res_fecha >= desdeUtc);
-            }
-
-            if (fechaHasta.HasValue)
-            {
-                var hastaUtc = DateTime.SpecifyKind(fechaHasta.Value, DateTimeKind.Utc);
-                reservas = reservas.Where(r => r.res_fecha <= hastaUtc);
-            }
-
-            var viewModel = new ServicioReservaViewModel
+            var model = new ServicioReservaViewModel
             {
                 Servicios = _context.Servicio.ToList(),
-                Reservas = reservas.ToList()
+                Reservas = reservas,
+                ServiciosSeleccionados = serviciosSeleccionados
             };
 
-            return View(viewModel);
+            return View(model);
         }
-
-
 
         public IActionResult MServicio()
         {

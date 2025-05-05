@@ -10,5 +10,6 @@ namespace Marimon.ViewModel
     {
         public List<Servicio> Servicios { get; set; }
         public List<Reserva> Reservas { get; set; }
+        public List<string> ServiciosSeleccionados { get; set; } = new();
     }
 }
