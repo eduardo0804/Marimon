@@ -57,13 +57,14 @@ namespace Marimon.Controllers
             ViewBag.Apellido = apellido;
 
             // Pasar las reservas al ViewBag
-            ViewBag.Reservas = servicio.Reservas.Select(r => new
-            {
-                Fecha = r.res_fecha.ToString("dd/MM/yyyy"),
-                Hora = r.res_hora.ToString(@"hh\:mm"),
-                Placa = r.res_placa,
-                Telefono = r.res_telefono
-            }).ToList();
+            ViewBag.TodasLasReservas = _context.Reserva
+            .Include(r => r.Servicio)
+            .Select(r => new {
+                res_fecha = r.res_fecha,
+                res_hora = r.res_hora,
+                ser_nombre = r.Servicio.ser_nombre
+            })
+            .ToList();
 
             return View("Servicio", servicio);
         }
@@ -88,6 +89,11 @@ namespace Marimon.Controllers
             var ahora = DateTime.Now;
             var hoy = ahora.Date;
 
+            if (fecha.DayOfWeek == DayOfWeek.Sunday)
+            {
+                TempData["ErrorReserva"] = "No se puede reservar los domingos.";
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
             if (fechaReserva.Date <= hoy)
             {
                 TempData["ErrorReserva"] = "Solo puedes reservar para días posteriores al actual.";

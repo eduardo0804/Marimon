@@ -153,19 +153,22 @@
                     <div class="col-12">
                         <div class="row g-2">
                             <div class="col-6">
-                                @if (ViewBag.Reservas != null && ViewBag.Reservas.Count > 0)
+                                @if (ViewBag.TodasLasReservas != null && ViewBag.TodasLasReservas.Count > 0)
                                 {
                                     <div class="dropdown w-100">
                                         <button class="btn btn-outline-danger btn-lg dropdown-toggle btn-ver-reservas w-100"
                                             type="button" id="dropdownReservas" data-bs-toggle="dropdown"
                                             aria-expanded="false" disabled>
-                                            <span><i class="far fa-calendar-alt me-2"></i>Ver Posibles Cruces
-                                                (@ViewBag.Reservas.Count)</span>
+                                            <span>
+                                                <i class="far fa-calendar-alt me-2"></i>
+                                                Ver Posibles Cruces (@ViewBag.TodasLasReservas.Count)
+                                            </span>
                                         </button>
                                         <div class="dropdown-menu w-100 p-0 border-0 shadow-sm">
                                             <div class="list-group" style="max-height: 225px; overflow-y: auto;">
-                                                @foreach (var reserva in Model.Reservas.OrderBy(r => r.res_fecha).ThenBy(r
-                                                                                            => r.res_hora))
+                                                @foreach (var reserva in
+                                                                                            ((IEnumerable<dynamic>)ViewBag.TodasLasReservas).OrderBy(r =>
+                                                                                            r.res_fecha).ThenBy(r => r.res_hora))
                                                 {
                                                     <div class="list-group-item border-0 py-2"
                                                         data-fecha="@reserva.res_fecha.ToString("yyyy-MM-dd")">
@@ -173,9 +176,11 @@
                                                             <div>
                                                                 <i class="far fa-clock me-2 text-muted"></i>
                                                                 <span>@reserva.res_fecha.ToString("dd/MM/yyyy")</span>
+                                                                <span class="ms-2 badge bg-secondary">@reserva.ser_nombre</span>
                                                             </div>
-                                                            <span
-                                                                class="badge bg-light text-dark">@reserva.res_hora.ToString(@"hh\:mm")</span>
+                                                            <span class="badge bg-light text-dark">
+                                                                @reserva.res_hora.ToString(@"hh\:mm")
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 }
@@ -223,16 +228,17 @@
             errorModal.show();
             return;
         }
-        //Inicializar Cruzes
+        // Inicializar Cruces
         const fechaInput = document.getElementById('fecha');
         const crucesBtn = document.getElementById('dropdownReservas');
-        const listGroupItems = document.querySelectorAll('.list-group-item[data-fecha]');
+        const listGroup = document.querySelector('.list-group');
+        const allItems = Array.from(document.querySelectorAll('.list-group-item[data-fecha]'));
 
         function actualizarCruces() {
             if (!fechaInput || !crucesBtn) return;
             const selectedDate = fechaInput.value;
             let count = 0;
-            listGroupItems.forEach(item => {
+            allItems.forEach(item => {
                 if (item.getAttribute('data-fecha') === selectedDate) {
                     item.style.display = '';
                     count++;
