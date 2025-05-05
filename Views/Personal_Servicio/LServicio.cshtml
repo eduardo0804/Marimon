@@ -4,6 +4,83 @@
 }
 
 <link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
+<!-- Agregar los nuevos estilos -->
+<style>
+    /* Estilos generales adaptados de la primera vista */
+    .container {
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    /* Cabecera con imagen */
+    .row.align-items-center {
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    /* Botón de agregar servicio con estilo similar al botón de registro */
+    .btn-registrar {
+        background-color: #d42025 !important;
+        color: white !important;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 12px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        margin-bottom: 20px;
+    }
+    
+    .btn-registrar:hover {
+        background-color: #b91d21 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ---- Estilos para botones de acciones ---- */
+    .btn-accion {
+        border: none;
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50% !important;
+        margin: 0 3px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Botón de editar estilizado */
+    .btn-editar {
+        background-color: #343a40;
+        color: white;
+    }
+    
+    .btn-editar:hover {
+        background-color: #23272b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Botón de eliminar estilizado */
+    .btn-eliminar {
+        background-color: #d42025;
+        color: white;
+    }
+    
+    .btn-eliminar:hover {
+        background-color: #b91d21;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+</style>
 
 <div class="container py-4">
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -35,7 +112,7 @@
         </div>
     </div>
 
-    <div class="mb-3"></div>
+    <div class="mb-3">
         <button class="btn-registrar" data-bs-toggle="modal" data-bs-target="#modalCrearServicio">
             <i class="fas fa-plus-circle me-2"></i>Agregar Servicio
         </button>
@@ -76,13 +153,15 @@
                                 <td data-label="Descripción" class="text-wrap">@servicio.ser_descripcion</td>
                                 <td data-label="Acciones" class="text-center">
                                     <div class="d-inline-flex gap-2">
-                                        <button class="btn btn-dark rounded-circle p-2 shadow-sm" title="Modificar"
+                                        <!-- Cambio de clases para el botón de editar -->
+                                        <button class="btn-accion btn-editar" title="Modificar"
                                             onclick="loadEditModal(@servicio.ser_id)">
-                                            <i class="bi bi-pencil-square text-white"></i>
+                                            <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <button class="btn btn-danger rounded-circle p-2 shadow-sm" title="Eliminar"
+                                        <!-- Cambio de clases para el botón de eliminar -->
+                                        <button class="btn-accion btn-eliminar" title="Eliminar"
                                             onclick="confirmDelete(@servicio.ser_id)">
-                                            <i class="bi bi-trash3-fill text-white"></i>
+                                            <i class="bi bi-trash3-fill"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -92,7 +171,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="4" class="text-center">No hay servicios registrados.</td>
+                            <td colspan="5" class="text-center">No hay servicios registrados.</td>
                         </tr>
                     }
                 </tbody>
@@ -100,6 +179,7 @@
         </div>
     </div>
 </div>
+
 <!-- Modal para confirmar eliminación -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
