@@ -4,320 +4,8 @@
     ViewData["Title"] = "Consultar Servicios";
     Layout = "~/Views/Shared/_LayoutServicio.cshtml";
 }
+<link rel="stylesheet" href="~/css/consultarServicio.css" />
 
-<style>
-    /* Modernized styles */
-    :root {
-        --primary-color: #FF0000;
-        --secondary-color: #f8f9fa;
-        --accent-color: #4a90e2;
-        --text-color: #333;
-        --border-radius: 8px;
-        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        --transition: all 0.3s ease;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: var(--text-color);
-        background-color: #f5f7fa;
-    }
-
-    .page-header {
-        text-align: center;
-        padding-bottom: 1rem;
-        position: relative;
-    }
-
-    .page-header h2 {
-        font-weight: 600;
-        color: var(--primary-color);
-        display: inline-block;
-        position: relative;
-    }
-
-    .page-header h2:after {
-        content: '';
-        position: absolute;
-        width: 60%;
-        height: 3px;
-        background-color: var(--primary-color);
-        bottom: -8px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    /* Filter Panel Styles */
-    .filter-panel {
-        background-color: white;
-        border-radius: var(--border-radius);
-        padding: 1.5rem;
-        box-shadow: var(--box-shadow);
-        height: 100%;
-        border-top: 4px solid var(--primary-color);
-    }
-
-    .filter-panel h5 {
-        font-weight: 600;
-        color: var(--primary-color);
-    }
-
-    .services-container {
-        max-height: 150px;
-        overflow: hidden;
-        transition: var(--transition);
-    }
-
-    .services-container.expanded {
-        max-height: 1000px;
-    }
-
-    .service-checkbox {
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        padding: 0.35rem 0.5rem;
-        border-radius: 4px;
-        transition: var(--transition);
-    }
-
-    .service-checkbox:hover {
-        background-color: rgba(0, 0, 0, 0.02);
-    }
-
-    .service-checkbox input[type="checkbox"] {
-        margin-right: 0.75rem;
-        width: 18px;
-        height: 18px;
-        accent-color: var(--primary-color);
-    }
-
-    .service-checkbox label {
-        font-size: 0.95rem;
-        margin-bottom: 0;
-        cursor: pointer;
-    }
-
-    .show-more-btn {
-        color: var(--accent-color);
-        background: none;
-        border: none;
-        padding: 0.5rem 0;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        width: 100%;
-        justify-content: center;
-        border-top: 1px solid #eee;
-        margin-top: 0.5rem;
-    }
-
-    .show-more-btn:hover {
-        text-decoration: underline;
-    }
-
-    .show-more-btn i {
-        margin-left: 0.25rem;
-        font-size: 0.8rem;
-        transition: var(--transition);
-    }
-
-    .show-more-btn:hover i {
-        transform: translateY(2px);
-    }
-
-    .date-filter label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        font-size: 0.9rem;
-    }
-
-    .date-filter input {
-        width: 100%;
-        padding: 0.6rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        transition: var(--transition);
-        background-color: #f9f9f9;
-    }
-
-    .date-filter input:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-        outline: none;
-        background-color: white;
-    }
-
-    .filter-btn {
-        width: 100%;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        padding: 0.75rem;
-        border-radius: var(--border-radius);
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .filter-btn i {
-        margin-right: 0.5rem;
-    }
-
-    .filter-btn:hover {
-        background-color: #d00000;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Table Container Styles */
-    .table-container {
-        background-color: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        border-top: 4px solid var(--primary-color);
-    }
-
-    .table-header {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #eee;
-    }
-
-    .table-header h5 {
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-
-    .table-header .input-group {
-        max-width: 300px;
-    }
-
-    .table-header .form-control {
-        border-radius: 4px 0 0 4px;
-        border-right: none;
-    }
-
-    .table-header .btn {
-        border-radius: 0 4px 4px 0;
-        border-color: #ddd;
-    }
-
-    .table-scroll-container {
-        overflow-y: auto;
-        max-height: 600px;
-        flex-grow: 1;
-    }
-
-    /* Table Styles */
-    .services-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        background-color: white;
-    }
-
-    .services-table th {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 1rem;
-        text-align: left;
-        font-weight: 600;
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .services-table th:first-child {
-        border-top-left-radius: 4px;
-    }
-
-    .services-table th:last-child {
-        border-top-right-radius: 4px;
-    }
-
-    .services-table td {
-        padding: 1rem;
-        border-bottom: 1px solid #eee;
-    }
-
-    .services-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .services-table tr {
-        transition: var(--transition);
-        cursor: pointer;
-    }
-
-    .services-table tr:hover {
-        background-color: rgba(74, 144, 226, 0.05);
-        transform: translateY(-2px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .badge {
-        padding: 0.35rem 0.75rem;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .badge::before {
-        content: '';
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 5px;
-    }
-
-    .badge-pendiente {
-        background-color: #fff4d9;
-        color: #8a6d00;
-    }
-
-    .badge-pendiente::before {
-        background-color: #ffc107;
-    }
-
-    .badge-confirmada {
-        background-color: #e6f4ff;
-        color: #0062cc;
-    }
-
-    .badge-confirmada::before {
-        background-color: #007bff;
-    }
-
-    .badge-cancelada {
-        background-color: #ffeaed;
-        color: #b21e2c;
-    }
-
-    .badge-cancelada::before {
-        background-color: #dc3545;
-    }
-
-    .badge-completada {
-        background-color: #e8f6ed;
-        color: #1e7e34;
-    }
-
-    .badge-completada::before {
-        background-color: #28a745;
-    }
-</style>
 
 <div class="container-fluid mt-4">
     <div class="page-header text-center mb-4">
@@ -329,7 +17,7 @@
         <div class="col-lg-3">
             <div class="filter-panel">
                 <h5 class="border-bottom pb-2 mb-3">Filtros de Búsqueda</h5>
-                
+
                 <div class="services-section">
                     <p class="fw-bold mb-2">Selecciona Servicios:</p>
                     <div class="services-container" id="servicesContainer">
@@ -341,9 +29,9 @@
                         @foreach (var servicio in displayedServices)
                         {
                             <div class="service-checkbox">
-                                <input class="form-check-input" type="checkbox" name="servicios" 
-                                       value="@servicio.ser_nombre" id="chk_@servicio.ser_nombre"
-                                       @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ? "checked" : "") />
+                                <input class="form-check-input" type="checkbox" name="servicios"
+                                    value="@servicio.ser_nombre" id="chk_@servicio.ser_nombre"
+                                    @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ? "checked" : "") />
                                 <label for="chk_@servicio.ser_nombre">@servicio.ser_nombre</label>
                             </div>
                         }
@@ -352,15 +40,15 @@
                             @foreach (var servicio in remainingServices)
                             {
                                 <div class="service-checkbox">
-                                    <input class="form-check-input" type="checkbox" name="servicios" 
-                                          value="@servicio.ser_nombre" id="chk_@servicio.ser_nombre"
-                                          @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ? "checked" : "") />
+                                    <input class="form-check-input" type="checkbox" name="servicios"
+                                        value="@servicio.ser_nombre" id="chk_@servicio.ser_nombre"
+                                        @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ? "checked" : "") />
                                     <label for="chk_@servicio.ser_nombre">@servicio.ser_nombre</label>
                                 </div>
                             }
                         </div>
                     </div>
-                    
+
                     @if (remainingServices.Any())
                     {
                         <button type="button" class="show-more-btn" id="showMoreBtn">
@@ -385,7 +73,7 @@
 
                 <div class="mt-4">
                     <button class="filter-btn" onclick="filtrarReservas()">
-                        <i class="fas fa-filter mr-2"></i> Aplicar Filtros
+                        <i class="fas fa-filter"></i> Aplicar Filtros
                     </button>
                 </div>
             </div>
@@ -393,15 +81,16 @@
 
         <!-- Table section (Right side) -->
         <div class="col-lg-9">
-            <div class="table-container">
+            <div class="table-container fade-in">
                 <div class="table-header">
                     <div class="row align-items-center">
                         <div class="col">
                             <h5 class="mb-0">Listado de Servicios</h5>
                         </div>
                         <div class="col-auto">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="searchTable" placeholder="Buscar en tabla...">
+                            <div class="input-group search-container">
+                                <input type="text" class="form-control" id="searchTable"
+                                    placeholder="Buscar en tabla...">
                                 <button class="btn btn-outline-secondary" type="button">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -434,27 +123,28 @@
                                         <td>@reserva.res_hora</td>
                                         <td>@reserva.Servicio?.ser_nombre</td>
                                         <td>@reserva.Usuario?.usu_nombre</td>
-                                        <td data-label="Estado">
-                                            <a href="#"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#cambiarEstadoModal"
-                                            data-reserva-id="@reserva.res_id"
-                                            data-estado-actual="@reserva.Estado"
-                                            class="text-decoration-none">
+                                        <td>
+                                            <a href="#" class="status-badge status-@reserva.Estado.ToString().ToLower()"
+                                                data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal"
+                                                data-reserva-id="@reserva.res_id" data-estado-actual="@reserva.Estado">
 
                                                 @switch (reserva.Estado)
                                                 {
                                                     case EstadoReserva.Pendiente:
-                                                        <span class="badge bg-warning text-dark">Pendiente</span>
+                                                        <i class="fas fa-clock"></i>
+                                                        <span>Pendiente</span>
                                                         break;
                                                     case EstadoReserva.Confirmada:
-                                                        <span class="badge bg-primary">Confirmada</span>
+                                                        <i class="fas fa-check-circle"></i>
+                                                        <span>Confirmada</span>
                                                         break;
                                                     case EstadoReserva.Cancelada:
-                                                        <span class="badge bg-danger">Cancelada</span>
+                                                        <i class="fas fa-times-circle"></i>
+                                                        <span>Cancelada</span>
                                                         break;
                                                     case EstadoReserva.Completada:
-                                                        <span class="badge bg-success">Completada</span>
+                                                        <i class="fas fa-check-double"></i>
+                                                        <span>Completada</span>
                                                         break;
                                                 }
                                             </a>
@@ -465,10 +155,10 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                                            <p class="mb-0">No hay servicios que coincidan con los filtros seleccionados.</p>
+                                    <td colspan="7" class="text-center">
+                                        <div class="empty-state">
+                                            <i class="fas fa-search"></i>
+                                            <p>No hay servicios que coincidan con los filtros seleccionados.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -481,45 +171,79 @@
     </div>
 </div>
 
-<div class="modal fade" id="cambiarEstadoModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="formCambiarEstado" method="post" asp-controller="Personal_Servicio" asp-action="CambiarEstadoReserva">
+<!-- Modernized Status Change Modal -->
+<div class="modal fade status-modal" id="cambiarEstadoModal" tabindex="-1" aria-labelledby="modalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <!-- Explicitly set the form action URL -->
+        <form id="formCambiarEstado" method="post" action="@Url.Action("CambiarEstadoReserva", "Personal_Servicio")">
             @Html.AntiForgeryToken()
             <input type="hidden" name="reservaId" id="modalReservaId" />
+            <input type="hidden" name="nuevoEstado" id="hiddenNuevoEstado" />
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalLabel">Cambiar estado de la reserva</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="modalNuevoEstado" class="form-label">Nuevo estado</label>
-                        <select class="form-select" id="modalNuevoEstado" name="nuevoEstado">
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="Confirmada">Confirmada</option>
-                            <option value="Cancelada">Cancelada</option>
-                            <option value="Completada">Completada</option>
-                        </select>
+                        <label class="form-label">Estado actual: <span id="estadoActualText"
+                                class="fw-bold"></span></label>
+
+                        <div class="status-select-container">
+                            <p class="form-label mb-2">Selecciona el nuevo estado:</p>
+
+                            <div class="status-option status-option-pendiente" data-value="Pendiente">
+                                <input type="radio" class="status-option-input" name="statusRadio" id="estadoPendiente"
+                                    value="Pendiente">
+                                <i class="status-icon fas fa-clock"></i>
+                                <span class="status-text">Pendiente</span>
+                            </div>
+
+                            <div class="status-option status-option-confirmada" data-value="Confirmada">
+                                <input type="radio" class="status-option-input" name="statusRadio" id="estadoConfirmada"
+                                    value="Confirmada">
+                                <i class="status-icon fas fa-check-circle"></i>
+                                <span class="status-text">Confirmada</span>
+                            </div>
+
+                            <div class="status-option status-option-cancelada" data-value="Cancelada">
+                                <input type="radio" class="status-option-input" name="statusRadio" id="estadoCancelada"
+                                    value="Cancelada">
+                                <i class="status-icon fas fa-times-circle"></i>
+                                <span class="status-text">Cancelada</span>
+                            </div>
+
+                            <div class="status-option status-option-completada" data-value="Completada">
+                                <input type="radio" class="status-option-input" name="statusRadio" id="estadoCompletada"
+                                    value="Completada">
+                                <i class="status-icon fas fa-check-double"></i>
+                                <span class="status-text">Completada</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar cambios</button>
+                    <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
+<!-- Toast notification container -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
-    // Show/hide additional services
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        // Show/hide additional services
         const showMoreBtn = document.getElementById('showMoreBtn');
         const hiddenServices = document.querySelector('.hidden-services');
         const servicesContainer = document.getElementById('servicesContainer');
-        
+
         if (showMoreBtn) {
-            showMoreBtn.addEventListener('click', function() {
+            showMoreBtn.addEventListener('click', function () {
                 if (hiddenServices.style.display === 'none') {
                     hiddenServices.style.display = 'block';
                     showMoreBtn.innerHTML = 'Ver menos servicios <i class="fas fa-chevron-up"></i>';
@@ -531,18 +255,115 @@
                 }
             });
         }
-        
-        // Row hover effect with subtle animation
+
+        // Table row click handler
         const tableRows = document.querySelectorAll('.table-row');
         tableRows.forEach(row => {
-            row.addEventListener('click', function() {
+            row.addEventListener('click', function (e) {
+                if (e.target.closest('.status-badge')) {
+                    // If clicking on status badge, let the modal handle it
+                    return;
+                }
                 const id = this.getAttribute('data-id');
-                // You can add functionality here to show more details or navigate to a details page
+                // You can add functionality here to show details or navigate
                 console.log('Clicked on service ID:', id);
             });
         });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchTable');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.services-table tbody tr');
+
+                rows.forEach(row => {
+                    if (row.querySelector('td[colspan]')) {
+                        // This is an empty state row, don't filter it
+                        return;
+                    }
+
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show empty state if no results
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none' && !row.querySelector('td[colspan]'));
+                const emptyStateRow = document.querySelector('.services-table tbody tr td[colspan]')?.parentNode;
+
+                if (visibleRows.length === 0 && emptyStateRow) {
+                    emptyStateRow.style.display = '';
+                } else if (emptyStateRow) {
+                    emptyStateRow.style.display = 'none';
+                }
+            });
+        }
+
+        // Status change modal setup
+        const modal = document.getElementById('cambiarEstadoModal');
+        if (modal) {
+            modal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const reservaId = button.getAttribute('data-reserva-id');
+                const estadoActual = button.getAttribute('data-estado-actual');
+
+                // Set modal values
+                document.getElementById('modalReservaId').value = reservaId;
+                document.getElementById('estadoActualText').textContent = estadoActual;
+                document.getElementById('hiddenNuevoEstado').value = estadoActual;
+
+                // Pre-select the current status radio
+                const radioOptions = document.querySelectorAll('.status-option input[type="radio"]');
+                radioOptions.forEach(option => {
+                    option.checked = (option.value === estadoActual);
+                    const optionLabel = option.closest('.status-option');
+
+                    if (option.checked) {
+                        optionLabel.classList.add('selected');
+                    } else {
+                        optionLabel.classList.remove('selected');
+                    }
+                });
+            });
+        }
+
+        // Status option selection
+        const statusOptions = document.querySelectorAll('.status-option');
+        statusOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                // Remove selected class from all options
+                statusOptions.forEach(opt => opt.classList.remove('selected'));
+
+                // Add selected class to clicked option
+                this.classList.add('selected');
+
+                // Set the hidden input value for form submission
+                const radioInput = this.querySelector('input[type="radio"]');
+                radioInput.checked = true;
+                document.getElementById('hiddenNuevoEstado').value = radioInput.value;
+            });
+        });
+
+        // Form submission with success notification
+        const cambiarEstadoForm = document.getElementById('formCambiarEstado');
+        if (cambiarEstadoForm) {
+            cambiarEstadoForm.addEventListener('submit', function (e) {
+                // For demo purposes, you can remove this preventDefault in production
+                // e.preventDefault();
+
+                showToast('Estado actualizado correctamente', 'success');
+
+                // In production, the form will submit normally and redirect
+                // after processing the controller action
+            });
+        }
     });
 
+    // Function to filter reservations
     function filtrarReservas() {
         var checkboxes = document.querySelectorAll('input[name="servicios"]:checked');
         var serviciosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
@@ -550,7 +371,7 @@
         var hasta = document.getElementById("fechaHasta").value;
 
         if (desde && hasta && new Date(desde) > new Date(hasta)) {
-            alert("La fecha 'Hasta' debe ser mayor o igual a la fecha 'Desde'.");
+            showToast('La fecha "Hasta" debe ser mayor o igual a la fecha "Desde".', 'error');
             return;
         }
 
@@ -565,13 +386,49 @@
 
         window.location.href = url;
     }
-    const modal = document.getElementById('cambiarEstadoModal');
-    modal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const reservaId = button.getAttribute('data-reserva-id');
-        const estadoActual = button.getAttribute('data-estado-actual');
 
-        document.getElementById('modalReservaId').value = reservaId;
-        document.getElementById('modalNuevoEstado').value = estadoActual;
-    });
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+
+        // Set background color based on type
+        let headerBgColor = 'var(--primary-color)';
+        let headerIcon = 'fas fa-check-circle';
+
+        if (type === 'error') {
+            headerBgColor = 'var(--cancelada-color)';
+            headerIcon = 'fas fa-exclamation-circle';
+        }
+
+        toast.innerHTML = `
+            <div class="toast-header" style="background-color: ${headerBgColor}">
+                <h6><i class="${headerIcon} me-2"></i> Notificación</h6>
+                <button type="button" class="toast-close">&times;</button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+
+        // Add to container
+        container.appendChild(toast);
+
+        // Close button functionality
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', function () {
+            container.removeChild(toast);
+        });
+
+        // Auto remove after 4 seconds
+        setTimeout(() => {
+            if (container.contains(toast)) {
+                container.removeChild(toast);
+            }
+        }, 4000);
+    }
+
 </script>
