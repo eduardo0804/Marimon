@@ -1,4 +1,5 @@
 @page
+@using Marimon.Enums
 @model Marimon.Areas.Identity.Pages.Account.Manage.Citas
 @{
     ViewData["Title"] = "Citas";
@@ -34,7 +35,8 @@
             {
                 <div class="alert alert-success success-message position-fixed" role="alert">
                     @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove();"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                        onclick="this.parentElement.remove();"></button>
                 </div>
             }
 
@@ -42,7 +44,8 @@
             {
                 <div class="alert alert-success success-message position-fixed" role="alert">
                     @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove();"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                        onclick="this.parentElement.remove();"></button>
                 </div>
             }
             @if (Model.ReservasUsuario != null && Model.ReservasUsuario.Any())
@@ -56,7 +59,8 @@
                             <th>Fecha</th>
                             <th>Hora</th>
                             <th>Servicio</th>
-                            <th></th>
+                            <th>Eliminar</th>
+                            <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,11 +72,32 @@
                                 <td>@reserva.res_telefono</td>
                                 <td>@reserva.res_fecha.ToString("dd/MM/yyyy")</td>
                                 <td>@reserva.res_hora</td>
-                                <td>@reserva.Servicio?.ser_nombre</td> 
+                                <td>@reserva.Servicio?.ser_nombre</td>
                                 <td>
                                     <form method="post" asp-page-handler="CancelarCita" asp-route-id="@reserva.res_id">
                                         <button type="submit" class="btn btn-danger">Eliminar Cita</button>
                                     </form>
+                                </td>
+                                <td>
+                                    @switch (reserva.Estado)
+                                    {
+                                        case EstadoReserva.Pendiente:
+                                            <span class="badge bg-warning text-dark">Pendiente</span>
+                                            break;
+                                        case EstadoReserva.Confirmada:
+                                            <span class="badge bg-primary">Confirmada</span>
+                                            break;
+                                        case EstadoReserva.Cancelada:
+                                            <span class="badge bg-danger">Cancelada</span>
+                                            break;
+                                        case EstadoReserva.Completada:
+                                            <span class="badge bg-success">Completada</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">Estado desconocido</span>
+                                            break;
+                                    }
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -91,15 +116,15 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const successMessage = document.querySelector(".success-message");
-        if (successMessage) {
-            setTimeout(() => {
-                successMessage.classList.add("hide");
-                setTimeout(() => successMessage.remove(), 500);
-            }, 10000);
-        }
-    });
+        document.addEventListener("DOMContentLoaded", function () {
+            const successMessage = document.querySelector(".success-message");
+            if (successMessage) {
+                setTimeout(() => {
+                    successMessage.classList.add("hide");
+                    setTimeout(() => successMessage.remove(), 500);
+                }, 10000);
+            }
+        });
     </script>
-<script src="~/js/home.js" asp-append-version="true"></script>
+    <script src="~/js/home.js" asp-append-version="true"></script>
 }
