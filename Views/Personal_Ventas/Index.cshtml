@@ -1,7 +1,78 @@
-@{
-    Layout = "~/Views/Shared/_LayoutVentas.cshtml";
+﻿@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Módulo de Autopartes - Administración";
 }
 
-<div>
-    Vista Ventas
+<link href="/css/styleAdmin.css" rel="stylesheet" type="text/css">
+
+<div class="admin-container">
+    <!-- Contenido principal -->
+    <main class="modulo-content">
+        <div class="modulo-grid">
+            <!-- Consultar Autopartes -->
+            <a href="@Url.Action("ConsultarAutoparte", "Personal_Ventas")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/auto.png" alt="Consultar Autopartes">
+                    </div>
+                    <div class="card-footer">
+                        <span>CONSULTAR AUTOPARTES</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Autopartes -->
+            <a href="@Url.Action("ListaAutopartes", "Personal_Ventas")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/autopartes.png" alt="Autopartes">
+                    </div>
+                    <div class="card-footer">
+                        <span>AUTOPARTES</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Flujo de Autopartes -->
+            <div class="modulo-item">
+                <div class="card-content flujo-section">
+                    <a href="@Url.Action("Entradas", "Personal_Ventas")" class="flujo-column-link">
+                        <div class="flujo-column">
+                            <div class="flujo-item">
+                                <img src="~/images/entrada.png" alt="Entradas" class="small-icon">
+                            </div>
+                            <div class="flujo-badge-container">
+                                <span class="flujo-badge entrada">ENTRADAS</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="@Url.Action("Salidas", "Personal_Ventas")" class="flujo-column-link">
+                        <div class="flujo-column">
+                            <div class="flujo-item">
+                                <img src="~/images/salida.png" alt="Salidas" class="small-icon">
+                            </div>
+                            <div class="flujo-badge-container">
+                                <span class="flujo-badge salida">SALIDAS</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="card-footer">
+                    <span class="flujo-text">FLUJO DE AUTOPARTES</span>
+                </div>
+            </div>
+
+            <!-- Reportes -->
+            <a href="@Url.Action("Reportes", "Personal_Ventas")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/estadistica.png" alt="Reportes">
+                    </div>
+                    <div class="card-footer">
+                        <span>REPORTES</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </main>
 </div>

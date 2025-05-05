@@ -1,24 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
+﻿using Google.Apis.Auth.OAuth2;
 using Marimon.Data;
 using Marimon.Models;
-using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marimon.Controllers
 {
     public class Personal_VentasController : Controller
     {
-        private readonly ILogger<Personal_VentasController> _logger;
         private readonly ApplicationDbContext _context;
-                private readonly IWebHostEnvironment _hostingEnvironment;
-
+        private readonly ILogger<Personal_VentasController> _logger;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public Personal_VentasController(ApplicationDbContext context, ILogger<Personal_VentasController> logger, IWebHostEnvironment hostingEnvironment)
         {
@@ -27,11 +21,10 @@ namespace Marimon.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-
-// GET: AdminController
+        // GET: Personal_VentasController
         public ActionResult Index()
         {
-            return View("~/Views/Admin/Index.cshtml");
+            return View();
         }
 
         // GET: Admin/Entradas - Página de entrada de productos
