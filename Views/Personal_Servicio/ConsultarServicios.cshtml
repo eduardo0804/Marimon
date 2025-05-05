@@ -391,70 +391,91 @@
             </div>
         </div>
 
-        <!-- Tabla a la derecha -->
-        <div class="col-md-8">
-            <div class="table-responsive">
-                <table class="modern-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>PLACA</th>
-                            <th>FECHA</th>
-                            <th>HORA</th>
-                            <th>SERVICIO</th>
-                            <th>USUARIO</th>
-                            <th>ESTADO</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model?.Reservas != null && Model.Reservas.Any())
-                        {
-                            @foreach (var reserva in Model.Reservas)
+        <!-- Table section (Right side) -->
+        <div class="col-lg-9">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-0">Listado de Servicios</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="searchTable" placeholder="Buscar en tabla...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-scroll-container">
+                    <table class="services-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>PLACA</th>
+                                <th>FECHA</th>
+                                <th>HORA</th>
+                                <th>SERVICIO</th>
+                                <th>USUARIO</th>
+                                <th>ESTADO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model?.Reservas != null && Model.Reservas.Any())
                             {
-                                <tr class="table-row">
-                                    <td data-label="ID">@reserva.res_id</td>
-                                    <td data-label="Placa">@reserva.res_placa</td>
-                                    <td data-label="Fecha">@reserva.res_fecha.ToShortDateString()</td>
-                                    <td data-label="Hora">@reserva.res_hora</td>
-                                    <td data-label="Servicio">@reserva.Servicio?.ser_nombre</td>
-                                    <td data-label="Usuario">@reserva.Usuario?.usu_nombre</td>
-                                    <td data-label="Estado">
-    <a href="#"
-       data-bs-toggle="modal"
-       data-bs-target="#cambiarEstadoModal"
-       data-reserva-id="@reserva.res_id"
-       data-estado-actual="@reserva.Estado"
-       class="text-decoration-none">
+                                @foreach (var reserva in Model.Reservas)
+                                {
+                                    <tr class="table-row" data-id="@reserva.res_id">
+                                        <td>@reserva.res_id</td>
+                                        <td>@reserva.res_placa</td>
+                                        <td>@reserva.res_fecha.ToShortDateString()</td>
+                                        <td>@reserva.res_hora</td>
+                                        <td>@reserva.Servicio?.ser_nombre</td>
+                                        <td>@reserva.Usuario?.usu_nombre</td>
+                                        <td data-label="Estado">
+                                            <a href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#cambiarEstadoModal"
+                                            data-reserva-id="@reserva.res_id"
+                                            data-estado-actual="@reserva.Estado"
+                                            class="text-decoration-none">
 
-        @switch (reserva.Estado)
-        {
-            case EstadoReserva.Pendiente:
-                <span class="badge bg-warning text-dark">Pendiente</span>
-                break;
-            case EstadoReserva.Confirmada:
-                <span class="badge bg-primary">Confirmada</span>
-                break;
-            case EstadoReserva.Cancelada:
-                <span class="badge bg-danger">Cancelada</span>
-                break;
-            case EstadoReserva.Completada:
-                <span class="badge bg-success">Completada</span>
-                break;
-        }
-    </a>
-</td>
-
+                                                @switch (reserva.Estado)
+                                                {
+                                                    case EstadoReserva.Pendiente:
+                                                        <span class="badge bg-warning text-dark">Pendiente</span>
+                                                        break;
+                                                    case EstadoReserva.Confirmada:
+                                                        <span class="badge bg-primary">Confirmada</span>
+                                                        break;
+                                                    case EstadoReserva.Cancelada:
+                                                        <span class="badge bg-danger">Cancelada</span>
+                                                        break;
+                                                    case EstadoReserva.Completada:
+                                                        <span class="badge bg-success">Completada</span>
+                                                        break;
+                                                }
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                            <p class="mb-0">No hay servicios que coincidan con los filtros seleccionados.</p>
+                                        </div>
+                                    </td>
                                 </tr>
                             }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="6" class="text-center">No hay servicios registrados.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
