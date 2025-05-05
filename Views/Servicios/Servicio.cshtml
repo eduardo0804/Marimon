@@ -23,7 +23,7 @@
 
 @if (TempData["ReservaExitosa"] != null)
 {
-    <div class="alert alert-success success-message" role="alert">
+    <div class="alert alert-success success-message position-fixed" role="alert">
         <strong>Éxito</strong>: ¡Reserva realizada con éxito!
         <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
     </div>
@@ -57,7 +57,7 @@
                 <p>¿Deseas agregar tu cita a tu calendario?</p>
                 <a id="googleCalendarLink" href="#" target="_blank" class="btn btn-success mb-2 w-100">Agregar a Google
                     Calendar</a>
-                <a id="icsDownloadLink" href="#" class="btn btn-primary w-100">Descargar evento (.ics)</a>
+                <a id="icsDownloadLink" href="#" class="btn btn-primary w-100">Agregar Otros Calendarios (.ics)</a>
             </div>
         </div>
     </div>
@@ -126,7 +126,9 @@
                     </div>
                     <div class="col-12 col-md-6">
                         <label for="telefono" class="form-label">Teléfono*</label>
-                        <input type="tel" class="form-control w-100" id="telefono" name="telefono" required>
+                        <input type="hidden" id="telefono_internacional" name="telefono_internacional">
+                        <input type="tel" class="form-control w-100" id="telefono" name="telefono" required
+                            minlength="9" placeholder="9XXXXXXXX">
                     </div>
                     <div class="col-12 col-md-6">
                         <label for="fecha" class="form-label">Fecha*</label>
@@ -149,7 +151,11 @@
                             <option value="18:00">18:00</option>
                         </select>
                     </div>
-
+                    <div class="col-12">
+                        <label for="detalle" class="form-label">Detalles adicionales</label>
+                        <textarea class="form-control" id="detalle" name="detalle" rows="3"
+                            placeholder="Añadir informacion relevante que ayude al diagnostico"></textarea>
+                    </div>
                     <div class="col-12">
                         <div class="row g-2">
                             <div class="col-6">
@@ -211,6 +217,27 @@
 
 <script>
     AOS.init({ once: true });
+    document.getElementById('formulario').addEventListener('submit', function (e) {
+        var iti = window.intlTelInputGlobals.getInstance(document.getElementById('telefono'));
+
+        // Validar que el número sea válido
+        if (!iti.isValidNumber()) {
+            e.preventDefault();
+            var errorModal = new bootstrap.Modal(document.getElementById('errorReservaModal'));
+            document.getElementById('errorReservaMensaje').innerHTML = "El teléfono debe tener el formato internacional correcto.";
+            errorModal.show();
+            return false;
+        }
+
+        var numeroIntl = iti.getNumber();
+
+        var countryCode = iti.getSelectedCountryData().dialCode;
+
+        var numeroFormateado = numeroIntl.replace('+' + countryCode, '+' + countryCode + ' ');
+
+        document.getElementById('telefono_internacional').value = numeroFormateado;
+    });
+
     document.addEventListener("DOMContentLoaded", function () {
         // Inicializa intl-tel-input
         var input = document.querySelector("#telefono");
@@ -219,7 +246,14 @@
             preferredCountries: ["pe", "ar", "es", "us", "br"],
             utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"
         });
-
+        // Inicializa mensaje de éxito
+        const successMessage = document.querySelector(".success-message");
+        if (successMessage) {
+            setTimeout(() => {
+                successMessage.classList.add("hide");
+                setTimeout(() => successMessage.remove(), 500);
+            }, 10000);
+        }
         // Mostrar modal de error si existe
         var errorMsg = '@Html.Raw(TempData["ErrorReserva"])';
         if (errorMsg && errorMsg !== '') {
