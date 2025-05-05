@@ -1,0 +1,382 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    border-radius: 8px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #d11a2a;
+}
+
+.alert-success {
+    background-color: #eafbe6;
+    color: #228b22;
+    padding: 15px 20px;
+    border-radius: 6px;
+    border-left: 6px solid #57d957;
+    margin-bottom: 25px;
+    font-size: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+th, td {
+    text-align: center;
+    padding: 15px;
+    vertical-align: middle;
+}
+
+th {
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+    background-color: #fafafa;
+    color: #555;
+}
+
+td img {
+    width: 60px;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+td {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cantidad-control button {
+    background-color: #eee;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.cantidad-control button:hover {
+    background-color: #ccc;
+}
+
+.cantidad-control span {
+    margin: 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.remove-btn {
+    color: #d11a2a;
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.remove-btn:hover {
+    transform: scale(1.2);
+}
+
+.cupon-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.cupon-container input[type="text"] {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.cupon-container button {
+    background-color: #d11a2a;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.cupon-container button:hover {
+    background-color: #b91524;
+}
+
+.resumen {
+    text-align: right;
+    font-size: 16px;
+}
+
+.resumen-2{
+    text-align: center;
+    font-size: 16px;
+}
+
+.resumen p {
+    margin: 8px 0;
+}
+
+.resumen .total {
+    font-size: 22px;
+    font-weight: bold;
+    color: #d11a2a;
+}
+
+.btn-finalizar {
+    display: inline-block;
+    background-color: #d11a2a;
+    color: white;
+    padding: 14px 32px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 20px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-finalizar:hover {
+    background-color: #b91524;
+}
+
+/* Estilos de los botones de cantidad */
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cantidad-control button {
+    background-color: #eee;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.cantidad-control button:hover {
+    background-color: #ccc;
+}
+
+.cantidad-control span {
+    margin: 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #34495e;
+    --accent-color: #e74c3c;
+    --light-color: #ecf0f1;
+    --dark-color: #000000;
+    --success-color: #27ae60;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f8f9fa;
+    color: var(--dark-color);
+}
+
+.page-header {
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+    .page-header:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: var(--accent-color);
+    }
+
+.cart-table {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+    .cart-table thead {
+        background: var(--primary-color);
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+    }
+
+    .cart-table th {
+        padding: 15px;
+        font-weight: 600;
+    }
+
+    .cart-table td {
+        vertical-align: middle;
+        padding: 20px 15px;
+    }
+
+.product-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    transition: transform 0.3s ease;
+}
+
+    .product-img:hover {
+        transform: scale(1.05);
+    }
+
+.product-name {
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.price {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .quantity-btn:hover {
+        background: #f8f9fa;
+    }
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-left: none;
+    border-right: none;
+    height: 32px;
+    font-weight: 600;
+}
+
+.remove-btn {
+    color: #dc3545;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+    .remove-btn:hover {
+        color: #c82333;
+        transform: scale(1.1);
+    }
+
+.summary-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-top: 3px solid var(--accent-color);
+}
+
+.total-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.checkout-btn {
+    background: #000000;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+    .checkout-btn:hover {
+        background: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+.empty-cart {
+    text-align: center;
+    padding: 50px;
+}
+
+.empty-cart-icon {
+    font-size: 5rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cart-item {
+    animation: fadeIn 0.5s ease forwards;
+}

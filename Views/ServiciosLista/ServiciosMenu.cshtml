@@ -1,0 +1,10 @@
+@model IEnumerable<Marimon.Models.Servicio>
+
+@foreach (var servicio in Model)
+{
+    <li>
+        <a asp-area="" asp-controller="Servicios" asp-action="Detalle" asp-route-id="@servicio.ser_id">
+            @servicio.ser_nombre
+        </a>
+    </li>
+}

@@ -6,7 +6,12 @@ using Marimon.Services;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Http; // Necesario para SameSiteMode
+using Microsoft.AspNetCore.Http;
+using DinkToPdf.Contracts;
+using DinkToPdf;
+using System.Runtime.Loader;
+using System.Reflection;
+using Marimon.Helpers; // Necesario para SameSiteMode
 
 var builder = WebApplication.CreateBuilder(args);
 // Configuración de PostgreSQL
@@ -54,7 +59,9 @@ builder.Services.AddAuthentication()
 
 // Configuración del servicio de email
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddTransient<IEmailSender, EmailSenderWithAttachments>();
+// Registrar la implementación extendida como IEmailSenderWithAttachments
+builder.Services.AddTransient<IEmailSenderWithAttachments, EmailSenderWithAttachments>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -66,12 +73,32 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Necesario para que no lo bloquee la política de cookies
 });
 
+// Configura DinkToPdf converter con el DLL cargado
+var context = new CustomAssemblyLoadContext();
+var path = Path.Combine(AppContext.BaseDirectory, "libwkhtmltox.dll");
+context.LoadUnmanagedLibrary(path);
 
+// Registra el converter como singleton (para inyectar en controladores si quieres)
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 // Protección de datos persistente en carpeta del contenedor
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
     .SetApplicationName("Marimon");
 var app = builder.Build();
+//asignación roles
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    string[] roles = { "Gerente_Operacion","Personal_Servicio","Personal_Ventas", "Cliente" }; // Agrega aquí los roles que necesites
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
 // Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {

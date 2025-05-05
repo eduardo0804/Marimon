@@ -2,7 +2,7 @@
 
 @{
     int cantidadTotal = Model?.CarritoAutopartes?.Sum(x => x.car_cantidad) ?? 0;
-    decimal subtotal = Model?.CarritoAutopartes?.Sum(x => x.Autoparte.aut_precio * x.car_cantidad) ?? 0;
+    
 }
 
 <style>
@@ -23,7 +23,8 @@
     }
 </style>
 
-<div class="offcanvas offcanvas-end bg-black text-white" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
+<div class="offcanvas offcanvas-end bg-black text-white" tabindex="-1" id="offcanvasCarrito"
+    aria-labelledby="offcanvasCarritoLabel">
     <div class="offcanvas-header border-bottom border-secondary">
         <h5 class="offcanvas-title fw-bold" id="offcanvasCarritoLabel">
             <svg class="bi me-2" width="24" height="24" fill="#E42229">
@@ -46,12 +47,12 @@
 
                     <div class="d-flex align-items-center mb-3 border-bottom pb-2">
                         <img src="@autoparte.aut_imagen" alt="Imagen de @autoparte.aut_nombre"
-                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 10px;" />
+                            style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 10px;" />
                         <div class="flex-grow-1">
                             <div class="fw-bold">@autoparte.aut_nombre</div>
                             <small>Cantidad: @item.car_cantidad</small><br />
                             <small>Precio unitario: S/@autoparte.aut_precio.ToString("0.00")</small><br />
-                            <small>Subtotal: <span class="fw-bold">S/@precioItem.ToString("0.00")</span></small>
+                            <small>Subtotal: <span class="fw-bold">S/@item.car_subtotal.ToString("0.00")</span></small>
                         </div>
                     </div>
                 }
@@ -59,21 +60,25 @@
             else
             {
                 <div class="text-white-50 text-center">
-                    Tu carrito está vacío.
+                    🛒 Tu canasta está vacía.
                 </div>
             }
         </div>
 
         <!-- Resumen -->
         <div class="border-secondary pt-3">
-            <div class="d-flex justify-content-between mb-2">
-                <span>Total:</span>
-                <span class="fw-bold">S/@subtotal.ToString("0.00")</span>
-            </div>
-
-            <div class="d-flex flex-column gap-2 text-center mb-3">
-                <a asp-controller="Catalogo" asp-action="Index" class="link-btn">VER CARRITO</a>
-            </div>
+            <!-- Aquí mostramos los productos si el carrito no está vacío -->
+            @if (Model?.CarritoAutopartes != null && Model.CarritoAutopartes.Any())
+            {
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total:</span>
+                   <span class="fw-bold">S/ @Model.car_total.ToString("0.00")</span>
+                </div>
+                <div class="d-flex flex-column gap-2 text-center mb-3">
+                    <a asp-controller="Carrito" asp-action="Index" class="link-btn">VER CARRITO</a>
+                </div>
+            }
         </div>
     </div>
 </div>
+<!-- Aquí el script para manejar el evento del botón "Cerrar" -->

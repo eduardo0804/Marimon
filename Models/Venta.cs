@@ -16,7 +16,6 @@ namespace Marimon.Models
 
         [ForeignKey("MetodoPagoId")]
         public MetodoPago? MetodoPago { get; set; }
-
         public string UsuarioId { get; set; }
 
         [ForeignKey("UsuarioId")]

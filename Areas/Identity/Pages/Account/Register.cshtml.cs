@@ -108,8 +108,6 @@ namespace Marimon.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-
-
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -123,6 +121,10 @@ namespace Marimon.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    // Asignar el rol "Cliente" al usuario recién creado
+                    await _userManager.AddToRoleAsync(user, "Cliente");
+                    _logger.LogInformation("Rol 'Cliente' asignado al usuario.");
 
                     // Obtener el ID generado correctamente
                     var userId = await _userManager.GetUserIdAsync(user);

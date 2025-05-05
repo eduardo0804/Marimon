@@ -1,107 +1,339 @@
+@model Marimon.Models.Servicio
 @{
     ViewBag.Title = "Servicios";
     ViewBag.FullWidthLayout = true;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
+<link rel="stylesheet" href="~/css/home.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
 <style>
     .container {
-        padding: 0 !important;
-        margin: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    .bg-black {
-        background-color: #000 !important;
-    }
-
-    .btn {
-        display: none;
-    }
-
-    .banner-text {
-        position: absolute;
-        top: 50%;
-        left: 40px;
-        transform: translateY(-50%);
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 </style>
 
-<!-- Banner Superior -->
-<div class="container-fluid full-width-banner p-0 position-relative">
-    <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
-        alt="Banner Scanner" class="img-fluid w-100" />
-    <div class="banner-text position-absolute top-10 start-0 ps-5 text-white">
-        <h4 class="text-uppercase fw-bold fs-7">TALLER ESPECIALIZADO EN</h4>
-        <h2 class="fw-bold fs-5">Vehículos Europeos y Americanos</h2>
+@if (TempData["ReservaExitosa"] != null)
+{
+    <div class="alert alert-success success-message position-fixed" role="alert">
+        <strong>Éxito</strong>: ¡Reserva realizada con éxito!
+        <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.remove();"></button>
+    </div>
+}
+
+<div class="modal fade" id="errorReservaModal" tabindex="-1" aria-labelledby="errorReservaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="errorReservaModalLabel">Error en la Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <span id="errorReservaMensaje"></span>
+            </div>
+        </div>
     </div>
 </div>
 
 
-<!-- Contenido -->
-<!-- Sección de Título -->
-<div class="container-fluid p-0 m-0 pt-3">
-    <h2 class="text-center text-white py-5 w-100 bg-black">
-        Servicio de Diagnóstico y Scanner
-    </h2>
+<!-- Modal de Calendario -->
+<div class="modal fade" id="calendarioModal" tabindex="-1" aria-labelledby="calendarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendarioModalLabel">¡Reserva exitosa!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>¿Deseas agregar tu cita a tu calendario?</p>
+                <a id="googleCalendarLink" href="#" target="_blank" class="btn btn-success mb-2 w-100">Agregar a Google
+                    Calendar</a>
+                <a id="icsDownloadLink" href="#" class="btn btn-primary w-100">Agregar Otros Calendarios (.ics)</a>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="container-fluid mt-4 px-4"> <!-- Usamos container-fluid + padding lateral opcional -->
+<!-- Banner -->
+<div class="container-fluid p-0 position-relative" style="height: 320px; overflow: hidden;">
+    <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
+        alt="Banner" class="img-fluid w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" />
+    <div class="banner-text position-absolute top-50 start-50 translate-middle text-center text-white"
+        data-aos="fade-down">
+        <h4 class="text-uppercase fw-bold fs-7 mb-2" style="letter-spacing:2px;">TALLER ESPECIALIZADO EN</h4>
+        <h2 class="fw-bold fs-2">Vehículos Europeos y Americanos</h2>
+    </div>
+</div>
 
-    <!-- Imagen y descripción -->
+<!-- Título del Servicio -->
+<div class="container-fluid p-0 pt-3">
+    <div class="text-center py-5 bg-black" data-aos="fade-up">
+        <h2 class="text-white mb-3">@Model.ser_nombre</h2>
+        <div style="width:60px;height:4px;background:#D42025;margin:auto;border-radius:2px;"></div>
+    </div>
+</div>
+
+<!-- Detalle del Servicio -->
+<div class="container-fluid mt-4 px-4">
     <div class="row my-5 align-items-center">
-        <div class="col-md-6 text-center">
-            <img src="https://images.ctfassets.net/gs0ws48zcft1/5Zs0uT2EM3NsOWikYDRDHB/71e1660c98ebb476c149625efd1ee4d3/imagen-compuesta-interfaz-ingenieria.jpg"
-                alt="Servicio Scanner" class="img-fluid rounded shadow" style="max-height: 350px;" />
+        <div class="col-md-6 text-center" data-aos="fade-right">
+            <img src="@Model.ser_imagen" alt="Imagen Servicio" class="img-fluid rounded shadow"
+                style="max-height: 350px;" />
         </div>
-        <div class="col-md-6">
-            <h5><strong>Diagnóstico y Scanner</strong></h5>
-            <p class="text-muted">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br />
-                Sed do eiusmod tempor incididunt ut labore et dolore."</p>
+        <div class="col-md-6" data-aos="fade-left">
+            <h5 class="fw-bold">@Model.ser_nombre</h5>
+            <p class="text-muted">@Model.ser_descripcion</p>
         </div>
     </div>
 
     <hr />
 
-    <!-- Sección de Reserva -->
-    <div class="container my-5">
-        <div class="row align-items-center">
-            <!-- Imagen a la izquierda -->
-            <div class="col-lg-6 col-md-12 text-center mb-4 mb-lg-0">
-                <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
-                    alt="Reserva tu Servicio" class="img-fluid rounded shadow" />
-            </div>
+    <!-- Formulario de Reserva -->
+    <div class="row my-5 align-items-center">
+        <div class="col-lg-6 text-center mb-4" data-aos="zoom-in">
+            <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
+                alt="Reserva tu Servicio" class="img-fluid rounded shadow" />
+        </div>
 
-            <!-- Formulario a la derecha -->
-            <div class="col-lg-6 col-md-12">
-                <h4 class="text-center mb-4">Reserva tu Servicio</h4>
-                <form class="row g-3" id="formulario">
-                    <div class="col-sm-6">
+        <div class="col-lg-6" data-aos="fade-up">
+            <div class="p-4 rounded-4 shadow-lg bg-white">
+                <h4 class="text-center mb-4 text-danger">Reserva tu Servicio</h4>
+
+                <form asp-action="Reservar" asp-controller="Servicios" method="post" class="row g-3" id="formulario">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ser_id" value="@Model.ser_id" />
+
+                    <div class="col-12 col-md-6">
                         <label for="nombre" class="form-label">Nombre*</label>
-                        <input type="text" class="form-control" id="nombre" placeholder="Tu nombre" required>
+                        <input type="text" class="form-control" id="nombre" value="@ViewBag.Nombre" readonly>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label for="apellido" class="form-label">Apellido*</label>
-                        <input type="text" class="form-control" id="apellido" placeholder="Tu apellido" required>
+                        <input type="text" class="form-control" id="apellido" value="@ViewBag.Apellido" readonly>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label for="placa" class="form-label">Placa*</label>
-                        <input type="text" class="form-control" id="placa" placeholder="ABC123" required>
+                        <input type="text" class="form-control" id="placa" name="placa" required placeholder="ABC123">
                     </div>
-                    <div class="col-sm-6">
-                        <label for="telefono" class="form-label">Número de Teléfono*</label>
-                        <input type="tel" class="form-control" id="telefono" placeholder="+51 900000000" required>
+                    <div class="col-12 col-md-6">
+                        <label for="telefono" class="form-label">Teléfono*</label>
+                        <input type="hidden" id="telefono_internacional" name="telefono_internacional">
+                        <input type="tel" class="form-control w-100" id="telefono" name="telefono" required
+                            minlength="9" placeholder="9XXXXXXXX">
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label for="fecha" class="form-label">Fecha*</label>
-                        <input type="date" class="form-control" id="fecha" required>
+                        <input type="date" class="form-control" id="fecha" name="fecha" required>
                     </div>
-                    <div class="col-sm-6 d-flex align-items-end ">
-                        <button type="submit" class="btn2 btn-danger w-100 btn-lg">RESERVAR CITA</button>
+                    <div class="col-12 col-md-6">
+                        <label for="hora" class="form-label">Hora*</label>
+                        <select class="form-control" id="hora" name="hora" required>
+                            <option value="">Selecciona una hora</option>
+                            <option value="08:00">08:00</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="12:00">12:00</option>
+                            <option value="13:00">13:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                            <option value="18:00">18:00</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="detalle" class="form-label">Detalles adicionales</label>
+                        <textarea class="form-control" id="detalle" name="detalle" rows="3"
+                            placeholder="Añadir informacion relevante que ayude al diagnostico"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                @if (ViewBag.TodasLasReservas != null && ViewBag.TodasLasReservas.Count > 0)
+                                {
+                                    <div class="dropdown w-100">
+                                        <button class="btn btn-outline-danger btn-lg dropdown-toggle btn-ver-reservas w-100"
+                                            type="button" id="dropdownReservas" data-bs-toggle="dropdown"
+                                            aria-expanded="false" disabled>
+                                            <span>
+                                                <i class="far fa-calendar-alt me-2"></i>
+                                                Ver Posibles Cruces (@ViewBag.TodasLasReservas.Count)
+                                            </span>
+                                        </button>
+                                        <div class="dropdown-menu w-100 p-0 border-0 shadow-sm">
+                                            <div class="list-group" style="max-height: 225px; overflow-y: auto;">
+                                                @foreach (var reserva in
+                                                                                            ((IEnumerable<dynamic>)ViewBag.TodasLasReservas).OrderBy(r =>
+                                                                                            r.res_fecha).ThenBy(r => r.res_hora))
+                                                {
+                                                    <div class="list-group-item border-0 py-2"
+                                                        data-fecha="@reserva.res_fecha.ToString("yyyy-MM-dd")">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <i class="far fa-clock me-2 text-muted"></i>
+                                                                <span>@reserva.res_fecha.ToString("dd/MM/yyyy")</span>
+                                                                <span class="ms-2 badge bg-secondary">@reserva.ser_nombre</span>
+                                                            </div>
+                                                            <span class="badge bg-light text-dark">
+                                                                @reserva.res_hora.ToString(@"hh\:mm")
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary btn-lg w-100 disabled">
+                                        <i class="far fa-calendar-alt me-2"></i>No hay reservas
+                                    </button>
+                                }
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-danger btn-lg w-100"
+                                    style="background:#D42025;border:none;">
+                                    <i class="fa fa-calendar-check-o me-2"></i>Reservar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    AOS.init({ once: true });
+    document.getElementById('formulario').addEventListener('submit', function (e) {
+        var iti = window.intlTelInputGlobals.getInstance(document.getElementById('telefono'));
+
+        // Validar que el número sea válido
+        if (!iti.isValidNumber()) {
+            e.preventDefault();
+            var errorModal = new bootstrap.Modal(document.getElementById('errorReservaModal'));
+            document.getElementById('errorReservaMensaje').innerHTML = "El teléfono debe tener el formato internacional correcto.";
+            errorModal.show();
+            return false;
+        }
+
+        var numeroIntl = iti.getNumber();
+
+        var countryCode = iti.getSelectedCountryData().dialCode;
+
+        var numeroFormateado = numeroIntl.replace('+' + countryCode, '+' + countryCode + ' ');
+
+        document.getElementById('telefono_internacional').value = numeroFormateado;
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Inicializa intl-tel-input
+        var input = document.querySelector("#telefono");
+        window.intlTelInput(input, {
+            initialCountry: "pe",
+            preferredCountries: ["pe", "ar", "es", "us", "br"],
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"
+        });
+        // Inicializa mensaje de éxito
+        const successMessage = document.querySelector(".success-message");
+        if (successMessage) {
+            setTimeout(() => {
+                successMessage.classList.add("hide");
+                setTimeout(() => successMessage.remove(), 500);
+            }, 10000);
+        }
+        // Mostrar modal de error si existe
+        var errorMsg = '@Html.Raw(TempData["ErrorReserva"])';
+        if (errorMsg && errorMsg !== '') {
+            var errorModal = new bootstrap.Modal(document.getElementById('errorReservaModal'));
+            document.getElementById('errorReservaMensaje').innerHTML = errorMsg;
+            errorModal.show();
+            return;
+        }
+        // Inicializar Cruces
+        const fechaInput = document.getElementById('fecha');
+        const crucesBtn = document.getElementById('dropdownReservas');
+        const listGroup = document.querySelector('.list-group');
+        const allItems = Array.from(document.querySelectorAll('.list-group-item[data-fecha]'));
+
+        function actualizarCruces() {
+            if (!fechaInput || !crucesBtn) return;
+            const selectedDate = fechaInput.value;
+            let count = 0;
+            allItems.forEach(item => {
+                if (item.getAttribute('data-fecha') === selectedDate) {
+                    item.style.display = '';
+                    count++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            // Actualiza el contador y el estado del botón
+            const countSpan = crucesBtn.querySelector('span');
+            if (count > 0) {
+                crucesBtn.disabled = false;
+                if (countSpan) {
+                    countSpan.innerHTML = `<i class="far fa-calendar-alt me-2"></i>Ver Posibles Cruces (${count})`;
+                }
+            } else {
+                crucesBtn.disabled = true;
+                if (countSpan) {
+                    countSpan.innerHTML = `<i class="far fa-calendar-alt me-2"></i>No hay cruces`;
+                }
+            }
+        }
+        if (fechaInput && crucesBtn) {
+            fechaInput.addEventListener('input', actualizarCruces);
+            actualizarCruces();
+        }
+
+        // Mostrar modal de calendario si la reserva fue exitosa
+        var reservaExitosa = '@TempData["ReservaExitosa"]';
+        if (reservaExitosa && reservaExitosa !== '') {
+            var calendarioModal = new bootstrap.Modal(document.getElementById('calendarioModal'));
+            calendarioModal.show();
+
+            // Datos para el evento
+            const titulo = 'Reserva Marimon';
+            const descripcion = 'Servicio: @Model.ser_nombre';
+            const location = 'Jr. Gral. Felipe Santiago Salaverry 44, Lima 15022, Perú';
+
+            // Usa la fecha seleccionada en el formulario o pásala desde el backend
+            const fecha = new Date(document.getElementById('fecha')?.value || Date.now());
+            const fechaInicio = fecha.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            const fechaFin = new Date(fecha.getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+            // Google Calendar link
+            const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&dates=${fechaInicio}/${fechaFin}&details=${encodeURIComponent(descripcion)}&location=${encodeURIComponent(location)}`;
+            document.getElementById('googleCalendarLink').href = googleUrl;
+
+            // ICS download link
+            const icsContent = `BEGIN:VCALENDAR
+            VERSION:2.0
+            BEGIN:VEVENT
+            SUMMARY:${titulo}
+            DESCRIPTION:${descripcion}
+            LOCATION:${location}
+            DTSTART:${fechaInicio}
+            DTEND:${fechaFin}
+            END:VEVENT
+            END:VCALENDAR`;
+
+            const blob = new Blob([icsContent], { type: 'text/calendar' });
+            document.getElementById('icsDownloadLink').href = URL.createObjectURL(blob);
+            document.getElementById('icsDownloadLink').download = "reserva.ics";
+        }
+    });
+</script>

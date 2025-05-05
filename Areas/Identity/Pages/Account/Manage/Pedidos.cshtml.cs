@@ -40,7 +40,7 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"No se pudo cargar el usuario con ID '{_userManager.GetUserId(User)}'.");
             }
-            //obtener pedidos desde comprobante, atraves de la tabla boleta-factura
+
             PedidosUsuario = await _context.Venta
             .Join(
                 _context.Comprobante, //tabla comprobante

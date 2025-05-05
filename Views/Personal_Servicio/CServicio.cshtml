@@ -1,0 +1,131 @@
+@model IEnumerable<Marimon.Models.Servicio>
+
+@{
+    Layout = "~/Views/Shared/_LayoutServicio.cshtml";
+}
+
+<link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
+
+<div class="container py-4">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success text-white">
+                    <strong class="me-auto">Éxito</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    @TempData["SuccessMessage"]
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6 text-center">
+            <img src="~/images/auto-rojo.png" alt="Auto" class="img-fluid" style="max-height: 200px;" />
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold">Registro de Nuevo Servicio</h2>
+            <p class="text-muted">
+                Administra y organiza los servicios automotrices registrados. Registra nuevos servicios para mantener tu catálogo actualizado y ofrecer una mejor experiencia a tus clientes.
+            </p>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn-registrar" data-bs-toggle="modal" data-bs-target="#modalCrearServicio">
+            <i class="fas fa-plus-circle me-2"></i>Agregar Servicio
+        </button>
+    </div>
+
+    <!-- Modal para crear servicio -->
+    <div class="modal fade" id="modalCrearServicio" tabindex="-1" aria-labelledby="modalCrearServicioLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Servicio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    @await Html.PartialAsync("CrearForm", new Marimon.Models.Servicio())
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de servicios -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var servicio in Model)
+                        {
+                            <tr class="table-row">
+                                <td data-label="ID">@servicio.ser_id</td>
+                                <td data-label="Imagen">
+                                    @if (!string.IsNullOrEmpty(servicio.ser_imagen))
+                                    {
+                                        <div class="image-container">
+                                            <img src="@servicio.ser_imagen" alt="Imagen Servicio" class="table-image" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-image"><i class="fas fa-image"></i> Sin imagen</span>
+                                    }
+                                </td>
+                                    <td data-label="Nombre" class="fw-bold text-wrap">@servicio.ser_nombre</td>
+                                        <td data-label="Descripción" class="text-wrap">
+                                        @servicio.ser_descripcion
+                                    </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">No hay servicios registrados.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Añadir tooltip para las descripciones largas
+        document.querySelectorAll('.td-description').forEach(cell => {
+            const content = cell.querySelector('.description-content');
+            const tooltip = cell.querySelector('.description-tooltip');
+            
+            if (content && tooltip && content.offsetWidth < content.scrollWidth) {
+                tooltip.style.display = 'block';
+            } else if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Ocultar automáticamente la notificación después de 10 segundos
+        setTimeout(() => {
+            const toast = document.querySelector('.toast');
+            if (toast) {
+                const bsToast = bootstrap.Toast.getOrCreateInstance(toast);
+                bsToast.hide();
+            }
+        }, 10000);
+    </script>
+}

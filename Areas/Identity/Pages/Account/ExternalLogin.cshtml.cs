@@ -207,6 +207,11 @@ namespace Marimon.Areas.Identity.Pages.Account
                 {
                     // Vincular la cuenta externa con el usuario de Identity
                     await _userManager.AddLoginAsync(user, info);
+                    
+                    // Asignar el rol "Cliente" al usuario
+                    await _userManager.AddToRoleAsync(user, "Cliente");
+                    _logger.LogInformation("Rol 'Cliente' asignado al usuario que inició sesión con {Name} provider.", info.LoginProvider);
+                    
                     _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
                     try
@@ -285,6 +290,10 @@ namespace Marimon.Areas.Identity.Pages.Account
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
+                        // Asignar el rol "Cliente" al usuario
+                        await _userManager.AddToRoleAsync(user, "Cliente");
+                        _logger.LogInformation("Rol 'Cliente' asignado al usuario durante la confirmación.");
+                        
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
                         try

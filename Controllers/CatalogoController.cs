@@ -8,7 +8,8 @@ using Marimon.Models;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using Marimon.Models.ViewModels;
-
+using System.Globalization;
+using System.Text;
 namespace Marimon.Controllers
 {
     public class CatalogoController : Controller
@@ -23,37 +24,52 @@ namespace Marimon.Controllers
         }
 
         // GET: Catalogo/Index
-        public async Task<IActionResult> Index(string buscar)
+        public IActionResult Index(string buscar, int pagina = 1)
         {
-            var autopartesQuery = _context.Autopartes
-                .Include(a => a.Categoria)
-                .OrderBy(a => a.aut_id)
-                .AsQueryable();
+            const int PaginasPorPagina = 12;  // Número de autopartes por página
 
+            // Consulta base para las autopartes
+            var autopartesQuery = _context.Autopartes.AsQueryable();
+
+            // Filtro por búsqueda
             if (!string.IsNullOrEmpty(buscar))
             {
                 autopartesQuery = autopartesQuery
-                    .Where(a => EF.Functions.ILike(a.aut_nombre, $"%{buscar}%"));
+                    .Where(a => EF.Functions.ILike(ApplicationDbContext.Unaccent(a.aut_nombre), $"%{buscar}%"));
             }
 
-            var autopartes = await autopartesQuery.ToListAsync();
+            // Obtener el total de registros
+            var totalAutopartes = autopartesQuery.Count();
 
-            // Obtener el ID del usuario autenticado (ajusta según tu lógica)
-            var usuarioId = User.Identity.Name;
+            // Si no hay resultados, establecer un mensaje
+            if (totalAutopartes == 0)
+            {
+                ViewBag.Mensaje = "No se encontraron productos que coincidan con tu búsqueda.";
+            }
 
-            var carrito = await _context.Carritos
-                .Include(c => c.CarritoAutopartes)
-                .ThenInclude(cp => cp.Autoparte)
-                .ThenInclude(a => a.Categoria)
-                .FirstOrDefaultAsync(c => c.UsuarioId == usuarioId);
+            // Obtener las autopartes para la página actual
+            var autopartes = autopartesQuery
+                .Skip((pagina - 1) * PaginasPorPagina)
+                .Take(PaginasPorPagina)
+                .ToList();
 
-            var model = new CatalogoViewModel
+            // Calcular cuántas páginas hay
+            var totalPaginas = (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
+
+            // Obtener el carrito (esto puede depender de tu implementación, por ejemplo, desde la sesión o la base de datos)
+            var carrito = _context.Carritos.FirstOrDefault(c => c.UsuarioId == User.Identity.Name); // Ejemplo de cómo obtener el carrito
+
+            // Crear el modelo para la vista
+            var viewModel = new CatalogoViewModel
             {
                 Autopartes = autopartes,
-                Carrito = carrito
+                Carrito = carrito,
+                PaginaActual = pagina,
+                TotalPaginas = totalPaginas,
+                Buscar = buscar
             };
-            ViewBag.Carrito = carrito;
-            return View(model);        
+
+            return View(viewModel);
         }
 
 
@@ -101,6 +117,30 @@ namespace Marimon.Controllers
         public IActionResult Error()
         {
             return View("Error");
+        }
+
+        // GET: Catalogo/Autocomplete
+        [HttpGet]
+        public async Task<IActionResult> Autocomplete(string query)
+        {
+            if (string.IsNullOrEmpty(query) || query.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+
+            var autopartes = await _context.Autopartes
+                .Where(a => EF.Functions.ILike(ApplicationDbContext.Unaccent(a.aut_nombre), $"%{query}%"))
+                .Select(a => new
+                {
+                    id = a.aut_id,
+                    nombre = a.aut_nombre,
+                    imagen = a.aut_imagen,
+                    precio = a.aut_precio
+                })
+                .Take(10)
+                .ToListAsync();
+
+            return Json(autopartes);
         }
 
 

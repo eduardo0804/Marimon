@@ -1,0 +1,311 @@
+@model Tuple<Marimon.Models.Usuario, List<Marimon.Models.Carrito.CarritoItem>>
+
+@{
+    var usuario = Model.Item1;
+    var carrito = Model.Item2;
+    var total = carrito.Sum(p => p.PrecioUnitario * p.Cantidad);
+    Layout = null;
+    ViewData["Title"] = "Finaliza tu compra";
+}
+
+<!-- ESTILOS -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+<style>
+    body {
+        font-family: 'Nunito', sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    .btn-primary-custom {
+        background-color: #E42239;
+        border-color: #E42239;
+        color: #fff;
+    }
+
+    .btn-primary-custom:hover,
+    .btn-primary-custom:focus {
+        background-color: #D40205;
+        border-color: #D40205;
+    }
+
+    .btn-secondary-custom {
+        background-color: #626C66;
+        border-color: #626C66;
+        color: #fff;
+    }
+
+    .btn-secondary-custom:hover {
+        opacity: 0.8;
+    }
+
+    .btn-disabled {
+        background-color: #CCCCCC !important;
+        border: none;
+        pointer-events: none;
+        color: #666;
+    }
+
+    input:disabled,
+    select:disabled {
+        background-color: #e9ecef !important;
+        opacity: 0.7;
+    }
+
+    .card {
+        transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.08);
+    }
+</style>
+
+<!-- FORMULARIO -->
+<form action="@Url.Action("RegistrarComprobante", "Comprobante")" method="post">
+    <div class="container my-5">
+        <!-- Cabecera -->
+        <div class="row mb-4">
+            <div class="col-lg-7">
+                <h2 class="fw-bold text-dark">Finaliza tu Compra</h2>
+            </div>
+            <div class="col-md-5 text-end text-success d-flex align-items-center justify-content-end gap-2">
+                <i class="bi bi-shield-check fs-4"></i>
+                <span class="fw-semibold">Compra Segura</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Resumen de Pedido -->
+            <div class="col-lg-5 order-lg-2 mb-4">
+                <!-- Botón para mostrar/ocultar resumen -->
+                <button type="button" id="toggleResumen"
+                    class="btn btn-secondary-custom w-100 mb-3 d-flex justify-content-between align-items-center">
+                    <span>Ocultar resumen del pedido</span>
+                    <i class="bi bi-chevron-up" id="toggleIcon"></i>
+                </button>
+
+                <div class="card shadow-sm border-0 rounded-4 bg-white p-4 sticky-top" id="resumenPedido"
+                    style="top: 20px;">
+                    <h4 class="fw-bold mb-4">Resumen de Pedido</h4>
+                    <div class="border-top border-bottom py-2 mb-3" style="max-height: 240px; overflow-y: auto;">
+                        @foreach (var item in carrito)
+                        {
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="d-flex align-items-center">
+                                    <!-- Imagen del producto -->
+                                    <div class="me-2" style="width: 50px; height: 50px; min-width: 50px;">
+                                        @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                                        {
+                                            <img src="@item.ImagenUrl" class="img-fluid rounded" alt="@item.Nombre"
+                                                style="object-fit: cover; width: 100%; height: 100%;">
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-light rounded d-flex justify-content-center align-items-center"
+                                                style="width: 100%; height: 100%;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold text-dark">@item.Nombre</div>
+                                        <small class="text-muted">Cantidad: @item.Cantidad</small>
+                                    </div>
+                                </div>
+                                <div class="fw-bold text-dark">
+                                    S/.@String.Format("{0:0.00}", item.PrecioUnitario * item.Cantidad)
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="pt-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold fs-5">Total:</span>
+                            <span class="fw-bold fs-5 text-dark">S/.@String.Format("{0:0.00}", total)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario principal -->
+            <div class="col-lg-7 order-lg-1">
+                <!-- Tipo de comprobante -->
+                <div class="card p-4 shadow-sm bg-light rounded-4 border-0 mb-4">
+                    <div class="form-label fw-semibold fs-4 text-center mb-3">Seleccione el Tipo de Comprobante</div>
+                    <div class="d-flex justify-content-center gap-5">
+                        <div class="form-check form-check-lg">
+                            <input class="form-check-input fs-4" type="radio" name="tipoComprobante" value="boleta"
+                                id="boleta" checked>
+                            <label class="form-check-label fs-5 ms-2" for="boleta">Boleta</label>
+                        </div>
+                        <div class="form-check form-check-lg">
+                            <input class="form-check-input fs-4" type="radio" name="tipoComprobante" value="factura"
+                                id="factura">
+                            <label class="form-check-label fs-5 ms-2" for="factura">Factura</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos personales -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label for="nombre" class="form-label fw-semibold">Nombre *</label>
+                        <input type="text"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="nombre"
+                            name="usu_nombre" placeholder="Ingrese su nombre" value="@usuario.usu_nombre" readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="apellidos" class="form-label fw-semibold">Apellidos *</label>
+                        <input type="text"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                            id="apellidos" name="usu_apellido" placeholder="Ingrese sus apellidos"
+                            value="@usuario.usu_apellido" readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="tipoDocumento" class="form-label fw-semibold">Tipo de documento *</label>
+                        <select class="form-select form-select-lg shadow-sm rounded-3 border-secondary-subtle"
+                            id="tipoDocumento">
+                            <option selected disabled>Seleccione</option>
+                            <option>DNI</option>
+                            <option>Carnet de Extranjería</option>
+                            <option>Pasaporte</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="numeroDocumento" class="form-label fw-semibold">N° de documento *</label>
+                        <input type="text"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                            id="numeroDocumento" name="num_identificacion" placeholder="Ingrese su número de documento">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="correo" class="form-label fw-semibold">Correo electrónico *</label>
+                        <input type="email"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="correo"
+                            name="usu_correo" placeholder="ejemplo@correo.com" value="@usuario.usu_correo" readonly>
+                    </div>
+                </div>
+
+                <!-- Datos para factura -->
+                <div class="row mb-4">
+                    <div class="col-12 mb-3">
+                        <label for="razonSocial" class="form-label fw-semibold">Razón Social</label>
+                        <input type="text"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                            id="razonSocial" name="fac_razonsocial" placeholder="Ingrese razón social">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="ruc" class="form-label fw-semibold">N° de R.U.C.</label>
+                        <input type="text"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="ruc"
+                            name="fac_ruc" placeholder="Ingrese número de RUC">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="direccion" class="form-label fw-semibold">Dirección fiscal o comercial</label>
+                        <input type="text"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                            id="direccion" name="fac_direccion" placeholder="Ingrese dirección">
+                    </div>
+                </div>
+
+                <!-- Entrega -->
+                <div class="card p-4 border-success border-2 rounded-4 mb-4 shadow-sm bg-success bg-opacity-10">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-geo-alt-fill text-success fs-4 me-2"></i>
+                        <h5 class="m-0 fw-bold text-success">Entrega en Tienda</h5>
+                    </div>
+                    <p class="mb-0 ps-4 text-dark">Recojo disponible en: <strong>Jr. Gral. Felipe Santiago Salaverry 44, Lima 15022</strong></p>
+                </div>
+
+                 <!-- Nota -->
+                <div class="alert alert-warning mt-3 rounded-4 shadow-sm ps-4">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Nota:</strong> De momento no hay servicio de envio a domicilio, solo recojo en tienda.
+                </div>
+
+                <!-- Botón -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 rounded-pill shadow">
+                        <i class="bi bi-cart-check-fill me-2"></i>REALIZAR EL PEDIDO
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    const boletaRadio = document.getElementById('boleta');
+    const facturaRadio = document.getElementById('factura');
+
+    const campos = {
+        nombre: document.getElementById('nombre'),
+        apellidos: document.getElementById('apellidos'),
+        tipoDocumento: document.getElementById('tipoDocumento'),
+        numeroDocumento: document.getElementById('numeroDocumento'),
+        correo: document.getElementById('correo'),
+        razonSocial: document.getElementById('razonSocial'),
+        ruc: document.getElementById('ruc'),
+        direccion: document.getElementById('direccion')
+    };
+
+    function actualizarCampos() {
+        const esBoleta = boletaRadio.checked;
+
+        campos.tipoDocumento.disabled = !esBoleta;
+        campos.numeroDocumento.disabled = !esBoleta;
+
+        campos.razonSocial.disabled = esBoleta;
+        campos.ruc.disabled = esBoleta;
+        campos.direccion.disabled = esBoleta;
+
+        if (!esBoleta) {
+            campos.tipoDocumento.selectedIndex = 0;
+            campos.numeroDocumento.value = '';
+        }
+    }
+
+    boletaRadio.addEventListener('change', actualizarCampos);
+    facturaRadio.addEventListener('change', actualizarCampos);
+    window.addEventListener('DOMContentLoaded', actualizarCampos);
+
+    const toggleBtn = document.getElementById('toggleResumen');
+    const resumenPedido = document.getElementById('resumenPedido');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    toggleBtn.addEventListener('click', function() {
+        if (resumenPedido.style.display === 'none') {
+            resumenPedido.style.display = 'block';
+            toggleBtn.querySelector('span').textContent = 'Ocultar resumen del pedido';
+            toggleIcon.classList.remove('bi-chevron-down');
+            toggleIcon.classList.add('bi-chevron-up');
+        } else {
+            resumenPedido.style.display = 'none';
+            toggleBtn.querySelector('span').textContent = 'Mostrar resumen del pedido';
+            toggleIcon.classList.remove('bi-chevron-up');
+            toggleIcon.classList.add('bi-chevron-down');
+        }
+    });
+    
+    // Para dispositivos móviles, ocultar el resumen por defecto
+    function checkWidth() {
+        if (window.innerWidth < 992) {
+            resumenPedido.style.display = 'none';
+            toggleBtn.querySelector('span').textContent = 'Mostrar resumen del pedido';
+            toggleIcon.classList.remove('bi-chevron-up');
+            toggleIcon.classList.add('bi-chevron-down');
+        } else {
+            resumenPedido.style.display = 'block';
+            toggleBtn.querySelector('span').textContent = 'Ocultar resumen del pedido';
+            toggleIcon.classList.remove('bi-chevron-down');
+            toggleIcon.classList.add('bi-chevron-up');
+        }
+    }
+    
+    // Verificar al cargar y al cambiar tamaño de ventana
+    window.addEventListener('DOMContentLoaded', checkWidth);
+    window.addEventListener('resize', checkWidth);
+</script>

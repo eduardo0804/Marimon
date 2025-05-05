@@ -1,0 +1,299 @@
+@model IEnumerable<Marimon.Models.Autoparte>
+
+@{
+    ViewData["Title"] = "Repuestos y Llantas";
+    Layout = "_LayoutAdmin";
+
+}
+
+<link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
+
+<div class="container py-4">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Éxito</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                La autoparte se registró correctamente.
+            </div>
+        </div>
+        <div id="editToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-warning text-white">
+                <strong class="me-auto">Edición Exitosa</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                La autoparte se actualizo correctamente.
+            </div>
+        </div>
+        <div id="deleteToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">Eliminación</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                La autoparte se eliminó correctamente.
+            </div>
+        </div>
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">Error</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="errorToastMessage">
+                Ha ocurrido un error.
+            </div>
+        </div>
+    </div>
+    <!-- Encabezado con imagen y texto -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6 text-center">
+            <img src="~/images/auto.png" alt="Auto" class="img-fluid" />
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold">Repuestos y Llantas</h2>
+            <p>
+                Contamos con una amplia variedad de autopartes y llantas para tu vehículo.
+                Consulta la lista y encuentra lo que necesitas.
+            </p>
+        </div>
+    </div>
+
+    <!-- Botón para abrir el modal de registro -->
+    <div class="mb-3">
+        <button class="btn-registrar" data-bs-toggle="modal" data-bs-target="#registerModal">
+            <i class="fas fa-plus-circle me-2"></i>Registrar nueva autoparte
+        </button>
+    </div>
+
+
+
+    <!-- Modal de Registro (Carga el formulario de la otra vista) -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Registrar nueva autoparte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    <!-- Aquí se cargará el formulario de la vista separada -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal para editar autoparte -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar autoparte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="modalContentEdit">
+                    <!-- Aquí se cargará el formulario de edición -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Tabla de autopartes -->
+    <div class="table-container">
+  <div class="table-responsive">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Especificaciones</th>
+          <th>Precio (S/)</th>
+          <th>Cantidad</th>
+          <th>Categoría</th>
+          <th>Imagen</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in Model)
+        {
+          <tr class="table-row">
+            <td data-label="ID">@item.aut_id</td>
+            <td data-label="Nombre">@item.aut_nombre</td>
+            <td data-label="Descripción" class="td-description">
+              <div class="description-content">@item.aut_descripcion</div>
+              <div class="description-tooltip">@item.aut_descripcion</div>
+            </td>
+            <td data-label="Especificaciones" class="td-description">
+              <div class="description-content">@item.aut_especificacion</div>
+              <div class="description-tooltip">@item.aut_especificacion</div>
+            </td>
+            <td data-label="Precio">S/ @item.aut_precio.ToString("F2")</td>
+            <td data-label="Cantidad">@item.aut_cantidad.ToString()</td>
+            <td data-label="Categoría">@item.Categoria?.cat_nombre</td>
+            <td data-label="Imagen">
+              @if (!string.IsNullOrEmpty(item.aut_imagen))
+              {
+                <div class="image-container">
+                  <img src="@item.aut_imagen" alt="Imagen" class="table-image" />
+                  <div class="image-overlay">
+                    @* <a href="@item.aut_imagen" target="_blank" class="image-zoom"> *@
+                    @*   <i class="fas fa-search-plus"></i> *@
+                    @* </a> *@
+                  </div>
+                </div>
+              }
+              else
+              {
+                <span class="no-image"><i class="fas fa-image"></i> Sin imagen</span>
+              }
+            </td>
+            <td data-label="Acciones" class="actions-cell">
+              <div class="action-buttons">
+                <button class="btn-action btn-edit" onclick="loadEditModal('@item.aut_id');" title="Modificar">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <form asp-action="Eliminar" asp-controller="Admin" asp-route-id="@item.aut_id" method="post" class="delete-form">
+                  <button type="button" class="btn-action btn-delete" onclick="confirmDelete(this)" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro que deseas eliminar esta autoparte? Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn-confirm-delete">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Este script carga el formulario desde otra página al abrir el modal de registro
+        $('#registerModal').on('show.bs.modal', function (e) {
+            $.get('@Url.Action("Create", "Admin")', function (data) {
+                $('#modalContent').html(data); // Inserta el contenido en el modal
+            });
+        });
+
+        // Este script carga el formulario desde otra página al abrir el modal de edición
+        function loadEditModal(aut_id) {
+            $.get('/Admin/Editar/' + aut_id, function (data) {
+                $('#modalContentEdit').html(data);
+                $('#editModal').modal('show');
+            });
+        }
+        $(document).ready(function () {
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                    const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+                    successToast.show();
+                </text>
+            }
+
+            @if (TempData["EditMessage"] != null) // Agregar la condición para el toast de edición
+            {
+                <text>
+                    const editToast = new bootstrap.Toast(document.getElementById('editToast'));
+                    editToast.show();
+                </text>
+            }
+
+            @if (TempData["DeleteMessage"] != null)
+            {
+                <text>
+                    const deleteToast = new bootstrap.Toast(document.getElementById('deleteToast'));
+                    deleteToast.show();
+                </text>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                    document.getElementById('errorToastMessage').innerText = '@TempData["Error"]';
+                    const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                    errorToast.show();
+                </text>
+            }
+        });
+
+
+        function confirmDelete(button) {
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        const deleteForm = button.closest('form');
+        
+        // Mostrar el modal
+        deleteModal.show();
+        
+        // Configurar el botón de confirmación
+        document.querySelector('.btn-confirm-delete').onclick = function() {
+          deleteForm.submit();
+          deleteModal.hide();
+        };
+}
+
+    // Añadir efectos de ripple a los botones de acción
+    document.querySelectorAll('.btn-action').forEach(button => {
+      button.addEventListener('mousedown', function(e) {
+        const x = e.clientX - e.target.getBoundingClientRect().left;
+        const y = e.clientY - e.target.getBoundingClientRect().top;
+        
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+
+// Añadir tooltip para las imágenes que están recortadas
+    document.querySelectorAll('.td-description').forEach(cell => {
+      const content = cell.querySelector('.description-content');
+      const tooltip = cell.querySelector('.description-tooltip');
+      
+      if (content.offsetWidth < content.scrollWidth) {
+        tooltip.style.display = 'block';
+      } else {
+        tooltip.style.display = 'none';
+      }
+    });
+    </script>
+
+}

@@ -22,10 +22,7 @@ namespace Marimon.Models
 
         public int car_cantidad { get; set; } = 0;
 
-        public decimal car_subtotal { 
-            get { return car_cantidad*Autoparte.aut_precio; }
-        }
-
+        public decimal car_subtotal { get; set; } = 0;  
     }
 
 }
