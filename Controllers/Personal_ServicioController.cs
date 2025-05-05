@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Marimon.Data;
+using Marimon.Enums;
 using Marimon.Models;
 using Marimon.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -128,6 +129,8 @@ namespace Marimon.Controllers
                     (!fechaInicio.HasValue || r.res_fecha >= fechaInicio.Value) &&
                     (!fechaFin.HasValue || r.res_fecha <= fechaFin.Value)
                 )
+                .OrderBy(r => r.res_fecha) // Ordena por fecha
+                .ThenBy(r => r.res_hora) // Y luego por hora
                 .ToList();
 
             var model = new ServicioReservaViewModel
@@ -248,6 +251,23 @@ namespace Marimon.Controllers
             }
 
             return RedirectToAction("LServicio");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CambiarEstadoReserva(int reservaId, string nuevoEstado)
+        {
+            var reserva = _context.Reserva.FirstOrDefault(r => r.res_id == reservaId);
+            if (reserva == null) return NotFound();
+
+            if (Enum.TryParse<EstadoReserva>(nuevoEstado, out var estado))
+            {
+                reserva.Estado = estado;
+                _context.SaveChanges();
+                return RedirectToAction("ConsultarServicios"); // o la acción donde muestras la tabla
+            }
+
+            return BadRequest("Estado inválido");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

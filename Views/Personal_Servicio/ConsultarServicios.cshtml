@@ -117,23 +117,29 @@
                                     <td data-label="Hora">@reserva.res_hora</td>
                                     <td data-label="Servicio">@reserva.Servicio?.ser_nombre</td>
                                     <td data-label="Usuario">@reserva.Usuario?.usu_nombre</td>
-                                    <td>
-                                        @switch (reserva.Estado)
-                                        {
-                                            case EstadoReserva.Pendiente:
-                                                <span class="badge bg-warning text-dark">Pendiente</span>
-                                                break;
-                                            case EstadoReserva.Confirmada:
-                                                <span class="badge bg-primary">Confirmada</span>
-                                                break;
-                                            case EstadoReserva.Cancelada:
-                                                <span class="badge bg-danger">Cancelada</span>
-                                                break;
-                                            case EstadoReserva.Completada:
-                                                <span class="badge bg-success">Completada</span>
-                                                break;
-                                        }
+                                    <td data-label="Estado">
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal"
+                                            data-reserva-id="@reserva.res_id" data-estado-actual="@reserva.Estado"
+                                            class="text-decoration-none">
+
+                                            @switch (reserva.Estado)
+                                            {
+                                                case EstadoReserva.Pendiente:
+                                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                                    break;
+                                                case EstadoReserva.Confirmada:
+                                                    <span class="badge bg-primary">Confirmada</span>
+                                                    break;
+                                                case EstadoReserva.Cancelada:
+                                                    <span class="badge bg-danger">Cancelada</span>
+                                                    break;
+                                                case EstadoReserva.Completada:
+                                                    <span class="badge bg-success">Completada</span>
+                                                    break;
+                                            }
+                                        </a>
                                     </td>
+
                                 </tr>
                             }
                         }
@@ -147,6 +153,36 @@
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cambiarEstadoModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formCambiarEstado" method="post" asp-controller="Personal_Servicio" asp-action="CambiarEstadoReserva">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="reservaId" id="modalReservaId" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Cambiar estado de la reserva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="modalNuevoEstado" class="form-label">Nuevo estado</label>
+                        <select class="form-select" id="modalNuevoEstado" name="nuevoEstado">
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Confirmada">Confirmada</option>
+                            <option value="Cancelada">Cancelada</option>
+                            <option value="Completada">Completada</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -173,4 +209,13 @@
 
         window.location.href = url;
     }
+    const modal = document.getElementById('cambiarEstadoModal');
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const reservaId = button.getAttribute('data-reserva-id');
+        const estadoActual = button.getAttribute('data-estado-actual');
+
+        document.getElementById('modalReservaId').value = reservaId;
+        document.getElementById('modalNuevoEstado').value = estadoActual;
+    });
 </script>
