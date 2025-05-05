@@ -202,14 +202,14 @@
     <script>
         // Este script carga el formulario desde otra página al abrir el modal de registro
         $('#registerModal').on('show.bs.modal', function (e) {
-            $.get('@Url.Action("Create", "Admin")', function (data) {
+            $.get('@Url.Action("Create", "Personal_Ventas")', function (data) {
                 $('#modalContent').html(data); // Inserta el contenido en el modal
             });
         });
 
         // Este script carga el formulario desde otra página al abrir el modal de edición
         function loadEditModal(aut_id) {
-            $.get('/Admin/Editar/' + aut_id, function (data) {
+            $.get('/Personal_Ventas/Editar/' + aut_id, function (data) {
                 $('#modalContentEdit').html(data);
                 $('#editModal').modal('show');
             });
