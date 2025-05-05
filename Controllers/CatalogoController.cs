@@ -41,6 +41,12 @@ namespace Marimon.Controllers
             // Obtener el total de registros
             var totalAutopartes = autopartesQuery.Count();
 
+            // Si no hay resultados, establecer un mensaje
+            if (totalAutopartes == 0)
+            {
+                ViewBag.Mensaje = "No se encontraron productos que coincidan con tu búsqueda.";
+            }
+
             // Obtener las autopartes para la página actual
             var autopartes = autopartesQuery
                 .Skip((pagina - 1) * PaginasPorPagina)
@@ -111,6 +117,30 @@ namespace Marimon.Controllers
         public IActionResult Error()
         {
             return View("Error");
+        }
+
+        // GET: Catalogo/Autocomplete
+        [HttpGet]
+        public async Task<IActionResult> Autocomplete(string query)
+        {
+            if (string.IsNullOrEmpty(query) || query.Length < 2)
+            {
+                return Json(new List<object>());
+            }
+
+            var autopartes = await _context.Autopartes
+                .Where(a => EF.Functions.ILike(ApplicationDbContext.Unaccent(a.aut_nombre), $"%{query}%"))
+                .Select(a => new
+                {
+                    id = a.aut_id,
+                    nombre = a.aut_nombre,
+                    imagen = a.aut_imagen,
+                    precio = a.aut_precio
+                })
+                .Take(10)
+                .ToListAsync();
+
+            return Json(autopartes);
         }
 
 

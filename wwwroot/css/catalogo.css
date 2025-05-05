@@ -8,6 +8,7 @@ body {
         pointer-events: none;
     }
 }
+
 .pagination .page-item .page-link {
     color: #333;
     background-color: #fff;
@@ -768,19 +769,7 @@ h2:after {
     color: #000;
 }
 
-.btn-primary {
-    background-color: #000 !important;
-    border: none !important;
-    border-radius: 50px !important;
-    padding: 10px 20px !important;
-    color: white !important;
-    font-weight: 500 !important;
-    transition: all 0.3s ease !important;
-    width: 80% !important;
-    display: block !important;
-    margin: 0 auto !important;
-    outline: none !important;
-    box-shadow: none !important;
+x-shadow: none !important;
 }
 
 .btn-primary:hover {
@@ -811,4 +800,12 @@ h2:after {
 .page-item.active .page-link {
     background-color: #000;
     border-color: #000;
+}
+
+.btn-search {
+    border-radius: 40px;
+    padding: 10px 24px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    font-weight: 600;
 }
