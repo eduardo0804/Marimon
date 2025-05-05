@@ -77,63 +77,112 @@ namespace Marimon.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reservar(int ser_id, string placa, string telefono, string telefono_internacional, DateTime fecha, TimeSpan hora, string detalle)
+        public async Task<IActionResult> Reservar(int ser_id, string placa, string telefono,string telefono_internacional, DateTime fecha, TimeSpan hora, string detalle)
         {
-            if (!User.Identity.IsAuthenticated)
-                return Unauthorized();
-
-            var identityUser = await _userManager.GetUserAsync(User);
-            if (identityUser == null)
-                return Unauthorized();
-
-            var usuario = _context.Usuario.FirstOrDefault(u => u.usu_id == identityUser.Id);
+            var usuario = await ObtenerUsuarioAutenticado();
             if (usuario == null)
                 return Unauthorized();
 
-            if (string.IsNullOrWhiteSpace(telefono_internacional) ||
-                !System.Text.RegularExpressions.Regex.IsMatch(telefono_internacional, @"^\+\d+\s\d{9,15}$"))
+            // 2. Validar entrada de datos
+            if (!ValidarFormatoTelefono(telefono_internacional))
             {
-                TempData["ErrorReserva"] = "El teléfono debe tener el formato internacional correcto (ej: +51 932454493).";
-                return RedirectToAction("Detalle", new { id = ser_id });
+                return MostrarErrorReserva(ser_id, "El teléfono debe tener el formato internacional correcto (ej: +51 932454493).");
             }
 
+            // 3. Validar fecha y hora
+            var resultadoValidacion = ValidarFechaHora(fecha, hora);
+            if (!resultadoValidacion.esValido)
+            {
+                return MostrarErrorReserva(ser_id, resultadoValidacion.mensaje);
+            }
+
+            // 4. Verificar reserva existente para la misma fecha
+            if (await ExisteReservaParaFecha(usuario.usu_id, fecha))
+            {
+                return MostrarErrorReserva(ser_id, "Ya tienes una reserva programada para esta fecha. Solo puedes realizar una reserva por día.");
+            }
+
+            var reserva = CrearNuevaReserva(ser_id, placa, telefono_internacional, fecha, hora, detalle, usuario.usu_id);
+
+            try
+            {
+                _context.Reserva.Add(reserva);
+                await _context.SaveChangesAsync();
+                await EnviarOrdenReservaPorCorreo(reserva);
+
+                TempData["ReservaExitosa"] = true;
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al guardar la reserva");
+                return MostrarErrorReserva(ser_id, "Ocurrió un error al procesar tu reserva. Por favor, intenta nuevamente.");
+            }
+        }
+
+        private async Task<Usuario> ObtenerUsuarioAutenticado()
+        {
+            if (!User.Identity.IsAuthenticated)
+                return null;
+
+            var identityUser = await _userManager.GetUserAsync(User);
+            if (identityUser == null)
+                return null;
+
+            return _context.Usuario.FirstOrDefault(u => u.usu_id == identityUser.Id);
+        }
+
+        private bool ValidarFormatoTelefono(string telefono)
+        {
+            return !string.IsNullOrWhiteSpace(telefono) &&
+                   System.Text.RegularExpressions.Regex.IsMatch(telefono, @"^\+\d+\s\d{9,15}$");
+        }
+
+        private (bool esValido, string mensaje) ValidarFechaHora(DateTime fecha, TimeSpan hora)
+        {
             var fechaReserva = fecha.Date + hora;
             var ahora = DateTime.Now;
             var hoy = ahora.Date;
 
             if (fecha.DayOfWeek == DayOfWeek.Sunday)
-            {
-                TempData["ErrorReserva"] = "No se puede reservar los domingos.";
-                return RedirectToAction("Detalle", new { id = ser_id });
-            }
-            if (fechaReserva.Date <= hoy)
-            {
-                TempData["ErrorReserva"] = "Solo puedes reservar para días posteriores al actual.";
-                return RedirectToAction("Detalle", new { id = ser_id });
-            }
-            if (fechaReserva <= ahora.AddHours(1))
-            {
-                TempData["ErrorReserva"] = "Solo puedes reservar con al menos 1 hora de anticipación.";
-                return RedirectToAction("Detalle", new { id = ser_id });
-            }
+                return (false, "No se puede reservar los domingos.");
 
-            var reserva = new Reserva
+            if (fechaReserva.Date <= hoy)
+                return (false, "Solo puedes reservar para días posteriores al actual.");
+
+            if (fechaReserva <= ahora.AddHours(1))
+                return (false, "Solo puedes reservar con al menos 1 hora de anticipación.");
+
+            return (true, string.Empty);
+        }
+
+        private async Task<bool> ExisteReservaParaFecha(string usuarioId, DateTime fecha)
+        {
+            var fechaUtc = DateTime.SpecifyKind(fecha.Date, DateTimeKind.Utc);
+            return await _context.Reserva.AnyAsync(r => 
+                r.UsuarioId == usuarioId && 
+                r.res_fecha.Date == fechaUtc.Date);
+        }
+
+        private Reserva CrearNuevaReserva(int servicioId, string placa, string telefono,
+            DateTime fecha, TimeSpan hora, string detalle, string usuarioId)
+        {
+            return new Reserva
             {
                 res_placa = placa,
-                res_telefono = telefono_internacional,
+                res_telefono = telefono,
                 res_fecha = fecha.ToUniversalTime(),
-                res_hora = hora, // Capturar la hora
-                UsuarioId = usuario.usu_id,
-                ser_id = ser_id,
+                res_hora = hora,
+                UsuarioId = usuarioId,
+                ser_id = servicioId,
                 res_detalle = detalle
             };
+        }
 
-            _context.Reserva.Add(reserva);
-            await _context.SaveChangesAsync();
-            await EnviarOrdenReservaPorCorreo(reserva);
-
-            TempData["ReservaExitosa"] = true;
-            return RedirectToAction("Detalle", new { id = ser_id });
+        private IActionResult MostrarErrorReserva(int servicioId, string mensaje)
+        {
+            TempData["ErrorReserva"] = mensaje;
+            return RedirectToAction("Detalle", new { id = servicioId });
         }
 
         public async Task EnviarOrdenReservaPorCorreo(Reserva reserva)
