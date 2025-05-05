@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Marimon.Enums;
 using Marimon.Models;
 
 namespace Marimon.Models
@@ -23,5 +24,7 @@ namespace Marimon.Models
 		[ForeignKey("Servicio")]
 		public int ser_id { get; set; }
 		public virtual Servicio Servicio { get; set; }
+
+		public EstadoReserva Estado { get; set; } = EstadoReserva.Pendiente;
 	}
 }

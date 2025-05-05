@@ -1,3 +1,4 @@
+@using Marimon.Enums
 @model Marimon.ViewModel.ServicioReservaViewModel
 @{
     ViewData["Title"] = "Consultar Servicios";
@@ -12,7 +13,7 @@
         border-radius: 8px;
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .filtros-box label {
@@ -37,7 +38,8 @@
         border-collapse: collapse;
     }
 
-    .modern-table th, .modern-table td {
+    .modern-table th,
+    .modern-table td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
@@ -65,20 +67,23 @@
                     @foreach (var servicio in Model.Servicios)
                     {
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="servicios" value="@servicio.ser_nombre" id="chk_@servicio.ser_nombre"
-                                   @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ? "checked" : "") />
-                            <label class="form-check-label" for="chk_@servicio.ser_nombre">@servicio.ser_nombre</label>
-                        </div>
-                    }
+                            <input class="form-check-input" type="checkbox" name="servicios" value="@servicio.ser_nombre"
+                                id="chk_@servicio.ser_nombre" @(Model.ServiciosSeleccionados.Contains(servicio.ser_nombre) ?
+                                                                                          "checked" : "") />
+                        <label class="form-check-label" for="chk_@servicio.ser_nombre">@servicio.ser_nombre</label>
+                    </div>
+                                        }
                 </div>
 
                 <div class="mb-3">
                     <label for="fechaDesde">Desde:</label>
-                    <input type="date" id="fechaDesde" class="form-control" value="@Context.Request.Query["fechaDesde"]" />
+                    <input type="date" id="fechaDesde" class="form-control"
+                        value="@Context.Request.Query["fechaDesde"]" />
                 </div>
                 <div class="mb-3">
                     <label for="fechaHasta">Hasta:</label>
-                    <input type="date" id="fechaHasta" class="form-control" value="@Context.Request.Query["fechaHasta"]" />
+                    <input type="date" id="fechaHasta" class="form-control"
+                        value="@Context.Request.Query["fechaHasta"]" />
                 </div>
 
                 <button class="btn btn-primary w-100" onclick="filtrarReservas()">Filtrar</button>
@@ -97,6 +102,7 @@
                             <th>HORA</th>
                             <th>SERVICIO</th>
                             <th>USUARIO</th>
+                            <th>ESTADO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -111,6 +117,23 @@
                                     <td data-label="Hora">@reserva.res_hora</td>
                                     <td data-label="Servicio">@reserva.Servicio?.ser_nombre</td>
                                     <td data-label="Usuario">@reserva.Usuario?.usu_nombre</td>
+                                    <td>
+                                        @switch (reserva.Estado)
+                                        {
+                                            case EstadoReserva.Pendiente:
+                                                <span class="badge bg-warning text-dark">Pendiente</span>
+                                                break;
+                                            case EstadoReserva.Confirmada:
+                                                <span class="badge bg-primary">Confirmada</span>
+                                                break;
+                                            case EstadoReserva.Cancelada:
+                                                <span class="badge bg-danger">Cancelada</span>
+                                                break;
+                                            case EstadoReserva.Completada:
+                                                <span class="badge bg-success">Completada</span>
+                                                break;
+                                        }
+                                    </td>
                                 </tr>
                             }
                         }

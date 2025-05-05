@@ -120,8 +120,8 @@ namespace Marimon.Controllers
                     res_fecha = r.res_fecha,
                     res_hora = r.res_hora,
                     Servicio = r.Servicio,
-                    Usuario = r.Usuario
-                    // res_detalle omitido a propósito
+                    Usuario = r.Usuario,
+                    Estado = r.Estado // Asegúrate de incluir el Estado aquí
                 })
                 .Where(r =>
                     (serviciosSeleccionados.Count == 0 || serviciosSeleccionados.Contains(r.Servicio.ser_nombre)) &&
@@ -139,6 +139,7 @@ namespace Marimon.Controllers
 
             return View(model);
         }
+
 
         public IActionResult MServicio()
         {

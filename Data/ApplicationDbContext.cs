@@ -35,6 +35,10 @@ public class ApplicationDbContext : IdentityDbContext
             .HasForeignKey(r => r.UsuarioId)
             .HasPrincipalKey(u => u.usu_id); 
 
+        builder.Entity<Reserva>()
+            .Property(r => r.Estado)
+            .HasConversion<string>();
+
     }
 
 
