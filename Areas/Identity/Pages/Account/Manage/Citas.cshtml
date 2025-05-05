@@ -6,6 +6,8 @@
 }
 
 <link rel="stylesheet" href="~/css/perfil_usuario.css" asp-append-version="true" />
+<!-- Add Font Awesome for the trash icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="user-profile-container">
     <div class="profile-header">
@@ -13,7 +15,7 @@
     </div>
     <div class="profile-content">
         <div class="sidebar">
-            <div class="sidebar-menu-item ">
+            <div class="sidebar-menu-item">
                 <a asp-area="Identity" asp-page="/Account/Manage/Index">Detalle de la cuenta</a>
             </div>
             <div class="sidebar-menu-item">
@@ -42,7 +44,7 @@
 
             @if (TempData["Error"] != null)
             {
-                <div class="alert alert-success success-message position-fixed" role="alert">
+                <div class="alert alert-danger success-message position-fixed" role="alert">
                     @TempData["Error"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
                         onclick="this.parentElement.remove();"></button>
@@ -53,14 +55,14 @@
                 <table class="table table-striped mt-4">
                     <thead>
                         <tr>
-                            <th>ID Cita</th>
-                            <th>Placa</th>
-                            <th>Teléfono</th>
-                            <th>Fecha</th>
-                            <th>Hora</th>
-                            <th>Servicio</th>
-                            <th>Eliminar</th>
-                            <th>Estado</th>
+                            <th>ID CITA</th>
+                            <th>PLACA</th>
+                            <th>TELÉFONO</th>
+                            <th>FECHA</th>
+                            <th>HORA</th>
+                            <th>SERVICIO</th>
+                            <th>ELIMINAR</th>
+                            <th>ESTADO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,7 +77,9 @@
                                 <td>@reserva.Servicio?.ser_nombre</td>
                                 <td>
                                     <form method="post" asp-page-handler="CancelarCita" asp-route-id="@reserva.res_id">
-                                        <button type="submit" class="btn btn-danger">Eliminar Cita</button>
+                                        <button type="submit" class="btn-delete" title="Eliminar Cita">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
                                     </form>
                                 </td>
                                 <td>
@@ -112,7 +116,7 @@
         </div>
     </div>
 </div>
-</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
