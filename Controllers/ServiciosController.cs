@@ -61,6 +61,7 @@ namespace Marimon.Controllers
             ViewBag.Apellido = apellido;
 
             // Pasar las reservas al ViewBag
+            ViewBag.UsuarioAutenticado = User.Identity.IsAuthenticated;
             ViewBag.TodasLasReservas = _context.Reserva
             .Include(r => r.Servicio)
             .Select(r => new
