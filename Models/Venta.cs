@@ -4,14 +4,13 @@ using Marimon.Models;
 
 namespace Marimon.Models
 {
-
     [Table("Venta")]
     public class Venta
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ven_id { get; set; }
-         public DateOnly ven_fecha { get; set; }
+        public DateOnly ven_fecha { get; set; }
         public int MetodoPagoId { get; set; }
 
         [ForeignKey("MetodoPagoId")]
@@ -22,7 +21,10 @@ namespace Marimon.Models
         public Usuario? Usuario { get; set; }
 
         public decimal Total {get; set; }
-        // Agregar esta línea 👇
+        
+        // Propiedad nueva para almacenar el ID de sesión de Stripe
+        public string StripeSessionId { get; set; }
+        
         public ICollection<DetalleVentas> Detalles { get; set; } = new List<DetalleVentas>();
 
         [NotMapped]

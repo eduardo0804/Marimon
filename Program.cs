@@ -12,6 +12,9 @@ using DinkToPdf;
 using System.Runtime.Loader;
 using System.Reflection;
 using Marimon.Helpers; // Necesario para SameSiteMode
+using Stripe;
+using Stripe.Checkout;
+using Marimon.Models;  // <-- Aquí está el using para StripeSettings
 
 var builder = WebApplication.CreateBuilder(args);
 // Configuración de PostgreSQL
@@ -65,6 +68,11 @@ builder.Services.AddTransient<IEmailSenderWithAttachments, EmailSenderWithAttach
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+
+// Agregar estas líneas
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 builder.Services.AddSession(options =>
 {

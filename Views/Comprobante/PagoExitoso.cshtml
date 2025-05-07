@@ -1,0 +1,30 @@
+@model Marimon.Models.Comprobante
+
+@{
+    ViewData["Title"] = "Pago Exitoso";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="card-title mb-4">¡Pago Completado con Éxito!</h2>
+                    <p class="card-text">Tu compra ha sido procesada correctamente.</p>
+                    <p>Número de Comprobante: <strong>@(Model.tipo_comprobante.ToUpper())-@Model.com_id.ToString("0000000")</strong></p>
+                    <p>Te hemos enviado el comprobante a tu correo electrónico.</p>
+                    
+                    <hr class="my-4" />
+                    
+                    <div class="mt-4">
+                        <a href="/" class="btn btn-primary">Volver a la tienda</a>
+                        <a href="/Usuario/MisCompras" class="btn btn-outline-secondary ml-2">Ver mis compras</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
