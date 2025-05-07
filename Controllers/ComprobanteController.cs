@@ -86,13 +86,14 @@ namespace Marimon.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegistrarComprobante(string tipoComprobante, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion)
+        public async Task<IActionResult> RegistrarComprobante(string tipoComprobante, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion,string StripeSessionId = null)
         {
             Console.WriteLine($"Tipo de comprobante recibido: {tipoComprobante}");
 
             // 1. Obtener el usuario autenticado
             var identityUserId = _userManager.GetUserId(User);
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
+            StripeSessionId = Guid.NewGuid().ToString();
 
             if (usuario == null)
             {
@@ -116,7 +117,9 @@ namespace Marimon.Controllers
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
                 MetodoPagoId = 1, // Puedes modificar esto si es dinámico
-                Total = carrito.car_total
+                Total = carrito.car_total,
+                StripeSessionId = StripeSessionId ?? throw new InvalidOperationException("StripeSessionId no puede ser nulo.")
+
             };
 
             _context.Venta.Add(venta);
