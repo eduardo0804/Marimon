@@ -342,6 +342,7 @@ namespace Marimon.Controllers
                 SuccessUrl = Url.Action("PagoExitoso", "Comprobante", new { session_id = "{CHECKOUT_SESSION_ID}" }, Request.Scheme),
                 CancelUrl = Url.Action("PagoCancelado", "Comprobante", null, Request.Scheme)
             };
+
             
             var service = new SessionService();
             var session = service.Create(options);
@@ -353,114 +354,167 @@ namespace Marimon.Controllers
             return Redirect(session.Url);
         }
 
-        public async Task<IActionResult> PagoExitoso(string session_id)
+public async Task<IActionResult> PagoExitoso(string session_id)
+{
+    // Agrega logs para depuración
+    _logger.LogInformation($"PagoExitoso llamado con session_id: {session_id}");
+    
+    if (string.IsNullOrEmpty(session_id))
+    {
+        _logger.LogWarning("session_id recibido está vacío");
+        return RedirectToAction("Error", "Home", new { mensaje = "ID de sesión inválido o vacío." });
+    }
+    
+    try
+    {
+        // Verificar el estado del pago
+        var service = new SessionService();
+        var session = service.Get(session_id);
+        
+        _logger.LogInformation($"Estado del pago de Stripe: {session.PaymentStatus}");
+        
+        // Buscar la venta asociada a esta sesión de Stripe
+        var venta = await _context.Venta.FirstOrDefaultAsync(v => v.StripeSessionId == session_id);
+        
+        if (venta == null)
         {
-            // Verificar el estado del pago
-            var service = new SessionService();
-            var session = service.Get(session_id);
+            _logger.LogWarning($"No se encontró venta asociada al session_id: {session_id}");
+            return RedirectToAction("Error", "Home", new { mensaje = "No se encontró la venta asociada a esta sesión de pago." });
+        }
+        
+        _logger.LogInformation($"Venta encontrada con ID: {venta.ven_id}");
+        
+        if (session.PaymentStatus == "paid")
+        {
+            _logger.LogInformation("Pago confirmado como exitoso, procesando comprobante");
             
-            // Buscar la venta asociada a esta sesión de Stripe
-            var venta = await _context.Venta.FirstOrDefaultAsync(v => v.StripeSessionId == session_id);
+            // El pago fue exitoso, continuar con el proceso de registro de comprobante
+            string tipoComprobante = TempData["tipoComprobante"]?.ToString();
+            string num_identificacion = TempData["num_identificacion"]?.ToString();
+            string fac_razon = TempData["fac_razon"]?.ToString();
+            string fac_ruc = TempData["fac_ruc"]?.ToString();
+            string fac_direccion = TempData["fac_direccion"]?.ToString();
             
-            if (venta == null)
+            _logger.LogInformation($"Datos de comprobante: Tipo={tipoComprobante}, ID={num_identificacion}");
+            
+            // Crear el comprobante
+            var comprobante = new Comprobante
             {
-                return NotFound("No se encontró la venta asociada a esta sesión de pago.");
+                tipo_comprobante = tipoComprobante,
+                VentaId = venta.ven_id
+            };
+            _context.Comprobante.Add(comprobante);
+            await _context.SaveChangesAsync();
+            
+            _logger.LogInformation($"Comprobante creado con ID: {comprobante.com_id}");
+            
+            // Obtener el carrito y crear salidas
+            var carrito = await _context.Carritos
+                .Include(c => c.CarritoAutopartes)
+                    .ThenInclude(cp => cp.Autoparte)
+                .FirstOrDefaultAsync(c => c.UsuarioId == venta.UsuarioId);
+            
+            if (carrito == null)
+            {
+                _logger.LogWarning($"No se encontró carrito para el usuario: {venta.UsuarioId}");
+                return RedirectToAction("Error", "Home", new { mensaje = "No se encontró el carrito asociado a esta venta." });
             }
             
-            if (session.PaymentStatus == "paid")
+            _logger.LogInformation($"Carrito encontrado con {carrito.CarritoAutopartes?.Count ?? 0} items");
+            
+            // Crear detalles de venta y salidas
+            foreach (var item in carrito.CarritoAutopartes)
             {
-                // El pago fue exitoso, continuar con el proceso de registro de comprobante
-                string tipoComprobante = TempData["tipoComprobante"]?.ToString();
-                string num_identificacion = TempData["num_identificacion"]?.ToString();
-                string fac_razon = TempData["fac_razon"]?.ToString();
-                string fac_ruc = TempData["fac_ruc"]?.ToString();
-                string fac_direccion = TempData["fac_direccion"]?.ToString();
-                
-                // Aquí reutilizamos gran parte de la lógica de RegistrarComprobante
-                // Crear el comprobante
-                var comprobante = new Comprobante
+                var detalle = new DetalleVentas
                 {
-                    tipo_comprobante = tipoComprobante,
-                    VentaId = venta.ven_id
+                    VentaId = venta.ven_id,
+                    AutoParteId = item.AutoparteId,
+                    det_cantidad = item.car_cantidad
                 };
-                _context.Comprobante.Add(comprobante);
-                await _context.SaveChangesAsync();
+                _context.DetalleVentas.Add(detalle);
                 
-                // Obtener el carrito y crear salidas
-                var carrito = await _context.Carritos
-                    .Include(c => c.CarritoAutopartes)
-                        .ThenInclude(cp => cp.Autoparte)
-                    .FirstOrDefaultAsync(c => c.UsuarioId == venta.UsuarioId);
+                _logger.LogInformation($"Detalle venta creado: AutoparteID={item.AutoparteId}, Cantidad={item.car_cantidad}");
                 
-                // Crear detalles de venta y salidas
-                foreach (var item in carrito.CarritoAutopartes)
+                // Reducir stock
+                var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
+                if (autoparte != null)
                 {
-                    var detalle = new DetalleVentas
-                    {
-                        VentaId = venta.ven_id,
-                        AutoParteId = item.AutoparteId,
-                        det_cantidad = item.car_cantidad
-                    };
-                    _context.DetalleVentas.Add(detalle);
-                    
-                    // Reducir stock
-                    var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
-                    if (autoparte != null)
-                    {
-                        autoparte.aut_cantidad -= item.car_cantidad;
-                        _context.Autopartes.Update(autoparte);
-                    }
-                    
-                    // Crear salida
-                    var salida = new Salida
-                    {
-                        sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
-                        sal_cantidad = item.car_cantidad,
-                        ComprobanteId = comprobante.com_id,
-                        AutoparteId = item.AutoparteId
-                    };
-                    _context.Salida.Add(salida);
+                    autoparte.aut_cantidad -= item.car_cantidad;
+                    _context.Autopartes.Update(autoparte);
+                    _logger.LogInformation($"Stock reducido para autoparte {autoparte.aut_id}, nuevo stock: {autoparte.aut_cantidad}");
+                }
+                else
+                {
+                    _logger.LogWarning($"No se encontró la autoparte con ID: {item.AutoparteId}");
                 }
                 
-                // Crear Boleta o Factura
-                if (tipoComprobante.ToLower() == "boleta")
+                // Crear salida
+                var salida = new Salida
                 {
-                    var boleta = new Boleta
-                    {
-                        ComprobanteId = comprobante.com_id,
-                        num_identificacion = num_identificacion,
-                    };
-                    _context.Boleta.Add(boleta);
-                }
-                else if (tipoComprobante.ToLower() == "factura")
+                    sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
+                    sal_cantidad = item.car_cantidad,
+                    ComprobanteId = comprobante.com_id,
+                    AutoparteId = item.AutoparteId
+                };
+                _context.Salida.Add(salida);
+                _logger.LogInformation($"Salida creada para autoparte {item.AutoparteId}");
+            }
+            
+            // Crear Boleta o Factura
+            if (tipoComprobante?.ToLower() == "boleta")
+            {
+                var boleta = new Boleta
                 {
-                    var factura = new Factura
-                    {
-                        ComprobanteId = comprobante.com_id,
-                        fac_ruc = fac_ruc,
-                        fac_razonsocial = fac_razon,
-                        fac_direccion = fac_direccion
-                    };
-                    _context.Factura.Add(factura);
-                }
-                
-                await _context.SaveChangesAsync();
-                
-                // Limpiar el carrito
-                _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
-                await _context.SaveChangesAsync();
-                
-                // Generar el PDF
-                var htmlContent = GenerateComprobanteHtml(comprobante);
-                var pdfBytes = ConvertHtmlToPdf(htmlContent);
-                
-                // Enviar por correo
-                var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == venta.UsuarioId);
+                    ComprobanteId = comprobante.com_id,
+                    num_identificacion = num_identificacion,
+                };
+                _context.Boleta.Add(boleta);
+                _logger.LogInformation($"Boleta creada con num_identificación: {num_identificacion}");
+            }
+            else if (tipoComprobante?.ToLower() == "factura")
+            {
+                var factura = new Factura
+                {
+                    ComprobanteId = comprobante.com_id,
+                    fac_ruc = fac_ruc,
+                    fac_razonsocial = fac_razon,
+                    fac_direccion = fac_direccion
+                };
+                _context.Factura.Add(factura);
+                _logger.LogInformation($"Factura creada para RUC: {fac_ruc}, Razón social: {fac_razon}");
+            }
+            else
+            {
+                _logger.LogWarning($"Tipo de comprobante no reconocido: {tipoComprobante}");
+            }
+            
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Información de comprobante guardada en la base de datos");
+            
+            // Limpiar el carrito
+            _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Carrito limpiado correctamente");
+            
+            // Generar el PDF
+            var htmlContent = GenerateComprobanteHtml(comprobante);
+            var pdfBytes = ConvertHtmlToPdf(htmlContent);
+            _logger.LogInformation("PDF del comprobante generado");
+            
+            // Enviar por correo
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == venta.UsuarioId);
+            
+            if (usuario == null)
+            {
+                _logger.LogWarning($"No se encontró el usuario con ID: {venta.UsuarioId}");
+            }
+            else
+            {
                 var user = await _userManager.FindByIdAsync(usuario.usu_id);
                 
                 if (user != null && !string.IsNullOrEmpty(user.Email))
                 {
-                    // Código para enviar el correo (igual que en RegistrarComprobante)
+                    // Código para enviar el correo
                     var nombreCompleto = usuario.usu_nombre + " " + usuario.usu_apellido;
                     var emailHtmlBody = $@"
                     <html>
@@ -491,7 +545,7 @@ namespace Marimon.Controllers
                             $"Tu {tipoComprobante} de compra - Marimon Autopartes",
                             emailHtmlBody,
                             pdfBytes,
-                            $"{tipoComprobante.ToLower()}_{comprobante.com_id}.pdf",
+                            $"{tipoComprobante?.ToLower()}_{comprobante.com_id}.pdf",
                             "application/pdf"
                         );
 
@@ -503,14 +557,29 @@ namespace Marimon.Controllers
                         // Continuar aunque falle el envío
                     }
                 }
-                
-                // Mostrar vista de éxito
-                return View("PagoExitoso", comprobante);
+                else
+                {
+                    _logger.LogWarning("No se pudo enviar el correo: usuario no encontrado o email vacío");
+                }
             }
             
-            return View("Error", "El pago no se completó correctamente.");
+            // Mostrar vista de éxito
+            _logger.LogInformation("Procesamiento completado exitosamente");
+            ViewBag.Comprobante = comprobante; // Pasar el comprobante como ViewBag
+            return View("PagoExitoso"); // Sin pasar modelo directamente
         }
-
+        else
+        {
+            _logger.LogWarning($"Pago no completado. Estado: {session.PaymentStatus}");
+            return RedirectToAction("Error", "Home", new { mensaje = "El pago no se completó correctamente." });
+        }
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error en el procesamiento de PagoExitoso: {ex.Message}");
+        return RedirectToAction("Error", "Home", new { mensaje = $"Ocurrió un error al procesar el pago: {ex.Message}" });
+    }
+}
         public IActionResult PagoCancelado()
         {
             // Eliminar la venta temporal
