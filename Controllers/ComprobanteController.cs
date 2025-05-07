@@ -34,10 +34,10 @@ namespace Marimon.Controllers
 
 
 
-        public ComprobanteController(ApplicationDbContext context, 
-                                    ILogger<ComprobanteController> logger, 
-                                    UserManager<IdentityUser> userManager, 
-                                    IConverter converter, 
+        public ComprobanteController(ApplicationDbContext context,
+                                    ILogger<ComprobanteController> logger,
+                                    UserManager<IdentityUser> userManager,
+                                    IConverter converter,
                                     IEmailSenderWithAttachments emailSender,
                                     IOptions<StripeSettings> stripeSettings)
         {
@@ -86,7 +86,7 @@ namespace Marimon.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegistrarComprobante(string tipoComprobante, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion,string StripeSessionId = null)
+        public async Task<IActionResult> RegistrarComprobante(string tipoComprobante, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion, string StripeSessionId = null)
         {
             Console.WriteLine($"Tipo de comprobante recibido: {tipoComprobante}");
 
@@ -267,137 +267,127 @@ namespace Marimon.Controllers
             return File(pdfBytes, "application/pdf", "comprobante.pdf");
         }
 
-
         //STRIPE
         [HttpPost]
         public async Task<IActionResult> ProcesarPago(string tipoComprobante, string metodoPago, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion)
         {
-            // Si el método de pago es Yape, procesa directamente
             if (metodoPago == "yape")
             {
                 return RedirectToAction("PagoYape");
             }
-            
-            // Si es tarjeta, crea una sesión de Stripe
+
             var identityUserId = _userManager.GetUserId(User);
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
-            
+
             if (usuario == null)
             {
                 return Unauthorized("Usuario no encontrado.");
             }
-            
+
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
                     .ThenInclude(cp => cp.Autoparte)
                 .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
-            
+
             if (carrito == null || !carrito.CarritoAutopartes.Any())
             {
                 return BadRequest("El carrito está vacío.");
             }
-            
-            // Crear venta temporal (pendiente de pago)
+
             var venta = new Venta
             {
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
-                MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1, // Ajusta según tus IDs de métodos de pago
+                MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1,
                 Total = carrito.car_total
             };
-            
+
             _context.Venta.Add(venta);
             await _context.SaveChangesAsync();
-            
-            // Guardar datos de comprobante temporalmente (puedes usar TempData o sesión)
+
             TempData["tipoComprobante"] = tipoComprobante;
             TempData["num_identificacion"] = num_identificacion;
             TempData["fac_razon"] = fac_razon;
             TempData["fac_ruc"] = fac_ruc;
             TempData["fac_direccion"] = fac_direccion;
             TempData["ventaId"] = venta.ven_id;
-            
-            // Crear sesión de Stripe
+
+            // Configurar las opciones de la sesión de Stripe
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>
+        {
+            new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    new SessionLineItemOptions
+                    Currency = "pen",
+                    UnitAmount = (long)(carrito.car_total * 100),
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
-                        {
-                            Currency = "pen", // Moneda peruana (soles)
-                            UnitAmount = (long)(carrito.car_total * 100), // Stripe trabaja en centavos
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = "Compra en Marimon Autopartes",
-                                Description = $"Pedido #{venta.ven_id}"
-                            },
-                        },
-                        Quantity = 1,
-                    }
+                        Name = "Compra en Marimon Autopartes",
+                        Description = $"Pedido #{venta.ven_id}"
+                    },
                 },
+                Quantity = 1,
+            }
+        },
                 Mode = "payment",
-                SuccessUrl = Url.Action("PagoExitoso", "Comprobante", new { session_id = "{CHECKOUT_SESSION_ID}" }, Request.Scheme),
+                SuccessUrl = Url.Action("PagoExitoso", "Comprobante", null, Request.Scheme) + "?session_id={CHECKOUT_SESSION_ID}",
                 CancelUrl = Url.Action("PagoCancelado", "Comprobante", null, Request.Scheme)
             };
 
-            
             var service = new SessionService();
             var session = service.Create(options);
-            
-            // Guardar el ID de sesión en la venta
+
+            // Guardar el ID de la sesión en la base de datos
             venta.StripeSessionId = session.Id;
             await _context.SaveChangesAsync();
-            
+
+            _logger.LogInformation($"Session ID generado: {session.Id}");
+
             return Redirect(session.Url);
         }
 
-public async Task<IActionResult> PagoExitoso(string session_id)
-{
-    // Agrega logs para depuración
-    _logger.LogInformation($"PagoExitoso llamado con session_id: {session_id}");
-    
-    if (string.IsNullOrEmpty(session_id))
-    {
-        _logger.LogWarning("session_id recibido está vacío");
-        return RedirectToAction("Error", "Home", new { mensaje = "ID de sesión inválido o vacío." });
-    }
-    
-    try
-    {
-        // Verificar el estado del pago
-        var service = new SessionService();
-        var session = service.Get(session_id);
-        
-        _logger.LogInformation($"Estado del pago de Stripe: {session.PaymentStatus}");
-        
-        // Buscar la venta asociada a esta sesión de Stripe
-        var venta = await _context.Venta.FirstOrDefaultAsync(v => v.StripeSessionId == session_id);
-        
-        if (venta == null)
+        public async Task<IActionResult> PagoExitoso(string session_id)
         {
-            _logger.LogWarning($"No se encontró venta asociada al session_id: {session_id}");
-            return RedirectToAction("Error", "Home", new { mensaje = "No se encontró la venta asociada a esta sesión de pago." });
-        }
-        
-        _logger.LogInformation($"Venta encontrada con ID: {venta.ven_id}");
-        
-        if (session.PaymentStatus == "paid")
-        {
-            _logger.LogInformation("Pago confirmado como exitoso, procesando comprobante");
-            
-            // El pago fue exitoso, continuar con el proceso de registro de comprobante
+            if (string.IsNullOrEmpty(session_id))
+            {
+                return BadRequest("El ID de la sesión es inválido.");
+            }
+
+            var service = new SessionService();
+            Session session;
+            try
+            {
+                session = await service.GetAsync(session_id);
+            }
+            catch (StripeException ex)
+            {
+                _logger.LogError($"Error al obtener la sesión de Stripe: {ex.Message}");
+                return BadRequest("No se encontró la sesión de Stripe.");
+            }
+
+            if (session.PaymentStatus != "paid")
+            {
+                return BadRequest("El pago no se completó correctamente.");
+            }
+
+            var venta = await _context.Venta.FirstOrDefaultAsync(v => v.StripeSessionId == session_id);
+
+            if (venta == null)
+            {
+                return NotFound("No se encontró la venta asociada a esta sesión de pago.");
+            }
+
+            // Continuar con el proceso de registro de comprobante
             string tipoComprobante = TempData["tipoComprobante"]?.ToString();
             string num_identificacion = TempData["num_identificacion"]?.ToString();
             string fac_razon = TempData["fac_razon"]?.ToString();
             string fac_ruc = TempData["fac_ruc"]?.ToString();
             string fac_direccion = TempData["fac_direccion"]?.ToString();
-            
-            _logger.LogInformation($"Datos de comprobante: Tipo={tipoComprobante}, ID={num_identificacion}");
-            
-            // Crear el comprobante
+
             var comprobante = new Comprobante
             {
                 tipo_comprobante = tipoComprobante,
@@ -405,118 +395,29 @@ public async Task<IActionResult> PagoExitoso(string session_id)
             };
             _context.Comprobante.Add(comprobante);
             await _context.SaveChangesAsync();
-            
-            _logger.LogInformation($"Comprobante creado con ID: {comprobante.com_id}");
-            
-            // Obtener el carrito y crear salidas
+
+            // Limpiar el carrito
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
                     .ThenInclude(cp => cp.Autoparte)
                 .FirstOrDefaultAsync(c => c.UsuarioId == venta.UsuarioId);
-            
-            if (carrito == null)
-            {
-                _logger.LogWarning($"No se encontró carrito para el usuario: {venta.UsuarioId}");
-                return RedirectToAction("Error", "Home", new { mensaje = "No se encontró el carrito asociado a esta venta." });
-            }
-            
-            _logger.LogInformation($"Carrito encontrado con {carrito.CarritoAutopartes?.Count ?? 0} items");
-            
-            // Crear detalles de venta y salidas
-            foreach (var item in carrito.CarritoAutopartes)
-            {
-                var detalle = new DetalleVentas
-                {
-                    VentaId = venta.ven_id,
-                    AutoParteId = item.AutoparteId,
-                    det_cantidad = item.car_cantidad
-                };
-                _context.DetalleVentas.Add(detalle);
-                
-                _logger.LogInformation($"Detalle venta creado: AutoparteID={item.AutoparteId}, Cantidad={item.car_cantidad}");
-                
-                // Reducir stock
-                var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
-                if (autoparte != null)
-                {
-                    autoparte.aut_cantidad -= item.car_cantidad;
-                    _context.Autopartes.Update(autoparte);
-                    _logger.LogInformation($"Stock reducido para autoparte {autoparte.aut_id}, nuevo stock: {autoparte.aut_cantidad}");
-                }
-                else
-                {
-                    _logger.LogWarning($"No se encontró la autoparte con ID: {item.AutoparteId}");
-                }
-                
-                // Crear salida
-                var salida = new Salida
-                {
-                    sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
-                    sal_cantidad = item.car_cantidad,
-                    ComprobanteId = comprobante.com_id,
-                    AutoparteId = item.AutoparteId
-                };
-                _context.Salida.Add(salida);
-                _logger.LogInformation($"Salida creada para autoparte {item.AutoparteId}");
-            }
-            
-            // Crear Boleta o Factura
-            if (tipoComprobante?.ToLower() == "boleta")
-            {
-                var boleta = new Boleta
-                {
-                    ComprobanteId = comprobante.com_id,
-                    num_identificacion = num_identificacion,
-                };
-                _context.Boleta.Add(boleta);
-                _logger.LogInformation($"Boleta creada con num_identificación: {num_identificacion}");
-            }
-            else if (tipoComprobante?.ToLower() == "factura")
-            {
-                var factura = new Factura
-                {
-                    ComprobanteId = comprobante.com_id,
-                    fac_ruc = fac_ruc,
-                    fac_razonsocial = fac_razon,
-                    fac_direccion = fac_direccion
-                };
-                _context.Factura.Add(factura);
-                _logger.LogInformation($"Factura creada para RUC: {fac_ruc}, Razón social: {fac_razon}");
-            }
-            else
-            {
-                _logger.LogWarning($"Tipo de comprobante no reconocido: {tipoComprobante}");
-            }
-            
-            await _context.SaveChangesAsync();
-            _logger.LogInformation("Información de comprobante guardada en la base de datos");
-            
-            // Limpiar el carrito
+
             _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Carrito limpiado correctamente");
-            
+
             // Generar el PDF
             var htmlContent = GenerateComprobanteHtml(comprobante);
             var pdfBytes = ConvertHtmlToPdf(htmlContent);
-            _logger.LogInformation("PDF del comprobante generado");
-            
+
             // Enviar por correo
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == venta.UsuarioId);
-            
-            if (usuario == null)
+            var user = await _userManager.FindByIdAsync(usuario.usu_id);
+
+            if (user != null && !string.IsNullOrEmpty(user.Email))
             {
-                _logger.LogWarning($"No se encontró el usuario con ID: {venta.UsuarioId}");
-            }
-            else
-            {
-                var user = await _userManager.FindByIdAsync(usuario.usu_id);
-                
-                if (user != null && !string.IsNullOrEmpty(user.Email))
-                {
-                    // Código para enviar el correo
-                    var nombreCompleto = usuario.usu_nombre + " " + usuario.usu_apellido;
-                    var emailHtmlBody = $@"
+                // Código para enviar el correo (igual que en RegistrarComprobante)
+                var nombreCompleto = usuario.usu_nombre + " " + usuario.usu_apellido;
+                var emailHtmlBody = $@"
                     <html>
                     <body style='font-family: Arial, sans-serif; line-height: 1.6;'>
                         <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;'>
@@ -538,48 +439,31 @@ public async Task<IActionResult> PagoExitoso(string session_id)
                     </body>
                     </html>";
 
-                    try
-                    {
-                        await _emailSender.SendEmailWithAttachmentAsync(
-                            user.Email,
-                            $"Tu {tipoComprobante} de compra - Marimon Autopartes",
-                            emailHtmlBody,
-                            pdfBytes,
-                            $"{tipoComprobante?.ToLower()}_{comprobante.com_id}.pdf",
-                            "application/pdf"
-                        );
-
-                        _logger.LogInformation($"Comprobante enviado por correo a {user.Email}");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Error al enviar el comprobante por correo: {ex.Message}");
-                        // Continuar aunque falle el envío
-                    }
-                }
-                else
+                try
                 {
-                    _logger.LogWarning("No se pudo enviar el correo: usuario no encontrado o email vacío");
+                    await _emailSender.SendEmailWithAttachmentAsync(
+                        user.Email,
+                        $"Tu {tipoComprobante} de compra - Marimon Autopartes",
+                        emailHtmlBody,
+                        pdfBytes,
+                        $"{tipoComprobante.ToLower()}_{comprobante.com_id}.pdf",
+                        "application/pdf"
+                    );
+
+                    _logger.LogInformation($"Comprobante enviado por correo a {user.Email}");
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error al enviar el comprobante por correo: {ex.Message}");
+                    // Continuar aunque falle el envío
+                }
+                // Mostrar vista de éxito
+                return View("PagoExitoso", comprobante);
             }
-            
-            // Mostrar vista de éxito
-            _logger.LogInformation("Procesamiento completado exitosamente");
-            ViewBag.Comprobante = comprobante; // Pasar el comprobante como ViewBag
-            return View("PagoExitoso"); // Sin pasar modelo directamente
+
+            return View("Error", "El pago no se completó correctamente.");
         }
-        else
-        {
-            _logger.LogWarning($"Pago no completado. Estado: {session.PaymentStatus}");
-            return RedirectToAction("Error", "Home", new { mensaje = "El pago no se completó correctamente." });
-        }
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error en el procesamiento de PagoExitoso: {ex.Message}");
-        return RedirectToAction("Error", "Home", new { mensaje = $"Ocurrió un error al procesar el pago: {ex.Message}" });
-    }
-}
+
         public IActionResult PagoCancelado()
         {
             // Eliminar la venta temporal
@@ -592,7 +476,7 @@ public async Task<IActionResult> PagoExitoso(string session_id)
                     _context.SaveChanges();
                 }
             }
-            
+
             return View();
         }
 
@@ -607,20 +491,59 @@ public async Task<IActionResult> PagoExitoso(string session_id)
             // Cargar comprobante con relaciones necesarias
             var comprobanteCompleto = _context.Comprobante
                 .Include(c => c.Venta)
+                .ThenInclude(v => v.Usuario)
                 .Include(c => c.Boletas)
                 .Include(c => c.Facturas)
                 .FirstOrDefault(c => c.com_id == comprobante.com_id);
 
-            if (comprobanteCompleto == null || comprobanteCompleto.Venta == null)
+            if (comprobanteCompleto == null)
+            {
+                _logger.LogError("El comprobante no se encontró.");
                 return "<p>Error: Comprobante no válido.</p>";
+            }
+
+            if (comprobanteCompleto.Venta == null)
+            {
+                _logger.LogError("La venta asociada al comprobante no se encontró.");
+                return "<p>Error: Venta no válida.</p>";
+            }
+
+            if (comprobanteCompleto.Boletas == null || !comprobanteCompleto.Boletas.Any())
+            {
+                _logger.LogWarning("No se encontraron boletas asociadas al comprobante.");
+            }
+
+            if (comprobanteCompleto.Facturas == null || !comprobanteCompleto.Facturas.Any())
+            {
+                _logger.LogWarning("No se encontraron facturas asociadas al comprobante.");
+            }
 
             var venta = comprobanteCompleto.Venta;
 
             // Obtener detalles de venta
             var detallesVenta = _context.DetalleVentas
-                .Where(dv => dv.VentaId == venta.ven_id)
-                .Include(dv => dv.Autoparte)
-                .ToList();
+            .Where(dv => dv.VentaId == venta.ven_id)
+            .Include(dv => dv.Autoparte)
+            .ToList();
+
+            if (!detallesVenta.Any())
+            {
+                _logger.LogWarning("No se encontraron detalles de venta para la venta ID: {venta.ven_id}");
+            }
+
+            _logger.LogInformation($"Detalles de venta encontrados: {detallesVenta.Count}");
+            foreach (var detalle in detallesVenta)
+            {
+                _logger.LogInformation($"Detalle - Autoparte ID: {detalle.AutoParteId}, Cantidad: {detalle.det_cantidad}");
+                if (detalle.Autoparte != null)
+                {
+                    _logger.LogInformation($"Autoparte - Nombre: {detalle.Autoparte.aut_nombre}, Precio: {detalle.Autoparte.aut_precio}");
+                }
+                else
+                {
+                    _logger.LogWarning($"Autoparte no encontrada para Detalle ID: {detalle.det_id}");
+                }
+            }
 
             // Obtener el usuario para datos de cliente
             var usuario = _context.Usuarios.FirstOrDefault(u => u.usu_id == venta.UsuarioId);
@@ -870,20 +793,28 @@ public async Task<IActionResult> PagoExitoso(string session_id)
             foreach (var detalle in detallesVenta)
             {
                 var autoparte = detalle.Autoparte;
-                decimal precioUnitario = Math.Round(autoparte.aut_precio / 1.18m, 2);
-                decimal subTotalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2);
-                decimal totalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2);
+                if (autoparte != null)
+                {
+                    decimal precioUnitario = Math.Round(autoparte.aut_precio / 1.18m, 2); // Precio sin IGV
+                    decimal subtotalItem = Math.Round(precioUnitario * detalle.det_cantidad, 2);
 
-                htmlContent += $@"
-                <tr>
-                    <td>{detalle.det_cantidad}</td>
-                    <td>{autoparte.aut_id}</td>
-                    <td class='description'>{autoparte.aut_nombre}</td>
-                    <td class='right'>{precioUnitario:N2}</td>
-                    <td class='right'>{subTotalItem:N2}</td>
-                    <td class='right'>{totalItem:N2}</td>
-                </tr>";
+                    _logger.LogInformation($"Generando fila para Autoparte - ID: {autoparte.aut_id}, Nombre: {autoparte.aut_nombre}, Cantidad: {detalle.det_cantidad}, Precio Unitario: {precioUnitario}, Subtotal: {subtotalItem}");
+
+                    htmlContent += $@"
+                    <tr>
+                        <td>{detalle.det_cantidad}</td>
+                        <td>{autoparte.aut_id}</td>
+                        <td class='description'>{autoparte.aut_nombre}</td>
+                        <td class='right'>S/ {precioUnitario:N2}</td>
+                        <td class='right'>S/ {subtotalItem:N2}</td>
+                    </tr>";
+                }
+                else
+                {
+                    _logger.LogWarning($"Autoparte no encontrada para Detalle ID: {detalle.det_id}");
+                }
             }
+            _logger.LogInformation($"Detalles de venta encontrados: {detallesVenta.Count}");
 
             // Convertir a palabras (ejemplo básico)
             string montoEnPalabras = ConvertirNumeroALetras((double)venta.Total) + " CON " +
