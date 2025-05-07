@@ -403,6 +403,39 @@ namespace Marimon.Controllers
                 .FirstOrDefaultAsync(c => c.UsuarioId == venta.UsuarioId);
 
             _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
+            
+            foreach (var item in carrito.CarritoAutopartes)
+            {
+                var detalle = new DetalleVentas
+                {
+                    VentaId = venta.ven_id,
+                    AutoParteId = item.AutoparteId,
+                    det_cantidad = item.car_cantidad
+                };
+                _context.DetalleVentas.Add(detalle);
+
+                // Actualizar stock de autopartes
+                var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
+                if (autoparte != null)
+                {
+                    autoparte.aut_cantidad -= item.car_cantidad;
+                    _context.Autopartes.Update(autoparte);
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            // También crear las salidas
+            foreach (var item in carrito.CarritoAutopartes)
+            {
+                var salida = new Salida
+                {
+                    sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
+                    sal_cantidad = item.car_cantidad,
+                    ComprobanteId = comprobante.com_id,
+                    AutoparteId = item.AutoparteId
+                };
+                _context.Salida.Add(salida);
+            }
             await _context.SaveChangesAsync();
 
             // Generar el PDF
@@ -557,6 +590,7 @@ namespace Marimon.Controllers
             // Calcular IGV (18%)
             decimal subtotal = Math.Round(venta.Total / 1.18m, 2);
             decimal igv = Math.Round(venta.Total - subtotal, 2);
+            _logger.LogInformation($"VentaID consultado: {venta.ven_id}, DetallesCount: {detallesVenta.Count}");
 
             // Iniciar HTML para el comprobante
             var htmlContent = $@"
@@ -797,8 +831,9 @@ namespace Marimon.Controllers
                 {
                     decimal precioUnitario = Math.Round(autoparte.aut_precio / 1.18m, 2); // Precio sin IGV
                     decimal subtotalItem = Math.Round(precioUnitario * detalle.det_cantidad, 2);
+                    decimal totalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2); // Total con IGV
 
-                    _logger.LogInformation($"Generando fila para Autoparte - ID: {autoparte.aut_id}, Nombre: {autoparte.aut_nombre}, Cantidad: {detalle.det_cantidad}, Precio Unitario: {precioUnitario}, Subtotal: {subtotalItem}");
+                    _logger.LogInformation($"Generando fila para Autoparte - ID: {autoparte.aut_id}, Nombre: {autoparte.aut_nombre}, Cantidad: {detalle.det_cantidad}, Precio Unitario: {precioUnitario}, Subtotal: {subtotalItem}, Total: {totalItem}");
 
                     htmlContent += $@"
                     <tr>
@@ -807,6 +842,7 @@ namespace Marimon.Controllers
                         <td class='description'>{autoparte.aut_nombre}</td>
                         <td class='right'>S/ {precioUnitario:N2}</td>
                         <td class='right'>S/ {subtotalItem:N2}</td>
+                        <td class='right'>S/ {totalItem:N2}</td>
                     </tr>";
                 }
                 else
