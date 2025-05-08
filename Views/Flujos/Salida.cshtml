@@ -217,7 +217,7 @@
             productoSelect.disabled = false;
 
             // Llamada AJAX para obtener los productos de la categoría seleccionada
-            fetch(`/Admin/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
+            fetch(`/Personal_Ventas/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Error en la respuesta del servidor');
