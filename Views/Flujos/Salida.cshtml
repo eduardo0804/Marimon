@@ -151,48 +151,60 @@
                                             </td>
                                             <td>@salida.sal_fechasalida.ToString("dd-MM-yyyy")</td>
                                             <td>
-                                                @{
-                                                    // Estado predeterminado es "Pendiente"
-                                                    string estadoActual = "Pendiente";
-                                                    string estadoGuardado = null;
+    @{
+        // Estado predeterminado es "Pendiente"
+        string estadoActual = "Pendiente";
+        string estadoGuardado = null;
 
-                                                    // Si existe un valor en StripeSessionId, el estado es "Completado"
-                                                    if (salida.Comprobante?.Venta?.StripeSessionId != null)
-                                                    {
-                                                        estadoActual = "Completado";
-                                                    }
+        // Si existe un valor en StripeSessionId, el estado es "Completado"
+        if (salida.Comprobante?.Venta?.StripeSessionId != null)
+        {
+            estadoActual = "Completado";
+        }
+        // Si UsuarioId está vacío o nulo, es "Presencial"
+        else if (string.IsNullOrEmpty(salida.Comprobante?.Venta?.UsuarioId))
+        {
+            estadoActual = "Presencial";
+        }
 
-                                                    // Comprobar si hay un valor guardado en TempData para esta salida
-                                                    string tempDataKey = $"Estado_Salida_{salida.sal_id}";
-                                                    if (TempData[tempDataKey] != null)
-                                                    {
-                                                        estadoGuardado = TempData[tempDataKey].ToString();
-                                                        estadoActual = estadoGuardado;
+        // Comprobar si hay un valor guardado en TempData para esta salida
+        string tempDataKey = $"Estado_Salida_{salida.sal_id}";
+        if (TempData[tempDataKey] != null)
+        {
+            estadoGuardado = TempData[tempDataKey].ToString();
+            estadoActual = estadoGuardado;
 
-                                                        // Mantener el valor para la siguiente carga de página
-                                                        TempData.Keep(tempDataKey);
-                                                    }
+            // Mantener el valor para la siguiente carga de página
+            TempData.Keep(tempDataKey);
+        }
 
-                                                    string btnClass = "btn-warning"; // Predeterminado para Pendiente
+        string btnClass = "btn-warning"; // Default: Pendiente
 
-                                                    if (estadoActual == "Completado")
-                                                    {
-                                                        btnClass = "btn-success";
-                                                    }
-                                                    else if (estadoActual == "Cancelado")
-                                                    {
-                                                        btnClass = "btn-danger";
-                                                    }
-                                                }
-                                                <button type="button"
-                                                        class="btn btn-sm @btnClass"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#estadoModal"
-                                                        data-id="@salida.sal_id"
-                                                        data-estado="@estadoActual">
-                                                    @estadoActual
-                                                </button>
-                                            </td>
+        if (estadoActual == "Completado")
+        {
+            btnClass = "btn-success";
+        }
+        else if (estadoActual == "Cancelado")
+        {
+            btnClass = "btn-danger";
+        }
+        else if (estadoActual == "Presencial")
+        {
+            btnClass = "btn-primary"; // Azul para estado Presencial
+        }
+    }
+    <button type="button"
+            class="btn btn-sm @btnClass"
+            data-bs-toggle="modal"
+            data-bs-target="#estadoModal"
+            data-id="@salida.sal_id"
+            data-estado="@estadoActual">
+        @estadoActual
+    </button>
+</td>
+
+
+
                                         </tr>
                                     }
                                 }
