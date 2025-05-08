@@ -1,0 +1,70 @@
+@model Marimon.Models.PagoYapeViewModel
+
+@{
+    Layout = "_LayoutPago";
+    ViewData["Title"] = "Pago con Yape";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="mb-0 text-center">Pago con Yape</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mx-auto text-center">
+                            <img src="/images/yape-qr.jpg" alt="Código QR Yape" class="img-fluid rounded shadow-sm mb-3" style="max-width: 250px;">
+                            <h5>Marimon Autopartes</h5>
+                            <p class="lead fw-bold">999-888-777</p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <ol class="mb-0">
+                            <li>Escanea el código QR con tu app de Yape</li>
+                            <li>Realiza el pago por el monto de tu compra</li>
+                            <li>Toma una captura de la confirmación del pago</li>
+                            <li>Sube la captura en el formulario a continuación</li>
+                        </ol>
+                    </div>
+
+                    <form action="@Url.Action("ConfirmarPagoYape", "Comprobante")" method="post" enctype="multipart/form-data">
+                        <!-- Incluimos campos ocultos para pasar los datos del comprobante -->
+                        <input type="hidden" name="tipoComprobante" value="@Model.TipoComprobante" />
+                        <input type="hidden" name="num_identificacion" value="@Model.NumIdentificacion" />
+                        <input type="hidden" name="fac_razon" value="@Model.RazonSocial" />
+                        <input type="hidden" name="fac_ruc" value="@Model.Ruc" />
+                        <input type="hidden" name="fac_direccion" value="@Model.Direccion" />
+
+                        <div class="mb-4">
+                            <label for="comprobanteFile" class="form-label fw-semibold">Subir comprobante de pago:</label>
+                            <input type="file" class="form-control form-control-lg" id="comprobanteFile" name="comprobanteFile" accept="image/*" required>
+                            <div class="form-text">Formatos aceptados: JPG, JPEG, PNG (máx. 5MB)</div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Importante:</strong> Por favor asegúrate que en la imagen se pueda ver claramente:
+                            <ul class="mb-0 mt-2">
+                                <li>Número de operación</li>
+                                <li>Fecha y hora de la transacción</li>
+                                <li>Monto transferido</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-lg" style="background-color: #8F35D4; color: white;">
+                                <i class="bi bi-check-circle-fill me-2"></i>Confirmar pago
+                            </button>
+                            <a href="@Url.Action("Index", "Carrito")" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-arrow-left me-2"></i>Volver al carrito
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
