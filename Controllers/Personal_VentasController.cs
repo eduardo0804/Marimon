@@ -185,43 +185,43 @@ namespace Marimon.Controllers
                     return RedirectToAction("Salidas");
                 }
 
-                // Paso 2: Crear el método de pago (en efectivo)
-                var metodoPago = new MetodoPago
-                {
-                    pag_metodo = "Efectivo",
-                    pag_fecha = DateOnly.FromDateTime(DateTime.Now),
-                };
+                // // Paso 2: Crear el método de pago (en efectivo)
+                // var metodoPago = new MetodoPago
+                // {
+                //     pag_metodo = "Efectivo",
+                //     pag_fecha = DateOnly.FromDateTime(DateTime.Now),
+                // };
 
-                _context.MetodoPago.Add(metodoPago);
-                await _context.SaveChangesAsync(); // Guardar y generar el ID de metodoPago
+                // _context.MetodoPago.Add(metodoPago);
+                // await _context.SaveChangesAsync(); // Guardar y generar el ID de metodoPago
 
-                // Paso 3: Crear la venta
-                var venta = new Venta
-                {
-                    ven_fecha = DateOnly.FromDateTime(DateTime.Now),
-                    MetodoPagoId = metodoPago.pag_id  // Relacionar con el metodo de pago ya guardado
-                };
-                _context.Venta.Add(venta);
-                await _context.SaveChangesAsync(); // Guardar y generar el ID de venta
+                // // Paso 3: Crear la venta
+                // var venta = new Venta
+                // {
+                //     ven_fecha = DateOnly.FromDateTime(DateTime.Now),
+                //     MetodoPagoId = metodoPago.pag_id  // Relacionar con el metodo de pago ya guardado
+                // };
+                // _context.Venta.Add(venta);
+                // await _context.SaveChangesAsync(); // Guardar y generar el ID de venta
 
-                // Paso 4: Crear el detalle de venta (usando solo la cantidad y el AutoparteId)
-                var detalleVenta = new DetalleVentas
-                {
-                    VentaId = venta.ven_id,  // Relacionar con la venta ya guardada
-                    AutoParteId = AutoparteId,
-                    det_cantidad = sal_cantidad,
-                };
-                _context.DetalleVentas.Add(detalleVenta);
-                await _context.SaveChangesAsync(); // Guardar y generar el ID de detalleVenta
+                // // Paso 4: Crear el detalle de venta (usando solo la cantidad y el AutoparteId)
+                // var detalleVenta = new DetalleVentas
+                // {
+                //     VentaId = venta.ven_id,  // Relacionar con la venta ya guardada
+                //     AutoParteId = AutoparteId,
+                //     det_cantidad = sal_cantidad,
+                // };
+                // _context.DetalleVentas.Add(detalleVenta);
+                // await _context.SaveChangesAsync(); // Guardar y generar el ID de detalleVenta
 
-                // Paso 5: Crear el comprobante (Boleta)
-                var comprobante = new Comprobante
-                {
-                    tipo_comprobante = "Boleta",  // Definir el tipo de comprobante
-                    VentaId = venta.ven_id   // Relacionar con la venta ya guardada
-                };
-                _context.Comprobante.Add(comprobante);
-                await _context.SaveChangesAsync(); // Guardar y generar el ID de comprobante
+                // // Paso 5: Crear el comprobante (Boleta)
+                // var comprobante = new Comprobante
+                // {
+                //     tipo_comprobante = "Boleta",  // Definir el tipo de comprobante
+                //     VentaId = venta.ven_id   // Relacionar con la venta ya guardada
+                // };
+                // _context.Comprobante.Add(comprobante);
+                // await _context.SaveChangesAsync(); // Guardar y generar el ID de comprobante
 
                 // Paso 6: Registrar la salida
                 var salida = new Salida
@@ -229,7 +229,7 @@ namespace Marimon.Controllers
                     AutoparteId = AutoparteId,
                     sal_cantidad = sal_cantidad,
                     sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
-                    ComprobanteId = comprobante.com_id // Relacionar con el comprobante ya guardado
+                    // ComprobanteId = comprobante.com_id // Relacionar con el comprobante ya guardado
                 };
                 _context.Salida.Add(salida);
 
