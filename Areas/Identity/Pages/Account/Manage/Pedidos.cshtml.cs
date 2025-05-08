@@ -77,6 +77,8 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
                 AutoParteNombre = x.vcdap.autoParte.aut_nombre,
                 AutoPartePrecio = x.vcdap.autoParte.aut_precio,
                 Cantidad = Convert.ToInt32(x.vcdap.vcd.detalle.det_cantidad),
+                // Asegúrate de manejar el null en StripeSessionId
+                StripeSessionId = x.vcdap.vcd.vc.venta.StripeSessionId
             })
             .ToListAsync();
             return Page();

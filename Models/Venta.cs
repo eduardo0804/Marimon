@@ -23,7 +23,7 @@ namespace Marimon.Models
         public decimal Total {get; set; }
         
         // Propiedad nueva para almacenar el ID de sesión de Stripe
-        public string StripeSessionId { get; set; }
+        public string? StripeSessionId { get; set; }
         
         public ICollection<DetalleVentas> Detalles { get; set; } = new List<DetalleVentas>();
 
