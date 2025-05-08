@@ -15,7 +15,12 @@
         <!-- Cabecera -->
         <div class="row mb-4">
             <div class="col-lg-7">
-                <h2 class="fw-bold text-dark">Finaliza tu Compra</h2>
+                <div class="titulo-con-flecha">
+                    <a href="@Url.Action("Index", "Carrito")" class="flecha-retroceso">
+                        <i class="bi bi-arrow-left-circle-fill"></i>
+                    </a>
+                    <h2 class="fw-bold text-dark mb-0">Finaliza tu Compra</h2>
+                </div>
             </div>
             <div class="col-md-5 text-end text-success d-flex align-items-center justify-content-end gap-2">
                 <i class="bi bi-shield-check fs-4"></i>
@@ -24,15 +29,8 @@
         </div>
 
         <div class="row">
-            <!-- Resumen de Pedido -->
+            <!-- Resumen de Pedido (siempre visible) -->
             <div class="col-lg-5 order-lg-2 mb-4">
-                <!-- Botón para mostrar/ocultar resumen -->
-                <button type="button" id="toggleResumen"
-                    class="btn btn-secondary-custom w-100 mb-3 d-flex justify-content-between align-items-center">
-                    <span>Ocultar resumen del pedido</span>
-                    <i class="bi bi-chevron-up" id="toggleIcon"></i>
-                </button>
-
                 <div class="card shadow-sm border-0 rounded-4 bg-white p-4 sticky-top" id="resumenPedido"
                     style="top: 20px;">
                     <h4 class="fw-bold mb-4">Resumen de Pedido</h4>
@@ -96,37 +94,8 @@
                     </div>
                 </div>
 
-                <!-- Método de pago -->
-                <div class="card p-4 shadow-sm bg-light rounded-4 border-0 mb-4">
-                    <div class="form-label fw-semibold fs-4 text-center mb-3">Seleccione el Método de Pago</div>
-                    <div class="d-flex justify-content-center gap-5">
-                        <div class="form-check form-check-lg">
-                            <input class="form-check-input fs-4" type="radio" name="metodoPago" value="tarjeta"
-                                id="pagoTarjeta" checked>
-                            <label class="form-check-label fs-5 ms-2" for="pagoTarjeta">
-                                <div class="d-flex align-items-center">
-                                    <span>Tarjeta de crédito/débito</span>
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/2560px-Stripe_Logo%2C_revised_2016.svg.png" 
-                                         alt="Stripe" class="ms-2" style="height: 20px;">
-                                </div>
-                            </label>
-                        </div>
-                        <div class="form-check form-check-lg">
-                            <input class="form-check-input fs-4" type="radio" name="metodoPago" value="yape"
-                                id="pagoYape">
-                            <label class="form-check-label fs-5 ms-2" for="pagoYape">
-                                <div class="d-flex align-items-center">
-                                    <span>Yape</span>
-                                    <img src="https://www.yape.com.pe/recursos/img/yape-logo.svg" 
-                                         alt="Yape" class="ms-2" style="height: 20px;">
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Datos personales -->
-                <div class="row mb-4">
+                <!-- Datos para Boleta -->
+                <div id="camposBoleta" class="row mb-4">
                     <div class="col-md-6 mb-3">
                         <label for="nombre" class="form-label fw-semibold">Nombre *</label>
                         <input type="text"
@@ -143,7 +112,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="tipoDocumento" class="form-label fw-semibold">Tipo de documento *</label>
                         <select class="form-select form-select-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="tipoDocumento">
+                            id="tipoDocumento" name="tipoDocumento">
                             <option selected disabled>Seleccione</option>
                             <option>DNI</option>
                             <option>Carnet de Extranjería</option>
@@ -164,22 +133,41 @@
                     </div>
                 </div>
 
-                <!-- Datos para factura -->
-                <div class="row mb-4">
+                <!-- Datos para Factura -->
+                <div id="camposFactura" class="row mb-4" style="display: none;">
+                    <div class="col-md-6 mb-3">
+                        <label for="nombreFactura" class="form-label fw-semibold">Nombre *</label>
+                        <input type="text"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="nombreFactura"
+                            name="usu_nombre" placeholder="Ingrese su nombre" value="@usuario.usu_nombre" readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="apellidosFactura" class="form-label fw-semibold">Apellidos *</label>
+                        <input type="text"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
+                            id="apellidosFactura" name="usu_apellido" placeholder="Ingrese sus apellidos"
+                            value="@usuario.usu_apellido" readonly>
+                    </div>
                     <div class="col-12 mb-3">
-                        <label for="razonSocial" class="form-label fw-semibold">Razón Social</label>
+                        <label for="correoFactura" class="form-label fw-semibold">Correo electrónico *</label>
+                        <input type="email"
+                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="correoFactura"
+                            name="usu_correo" placeholder="ejemplo@correo.com" value="@usuario.usu_correo" readonly>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="razonSocial" class="form-label fw-semibold">Razón Social *</label>
                         <input type="text"
                             class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
                             id="razonSocial" name="fac_razonsocial" placeholder="Ingrese razón social">
                     </div>
                     <div class="col-12 mb-3">
-                        <label for="ruc" class="form-label fw-semibold">N° de R.U.C.</label>
+                        <label for="ruc" class="form-label fw-semibold">N° de R.U.C. *</label>
                         <input type="text"
                             class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="ruc"
                             name="fac_ruc" placeholder="Ingrese número de RUC">
                     </div>
                     <div class="col-12 mb-3">
-                        <label for="direccion" class="form-label fw-semibold">Dirección fiscal o comercial</label>
+                        <label for="direccion" class="form-label fw-semibold">Dirección fiscal o comercial *</label>
                         <input type="text"
                             class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
                             id="direccion" name="fac_direccion" placeholder="Ingrese dirección">
@@ -195,6 +183,31 @@
                     <p class="mb-0 ps-4 text-dark">Recojo disponible en: <strong>Jr. Gral. Felipe Santiago Salaverry 44, Lima 15022</strong></p>
                 </div>
 
+                <!-- Método de pago -->
+                <div class="card p-4 shadow-sm bg-light rounded-4 border-0 mb-4">
+                    <div class="form-label fw-semibold fs-4 text-center mb-3">Seleccione el Método de Pago</div>
+                    <div class="d-flex justify-content-center gap-5">
+                        <div class="form-check form-check-lg">
+                            <input class="form-check-input fs-4" type="radio" name="metodoPago" value="tarjeta"
+                                id="pagoTarjeta" checked>
+                            <label class="form-check-label fs-5 ms-2" for="pagoTarjeta">
+                                <div class="d-flex align-items-center">
+                                    <span>Tarjeta de crédito/débito</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="form-check form-check-lg">
+                            <input class="form-check-input fs-4" type="radio" name="metodoPago" value="yape"
+                                id="pagoYape">
+                            <label class="form-check-label fs-5 ms-2" for="pagoYape">
+                                <div class="d-flex align-items-center">
+                                    <span>Yape + Deposito Bancarios</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                  <!-- Nota -->
                 <div class="alert alert-warning mt-3 rounded-4 shadow-sm ps-4">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -203,111 +216,19 @@
 
                 <!-- Botón para Stripe -->
                 <div id="botonStripe" class="text-center">
-                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 rounded-pill shadow" style="background-color: #635BFF; border-color: #635BFF;">
-                        <i class="bi bi-credit-card-fill me-2"></i>PAGAR CON TARJETA
+                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 rounded-pill shadow" >
+                        <i class="bi bi-credit-card-fill me-2"></i>CONTINUAR PAGO
                     </button>
                 </div>
 
                 <!-- Botón para Yape -->
                 <div id="botonYape" class="text-center" style="display: none;">
-                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 rounded-pill shadow" style="background-color: #8F35D4; border-color: #8F35D4;">
-                        <i class="bi bi-phone-fill me-2"></i>PAGAR CON YAPE
+                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 rounded-pill shadow" >
+                        <i class="bi bi-phone-fill me-2"></i>CONTINUAR PAGO
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </form>
-
-<script>
-    const boletaRadio = document.getElementById('boleta');
-    const facturaRadio = document.getElementById('factura');
-    const pagoTarjetaRadio = document.getElementById('pagoTarjeta');
-    const pagoYapeRadio = document.getElementById('pagoYape');
-    const botonStripe = document.getElementById('botonStripe');
-    const botonYape = document.getElementById('botonYape');
-
-    const campos = {
-        nombre: document.getElementById('nombre'),
-        apellidos: document.getElementById('apellidos'),
-        tipoDocumento: document.getElementById('tipoDocumento'),
-        numeroDocumento: document.getElementById('numeroDocumento'),
-        correo: document.getElementById('correo'),
-        razonSocial: document.getElementById('razonSocial'),
-        ruc: document.getElementById('ruc'),
-        direccion: document.getElementById('direccion')
-    };
-
-    function actualizarCampos() {
-        const esBoleta = boletaRadio.checked;
-
-        campos.tipoDocumento.disabled = !esBoleta;
-        campos.numeroDocumento.disabled = !esBoleta;
-
-        campos.razonSocial.disabled = esBoleta;
-        campos.ruc.disabled = esBoleta;
-        campos.direccion.disabled = esBoleta;
-
-        if (!esBoleta) {
-            campos.tipoDocumento.selectedIndex = 0;
-            campos.numeroDocumento.value = '';
-        }
-    }
-
-    function actualizarBotonesPago() {
-        if (pagoTarjetaRadio.checked) {
-            botonStripe.style.display = 'block';
-            botonYape.style.display = 'none';
-        } else {
-            botonStripe.style.display = 'none';
-            botonYape.style.display = 'block';
-        }
-    }
-
-    boletaRadio.addEventListener('change', actualizarCampos);
-    facturaRadio.addEventListener('change', actualizarCampos);
-    pagoTarjetaRadio.addEventListener('change', actualizarBotonesPago);
-    pagoYapeRadio.addEventListener('change', actualizarBotonesPago);
-    
-    window.addEventListener('DOMContentLoaded', () => {
-        actualizarCampos();
-        actualizarBotonesPago();
-    });
-
-    const toggleBtn = document.getElementById('toggleResumen');
-    const resumenPedido = document.getElementById('resumenPedido');
-    const toggleIcon = document.getElementById('toggleIcon');
-    
-    toggleBtn.addEventListener('click', function() {
-        if (resumenPedido.style.display === 'none') {
-            resumenPedido.style.display = 'block';
-            toggleBtn.querySelector('span').textContent = 'Ocultar resumen del pedido';
-            toggleIcon.classList.remove('bi-chevron-down');
-            toggleIcon.classList.add('bi-chevron-up');
-        } else {
-            resumenPedido.style.display = 'none';
-            toggleBtn.querySelector('span').textContent = 'Mostrar resumen del pedido';
-            toggleIcon.classList.remove('bi-chevron-up');
-            toggleIcon.classList.add('bi-chevron-down');
-        }
-    });
-    
-    // Para dispositivos móviles, ocultar el resumen por defecto
-    function checkWidth() {
-        if (window.innerWidth < 992) {
-            resumenPedido.style.display = 'none';
-            toggleBtn.querySelector('span').textContent = 'Mostrar resumen del pedido';
-            toggleIcon.classList.remove('bi-chevron-up');
-            toggleIcon.classList.add('bi-chevron-down');
-        } else {
-            resumenPedido.style.display = 'block';
-            toggleBtn.querySelector('span').textContent = 'Ocultar resumen del pedido';
-            toggleIcon.classList.remove('bi-chevron-down');
-            toggleIcon.classList.add('bi-chevron-up');
-        }
-    }
-    
-    // Verificar al cargar y al cambiar tamaño de ventana
-    window.addEventListener('DOMContentLoaded', checkWidth);
-    window.addEventListener('resize', checkWidth);
-</script>
+<script src="~/js/comprobante.js" asp-append-version="true"></script>

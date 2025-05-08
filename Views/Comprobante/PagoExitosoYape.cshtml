@@ -1,28 +1,43 @@
-
 @model Marimon.Models.Comprobante
 @{
     ViewData["Title"] = "Pago Exitoso";
 }
-
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h3 class="my-2">¡Transacción Exitosa!</h3>
+                </div>
                 <div class="card-body text-center">
                     <div class="mb-4">
                         <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
                     </div>
-                    <h2 class="card-title mb-4">¡Pago Completado con Éxito!</h2>
-                    <p class="card-text">Tu compra ha sido procesada correctamente.</p>
-                    <p>Número de Comprobante: <strong>@(Model.tipo_comprobante.ToUpper())-@Model.com_id.ToString("0000000")</strong></p>
-                    <p>Te hemos enviado el comprobante a tu correo electrónico.</p>
+                    <h2 class="card-title mb-3">¡Gracias por tu compra!</h2>
+
+                    <div class="alert alert-success py-3">
+                        <h5><i class="fas fa-check-double mr-2"></i> ¡Pago procesado correctamente!</h5>
+                    </div>
+                    
+                   
+                    <p class="card-text mb-4">
+                        Estamos procesando tu pedido con mucho cuidado. Recibirás una notificación cuando 
+                        esté listo para entrega o envío. ¡Gracias por elegirnos!
+                    </p>
                     
                     <hr class="my-4" />
                     
                     <div class="mt-4">
-                        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary">Volver a la tienda</a>
-                        <a asp-area="Identity" asp-page="/Account/Manage/Pedidos" class="btn btn-outline-secondary ml-2">Ver mis compras</a>
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                            <i class="fas fa-store mr-1"></i> Volver a la tienda
+                        </a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/Pedidos" class="btn btn-outline-secondary ml-3">
+                            <i class="fas fa-list-alt mr-1"></i> Ver mis compras
+                        </a>
                     </div>
+                </div>
+                <div class="card-footer text-center text-muted">
+                    <small>Si tienes alguna pregunta sobre tu pedido, no dudes en contactarnos.</small>
                 </div>
             </div>
         </div>
@@ -52,6 +67,20 @@
                     }
                 }
             });
+            
+            // Efecto visual para mejorar la experiencia
+            $(".card").hide().fadeIn(800);
+            
+            // Confetti para celebrar la compra exitosa
+            setTimeout(function() {
+                if (typeof confetti !== 'undefined') {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }
+            }, 500);
         });
     </script>
 }
