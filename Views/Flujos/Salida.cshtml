@@ -3,7 +3,13 @@
     ViewData["Title"] = "Registro de Salidas";
     Layout = "_LayoutAdmin";
 }
-
+<style>
+    .btn-info{
+        color: #fff !important;
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+    }
+</style>
 <!-- Contenido Principal -->
 <div class="container mt-4">
     <!-- Título y descripción -->
@@ -190,7 +196,7 @@
         }
         else if (estadoActual == "Presencial")
         {
-            btnClass = "btn-primary"; // Azul para estado Presencial
+            btnClass = "btn-info disabled";
         }
     }
     <button type="button"
