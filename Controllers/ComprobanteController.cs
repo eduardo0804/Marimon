@@ -328,35 +328,31 @@ namespace Marimon.Controllers
             TempData["fac_ruc"] = fac_ruc;
             TempData["fac_direccion"] = fac_direccion;
             TempData["ventaId"] = venta.ven_id;
-            
+
             // Crear sesión de Stripe
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
-                LineItems = new List<SessionLineItemOptions>
+                LineItems = carrito.CarritoAutopartes.Select(item => new SessionLineItemOptions
                 {
-                    new SessionLineItemOptions
+                    PriceData = new SessionLineItemPriceDataOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
+                        Currency = "pen", // Moneda peruana (soles)
+                        UnitAmount = (long)(item.Autoparte.aut_precio * 100), // Stripe trabaja en centavos
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-                            Currency = "pen", // Moneda peruana (soles)
-                            UnitAmount = (long)(carrito.car_total * 100), // Stripe trabaja en centavos
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = "Compra en Marimon Autopartes",
-                                Description = $"Pedido #{venta.ven_id}"
-                            },
+                            Name = item.Autoparte.aut_nombre,
+                            Description = item.Autoparte.aut_descripcion, 
+                            Images = new List<string> { item.Autoparte.aut_imagen } 
                         },
-                        Quantity = 1,
-                    }
-                },
+                    },
+                    Quantity = item.car_cantidad, // Cantidad del producto
+                }).ToList(),
                 Mode = "payment",
                 SuccessUrl = $"{Request.Scheme}://{Request.Host}/Comprobante/PagoExitoso?session_id={{CHECKOUT_SESSION_ID}}",
-
-                //SuccessUrl = Url.Action("PagoExitoso", "Comprobante", new { session_id = "{CHECKOUT_SESSION_ID}" }, Request.Scheme),
                 CancelUrl = Url.Action("Index", "Comprobante", null, Request.Scheme)
             };
-            
+
             var service = new SessionService();
             var session = service.Create(options);
             
