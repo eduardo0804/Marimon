@@ -343,7 +343,9 @@ namespace Marimon.Controllers
                     }
                 },
                 Mode = "payment",
-                SuccessUrl = Url.Action("PagoExitoso", "Comprobante", new { session_id = "{CHECKOUT_SESSION_ID}" }, Request.Scheme),
+                SuccessUrl = $"{Request.Scheme}://{Request.Host}/Comprobante/PagoExitoso?session_id={{CHECKOUT_SESSION_ID}}",
+
+                //SuccessUrl = Url.Action("PagoExitoso", "Comprobante", new { session_id = "{CHECKOUT_SESSION_ID}" }, Request.Scheme),
                 CancelUrl = Url.Action("Index", "Comprobante", null, Request.Scheme)
             };
             
@@ -513,28 +515,6 @@ namespace Marimon.Controllers
             }
             
             return View("Error", "El pago no se completó correctamente.");
-        }
-
-        public IActionResult PagoYape()
-        {
-            // Crea un ViewModel con los datos almacenados en TempData
-            var viewModel = new PagoYapeViewModel
-            {
-                TipoComprobante = TempData["tipoComprobante"]?.ToString(),
-                NumIdentificacion = TempData["num_identificacion"]?.ToString(),
-                RazonSocial = TempData["fac_razon"]?.ToString(),
-                Ruc = TempData["fac_ruc"]?.ToString(),
-                Direccion = TempData["fac_direccion"]?.ToString()
-            };
-            
-            // Mantener los datos en TempData para el siguiente request
-            TempData.Keep("tipoComprobante");
-            TempData.Keep("num_identificacion");
-            TempData.Keep("fac_razon");
-            TempData.Keep("fac_ruc");
-            TempData.Keep("fac_direccion");
-            
-            return View(viewModel);
         }
 
         private string GenerateComprobanteHtml(Comprobante comprobante)
@@ -991,8 +971,29 @@ namespace Marimon.Controllers
             return _converter.Convert(doc);
         }
 
-
-                [HttpPost]
+        public IActionResult PagoYape()
+        {
+            // Crea un ViewModel con los datos almacenados en TempData
+            var viewModel = new PagoYapeViewModel
+            {
+                TipoComprobante = TempData["tipoComprobante"]?.ToString(),
+                NumIdentificacion = TempData["num_identificacion"]?.ToString(),
+                RazonSocial = TempData["fac_razon"]?.ToString(),
+                Ruc = TempData["fac_ruc"]?.ToString(),
+                Direccion = TempData["fac_direccion"]?.ToString()
+            };
+            
+            // Mantener los datos en TempData para el siguiente request
+            TempData.Keep("tipoComprobante");
+            TempData.Keep("num_identificacion");
+            TempData.Keep("fac_razon");
+            TempData.Keep("fac_ruc");
+            TempData.Keep("fac_direccion");
+            
+            return View(viewModel);
+        }
+        
+        [HttpPost]
         public async Task<IActionResult> ConfirmarPagoYape(IFormFile comprobanteFile)
         {
             // Verificar si se ha subido un archivo
@@ -1117,18 +1118,18 @@ namespace Marimon.Controllers
             }
             
             // Guardar imagen del comprobante
-            // Obtener la ruta física del directorio de comprobantes
-            string comprobantesDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "comprobantes");
+            // Obtener la ruta física del directorio de evidencias
+            string evidenciasDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "evidencias");
             
             // Crear el directorio si no existe
-            if (!Directory.Exists(comprobantesDir))
+            if (!Directory.Exists(evidenciasDir))
             {
-                Directory.CreateDirectory(comprobantesDir);
+                Directory.CreateDirectory(evidenciasDir);
             }
             
             // Generar un nombre único para el archivo
-            string nombreArchivo = $"comprobante_yape_{comprobante.com_id}{extension}";
-            string rutaCompleta = Path.Combine(comprobantesDir, nombreArchivo);
+            string nombreArchivo = $"evidencias_{comprobante.com_id}{extension}";
+            string rutaCompleta = Path.Combine(evidenciasDir, nombreArchivo);
             
             // Guardar el archivo
             using (var stream = new FileStream(rutaCompleta, FileMode.Create))
@@ -1137,7 +1138,7 @@ namespace Marimon.Controllers
             }
             
             // Guardar la ruta del comprobante en la base de datos
-            comprobante.com_imagen = "/comprobantes/" + nombreArchivo;
+            comprobante.com_evidencia = "/evidencias/" + nombreArchivo;
             _context.Comprobante.Update(comprobante);
             
             // Limpiar el carrito
