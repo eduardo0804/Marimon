@@ -344,7 +344,7 @@ namespace Marimon.Controllers
                 },
                 Mode = "payment",
                 SuccessUrl = Url.Action("PagoExitoso", "Comprobante", new { session_id = "{CHECKOUT_SESSION_ID}" }, Request.Scheme),
-                CancelUrl = Url.Action("PagoCancelado", "Comprobante", null, Request.Scheme)
+                CancelUrl = Url.Action("Index", "Comprobante", null, Request.Scheme)
             };
             
             var service = new SessionService();
@@ -513,22 +513,6 @@ namespace Marimon.Controllers
             }
             
             return View("Error", "El pago no se completó correctamente.");
-        }
-
-        public IActionResult PagoCancelado()
-        {
-            // Eliminar la venta temporal
-            if (TempData["ventaId"] != null && int.TryParse(TempData["ventaId"].ToString(), out int ventaId))
-            {
-                var venta = _context.Venta.Find(ventaId);
-                if (venta != null)
-                {
-                    _context.Venta.Remove(venta);
-                    _context.SaveChanges();
-                }
-            }
-            
-            return View();
         }
 
         public IActionResult PagoYape()
