@@ -252,26 +252,117 @@ namespace Marimon.Controllers
             }
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> CambiarEstado(int id)
+        //{
+        //    var salida = await _context.Salida
+        //        .Include(s => s.Comprobante)
+        //        .ThenInclude(c => c.Venta)
+        //        .FirstOrDefaultAsync(s => s.sal_id == id);
+
+        //    if (salida?.Comprobante?.Venta == null)
+        //        return NotFound();
+
+        //    var venta = salida.Comprobante.Venta;
+
+        //    // Solo asignar "Pago verificado" si StripeSessionId es nulo
+        //    if (string.IsNullOrEmpty(venta.StripeSessionId))
+        //    {
+        //        venta.StripeSessionId = "Pago verificado"; // Asigna el valor solo si está vacío
+        //    }
+
+        //    await _context.SaveChangesAsync();
+
+        //    return RedirectToAction("Salidas");
+        //}
+
+        // Versión avanzada que simula el comportamiento de cambiar el estado
+        // modificando el StripeSessionId según sea necesario
         [HttpPost]
-        public async Task<IActionResult> CambiarEstado(int id)
+        [Route("CambiarEstadoAvanzado")]
+        public IActionResult CambiarEstadoAvanzado(int id, string estado)
         {
-            var salida = await _context.Salida
-                .Include(s => s.Comprobante)
-                .ThenInclude(c => c.Venta)
-                .FirstOrDefaultAsync(s => s.sal_id == id);
-
-            if (salida?.Comprobante?.Venta == null)
-                return NotFound();
-
-            var venta = salida.Comprobante.Venta;
-
-            // Solo asignar "Pago verificado" si StripeSessionId es nulo
-            if (string.IsNullOrEmpty(venta.StripeSessionId))
+            _logger.LogInformation("Inicio de CambiarEstadoAvanzado para salida #{id} con estado {estado}", id, estado);
+            try
             {
-                venta.StripeSessionId = "Pago verificado"; // Asigna el valor solo si está vacío
-            }
+                // Buscar la salida por ID incluyendo el comprobante y la venta
+                var salida = _context.Salida
+                    .Include(s => s.Comprobante)
+                    .ThenInclude(c => c.Venta)
+                    .FirstOrDefault(s => s.sal_id == id);
 
-            await _context.SaveChangesAsync();
+                if (salida == null)
+                {
+                    _logger.LogWarning("No se encontró la salida especificada para ID: {id}", id);
+                    TempData["Error"] = "No se encontró la salida especificada.";
+                    return RedirectToAction("Salidas");
+                }
+
+                _logger.LogInformation("Salida encontrada para ID: {id}. Estado actual: {estadoActual}", id, salida.Comprobante?.Venta?.StripeSessionId ?? "Sin StripeSessionId");
+
+                // Siempre limpiar cualquier estado anterior en TempData
+                string tempDataKey = $"Estado_Salida_{id}";
+                if (TempData.ContainsKey(tempDataKey))
+                {
+                    TempData.Remove(tempDataKey);
+                    _logger.LogInformation("Estado previo en TempData eliminado para salida #{id}", id);
+                }
+
+                if (estado == "Completado")
+                {
+                    if (salida.Comprobante == null)
+                    {
+                        salida.Comprobante = new Comprobante();
+                        _context.Comprobante.Add(salida.Comprobante);
+                        _logger.LogInformation("Comprobante creado automáticamente.");
+                    }
+
+                    if (salida.Comprobante.Venta == null)
+                    {
+                        salida.Comprobante.Venta = new Venta();
+                        _context.Venta.Add(salida.Comprobante.Venta);
+                        _logger.LogInformation("Venta creada automáticamente.");
+                    }
+
+                    salida.Comprobante.Venta.StripeSessionId = "SIMULADO_" + Guid.NewGuid().ToString();
+                    _logger.LogInformation("Estado cambiado a Completado con StripeSessionId asignado.");
+                }
+                else if (estado == "Pendiente")
+                {
+                    if (salida.Comprobante?.Venta?.StripeSessionId != null)
+                    {
+                        salida.Comprobante.Venta.StripeSessionId = null;
+                        _logger.LogInformation("StripeSessionId eliminado para estado Pendiente.");
+                    }
+                }
+                else if (estado == "Cancelado")
+                {
+                    if (salida.Comprobante?.Venta?.StripeSessionId != null)
+                    {
+                        salida.Comprobante.Venta.StripeSessionId = null;
+                        _logger.LogInformation("StripeSessionId eliminado para estado Cancelado.");
+                    }
+
+                    // Guardar el estado Cancelado en TempData
+                    TempData[tempDataKey] = "Cancelado";
+                    _logger.LogInformation("Salida marcada como Cancelada en TempData.");
+                }
+
+                // Asegurarnos de guardar el estado actual en la entidad también
+                // (Asumiendo que hay una propiedad para almacenar el estado)
+                // Si no existe tal propiedad, debes añadirla a tu modelo
+                // Por ejemplo: salida.Estado = estado;
+
+                _context.Update(salida);
+                _context.SaveChanges();
+                _logger.LogInformation("Cambios guardados para salida #{id}. Estado final: {estado}", id, estado);
+                TempData["Mensaje"] = $"Se ha cambiado el estado de la salida #{id} a '{estado}'.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cambiar el estado de la salida #{id}.", id);
+                TempData["Error"] = $"Error al cambiar el estado: {ex.Message}";
+            }
 
             return RedirectToAction("Salidas");
         }
