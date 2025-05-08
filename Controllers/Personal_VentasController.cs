@@ -252,6 +252,29 @@ namespace Marimon.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CambiarEstado(int id)
+        {
+            var salida = await _context.Salida
+                .Include(s => s.Comprobante)
+                .ThenInclude(c => c.Venta)
+                .FirstOrDefaultAsync(s => s.sal_id == id);
+
+            if (salida?.Comprobante?.Venta == null)
+                return NotFound();
+
+            var venta = salida.Comprobante.Venta;
+
+            // Solo asignar "Pago verificado" si StripeSessionId es nulo
+            if (string.IsNullOrEmpty(venta.StripeSessionId))
+            {
+                venta.StripeSessionId = "Pago verificado"; // Asigna el valor solo si está vacío
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Salidas");
+        }
 
         //AUTOPARTE - CRUD
 

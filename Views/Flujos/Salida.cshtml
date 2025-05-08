@@ -157,14 +157,14 @@
                                             </td>
                                             <td>@salida.sal_fechasalida.ToString("dd-MM-yyyy")</td>
                                             <td>
-                                                @if (salida.Comprobante?.Venta?.StripeSessionId != null)
-                                                {
-                                                    <span class="badge bg-success">Completado</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-warning text-dark">Pendiente</span>
-                                                }
+                                                <button type="button"
+                                                        class="btn btn-sm @(salida.Comprobante?.Venta?.StripeSessionId != null ? "btn-success" : "btn-warning")"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#estadoModal"
+                                                        data-id="@salida.sal_id"
+                                                        data-estado="@(salida.Comprobante?.Venta?.StripeSessionId != null ? "Completado" : "Pendiente")">
+                                                    @(salida.Comprobante?.Venta?.StripeSessionId != null ? "Completado" : "Pendiente")
+                                                </button>
                                             </td>
                                         </tr>
                                     }
@@ -208,6 +208,27 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="estadoModal" tabindex="-1" aria-labelledby="estadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <form asp-controller="Personal_Ventas" asp-action="CambiarEstado" method="post">
+            <div class="modal-header">
+            <h5 class="modal-title" id="estadoModalLabel">Cambiar Estado</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+            ¿Estás seguro de que deseas cambiar el estado de esta salida?
+            <input type="hidden" id="salidaIdInput" name="id" />
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Cambiar Estado</button>
+            </div>
+        </form>
+        </div>
+    </div>
+    </div>
+
 
 @section Scripts {
         <script>
@@ -324,6 +345,25 @@
 
 
                 return true;
+            });
+        </script>
+        <script>
+            const estadoModal = document.getElementById('estadoModal');
+            
+            estadoModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const estado = button.getAttribute('data-estado');  // Obtener el estado (Completado o Pendiente)
+                
+                // Si el estado es 'Completado', evita abrir el modal
+                if (estado === 'Completado') {
+                    // Aquí puedes agregar una notificación si deseas, o solo evitar mostrar el modal
+                    event.preventDefault();  // Prevenir que el modal se muestre
+                    return;
+                }
+
+                const salidaId = button.getAttribute('data-id');
+                const input = document.getElementById('salidaIdInput');
+                input.value = salidaId;
             });
         </script>
     @{
