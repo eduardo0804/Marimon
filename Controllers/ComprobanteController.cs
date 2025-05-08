@@ -207,6 +207,14 @@ namespace Marimon.Controllers
             var htmlContent = GenerateComprobanteHtml(comprobante);
             var pdfBytes = ConvertHtmlToPdf(htmlContent);
 
+            // RUTA DEL PDF GENERADO
+            var rutaPdf = SavePdfToFile(pdfBytes, comprobante.com_id, tipoComprobante);
+
+            // Actualizar la tabla Comprobante con la ruta del PDF
+            comprobante.com_imagen = rutaPdf;
+            _context.Update(comprobante);
+            await _context.SaveChangesAsync();
+
             // Obtener el correo del usuario para enviar el comprobante
             var user = await _userManager.FindByIdAsync(usuario.usu_id);
             if (user != null && !string.IsNullOrEmpty(user.Email))
@@ -459,6 +467,14 @@ namespace Marimon.Controllers
                 // Generar el PDF
                 var htmlContent = GenerateComprobanteHtml(comprobante);
                 var pdfBytes = ConvertHtmlToPdf(htmlContent);
+
+                // Añadir después de generar el PDF y antes de enviar el correo
+                var rutaPdf = SavePdfToFile(pdfBytes, comprobante.com_id, tipoComprobante);
+
+                // Actualizar la tabla Comprobante con la ruta del PDF
+                comprobante.com_imagen = rutaPdf;
+                _context.Update(comprobante);
+                await _context.SaveChangesAsync();
                 
                 // Enviar por correo
                 var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == venta.UsuarioId);
@@ -947,9 +963,6 @@ namespace Marimon.Controllers
                 return "";
             }
         }
-
-
-
         private byte[] ConvertHtmlToPdf(string htmlContent)
         {
 
@@ -969,6 +982,27 @@ namespace Marimon.Controllers
             };
 
             return _converter.Convert(doc);
+        }
+
+        // Método para guardar el PDF en disco
+        private string SavePdfToFile(byte[] pdfBytes, int comprobanteId, string tipoComprobante)
+        {
+            // Asegúrate que la carpeta "comprobantes" exista
+            string directorio = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "comprobantes");
+            if (!Directory.Exists(directorio))
+            {
+                Directory.CreateDirectory(directorio);
+            }
+
+            // Crear nombre del archivo y ruta
+            string nombreArchivo = $"{tipoComprobante.ToLower()}_{comprobanteId}.pdf";
+            string rutaArchivo = Path.Combine(directorio, nombreArchivo);
+            
+            // Guardar el archivo
+            System.IO.File.WriteAllBytes(rutaArchivo, pdfBytes);
+            
+            // Devolver la ruta relativa para guardar en la BD
+            return $"/comprobantes/{nombreArchivo}";
         }
 
         public IActionResult PagoYape()
@@ -992,7 +1026,7 @@ namespace Marimon.Controllers
             
             return View(viewModel);
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> ConfirmarPagoYape(IFormFile comprobanteFile)
         {
