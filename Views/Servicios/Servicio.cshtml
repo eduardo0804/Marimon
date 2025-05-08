@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
 <link rel="stylesheet" href="~/css/home.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
 <style>
     .container {
@@ -65,13 +66,21 @@
 </div>
 
 <!-- Banner -->
-<div class="container-fluid p-0 position-relative" style="height: 320px; overflow: hidden;">
-    <img src="https://www.foxwelldiag.com/cdn/shop/articles/10_debbfc55-4bf4-4238-8372-35cad9cc6181.jpg?v=1718870602&width=2048"
+<div class="container-fluid p-0 position-relative" style="height: 350px; overflow: hidden;">
+    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fimg-galeria-01.jpg?alt=media&token=8119fed0-1123-40cb-81b1-a2d9ce3e4b81"
         alt="Banner" class="img-fluid w-100 h-100" style="object-fit: cover; filter: brightness(0.6);" />
+    <div class="banner-overlay position-absolute top-0 start-0 w-100 h-100"
+        style="background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.8) 100%);">
+    </div>
     <div class="banner-text position-absolute top-50 start-50 translate-middle text-center text-white"
         data-aos="fade-down">
-        <h4 class="text-uppercase fw-bold fs-7 mb-2" style="letter-spacing:2px;">TALLER ESPECIALIZADO EN</h4>
-        <h2 class="fw-bold fs-2">Vehículos Europeos y Americanos</h2>
+        <h4 class="text-uppercase fw-bold fs-7 mb-2" style="letter-spacing:2px;">
+            EXPERTOS EN TU VEHÍCULO
+        </h4>
+        <h2 class="fw-bold fs-2">
+            ¡Tu Tranquilidad Es Nuestra Prioridad!<br>
+            <span style="color:#ff9d00;">Años de Experiencia Comprobada</span> Nos Respaldan
+        </h2>
     </div>
 </div>
 
@@ -86,9 +95,14 @@
 <!-- Detalle del Servicio -->
 <div class="container-fluid mt-4 px-4">
     <div class="row my-5 align-items-center">
-        <div class="col-md-6 text-center" data-aos="fade-right">
-            <img src="@Model.ser_imagen" alt="Imagen Servicio" class="img-fluid rounded shadow"
-                style="max-height: 350px;" />
+        <div class="col-md-6 text-center position-relative" data-aos="fade-right">
+            <div class="image-container position-relative overflow-hidden rounded-3 shadow" style="max-height: 350px;">
+                <img src="@Model.ser_imagen" alt="Imagen Servicio" class="img-fluid w-100 service-image"
+                    style="height: 100%; object-fit: contain; transition: transform 0.5s ease;" />
+                <div class="position-absolute top-0 start-0 m-3 d-flex flex-column align-items-start">
+                    <span class="badge bg-light text-dark p-2"><i class="fas fa-clock me-1"></i> 60-90 min</span>
+                </div>
+            </div>
         </div>
         <div class="col-md-6" data-aos="fade-left">
             <h5 class="fw-bold">@Model.ser_nombre</h5>
@@ -171,12 +185,12 @@
                         </div>
                         <div class="col-12">
                             <div class="row g-2">
-                                <div class="col-6">
+                                <div class="col-md-6 mb-2">
                                     @if (ViewBag.TodasLasReservas != null && ViewBag.TodasLasReservas.Count > 0)
                                     {
                                         <div class="dropdown w-100">
                                             <button
-                                                class="btn btn-outline-danger btn-lg dropdown-toggle btn-ver-reservas w-100"
+                                                class="btn btn-outline-danger btn-lg dropdown-toggle btn-ver-reservas w-100 py-3"
                                                 type="button" id="dropdownReservas" data-bs-toggle="dropdown"
                                                 aria-expanded="false" disabled>
                                                 <span>
@@ -211,18 +225,16 @@
                                     }
                                     else
                                     {
-                                        <button class="btn btn-outline-secondary btn-lg w-100 disabled">
+                                        <button class="btn btn-outline-secondary btn-lg w-100 py-2 disabled">
                                             <i class="far fa-calendar-alt me-2"></i>No hay reservas
                                         </button>
                                     }
                                 </div>
-                                <div class="col-6">
-                                    <div class="col-6">
-                                        <button type="submit" class="btn btn-danger btn-lg w-100"
-                                            style="background:#D42025;border:none;">
-                                            <i class="fa fa-calendar-check-o me-2"></i>Reservar
-                                        </button>
-                                    </div>
+                                <div class="col-md-6 mb-2">
+                                    <button type="submit" class="btn btn-danger btn-lg w-100 py-3"
+                                        style="background:#D42025;border:none;">
+                                        <i class="fa fa-calendar-check-o me-2"></i>Reservar
+                                    </button>
                                 </div>
                             </div>
                         </div>
