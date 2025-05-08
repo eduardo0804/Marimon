@@ -1083,7 +1083,7 @@ namespace Marimon.Controllers
             {
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
-                MetodoPagoId = 2, // ID para Yape
+                MetodoPagoId = 10, // ID para Yape
                 Total = carrito.car_total,
             };
             

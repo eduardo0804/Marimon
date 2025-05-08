@@ -27,23 +27,23 @@
     </div>
 
     <!-- Alertas con animación -->
-    @if (TempData["Mensaje"] != null)
-    {
+@if (TempData["Mensaje"] != null)
+{
         <div class="alert alert-success alert-dismissible fade show shadow-sm border-start border-success border-4 rounded-3"
             role="alert">
             <i class="fas fa-check-circle me-2"></i> @TempData["Mensaje"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    }
+}
 
-    @if (TempData["Error"] != null)
-    {
+@if (TempData["Error"] != null)
+{
         <div class="alert alert-danger alert-dismissible fade show shadow-sm border-start border-danger border-4 rounded-3"
             role="alert">
             <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    }
+}
 
     <div class="row">
         <!-- Formulario de registro (Columna izquierda) -->
@@ -83,8 +83,8 @@
                             <label for="sal_cantidad" class="form-label fw-semibold">Cantidad</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
-                                <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2" min="1"
-                                    value="1">
+                                <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2"
+                                    min="1" value="1">
                                 <button type="button" class="btn btn-outline-secondary"
                                     onclick="document.getElementById('sal_cantidad').stepUp()">
                                     <i class="fas fa-plus"></i>
@@ -101,7 +101,8 @@
                         <input type="hidden" name="sal_fechasalida" value="@DateOnly.FromDateTime(DateTime.Now)" />
 
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
+                            <button type="submit"
+                                class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
                                 id="submitButton">
                                 <i class="fas fa-plus-circle me-2"></i>REGISTRAR SALIDA
                                 <span class="hover-overlay"></span>
@@ -136,6 +137,7 @@
                                     <th class="border-0">Cantidad</th>
                                     <th class="border-0">Imagen</th>
                                     <th class="border-0">Fecha</th>
+                                    <th class="border-0">Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -149,18 +151,29 @@
                                             <td><span class="badge bg-success rounded-pill">@salida.sal_cantidad</span></td>
                                             <td>
                                                 <div class="avatar-item">
-                                                   <img src="@salida.Autoparte.aut_imagen" alt="@salida.Autoparte.aut_nombre"
+                                                    <img src="@salida.Autoparte.aut_imagen" alt="@salida.Autoparte.aut_nombre"
                                                         title="@salida.Autoparte.aut_nombre" class="rounded" width="36" />
                                                 </div>
                                             </td>
                                             <td>@salida.sal_fechasalida.ToString("dd-MM-yyyy")</td>
+                                            <td>
+                                                @if (salida.Comprobante?.Venta?.StripeSessionId != null)
+                                                {
+                                                    <span class="badge bg-success">Completado</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                                }
+                                            </td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center py-3">No hay registros de salidas disponibles</td>
+                                        <td colspan="5" class="text-center py-3">No hay registros de salidas disponibles
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -172,23 +185,23 @@
                     <span class="text-muted">Mostrando @(ViewBag.ListaEntradas != null ? ViewBag.ListaEntradas.Count : 0) entradas</span>
                     @if (ViewBag.ListaEntradas != null && ViewBag.ListaEntradas.Count > 0)
                     {
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
                     }
                 </div>
                 -->
@@ -197,260 +210,260 @@
     </div>
 
 @section Scripts {
-    <script>
-        // Función para cargar productos por categoría
-        function cargarProductos() {
-            var categoriaId = document.getElementById("categoriaSelect").value;
-            var productoSelect = document.getElementById("productoSelect");
+        <script>
+            // Función para cargar productos por categoría
+            function cargarProductos() {
+                var categoriaId = document.getElementById("categoriaSelect").value;
+                var productoSelect = document.getElementById("productoSelect");
 
-            // Limpiar el select de productos
-            productoSelect.innerHTML = "";
+                // Limpiar el select de productos
+                productoSelect.innerHTML = "";
 
-            if (!categoriaId) {
-                // Si no hay categoría seleccionada
-                productoSelect.innerHTML = "<option value=''>-- Primero seleccione una categoría --</option>";
-                productoSelect.disabled = true;
-                return;
+                if (!categoriaId) {
+                    // Si no hay categoría seleccionada
+                    productoSelect.innerHTML = "<option value=''>-- Primero seleccione una categoría --</option>";
+                    productoSelect.disabled = true;
+                    return;
+                }
+
+                // Habilitar el select de productos
+                productoSelect.disabled = false;
+
+                // Llamada AJAX para obtener los productos de la categoría seleccionada
+                fetch(`/Personal_Ventas/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.length === 0) {
+                            productoSelect.innerHTML = "<option value=''>No hay productos disponibles</option>";
+                        } else {
+                            productoSelect.innerHTML = "<option value=''>-- Seleccionar Producto --</option>";
+                            data.forEach(producto => {
+                                var option = document.createElement("option");
+                                option.value = producto.aut_id;
+                                option.text = producto.aut_nombre;
+                                productoSelect.appendChild(option);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al cargar los productos:", error);
+                        productoSelect.innerHTML = "<option value=''>Error al cargar productos</option>";
+                    });
             }
 
-            // Habilitar el select de productos
-            productoSelect.disabled = false;
+            // Efecto de hover para el botón
+            document.addEventListener('DOMContentLoaded', function () {
+                // Aplicar el estilo directamente al botón
+                const submitButton = document.getElementById('submitButton');
+                if (submitButton) {
+                    // Asegurarse de que el botón sea visible y tenga el color correcto
+                    submitButton.style.backgroundColor = '#d42025';
+                    submitButton.style.display = 'block';
+                    submitButton.style.width = '100%';
 
-            // Llamada AJAX para obtener los productos de la categoría seleccionada
-            fetch(`/Personal_Ventas/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error en la respuesta del servidor');
+                    submitButton.addEventListener('mouseover', function () {
+                        this.style.backgroundColor = '#b91d21';
+                        this.style.transform = 'translateY(-2px)';
+                        this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+                    });
+
+                    submitButton.addEventListener('mouseout', function () {
+                        this.style.backgroundColor = '#d42025';
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+                    });
+                }
+            });
+
+            // Función de búsqueda en la tabla
+            document.getElementById('searchInput').addEventListener('keyup', function () {
+                let searchText = this.value.toLowerCase();
+                let table = document.getElementById('entriesTable');
+                let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+                for (let i = 0; i < rows.length; i++) {
+                    let found = false;
+                    let cells = rows[i].getElementsByTagName('td');
+
+                    for (let j = 0; j < cells.length; j++) {
+                        let cellText = cells[j].innerText.toLowerCase();
+                        if (cellText.indexOf(searchText) > -1) {
+                            found = true;
+                            break;
+                        }
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.length === 0) {
-                        productoSelect.innerHTML = "<option value=''>No hay productos disponibles</option>";
+
+                    if (found) {
+                        rows[i].style.display = '';
                     } else {
-                        productoSelect.innerHTML = "<option value=''>-- Seleccionar Producto --</option>";
-                        data.forEach(producto => {
-                            var option = document.createElement("option");
-                            option.value = producto.aut_id;
-                            option.text = producto.aut_nombre;
-                            productoSelect.appendChild(option);
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error("Error al cargar los productos:", error);
-                    productoSelect.innerHTML = "<option value=''>Error al cargar productos</option>";
-                });
-        }
-
-        // Efecto de hover para el botón
-        document.addEventListener('DOMContentLoaded', function() {
-            // Aplicar el estilo directamente al botón
-            const submitButton = document.getElementById('submitButton');
-            if (submitButton) {
-                // Asegurarse de que el botón sea visible y tenga el color correcto
-                submitButton.style.backgroundColor = '#d42025';
-                submitButton.style.display = 'block';
-                submitButton.style.width = '100%';
-                
-                submitButton.addEventListener('mouseover', function() {
-                    this.style.backgroundColor = '#b91d21';
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-                });
-                
-                submitButton.addEventListener('mouseout', function() {
-                    this.style.backgroundColor = '#d42025';
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
-                });
-            }
-        });
-
-        // Función de búsqueda en la tabla
-        document.getElementById('searchInput').addEventListener('keyup', function () {
-            let searchText = this.value.toLowerCase();
-            let table = document.getElementById('entriesTable');
-            let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                let found = false;
-                let cells = rows[i].getElementsByTagName('td');
-
-                for (let j = 0; j < cells.length; j++) {
-                    let cellText = cells[j].innerText.toLowerCase();
-                    if (cellText.indexOf(searchText) > -1) {
-                        found = true;
-                        break;
+                        rows[i].style.display = 'none';
                     }
                 }
+            });
 
-                if (found) {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
+            // Validación del formulario
+            document.querySelector('form').addEventListener('submit', function (e) {
+                const productoSelect = document.getElementById('productoSelect');
+                const cantidadInput = document.getElementById('sal_cantidad');
+
+                if (productoSelect.value === '') {
+                    e.preventDefault();
+                    alert('Por favor seleccione un producto');
+                    return false;
                 }
-            }
-        });
 
-        // Validación del formulario
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const productoSelect = document.getElementById('productoSelect');
-            const cantidadInput = document.getElementById('sal_cantidad');
-            
-            if (productoSelect.value === '') {
-                e.preventDefault();
-                alert('Por favor seleccione un producto');
-                return false;
-            }
-            
-            if (model.AutoparteId == null || model.sal_cantidad < 1) {
-    TempData["Error"] = "Debe seleccionar un producto válido y una cantidad mayor a 0.";
-    return RedirectToAction("Salidas");
-}
+                if (model.AutoparteId == null || model.sal_cantidad < 1) {
+                    TempData["Error"] = "Debe seleccionar un producto válido y una cantidad mayor a 0.";
+                    return RedirectToAction("Salidas");
+                }
 
-            
-            return true;
-        });
-    </script>
+
+                return true;
+            });
+        </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <style>
-        /* Estilos generales incluidos directamente */
-        
-        /* Estilos para el botón de registro */
-        .btn-registro {
-            background-color: #d42025 !important;
-            color: white !important;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-registro:hover {
-            background-color: #b91d21 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn-registro .hover-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .btn-registro:hover .hover-overlay {
-            opacity: 1;
-        }
-        
-        .admin-container {
-            max-width: 1500px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+        <style>
+            /* Estilos generales incluidos directamente */
 
-        /* Header */
-        .modulo-header {
-            width: 100%;
-        }
+            /* Estilos para el botón de registro */
+            .btn-registro {
+                background-color: #d42025 !important;
+                color: white !important;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
 
-        .modulo-title-bar {
-            background-color: #d42025;
-            color: white;
-            padding: 15px 25px;
-            text-align: left;
-        }
+            .btn-registro:hover {
+                background-color: #b91d21 !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
 
-        .modulo-title {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 600;
-        }
+            .btn-registro .hover-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.2);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
 
-        /* Footer de las tarjetas */
-        .card-footer {
-            background-color: #f8f9fa;
-            color: #6c757d;
-            padding: 12px;
-            text-align: center;
-        }
+            .btn-registro:hover .hover-overlay {
+                opacity: 1;
+            }
 
-        /* Footer principal */
-        .modulo-footer {
-            background-color: #d42025;
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+            .admin-container {
+                max-width: 1500px;
+                margin: 0 auto;
+                background-color: #fff;
+                border-radius: 8px;
+                overflow: hidden;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
 
-        .modulo-footer a {
-            color: white;
-            text-decoration: none;
-        }
+            /* Header */
+            .modulo-header {
+                width: 100%;
+            }
 
-        .modulo-footer a:hover {
-            text-decoration: underline;
-        }
+            .modulo-title-bar {
+                background-color: #d42025;
+                color: white;
+                padding: 15px 25px;
+                text-align: left;
+            }
 
-        /* Estilos específicos para esta página */
-        .avatar-item {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
+            .modulo-title {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 600;
+            }
 
-        .pagination .page-item.active .page-link {
-            background-color: #d42025;
-            border-color: #d42025;
-        }
+            /* Footer de las tarjetas */
+            .card-footer {
+                background-color: #f8f9fa;
+                color: #6c757d;
+                padding: 12px;
+                text-align: center;
+            }
 
-        .pagination .page-link {
-            color: #d42025;
-        }
+            /* Footer principal */
+            .modulo-footer {
+                background-color: #d42025;
+                color: white;
+                padding: 15px 25px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
-        /* Transiciones suaves */
-        .form-control,
-        .form-select,
-        .btn {
-            transition: all 0.3s ease;
-        }
+            .modulo-footer a {
+                color: white;
+                text-decoration: none;
+            }
 
-        /* Animación para alertas */
-        .alert {
-            animation: fadeInDown 0.5s ease;
-        }
-        
+            .modulo-footer a:hover {
+                text-decoration: underline;
+            }
 
-      
-        /* Asegurarse de que el botón de registro sea visible y destacado */
-        #submitButton {
-            background-color: #d42025 !important;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            padding: 12px 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: block;
-            width: 100%;
-        }
-    </style>
+            /* Estilos específicos para esta página */
+            .avatar-item {
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                background-color: #f8f9fa;
+                border-radius: 4px;
+            }
+
+            .pagination .page-item.active .page-link {
+                background-color: #d42025;
+                border-color: #d42025;
+            }
+
+            .pagination .page-link {
+                color: #d42025;
+            }
+
+            /* Transiciones suaves */
+            .form-control,
+            .form-select,
+            .btn {
+                transition: all 0.3s ease;
+            }
+
+            /* Animación para alertas */
+            .alert {
+                animation: fadeInDown 0.5s ease;
+            }
+
+
+
+            /* Asegurarse de que el botón de registro sea visible y destacado */
+            #submitButton {
+                background-color: #d42025 !important;
+                border: none;
+                cursor: pointer;
+                font-weight: bold;
+                padding: 12px 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                display: block;
+                width: 100%;
+            }
+        </style>
 }

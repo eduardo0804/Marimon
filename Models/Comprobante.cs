@@ -22,6 +22,7 @@ namespace Marimon.Models
 
         public ICollection<Boleta>? Boletas { get; set; } = new List<Boleta>();
         public ICollection<Factura>? Facturas { get; set; } = new List<Factura>();
+        public ICollection<Salida>? Salidas { get; set; } = new List<Salida>();
 
     }
 }

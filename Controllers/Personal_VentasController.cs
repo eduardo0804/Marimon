@@ -137,9 +137,11 @@ namespace Marimon.Controllers
 
             // Cargar la lista de entradas para mostrar en la tabla
             var listaSalidas = _context.Salida
-                .Include(e => e.Autoparte)
-                .OrderByDescending(e => e.sal_id)
-                .Take(10)  // Limitar a las últimas 20 entradas
+                .Include(s => s.Autoparte)
+                .Include(s => s.Comprobante)
+                    .ThenInclude(c => c.Venta)
+                .OrderByDescending(s => s.sal_id)
+                .Take(10)
                 .ToList();
 
             ViewBag.ListaSalidas = listaSalidas;
