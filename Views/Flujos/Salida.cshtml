@@ -12,9 +12,9 @@
             <div class="card shadow border-0 rounded-lg overflow-hidden">
                 <div class="card-body d-flex p-0">
                     <div class="bg-danger text-white p-4 d-flex align-items-center justify-content-center"
-                         style="background-color: #d42025 !important; min-width: 120px;">
+                        style="background-color: #d42025 !important; min-width: 120px;">
                         <img src="~/images/salida.png" alt="Imagen almacén" class="img-fluid"
-                             style="max-width: 80px;" />
+                            style="max-width: 80px;" />
                     </div>
                     <div class="p-4">
                         <h2 class="fw-bold mb-2">Registro de Salidas</h2>
@@ -29,23 +29,23 @@
     </div>
 
     <!-- Alertas con animación -->
-    @if (TempData["Mensaje"] != null)
-    {
+@if (TempData["Mensaje"] != null)
+{
         <div class="alert alert-success alert-dismissible fade show shadow-sm border-start border-success border-4 rounded-3"
-             role="alert">
+            role="alert">
             <i class="fas fa-check-circle me-2"></i> @TempData["Mensaje"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    }
+}
 
-    @if (TempData["Error"] != null)
-    {
+@if (TempData["Error"] != null)
+{
         <div class="alert alert-danger alert-dismissible fade show shadow-sm border-start border-danger border-4 rounded-3"
-             role="alert">
+            role="alert">
             <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    }
+}
 
     <div class="row">
         <!-- Formulario de registro (Columna izquierda) -->
@@ -63,7 +63,7 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
                                 <select id="categoriaSelect" class="form-select py-2" name="CategoriaId"
-                                        asp-items="ViewBag.Categorias" onchange="cargarProductos()">
+                                    asp-items="ViewBag.Categorias" onchange="cargarProductos()">
                                     <option value="">-- Seleccionar Categoría --</option>
                                 </select>
                             </div>
@@ -86,13 +86,13 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
                                 <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2"
-                                       min="1" value="1">
+                                    min="1" value="1">
                                 <button type="button" class="btn btn-outline-secondary"
-                                        onclick="document.getElementById('sal_cantidad').stepUp()">
+                                    onclick="document.getElementById('sal_cantidad').stepUp()">
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary"
-                                        onclick="document.getElementById('sal_cantidad').stepDown()">
+                                    onclick="document.getElementById('sal_cantidad').stepDown()">
                                     <i class="fas fa-minus"></i>
                                 </button>
                             </div>
@@ -104,8 +104,8 @@
 
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit"
-                                    class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
-                                    id="submitButton">
+                                class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
+                                id="submitButton">
                                 <i class="fas fa-plus-circle me-2"></i>REGISTRAR SALIDA
                                 <span class="hover-overlay"></span>
                             </button>
@@ -146,65 +146,59 @@
                                             <td>
                                                 <div class="avatar-item">
                                                     <img src="@salida.Autoparte.aut_imagen" alt="@salida.Autoparte.aut_nombre"
-                                                         title="@salida.Autoparte.aut_nombre" class="rounded" width="36" />
+                                                        title="@salida.Autoparte.aut_nombre" class="rounded" width="36" />
                                                 </div>
                                             </td>
                                             <td>@salida.sal_fechasalida.ToString("dd-MM-yyyy")</td>
                                             <td>
-    @{
-        // Estado predeterminado es "Pendiente"
-        string estadoActual = "Pendiente";
-        string estadoGuardado = null;
+                                                @{
+                                                    // Estado predeterminado es "Pendiente"
+                                                    string estadoActual = "Pendiente";
+                                                    string estadoGuardado = null;
 
-        // Si existe un valor en StripeSessionId, el estado es "Completado"
-        if (salida.Comprobante?.Venta?.StripeSessionId != null)
-        {
-            estadoActual = "Completado";
-        }
-        // Si UsuarioId está vacío o nulo, es "Presencial"
-        else if (string.IsNullOrEmpty(salida.Comprobante?.Venta?.UsuarioId))
-        {
-            estadoActual = "Presencial";
-        }
+                                                    // Si existe un valor en StripeSessionId, el estado es "Completado"
+                                                    if (salida.Comprobante?.Venta?.StripeSessionId != null)
+                                                    {
+                                                        estadoActual = "Completado";
+                                                    }
+                                                    // Si UsuarioId está vacío o nulo, es "Presencial"
+                                                    else if (string.IsNullOrEmpty(salida.Comprobante?.Venta?.UsuarioId))
+                                                    {
+                                                        estadoActual = "Presencial";
+                                                    }
 
-        // Comprobar si hay un valor guardado en TempData para esta salida
-        string tempDataKey = $"Estado_Salida_{salida.sal_id}";
-        if (TempData[tempDataKey] != null)
-        {
-            estadoGuardado = TempData[tempDataKey].ToString();
-            estadoActual = estadoGuardado;
+                                                    // Comprobar si hay un valor guardado en TempData para esta salida
+                                                    string tempDataKey = $"Estado_Salida_{salida.sal_id}";
+                                                    if (TempData[tempDataKey] != null)
+                                                    {
+                                                        estadoGuardado = TempData[tempDataKey].ToString();
+                                                        estadoActual = estadoGuardado;
 
-            // Mantener el valor para la siguiente carga de página
-            TempData.Keep(tempDataKey);
-        }
+                                                        // Mantener el valor para la siguiente carga de página
+                                                        TempData.Keep(tempDataKey);
+                                                    }
 
-        string btnClass = "btn-warning"; // Default: Pendiente
+                                                    string btnClass = "btn-warning"; // Default: Pendiente
 
-        if (estadoActual == "Completado")
-        {
-            btnClass = "btn-success";
-        }
-        else if (estadoActual == "Cancelado")
-        {
-            btnClass = "btn-danger";
-        }
-        else if (estadoActual == "Presencial")
-        {
-            btnClass = "btn-primary"; // Azul para estado Presencial
-        }
-    }
-    <button type="button"
-            class="btn btn-sm @btnClass"
-            data-bs-toggle="modal"
-            data-bs-target="#estadoModal"
-            data-id="@salida.sal_id"
-            data-estado="@estadoActual">
-        @estadoActual
-    </button>
-</td>
-
-
-
+                                                    if (estadoActual == "Completado")
+                                                    {
+                                                        btnClass = "btn-success";
+                                                    }
+                                                    else if (estadoActual == "Cancelado")
+                                                    {
+                                                        btnClass = "btn-danger";
+                                                    }
+                                                    else if (estadoActual == "Presencial")
+                                                    {
+                                                        btnClass = "btn-primary"; // Azul para estado Presencial
+                                                    }
+                                                }
+                                                <button type="button" class="btn btn-sm @btnClass" data-bs-toggle="modal"
+                                                    data-bs-target="#estadoModal" data-id="@salida.sal_id"
+                                                    data-estado="@estadoActual">
+                                                    @estadoActual
+                                                </button>
+                                            </td>
                                         </tr>
                                     }
                                 }
@@ -253,7 +247,7 @@
         </div>
     </div>
 
-    @section Scripts {
+@section Scripts {
         <script>
             // Función para cargar productos por categoría
             function cargarProductos() {
@@ -365,9 +359,9 @@
                 document.getElementById('estadoSelect').value = 'Pendiente';
             });
         </script>
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
         <style>
             /* Estilos generales incluidos directamente */
 
@@ -380,26 +374,26 @@
                 overflow: hidden;
             }
 
-                .btn-registro:hover {
-                    background-color: #b91d21 !important;
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                }
+            .btn-registro:hover {
+                background-color: #b91d21 !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
 
-                .btn-registro .hover-overlay {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: rgba(255, 255, 255, 0.2);
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
-                }
+            .btn-registro .hover-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.2);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
 
-                .btn-registro:hover .hover-overlay {
-                    opacity: 1;
-                }
+            .btn-registro:hover .hover-overlay {
+                opacity: 1;
+            }
 
             .admin-container {
                 max-width: 1500px;
@@ -448,14 +442,14 @@
                 align-items: center;
             }
 
-                .modulo-footer a {
-                    color: white;
-                    text-decoration: none;
-                }
+            .modulo-footer a {
+                color: white;
+                text-decoration: none;
+            }
 
-                    .modulo-footer a:hover {
-                        text-decoration: underline;
-                    }
+            .modulo-footer a:hover {
+                text-decoration: underline;
+            }
 
             /* Estilos específicos para esta página */
             .avatar-item {
@@ -517,4 +511,4 @@
                 background-color: #dc3545 !important;
             }
         </style>
-    }
+}

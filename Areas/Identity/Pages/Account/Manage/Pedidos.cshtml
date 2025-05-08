@@ -41,6 +41,7 @@
                             <th>Autoparte</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
+                            <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,6 +53,16 @@
                                 <td>@pedido.AutoParteNombre</td>
                                 <td>@pedido.Cantidad</td>
                                 <td>S/. @pedido.AutoPartePrecio</td>
+                                <td>
+                                    @if (string.IsNullOrEmpty(pedido.StripeSessionId))
+                                    {
+                                        <button class="btn btn-warning">Pendiente</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-success">Completado</button>
+                                    }
+                                </td>
                             </tr>
                         }
                     </tbody>
