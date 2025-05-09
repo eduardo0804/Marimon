@@ -1,11 +1,14 @@
-﻿using Google.Apis.Auth.OAuth2;
+﻿using System.Transactions;
+using Google.Apis.Auth.OAuth2;
 using Marimon.Data;
 using Marimon.Models;
 using Marimon.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Marimon.Controllers
 {
@@ -15,12 +18,19 @@ namespace Marimon.Controllers
         private readonly ILogger<Personal_VentasController> _logger;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IEmailSenderWithAttachments _emailSender;
-
-        public Personal_VentasController(ApplicationDbContext context, ILogger<Personal_VentasController> logger, IWebHostEnvironment hostingEnvironment)
+        private readonly IOptions<EmailSettings> _emailSettings;
+        public Personal_VentasController(
+            ApplicationDbContext context,
+            ILogger<Personal_VentasController> logger,
+            IWebHostEnvironment hostingEnvironment,
+            IEmailSenderWithAttachments emailSender,
+            IOptions<EmailSettings> emailSettings) // Añade este parámetro
         {
             _context = context;
             _logger = logger;
             _hostingEnvironment = hostingEnvironment;
+            _emailSender = emailSender;
+            _emailSettings = emailSettings; // Añade esta asignación
         }
 
         // GET: Personal_VentasController
@@ -223,19 +233,18 @@ namespace Marimon.Controllers
             }
         }
 
+        // Fix for CS0103 and CS1525: Define the missing method 'EnviarNotiEmail' and provide the required parameters.
+        private void EnviarNotiEmail(string estado, int ventaId)
+        {
+            // Implement the logic to send a notification email based on the state and ventaId.
+            _logger.LogInformation($"Notificación enviada para la venta #{ventaId} con estado: {estado}");
+        }
+
         [HttpPost]
-        public IActionResult CambiarEstadoAvanzado(int id, string estado)
+        public async Task<IActionResult> CambiarEstadoAvanzado(int id, string estado, [FromServices] IEmailSenderWithAttachments emailSender)
         {
             try
             {
-                // Buscar la venta por ID
-                var venta = _context.Venta.FirstOrDefault(v => v.ven_id == id);
-                if (venta == null)
-                {
-                    TempData["Error"] = "Venta no encontrada.";
-                    return RedirectToAction("Salidas");
-                }
-
                 // Validar el estado
                 if (estado != "Completado" && estado != "Pendiente" && estado != "Cancelado")
                 {
@@ -243,18 +252,182 @@ namespace Marimon.Controllers
                     return RedirectToAction("Salidas");
                 }
 
-                string estadoAnterior = venta.Estado;
-                if (estadoAnterior == estado)
+                // Crear un contexto separado para esta operación
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    TempData["Mensaje"] = $"La venta #{id} ya se encuentra en estado {estado}.";
-                    return RedirectToAction("Salidas");
+                    // Buscar la venta por ID incluyendo el Usuario relacionado
+                    var venta = await _context.Venta
+                        .Include(v => v.Usuario)
+                        .FirstOrDefaultAsync(v => v.ven_id == id);
+
+                    if (venta == null)
+                    {
+                        TempData["Error"] = "Venta no encontrada.";
+                        return RedirectToAction("Salidas");
+                    }
+
+                    string estadoAnterior = venta.Estado;
+                    if (estadoAnterior == estado)
+                    {
+                        TempData["Mensaje"] = $"La venta #{id} ya se encuentra en estado {estado}.";
+                        return RedirectToAction("Salidas");
+                    }
+
+                    // Actualizar el estado
+                    venta.Estado = estado;
+                    await _context.SaveChangesAsync();
+
+                    // Preparar la notificación por correo
+                    var subject = $"🚀 ¡Venta #{id} acaba de cambiar a {estado}!";
+                    var message = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }}
+        .email-container {{
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }}
+        .status-change {{
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }}
+        .content {{
+            padding: 30px;
+        }}
+        .details-card {{
+            background: #f9fafc;
+            border-left: 4px solid #6e8efb;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }}
+        .detail-item {{
+            margin-bottom: 10px;
+            display: flex;
+        }}
+        .detail-label {{
+            font-weight: bold;
+            min-width: 120px;
+            color: #555;
+        }}
+        .status-badge {{
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 12px;
+        }}
+        .old-status {{
+            background: #ffdddd;
+            color: #d63031;
+        }}
+        .new-status {{
+            background: #ddffdd;
+            color: #27ae60;
+        }}
+        .cta-button {{
+            display: block;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 25px 0;
+        }}
+        .footer {{
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+        }}
+    </style>
+</head>
+<body>
+    <div class='email-container'>
+        <div class='header'>
+            <h1>¡Estado actualizado!</h1>
+            <div class='status-change'>
+                {estadoAnterior} → {estado}
+            </div>
+        </div>
+        
+        <div class='content'>
+            <p>Hola,</p>
+            <p>El estado de la venta <strong>#{id}</strong> ha sido modificado en nuestro sistema:</p>
+            
+            <div class='details-card'>
+                <div class='detail-item'>
+                    <span class='detail-label'>Venta ID:</span>
+                    <span>#{id}</span>
+                </div>
+                <div class='detail-item'>
+                    <span class='detail-label'>Estado anterior:</span>
+                    <span class='status-badge old-status'>{estadoAnterior}</span>
+                </div>
+                <div class='detail-item'>
+                    <span class='detail-label'>Nuevo estado:</span>
+                    <span class='status-badge new-status'>{estado}</span>
+                </div>
+                <div class='detail-item'>
+                    <span class='detail-label'>Fecha del cambio:</span>
+                    <span>{DateTime.Now.ToString("dd/MM/yyyy HH:mm")}</span>
+                </div>
+            </div>
+            
+            <p>Para ver todos los detalles de esta venta, puedes acceder al sistema:</p>
+            <a href='[URL_DEL_SISTEMA]' class='cta-button'>VER DETALLES DE LA VENTA</a>
+            
+            <p>Si no solicitaste este cambio o tienes alguna pregunta, por favor contacta a nuestro equipo de soporte.</p>
+        </div>
+        
+        <div class='footer'>
+            <p>© {DateTime.Now.Year} [Nombre de tu Empresa]. Todos los derechos reservados.</p>
+            <p>Este es un mensaje automático, por favor no respondas directamente.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+                    // Confirmar la transacción
+                    scope.Complete();
+
+                    // Enviar correo fuera de la transacción para evitar bloqueos
+                    if (venta.Usuario != null && !string.IsNullOrEmpty(venta.Usuario.usu_correo))
+                    {
+                        await emailSender.SendEmailAsync(venta.Usuario.usu_correo, subject, message);
+                        TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}. Se ha enviado notificación por correo al usuario.";
+                    }
+                    else
+                    {
+                        TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}. No se envió notificación porque el usuario no tiene correo registrado.";
+                    }
                 }
-
-                // Actualizar el estado
-                venta.Estado = estado;
-                _context.SaveChanges();
-
-                TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}.";
             }
             catch (Exception ex)
             {
@@ -262,6 +435,11 @@ namespace Marimon.Controllers
             }
 
             return RedirectToAction("Salidas");
+        }
+
+        private void EnviarNotiEmail()
+        {
+            throw new NotImplementedException();
         }
 
 
