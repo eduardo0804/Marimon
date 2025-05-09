@@ -50,9 +50,17 @@
                                         {
                                             <span class="badge bg-warning text-dark">Pendiente</span>
                                         }
-                                        else
+                                        else if (pedido.Estado == "Completado")
                                         {
                                             <span class="badge bg-success">Completado</span>
+                                        }
+                                        else if (pedido.Estado == "Cancelado")
+                                        {
+                                            <span class="badge bg-danger">Cancelado</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@pedido.Estado</span>
                                         }
                                     </span>
                                 </button>

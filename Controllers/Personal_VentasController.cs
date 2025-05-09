@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Marimon.Data;
 using Marimon.Models;
+using Marimon.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,6 +14,7 @@ namespace Marimon.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<Personal_VentasController> _logger;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IEmailSenderWithAttachments _emailSender;
 
         public Personal_VentasController(ApplicationDbContext context, ILogger<Personal_VentasController> logger, IWebHostEnvironment hostingEnvironment)
         {
@@ -130,23 +132,30 @@ namespace Marimon.Controllers
             }
         }
 
-        // GET: Admin/Salidas - Página de salida de productos
+        // Fix for CS8602: Desreferencia de una referencia posiblemente NULL.
         public ActionResult Salidas()
         {
-            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
-
-            // Cargar la lista de entradas para mostrar en la tabla
-            var listaSalidas = _context.Salida
+            // Agrupar las salidas por VentaId
+            var salidasAgrupadas = _context.Salida
                 .Include(s => s.Autoparte)
                 .Include(s => s.Comprobante)
                     .ThenInclude(c => c.Venta)
+                .Where(s => s.Comprobante != null && s.Comprobante.Venta != null)
                 .OrderByDescending(s => s.sal_id)
-                .Take(100)
+                .GroupBy(s => s.Comprobante!.Venta!.ven_id)
+                .Select(g => new
+                {
+                    VentaId = g.Key,
+                    Estado = g.FirstOrDefault()!.Comprobante!.Venta!.Estado, // Incluir el estado de la venta
+                    Salidas = g.ToList()
+                })
                 .ToList();
-
-            ViewBag.ListaSalidas = listaSalidas;
+            ViewBag.SalidasAgrupadas = salidasAgrupadas;
             return View("~/Views/Flujos/Salida.cshtml");
         }
+
+
+
 
         // POST: Admin/RegistrarSalida - Procesar salida de productos
         [HttpPost]
@@ -187,44 +196,6 @@ namespace Marimon.Controllers
                     return RedirectToAction("Salidas");
                 }
 
-                // // Paso 2: Crear el método de pago (en efectivo)
-                // var metodoPago = new MetodoPago
-                // {
-                //     pag_metodo = "Efectivo",
-                //     pag_fecha = DateOnly.FromDateTime(DateTime.Now),
-                // };
-
-                // _context.MetodoPago.Add(metodoPago);
-                // await _context.SaveChangesAsync(); // Guardar y generar el ID de metodoPago
-
-                // // Paso 3: Crear la venta
-                // var venta = new Venta
-                // {
-                //     ven_fecha = DateOnly.FromDateTime(DateTime.Now),
-                //     MetodoPagoId = metodoPago.pag_id  // Relacionar con el metodo de pago ya guardado
-                // };
-                // _context.Venta.Add(venta);
-                // await _context.SaveChangesAsync(); // Guardar y generar el ID de venta
-
-                // // Paso 4: Crear el detalle de venta (usando solo la cantidad y el AutoparteId)
-                // var detalleVenta = new DetalleVentas
-                // {
-                //     VentaId = venta.ven_id,  // Relacionar con la venta ya guardada
-                //     AutoParteId = AutoparteId,
-                //     det_cantidad = sal_cantidad,
-                // };
-                // _context.DetalleVentas.Add(detalleVenta);
-                // await _context.SaveChangesAsync(); // Guardar y generar el ID de detalleVenta
-
-                // // Paso 5: Crear el comprobante (Boleta)
-                // var comprobante = new Comprobante
-                // {
-                //     tipo_comprobante = "Boleta",  // Definir el tipo de comprobante
-                //     VentaId = venta.ven_id   // Relacionar con la venta ya guardada
-                // };
-                // _context.Comprobante.Add(comprobante);
-                // await _context.SaveChangesAsync(); // Guardar y generar el ID de comprobante
-
                 // Paso 6: Registrar la salida
                 var salida = new Salida
                 {
@@ -253,93 +224,49 @@ namespace Marimon.Controllers
         }
 
         [HttpPost]
-        [Route("CambiarEstadoAvanzado")]
         public IActionResult CambiarEstadoAvanzado(int id, string estado)
         {
-            _logger.LogInformation("Inicio de CambiarEstadoAvanzado para salida #{id} con estado {estado}", id, estado);
             try
             {
-                // Buscar la salida por ID incluyendo el comprobante y la venta
-                var salida = _context.Salida
-                    .Include(s => s.Comprobante)
-                    .ThenInclude(c => c.Venta)
-                    .FirstOrDefault(s => s.sal_id == id);
-
-                if (salida == null)
+                // Buscar la venta por ID
+                var venta = _context.Venta.FirstOrDefault(v => v.ven_id == id);
+                if (venta == null)
                 {
-                    _logger.LogWarning("No se encontró la salida especificada para ID: {id}", id);
-                    TempData["Error"] = "No se encontró la salida especificada.";
+                    TempData["Error"] = "Venta no encontrada.";
                     return RedirectToAction("Salidas");
                 }
 
-                _logger.LogInformation("Salida encontrada para ID: {id}. Estado actual: {estadoActual}", id, salida.Comprobante?.Venta?.StripeSessionId ?? "Sin StripeSessionId");
-
-                // Siempre limpiar cualquier estado anterior en TempData
-                string tempDataKey = $"Estado_Salida_{id}";
-                if (TempData.ContainsKey(tempDataKey))
+                // Validar el estado
+                if (estado != "Completado" && estado != "Pendiente" && estado != "Cancelado")
                 {
-                    TempData.Remove(tempDataKey);
-                    _logger.LogInformation("Estado previo en TempData eliminado para salida #{id}", id);
+                    TempData["Error"] = "Estado no válido.";
+                    return RedirectToAction("Salidas");
                 }
 
-                if (estado == "Completado")
+                string estadoAnterior = venta.Estado;
+                if (estadoAnterior == estado)
                 {
-                    if (salida.Comprobante == null)
-                    {
-                        salida.Comprobante = new Comprobante();
-                        _context.Comprobante.Add(salida.Comprobante);
-                        _logger.LogInformation("Comprobante creado automáticamente.");
-                    }
-
-                    if (salida.Comprobante.Venta == null)
-                    {
-                        salida.Comprobante.Venta = new Venta();
-                        _context.Venta.Add(salida.Comprobante.Venta);
-                        _logger.LogInformation("Venta creada automáticamente.");
-                    }
-
-                    salida.Comprobante.Venta.StripeSessionId = "SIMULADO_" + Guid.NewGuid().ToString();
-                    _logger.LogInformation("Estado cambiado a Completado con StripeSessionId asignado.");
-                }
-                else if (estado == "Pendiente")
-                {
-                    if (salida.Comprobante?.Venta?.StripeSessionId != null)
-                    {
-                        salida.Comprobante.Venta.StripeSessionId = null;
-                        _logger.LogInformation("StripeSessionId eliminado para estado Pendiente.");
-                    }
-                }
-                else if (estado == "Cancelado")
-                {
-                    if (salida.Comprobante?.Venta?.StripeSessionId != null)
-                    {
-                        salida.Comprobante.Venta.StripeSessionId = null;
-                        _logger.LogInformation("StripeSessionId eliminado para estado Cancelado.");
-                    }
-
-                    // Guardar el estado Cancelado en TempData
-                    TempData[tempDataKey] = "Cancelado";
-                    _logger.LogInformation("Salida marcada como Cancelada en TempData.");
+                    TempData["Mensaje"] = $"La venta #{id} ya se encuentra en estado {estado}.";
+                    return RedirectToAction("Salidas");
                 }
 
-                // Asegurarnos de guardar el estado actual en la entidad también
-                // (Asumiendo que hay una propiedad para almacenar el estado)
-                // Si no existe tal propiedad, debes añadirla a tu modelo
-                // Por ejemplo: salida.Estado = estado;
-
-                _context.Update(salida);
+                // Actualizar el estado
+                venta.Estado = estado;
                 _context.SaveChanges();
-                _logger.LogInformation("Cambios guardados para salida #{id}. Estado final: {estado}", id, estado);
-                TempData["Mensaje"] = $"Se ha cambiado el estado de la salida #{id} a '{estado}'.";
+
+                TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al cambiar el estado de la salida #{id}.", id);
                 TempData["Error"] = $"Error al cambiar el estado: {ex.Message}";
             }
 
             return RedirectToAction("Salidas");
         }
+
+
+
+
 
         //AUTOPARTE - CRUD
 
