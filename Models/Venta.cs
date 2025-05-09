@@ -24,6 +24,8 @@ namespace Marimon.Models
         
         // Propiedad nueva para almacenar el ID de sesión de Stripe
         public string? StripeSessionId { get; set; }
+
+        public string Estado { get; set; } = "Pendiente";
         
         public ICollection<DetalleVentas> Detalles { get; set; } = new List<DetalleVentas>();
 

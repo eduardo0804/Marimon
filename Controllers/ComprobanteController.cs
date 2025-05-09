@@ -315,6 +315,7 @@ namespace Marimon.Controllers
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
                 MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1, // Ajusta según tus IDs de métodos de pago
+                Estado = "Completado",
                 Total = carrito.car_total
             };
             
