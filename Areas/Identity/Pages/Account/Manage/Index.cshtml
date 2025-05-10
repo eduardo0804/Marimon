@@ -16,22 +16,23 @@
                 <span>Detalle de la cuenta</span>
             </div>
             <div class="sidebar-menu-item">
-                <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">Mis pedidos</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">Mis Pedidos</a>
             </div>
             <div class="sidebar-menu-item">
-                <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis citas</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis Citas</a>
             </div>
             <div class="sidebar-menu-item exit">
-                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <form asp-area="Identity" asp-page="/Account/Logout"
+                    asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                     <button type="submit">SALIR</button>
                 </form>
             </div>
         </div>
         <div class="profile-details">
             <partial name="_StatusMessage" for="StatusMessage" />
-            
-            <h2>Detalles de la cuenta</h2>
-            
+
+            <h2>Detalles de la Cuenta</h2>
+
             @if (Model.UsesExternalLogin)
             {
                 <div class="alert alert-info">
@@ -39,51 +40,53 @@
                     Tu cuenta está vinculada con Google. Solo puedes modificar tu Nombre de Perfil.
                 </div>
             }
-            
+
             <form id="profile-form" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                
+
                 <div class="account-section">
                     <h3>Editar Cuenta</h3>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label asp-for="Input.Nombres">Nombre</label>
-                            <input asp-for="Input.Nombres" type="text" class="form-control" placeholder="Nombres" 
-                                   disabled="@Model.UsesExternalLogin" readonly="@Model.UsesExternalLogin" />
+                            <input asp-for="Input.Nombres" type="text" class="form-control" placeholder="Nombres"
+                                disabled="@Model.UsesExternalLogin" readonly="@Model.UsesExternalLogin" />
                             <span asp-validation-for="Input.Nombres" class="text-danger"></span>
                         </div>
-                        
+
                         <div class="form-group">
                             <label asp-for="Input.Apellidos">Apellidos</label>
-                            <input asp-for="Input.Apellidos" type="text" class="form-control" placeholder="Apellidos" 
-                                   disabled="@Model.UsesExternalLogin" readonly="@Model.UsesExternalLogin" />
+                            <input asp-for="Input.Apellidos" type="text" class="form-control" placeholder="Apellidos"
+                                disabled="@Model.UsesExternalLogin" readonly="@Model.UsesExternalLogin" />
                             <span asp-validation-for="Input.Apellidos" class="text-danger"></span>
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label asp-for="Input.NombrePerfil">Nombre para mostrar</label>
-                            <input asp-for="Input.NombrePerfil" class="form-control" placeholder="Nombre para mostrar" />
-                            <small class="form-text">Este nombre aparecerá cuando realices reviews en los productos</small>
+                            <input asp-for="Input.NombrePerfil" class="form-control"
+                                placeholder="Nombre para mostrar" />
+                            <small class="form-text">Este nombre aparecerá cuando realices reviews en los
+                                productos</small>
                             <span asp-validation-for="Input.NombrePerfil" class="text-danger"></span>
                         </div>
-                        
+
                         <div class="form-group">
                             <label asp-for="Input.Email">Email</label>
-                            <input asp-for="Input.Email" type="email" class="form-control" 
-                                   disabled="@Model.UsesExternalLogin" readonly="@Model.UsesExternalLogin" />
+                            <input asp-for="Input.Email" type="email" class="form-control"
+                                disabled="@Model.UsesExternalLogin" readonly="@Model.UsesExternalLogin" />
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
-                
+
                 @if (!Model.UsesExternalLogin)
                 {
                     <div class="password-section">
                         <h3>Cambiar Contraseña</h3>
-                        
+
                         <div class="form-group password-field">
                             <label asp-for="Input.ContraseñaActual">Contraseña Actual</label>
                             <div class="password-input">
@@ -91,7 +94,7 @@
                                 <span asp-validation-for="Input.ContraseñaActual" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
                         <div class="form-group password-field">
                             <label asp-for="Input.NuevaContraseña">Nueva Contraseña</label>
                             <div class="password-input">
@@ -99,7 +102,7 @@
                                 <span asp-validation-for="Input.NuevaContraseña" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
                         <div class="form-group password-field">
                             <label asp-for="Input.ConfirmarContraseña">Repetir Nueva Contraseña</label>
                             <div class="password-input">
@@ -109,7 +112,7 @@
                         </div>
                     </div>
                 }
-                
+
                 <button id="update-profile-button" type="submit" class="btn-save">GUARDAR CAMBIOS</button>
             </form>
         </div>

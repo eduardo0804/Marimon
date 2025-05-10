@@ -18,7 +18,7 @@
                 <a asp-area="Identity" asp-page="/Account/Manage/Index">Detalle de la cuenta</a>
             </div>
             <div class="sidebar-menu-item active">
-                <span>Mis pedidos</span>
+                <span>Mis Pedidos</span>
             </div>
             <div class="sidebar-menu-item">
                 <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis Citas</a>
@@ -43,7 +43,8 @@
                         var headingId = $"heading{i}";
                         <div class="accordion-item mb-3">
                             <h2 class="accordion-header" id="@headingId">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
                                     Pedido ID: @pedido.ven_id - Fecha: @pedido.ven_fecha.ToString("dd/MM/yyyy")
                                     <span class="ms-3">
                                         @if (pedido.Estado == "Pendiente")
@@ -65,7 +66,8 @@
                                     </span>
                                 </button>
                             </h2>
-                            <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#accordionPedidos">
+                            <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId"
+                                data-bs-parent="#accordionPedidos">
                                 <div class="accordion-body">
                                     <table class="table table-striped">
                                         <thead>
@@ -90,15 +92,16 @@
                                         <tfoot>
                                             <tr>
                                                 <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                                                <td><strong>S/. @pedido.Detalles.Sum(d => d.det_subtotal).ToString("0.00")</strong></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                    <p><strong>Método de pago:</strong> @pedido.MetodoPago?.pag_metodo</p>
-                                </div>
-                            </div>
+                                                <td><strong>S/. @pedido.Detalles.Sum(d =>
+                                                                                                        d.det_subtotal).ToString("0.00")</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <p><strong>Método de pago:</strong> @pedido.MetodoPago?.pag_metodo</p>
                         </div>
-                    }
+                    </div>
+                </div>
+                                }
                 </div>
             }
             else
