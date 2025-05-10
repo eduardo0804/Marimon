@@ -175,7 +175,7 @@ namespace Marimon.Controllers
                     Cantidad = s.sal_cantidad,
                     FechaSalida = s.sal_fechasalida,
                     VentaId = 0,
-                    Estado = "Completado"
+                    Estado = "Presencial"
                 })
                 .ToList();
 
