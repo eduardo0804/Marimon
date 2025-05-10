@@ -158,10 +158,29 @@ namespace Marimon.Controllers
                 {
                     VentaId = g.Key,
                     Estado = g.FirstOrDefault()!.Comprobante!.Venta!.Estado, // Incluir el estado de la venta
-                    Salidas = g.ToList()
+                    Salidas = g.ToList(),
+
                 })
                 .ToList();
+
+            // Obtener las salidas que no tienen VentaId
+            var salidasSinVenta = _context.Salida
+                .Include(s => s.Autoparte)
+                .Where(s => s.Comprobante == null || s.Comprobante.Venta == null)
+                .OrderByDescending(s => s.sal_id)
+                .Select(s => new
+                {
+                    SalidaId = s.sal_id,
+                    Producto = s.Autoparte.aut_nombre,
+                    Cantidad = s.sal_cantidad,
+                    FechaSalida = s.sal_fechasalida,
+                    VentaId = 0,
+                    Estado = "Completado"
+                })
+                .ToList();
+
             ViewBag.SalidasAgrupadas = salidasAgrupadas;
+            ViewBag.SalidasSinVenta = salidasSinVenta;
             return View("~/Views/Flujos/Salida.cshtml");
         }
 
