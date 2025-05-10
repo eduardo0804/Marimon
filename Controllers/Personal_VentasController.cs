@@ -158,10 +158,29 @@ namespace Marimon.Controllers
                 {
                     VentaId = g.Key,
                     Estado = g.FirstOrDefault()!.Comprobante!.Venta!.Estado, // Incluir el estado de la venta
-                    Salidas = g.ToList()
+                    Salidas = g.ToList(),
+
                 })
                 .ToList();
+
+            // Obtener las salidas que no tienen VentaId
+            var salidasSinVenta = _context.Salida
+                .Include(s => s.Autoparte)
+                .Where(s => s.Comprobante == null || s.Comprobante.Venta == null)
+                .OrderByDescending(s => s.sal_id)
+                .Select(s => new
+                {
+                    SalidaId = s.sal_id,
+                    Producto = s.Autoparte.aut_nombre,
+                    Cantidad = s.sal_cantidad,
+                    FechaSalida = s.sal_fechasalida,
+                    VentaId = 0,
+                    Estado = "Presencial"
+                })
+                .ToList();
+
             ViewBag.SalidasAgrupadas = salidasAgrupadas;
+            ViewBag.SalidasSinVenta = salidasSinVenta;
             return View("~/Views/Flujos/Salida.cshtml");
         }
 
@@ -281,142 +300,50 @@ namespace Marimon.Controllers
                     venta.Estado = estado;
                     await _context.SaveChangesAsync();
 
-                    // Preparar la notificación por correo
-                    var subject = $"🚀 ¡Venta #{id} acaba de cambiar a {estado}!";
-                    var message = $@"
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }}
-        .email-container {{
-            max-width: 600px;
-            margin: 20px auto;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }}
-        .header {{
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-        }}
-        .status-change {{
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-        }}
-        .content {{
-            padding: 30px;
-        }}
-        .details-card {{
-            background: #f9fafc;
-            border-left: 4px solid #6e8efb;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 0 8px 8px 0;
-        }}
-        .detail-item {{
-            margin-bottom: 10px;
-            display: flex;
-        }}
-        .detail-label {{
-            font-weight: bold;
-            min-width: 120px;
-            color: #555;
-        }}
-        .status-badge {{
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 12px;
-        }}
-        .old-status {{
-            background: #ffdddd;
-            color: #d63031;
-        }}
-        .new-status {{
-            background: #ddffdd;
-            color: #27ae60;
-        }}
-        .cta-button {{
-            display: block;
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            color: white;
-            text-align: center;
-            padding: 12px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 25px 0;
-        }}
-        .footer {{
-            text-align: center;
-            padding: 20px;
-            font-size: 12px;
-            color: #7f8c8d;
-            border-top: 1px solid #eee;
-        }}
-    </style>
-</head>
-<body>
-    <div class='email-container'>
-        <div class='header'>
-            <h1>¡Estado actualizado!</h1>
-            <div class='status-change'>
-                {estadoAnterior} → {estado}
-            </div>
-        </div>
-        
-        <div class='content'>
-            <p>Hola,</p>
-            <p>El estado de la venta <strong>#{id}</strong> ha sido modificado en nuestro sistema:</p>
-            
-            <div class='details-card'>
-                <div class='detail-item'>
-                    <span class='detail-label'>Venta ID:</span>
-                    <span>#{id}</span>
-                </div>
-                <div class='detail-item'>
-                    <span class='detail-label'>Estado anterior:</span>
-                    <span class='status-badge old-status'>{estadoAnterior}</span>
-                </div>
-                <div class='detail-item'>
-                    <span class='detail-label'>Nuevo estado:</span>
-                    <span class='status-badge new-status'>{estado}</span>
-                </div>
-                <div class='detail-item'>
-                    <span class='detail-label'>Fecha del cambio:</span>
-                    <span>{DateTime.Now.ToString("dd/MM/yyyy HH:mm")}</span>
-                </div>
-            </div>
-            
-            <p>Para ver todos los detalles de esta venta, puedes acceder al sistema:</p>
-            <a href='[URL_DEL_SISTEMA]' class='cta-button'>VER DETALLES DE LA VENTA</a>
-            
-            <p>Si no solicitaste este cambio o tienes alguna pregunta, por favor contacta a nuestro equipo de soporte.</p>
-        </div>
-        
-        <div class='footer'>
-            <p>© {DateTime.Now.Year} [Nombre de tu Empresa]. Todos los derechos reservados.</p>
-            <p>Este es un mensaje automático, por favor no respondas directamente.</p>
-        </div>
-    </div>
-</body>
-</html>";
+                    // Cargar el contenido del archivo HTML
+                    var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "EstadosPedido.html");
+                    var emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                    // Determinar las clases CSS según el estado
+                    string claseEstadoTexto = "";
+                    string clasePendiente = "";
+                    string claseCompletado = "";
+                    string claseCancelado = "";
+
+                    switch (estado)
+                    {
+                        case "Pendiente":
+                            claseEstadoTexto = "estado-pendiente";
+                            clasePendiente = "active active-pendiente";
+                            claseCompletado = "";
+                            claseCancelado = "hidden";
+                            break;
+                        case "Completado":
+                            claseEstadoTexto = "estado-completado";
+                            clasePendiente = "";
+                            claseCompletado = "active active-completado";
+                            claseCancelado = "hidden";
+                            break;
+                        case "Cancelado":
+                            claseEstadoTexto = "estado-cancelado";
+                            clasePendiente = "";
+                            claseCompletado = "";
+                            claseCancelado = "active active-cancelado";
+                            break;
+                    }
+
+                    // Reemplazar los valores dinámicos
+                    emailBody = emailBody.Replace("{{UserName}}", venta.Usuario?.usu_nombre ?? "Cliente")
+                                        .Replace("{{PedidoId}}", id.ToString())
+                                        .Replace("{{Estado}}", estado)
+                                        .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
+                                        .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
+                                        .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto)
+                                        .Replace("{{ClasePendiente}}", clasePendiente)
+                                        .Replace("{{ClaseCompletado}}", claseCompletado)
+                                        .Replace("{{ClaseCancelado}}", claseCancelado);
+
+                    var subject = $"Estado de tu pedido #{id} actualizado a {estado}";
 
                     // Confirmar la transacción
                     scope.Complete();
@@ -424,8 +351,17 @@ namespace Marimon.Controllers
                     // Enviar correo fuera de la transacción para evitar bloqueos
                     if (venta.Usuario != null && !string.IsNullOrEmpty(venta.Usuario.usu_correo))
                     {
-                        await emailSender.SendEmailAsync(venta.Usuario.usu_correo, subject, message);
-                        TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}. Se ha enviado notificación por correo al usuario.";
+                        try
+                        {
+                            await emailSender.SendEmailAsync(venta.Usuario.usu_correo, subject, emailBody);
+                            TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}. Se ha enviado notificación por correo al usuario.";
+                            _logger.LogInformation($"Correo enviado al usuario {venta.Usuario.usu_correo} con el estado '{estado}'.");
+                        }
+                        catch (Exception ex)
+                        {
+                            TempData["Error"] = $"El estado de la venta #{id} se actualizó, pero no se pudo enviar el correo: {ex.Message}";
+                            _logger.LogError($"Error al enviar el correo: {ex.Message}");
+                        }
                     }
                     else
                     {

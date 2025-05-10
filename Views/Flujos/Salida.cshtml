@@ -11,7 +11,7 @@
 <div class="container mt-4">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="https://localhost:7178/personal_ventas">Inicio</a>
+            <a href="/personal_ventas">Modulo de Autopartes</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">Registro de Salidas</li>
     </ol>
@@ -22,8 +22,10 @@
         <div class="col-12">
             <div class="card shadow border-0 rounded-lg overflow-hidden">
                 <div class="card-body d-flex p-0">
-                    <div class="bg-danger text-white p-4 d-flex align-items-center justify-content-center" style="min-width: 120px;">
-                        <img src="~/images/salida.png" alt="Imagen almacén" class="img-fluid" style="max-width: 80px;" />
+                    <div class="bg-danger text-white p-4 d-flex align-items-center justify-content-center"
+                        style="min-width: 120px;">
+                        <img src="~/images/salida.png" alt="Imagen almacén" class="img-fluid"
+                            style="max-width: 80px;" />
                     </div>
                     <div class="p-4">
                         <h2 class="fw-bold mb-2">Registro de Salidas</h2>
@@ -40,7 +42,8 @@
     <!-- Alertas con animación -->
     @if (TempData["Mensaje"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm border-start border-success border-4 rounded-3" role="alert">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-start border-success border-4 rounded-3"
+            role="alert">
             <i class="fas fa-check-circle me-2"></i> @TempData["Mensaje"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -48,7 +51,8 @@
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-start border-danger border-4 rounded-3" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-start border-danger border-4 rounded-3"
+            role="alert">
             <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -70,7 +74,7 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
                                 <select id="categoriaSelect" class="form-select py-2" name="CategoriaId"
-                                        asp-items="ViewBag.Categorias" onchange="cargarProductos()">
+                                    asp-items="ViewBag.Categorias" onchange="cargarProductos()">
                                     <option value="">-- Seleccionar Categoría --</option>
                                 </select>
                             </div>
@@ -93,13 +97,13 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
                                 <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2"
-                                       min="1" value="1">
+                                    min="1" value="1">
                                 <button type="button" class="btn btn-outline-secondary"
-                                        onclick="document.getElementById('sal_cantidad').stepUp()">
+                                    onclick="document.getElementById('sal_cantidad').stepUp()">
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary"
-                                        onclick="document.getElementById('sal_cantidad').stepDown()">
+                                    onclick="document.getElementById('sal_cantidad').stepDown()">
                                     <i class="fas fa-minus"></i>
                                 </button>
                             </div>
@@ -122,6 +126,20 @@
         <!-- Tabla de registros (Columna derecha) -->
         <!-- Tabla de registros (Columna derecha) -->
         <div class="col-lg-7 mb-4">
+            <div class="row">
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2">LISTA DE SALIDAS</p>
+                </div>
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2">||</p>
+                </div>
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2"> <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">VER SALIDAS PRESENCIALES</a> </p>
+
+                </div>
+            </div>
+            
+
             <div class="accordion" id="salidasAccordion">
                 @if (salidasAgrupadas != null)
                 {
@@ -130,12 +148,9 @@
                     {
                         <div class="accordion-item mb-2 border rounded">
                             <h2 class="accordion-header d-flex" id="heading-@index">
-                                <button class="accordion-button @(index > 0 ? "collapsed" : "") flex-grow-1"
-                                        type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#collapse-@index"
-                                        aria-expanded="@(index == 0)"
-                                        aria-controls="collapse-@index">
+                                <button class="accordion-button @(index > 0 ? "collapsed" : "") flex-grow-1" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapse-@index" aria-expanded="@(index == 0)"
+                                    aria-controls="collapse-@index">
                                     <span class="fw-bold">Venta ID:</span> @grupo.VentaId
                                 </button>
 
@@ -146,26 +161,22 @@
                                     estado == "Cancelado" ? "bg-danger" : "bg-secondary";
                                 }
                                 <div class="d-flex align-items-center me-3">
-                                    <span class="badge @badgeClass rounded-pill fs-6"
-                                          id="badge-@index"
-                                          style="cursor: pointer;"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#estadoModal"
-                                          data-id="@grupo.VentaId"
-                                          data-estado="@estado">
+                                    <span class="badge @badgeClass rounded-pill fs-6" id="badge-@index" style="cursor: pointer;"
+                                        data-bs-toggle="modal" data-bs-target="#estadoModal" data-id="@grupo.VentaId"
+                                        data-estado="@estado">
                                         @estado
                                     </span>
                                 </div>
                             </h2>
 
                             <div id="collapse-@index" class="accordion-collapse collapse @(index == 0 ? "show" : "")"
-                                 aria-labelledby="heading-@index"
-                                 data-bs-parent="#salidasAccordion">
+                                aria-labelledby="heading-@index" data-bs-parent="#salidasAccordion">
                                 <div class="accordion-body bg-light">
                                     <ul class="list-group list-group-flush">
                                         @foreach (var salida in grupo.Salidas)
                                         {
-                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light border-bottom">
+                                            <li
+                                                class="list-group-item d-flex justify-content-between align-items-center bg-light border-bottom">
                                                 <div>
                                                     <div class="fw-bold">@salida.Autoparte.aut_nombre</div>
                                                     <small class="text-muted">Salida ID: @salida.sal_id</small>
@@ -186,6 +197,68 @@
                         No hay salidas disponibles.
                     </div>
                 }
+
+                <!-- Salidas sin VentaId -->
+                <div class="offcanvas offcanvas-end bg-black text-light" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" data-bs-backdrop="true">
+
+                    <div class="offcanvas-header border-bottom border-secondary">
+                        <h5 class="offcanvas-title fw-bold text-light" id="offcanvasRightLabel">
+                            <i class="bi bi-box-seam me-2"></i>Salidas Presenciales
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body bg-black">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="fw-light text-light mb-0"><i class="bi bi-clipboard-data me-2"></i>Todas las salidas hechas en tienda</h4>
+                        </div>
+
+                        @if (ViewBag.SalidasSinVenta != null && ViewBag.SalidasSinVenta.Count > 0)
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var salida in ViewBag.SalidasSinVenta)
+                                {
+                                    <li class="list-group-item bg-black text-light border-secondary d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-semibold">@salida.Producto</div>
+                                            <small class="text-secondary">
+                                                <i class="bi bi-upc-scan me-1"></i>ID: @salida.SalidaId
+                                            </small>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="mx-4">
+                                                <i class="bi bi-box me-1"></i>@salida.Cantidad   
+                                            </span>
+                                            <span class="badge bg-info text-dark">
+                                                <i class="bi bi-check-circle me-1"></i>@salida.Estado
+                                            </span>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            @* <div class="d-grid gap-2 mt-4"> *@
+                            @*     <button class="btn btn-outline-light btn-sm" type="button"> *@
+                            @*         <i class="bi bi-printer me-2"></i>Imprimir reporte *@
+                            @*     </button> *@
+                            @* </div> *@
+                        }
+                        else
+                        {
+                            <div class="alert alert-dark bg-dark text-center border border-secondary">
+                                <i class="bi bi-cart-x me-2 fs-4"></i>
+                                <p class="mb-0">No hay salidas sin venta disponibles</p>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Actualizar
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+
+
+                
             </div>
         </div>
 
@@ -226,6 +299,7 @@
 
 @section Scripts {
     <script>
+
         // Función para cargar productos por categoría
         function cargarProductos() {
             var categoriaId = document.getElementById("categoriaSelect").value;
