@@ -145,6 +145,7 @@ namespace Marimon.Controllers
         // Fix for CS8602: Desreferencia de una referencia posiblemente NULL.
         public ActionResult Salidas()
         {
+            ViewBag.Categorias = new SelectList(_context.Categorias.ToList(), "cat_id", "cat_nombre");
             // Agrupar las salidas por VentaId
             var salidasAgrupadas = _context.Salida
                 .Include(s => s.Autoparte)
@@ -221,6 +222,9 @@ namespace Marimon.Controllers
                 _context.Autopartes.Update(autoparte);
 
                 await _context.SaveChangesAsync(); // Guardar todo
+                TempData["ShowModal"] = true;
+                TempData["ProductoNombre"] = autoparte.aut_nombre;
+                TempData["Cantidad"] = sal_cantidad;
 
                 TempData["Mensaje"] = $"Se han registrado la salida de {sal_cantidad} unidades de {autoparte.aut_nombre} correctamente.";
                 return RedirectToAction("Salidas");  // FIXED: Changed to redirect to Salidas instead of returning Ok
