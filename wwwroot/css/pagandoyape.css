@@ -1,0 +1,452 @@
+.text-black, 
+.text-black h1, 
+.text-black h2, 
+.text-black h3, 
+.text-black h4, 
+.text-black h5, 
+.text-black h6, 
+.text-black p, 
+.text-black li, 
+.text-black ol, 
+.text-black ul, 
+.text-black span, 
+.text-black label, 
+.text-black .bi {
+    color: #000000 !important;
+}
+
+/* Evita que botones cambien a negro */
+.btn-marimon, .btn-outline {
+    color: white !important;
+    background-color: var(--primary-color); /* o tu color original */
+    border-color: var(--primary-color);
+}
+.btn-outline {
+    background-color: transparent;
+    color: var(--primary-color) !important;
+}
+
+:root {
+        --primary: #E42229;
+        --primary-dark: #D42025;
+        --neutral-gray: #626C66;
+        --white: #FFFFFF;
+        --black: #000000;
+    }
+
+    body {
+        background: var(--white);
+        min-height: 100vh;
+        font-family: 'Poppins', 'Segoe UI', sans-serif;
+        color: var(--black);
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .card-container {
+        perspective: 1000px;
+    }
+
+    .glass-card {
+    background: var(--white);
+    border-radius: 2.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    color: var(--black);
+}
+
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo-container {
+        width: 80px;
+        height: 80px;
+        background-color: var(--white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo-container img {
+        width: 50px;
+        height: auto;
+    }
+
+    .page-title {
+    font-weight: 700;
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--black); /* Cambiado de var(--white) a var(--black) */
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+    .qr-container {
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .qr-container:hover {
+        transform: scale(1.02);
+    }
+
+    .qr-box img {
+        max-width: 220px;
+        border-radius: 1.2rem;
+        border: 4px solid var(--white);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .qr-box img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .company-name {
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .phone-number {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .payment-methods {
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05));
+    border-radius: 1.5rem;
+    border-left: 5px solid var(--white);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+    color: black; /* Aplica color negro al texto */
+}
+
+    .payment-methods h5 {
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        font-size: 1.3rem;
+    }
+
+    .payment-methods i {
+        color: var(--white);
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+    }
+
+    .payment-methods ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+        counter-reset: item;
+    }
+
+    .payment-methods ol li {
+        position: relative;
+        padding: 0.5rem 0 0.5rem 0.5rem;
+        counter-increment: item;
+        font-weight: 500;
+    }
+
+    .payment-methods ol li::marker {
+        color: var(--white);
+    }
+
+    .bcp-info {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 1rem;
+        margin-top: 1rem;
+    }
+
+    .bcp-info h6 {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .bcp-info h6 i {
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+
+    .bcp-info p {
+        margin-bottom: 0;
+        font-size: 1rem;
+    }
+
+    .account-number {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: var(--white);
+        background: rgba(0, 0, 0, 0.15);
+        padding: 0.3rem 0.7rem;
+        border-radius: 0.5rem;
+        display: inline-block;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .form-section {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-section h5 {
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--white);
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-section h5 i {
+        margin-right: 0.75rem;
+        font-size: 1.5rem;
+    }
+
+    .form-label {
+        color: var(--white);
+        font-weight: 600;
+        font-size: 1.05rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .form-control-lg {
+        border-radius: 1rem;
+        padding: 0.8rem 1.2rem;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control-lg:focus {
+        background: var(--white);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-text {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .alert-important {
+        background: rgba(0, 0, 0, 0.15);
+        border-left: 4px solid var(--white);
+        border-radius: 1rem;
+        padding: 1.2rem;
+        margin-top: 1.5rem;
+        color: var(--white);
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .alert-important i {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        color: var(--white);
+    }
+
+    .alert-important strong {
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .alert-important ul {
+        padding-left: 1.2rem;
+        margin-bottom: 0;
+        margin-top: 0.5rem;
+    }
+
+    .alert-important ul li {
+        padding: 0.3rem 0;
+    }
+
+    .btn-marimon {
+        background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+        color: var(--white);
+        border: none;
+        font-weight: 700;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn-marimon::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+        transition: all 0.5s ease;
+        z-index: -1;
+    }
+
+    .btn-marimon:hover::before {
+        left: 0;
+    }
+
+    .btn-marimon:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        color: var(--white);
+    }
+
+    .btn-marimon:active {
+        transform: translateY(2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-outline {
+        background: var(--black);
+        color: var(--white);
+        border: none;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgb(255, 255, 255);
+    }
+
+    .btn-outline:hover {
+        background: #333333;
+        color: var(--white);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-outline:active {
+        transform: translateY(2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn i {
+        font-size: 1.2rem;
+        vertical-align: middle;
+        margin-right: 0.5rem;
+    }
+
+    .custom-file-upload {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        border-radius: 1rem;
+        background: rgba(0, 0, 0, 0.1);
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        padding: 2rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .custom-file-upload:hover {
+        background: rgba(0, 0, 0, 0.15);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .custom-file-upload i {
+        font-size: 2.5rem;
+        color: var(--white);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .custom-file-upload .file-text {
+        color: var(--white);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .custom-file-upload .file-subtext {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+    }
+
+    .custom-file-upload input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .file-preview {
+        max-width: 100%;
+        margin-top: 1rem;
+        border-radius: 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        display: none;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .fade-in-1 { animation-delay: 0.1s; }
+    .fade-in-2 { animation-delay: 0.2s; }
+    .fade-in-3 { animation-delay: 0.3s; }
+    .fade-in-4 { animation-delay: 0.4s; }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .glass-card {
+            padding: 1.5rem !important;
+            border-radius: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+        }
+
+        .form-section, .payment-methods {
+            padding: 1.2rem;
+        }
+    }
+.btn-outline {
+    color: #ffffff !important;
+}

@@ -32,13 +32,14 @@
                 <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">Mis Pedidos</a>
             </li>
             <li>
-                <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis citas</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis Citas</a>
             </li>
             <li>
                 <a asp-area="Identity" asp-page="/Account/Manage/Index">Favoritos</a>
             </li>
             <li>
-                <form class="logout-form-movil" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <form class="logout-form-movil" asp-area="Identity" asp-page="/Account/Logout"
+                    asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                     <button type="submit" class="logout-button-movil">Salir</button>
                 </form>
             </li>

@@ -11,7 +11,7 @@
 <div class="container mt-4">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="https://localhost:7178/personal_ventas">Inicio</a>
+            <a href="/personal_ventas">Modulo de Autopartes</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">Registro de Salidas</li>
     </ol>
@@ -126,6 +126,20 @@
         <!-- Tabla de registros (Columna derecha) -->
         <!-- Tabla de registros (Columna derecha) -->
         <div class="col-lg-7 mb-4">
+            <div class="row">
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2">LISTA DE SALIDAS</p>
+                </div>
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2">||</p>
+                </div>
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2"> <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">VER SALIDAS PRESENCIALES</a> </p>
+
+                </div>
+            </div>
+            
+
             <div class="accordion" id="salidasAccordion">
                 @if (salidasAgrupadas != null)
                 {
@@ -185,31 +199,66 @@
                 }
 
                 <!-- Salidas sin VentaId -->
-                <h3 class="mt-4">Salidas Sin Venta</h3>
-                @if (ViewBag.SalidasSinVenta != null && ViewBag.SalidasSinVenta.Count > 0)
-                {
-                    <ul class="list-group">
-                        @foreach (var salida in ViewBag.SalidasSinVenta)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fw-bold">@salida.Producto</div>
-                                    <small class="text-muted">Salida ID: @salida.SalidaId</small>
-                                </div>
-                                <div>
-                                    <span class="badge bg-primary rounded-pill me-2">@salida.Cantidad</span>
-                                    <span class="badge bg-secondary">@salida.Estado</span>
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <div class="alert alert-info" role="alert">
-                        No hay salidas sin venta disponibles.
+                <div class="offcanvas offcanvas-end bg-black text-light" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" data-bs-backdrop="true">
+
+                    <div class="offcanvas-header border-bottom border-secondary">
+                        <h5 class="offcanvas-title fw-bold text-light" id="offcanvasRightLabel">
+                            <i class="bi bi-box-seam me-2"></i>Salidas Presenciales
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
-                }
+                    <div class="offcanvas-body bg-black">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="fw-light text-light mb-0"><i class="bi bi-clipboard-data me-2"></i>Todas las salidas hechas en tienda</h4>
+                        </div>
+
+                        @if (ViewBag.SalidasSinVenta != null && ViewBag.SalidasSinVenta.Count > 0)
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var salida in ViewBag.SalidasSinVenta)
+                                {
+                                    <li class="list-group-item bg-black text-light border-secondary d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-semibold">@salida.Producto</div>
+                                            <small class="text-secondary">
+                                                <i class="bi bi-upc-scan me-1"></i>ID: @salida.SalidaId
+                                            </small>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="mx-4">
+                                                <i class="bi bi-box me-1"></i>@salida.Cantidad   
+                                            </span>
+                                            <span class="badge bg-info text-dark">
+                                                <i class="bi bi-check-circle me-1"></i>@salida.Estado
+                                            </span>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            @* <div class="d-grid gap-2 mt-4"> *@
+                            @*     <button class="btn btn-outline-light btn-sm" type="button"> *@
+                            @*         <i class="bi bi-printer me-2"></i>Imprimir reporte *@
+                            @*     </button> *@
+                            @* </div> *@
+                        }
+                        else
+                        {
+                            <div class="alert alert-dark bg-dark text-center border border-secondary">
+                                <i class="bi bi-cart-x me-2 fs-4"></i>
+                                <p class="mb-0">No hay salidas sin venta disponibles</p>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Actualizar
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+
+
+                
             </div>
         </div>
 
@@ -250,6 +299,7 @@
 
 @section Scripts {
     <script>
+
         // Función para cargar productos por categoría
         function cargarProductos() {
             var categoriaId = document.getElementById("categoriaSelect").value;
