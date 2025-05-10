@@ -368,6 +368,65 @@ namespace Marimon.Controllers
             return Redirect(session.Url);
         }
 
+        private async Task EnviarCorreoEstadoAsync(int ventaId, string estado, string correoUsuario, string nombreUsuario, [FromServices] IEmailSenderWithAttachments emailSender)
+        {
+            try
+            {
+                // Cargar la plantilla de correo
+                var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "EstadosPedido.html");
+                var emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                // Definir clases CSS según el estado
+                string claseEstadoTexto = "";
+                string clasePendiente = "";
+                string claseCompletado = "";
+                string claseCancelado = "";
+
+                switch (estado)
+                {
+                    case "Pendiente":
+                        claseEstadoTexto = "estado-pendiente";
+                        clasePendiente = "active active-pendiente";
+                        claseCompletado = "";
+                        claseCancelado = "hidden";
+                        break;
+                    case "Completado":
+                        claseEstadoTexto = "estado-completado";
+                        clasePendiente = "";
+                        claseCompletado = "active active-completado";
+                        claseCancelado = "hidden";
+                        break;
+                    case "Cancelado":
+                        claseEstadoTexto = "estado-cancelado";
+                        clasePendiente = "";
+                        claseCompletado = "";
+                        claseCancelado = "active active-cancelado";
+                        break;
+                }
+
+                // Reemplazar valores dinámicos en la plantilla
+                emailBody = emailBody.Replace("{{UserName}}", nombreUsuario ?? "Cliente")
+                                     .Replace("{{PedidoId}}", ventaId.ToString())
+                                     .Replace("{{Estado}}", estado)
+                                     .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
+                                     .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
+                                     .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto)
+                                     .Replace("{{ClasePendiente}}", clasePendiente)
+                                     .Replace("{{ClaseCompletado}}", claseCompletado)
+                                     .Replace("{{ClaseCancelado}}", claseCancelado);
+
+                var subject = $"Estado de tu pedido #{ventaId} actualizado a {estado}";
+
+                // Enviar el correo
+                await emailSender.SendEmailAsync(correoUsuario, subject, emailBody);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error al enviar el correo de estado: {ex.Message}");
+                throw;
+            }
+        }
+
         public async Task<IActionResult> PagoExitoso(string session_id)
         {
             // Verificar el estado del pago
@@ -1086,6 +1145,7 @@ namespace Marimon.Controllers
                 UsuarioId = usuario.usu_id,
                 MetodoPagoId = 10, // ID para Yape
                 Total = carrito.car_total,
+                Estado = "Pendiente"
             };
             
             _context.Venta.Add(venta);
@@ -1099,7 +1159,12 @@ namespace Marimon.Controllers
             };
             _context.Comprobante.Add(comprobante);
             await _context.SaveChangesAsync();
-            
+
+            if (!string.IsNullOrEmpty(usuario.usu_correo))
+            {
+                await EnviarCorreoEstadoAsync(venta.ven_id, "Pendiente", usuario.usu_correo, $"{usuario.usu_nombre} {usuario.usu_apellido}", _emailSender);
+            }
+
             // Crear Boleta o Factura según corresponda
             if (tipoComprobante.ToLower() == "boleta")
             {
