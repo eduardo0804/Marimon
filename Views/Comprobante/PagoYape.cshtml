@@ -96,6 +96,21 @@
                                     </div>
                                 </div>
 
+                                <div class="mt-4 terms-container fade-in fade-in-3">
+                                    <div class="terms-check">
+                                        <div class="custom-checkbox" id="customCheckbox"></div>
+                                        <input type="checkbox" class="form-check-input" id="aceptaTerminos" required
+                                            style="display: none;">
+                                        <div class="terms-text">
+                                            He leído y acepto los
+                                            <a href="Home\Terminos.cshtml" target="_blank" class="terms-link">
+                                                Términos y Condiciones
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="d-grid gap-3 mt-4">
                                     <button type="submit" class="btn btn-marimon" id="confirmBtn">
                                         <i class="bi bi-check-circle-fill me-2"></i>
@@ -151,6 +166,14 @@
                         event.preventDefault();
                         event.stopPropagation();
 
+                        // Check if terms checkbox is causing validation error
+                        if (!document.getElementById('aceptaTerminos').checked) {
+                            document.querySelector('.terms-container').classList.add('shake');
+                            setTimeout(() => {
+                                document.querySelector('.terms-container').classList.remove('shake');
+                            }, 600);
+                        }
+
                         // Animate the form shake if invalid
                         form.classList.add('animate__animated', 'animate__shakeX');
                         setTimeout(() => {
@@ -179,6 +202,36 @@
                 this.classList.remove('copied');
             }, 2000);
         });
+    });
+
+    // Custom checkbox functionality
+    document.getElementById('customCheckbox').addEventListener('click', function () {
+        const checkbox = document.getElementById('aceptaTerminos');
+        checkbox.checked = !checkbox.checked;
+
+        if (checkbox.checked) {
+            this.classList.add('checked');
+        } else {
+            this.classList.remove('checked');
+        }
+    });
+
+    // Add ripple effect to custom checkbox
+    let ripple = document.createElement('span');
+    ripple.classList.add('ripple');
+    document.getElementById('customCheckbox').appendChild(ripple);
+
+    document.getElementById('customCheckbox').addEventListener('mousedown', function (e) {
+        const x = e.clientX - e.target.getBoundingClientRect().left;
+        const y = e.clientY - e.target.getBoundingClientRect().top;
+
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        ripple.classList.add('animate');
+
+        setTimeout(() => {
+            ripple.classList.remove('animate');
+        }, 500);
     });
 
     // Add smooth scrolling
