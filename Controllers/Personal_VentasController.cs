@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 
 namespace Marimon.Controllers
 {
@@ -18,19 +20,22 @@ namespace Marimon.Controllers
         private readonly ILogger<Personal_VentasController> _logger;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IEmailSenderWithAttachments _emailSender;
+        private readonly IConverter _converter;
         private readonly IOptions<EmailSettings> _emailSettings;
         public Personal_VentasController(
             ApplicationDbContext context,
             ILogger<Personal_VentasController> logger,
             IWebHostEnvironment hostingEnvironment,
             IEmailSenderWithAttachments emailSender,
-            IOptions<EmailSettings> emailSettings) // Añade este parámetro
+            IOptions<EmailSettings> emailSettings,
+            IConverter converter) // Añade este parámetro
         {
             _context = context;
             _logger = logger;
             _hostingEnvironment = hostingEnvironment;
             _emailSender = emailSender;
             _emailSettings = emailSettings; // Añade esta asignación
+            _converter = converter; 
         }
 
         // GET: Personal_VentasController
@@ -266,6 +271,10 @@ namespace Marimon.Controllers
         [HttpPost]
         public async Task<IActionResult> CambiarEstadoAvanzado(int id, string estado, [FromServices] IEmailSenderWithAttachments emailSender)
         {
+            Venta? venta = null;
+            string estadoAnterior = "";
+            string emailBody = "";
+            string subject = "";
             try
             {
                 // Validar el estado
@@ -275,11 +284,10 @@ namespace Marimon.Controllers
                     return RedirectToAction("Salidas");
                 }
 
-                // Crear un contexto separado para esta operación
                 using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     // Buscar la venta por ID incluyendo el Usuario relacionado
-                    var venta = await _context.Venta
+                    venta = await _context.Venta
                         .Include(v => v.Usuario)
                         .FirstOrDefaultAsync(v => v.ven_id == id);
 
@@ -289,7 +297,7 @@ namespace Marimon.Controllers
                         return RedirectToAction("Salidas");
                     }
 
-                    string estadoAnterior = venta.Estado;
+                    estadoAnterior = venta.Estado;
                     if (estadoAnterior == estado)
                     {
                         TempData["Mensaje"] = $"La venta #{id} ya se encuentra en estado {estado}.";
@@ -302,7 +310,7 @@ namespace Marimon.Controllers
 
                     // Cargar el contenido del archivo HTML
                     var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "EstadosPedido.html");
-                    var emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+                    emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
 
                     // Determinar las clases CSS según el estado
                     string stylePendiente = "opacity:0.4; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
@@ -310,36 +318,51 @@ namespace Marimon.Controllers
                     string styleCancelado = "opacity:0.4; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;";
                     string claseEstadoTexto = "";
                     string colCancelado = "";
-
+                    subject = $"Estado de tu pedido #{id} actualizado a {estado}";
                     string mensajeEstado = "";
-                    if (estado == "Pendiente")
-                        mensajeEstado = "Tu pedido está pendiente de confirmación. Estamos revisando tu pago y te notificaremos cuando se confirme.";
-                    else if (estado == "Completado")
-                        mensajeEstado = "¡Tu pedido ha sido completado exitosamente! Ya puedes acercarte a recogerlo en el local.";
-                    else if (estado == "Cancelado")
-                        mensajeEstado = "Tu pedido ha sido cancelado. Si tienes dudas, por favor contáctanos para más información.";
-                    
                     string mensajeCambio = $"El estado de tu pedido <strong>#{id}</strong> ha cambiado a:";
-
 
                     if (estado == "Pendiente")
                     {
                         stylePendiente = "opacity:1; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
                         claseEstadoTexto = "color: #F39C12;";
+                        mensajeEstado = "Tu pedido está pendiente de confirmación. Estamos revisando tu pago y te notificaremos cuando se confirme.";
                     }
                     else if (estado == "Completado")
                     {
                         styleCompletado = "opacity:1; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
                         claseEstadoTexto = "color: #27ae60;";
+                        mensajeEstado = "¡Tu pedido ha sido completado exitosamente! Puedes acercarte a nuestro local para recogerlo. <br><b>Adjuntamos tu boleta electrónica en este correo para tu comodidad y respaldo.</b> ¡Gracias por confiar en Marimon!";
+                        // Buscar el comprobante relacionado
+                        var comprobante = await _context.Comprobante
+                            .Include(c => c.Boletas)
+                            .FirstOrDefaultAsync(c => c.VentaId == venta.ven_id);
+
+                        if (comprobante != null)
+                        {
+                            // Generar HTML y PDF SOLO si com_imagen está vacío o el archivo no existe
+                            if (string.IsNullOrEmpty(comprobante.com_imagen) ||
+                                !System.IO.File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", comprobante.com_imagen?.TrimStart('/'))))
+                            {
+                                var htmlContent = GenerateComprobanteHtml(comprobante);
+                                var pdfBytes = ConvertHtmlToPdf(htmlContent);
+                                var rutaPdf = SavePdfToFile(pdfBytes, comprobante.com_id, comprobante.tipo_comprobante);
+
+                                comprobante.com_imagen = rutaPdf;
+                                _context.Update(comprobante);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
                     }
                     else if (estado == "Cancelado")
                     {
                         colCancelado = @"<td style=""opacity:1; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;"">
-                            <img src=""https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fel-tiempo-de-entrega.png?alt=media&token=3eed4a09-a993-40fc-9989-4abcc4c2359b.jpg""
-                                alt=""Cancelado"" width=""50"" height=""50"" style=""display:block; margin:0 auto 10px auto;"">
-                            Cancelado
-                        </td>";
+                    <img src=""https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fel-tiempo-de-entrega.png?alt=media&token=3eed4a09-a993-40fc-9989-4abcc4c2359b.jpg""
+                        alt=""Cancelado"" width=""50"" height=""50"" style=""display:block; margin:0 auto 10px auto;"">
+                    Cancelado
+                </td>";
                         claseEstadoTexto = "color: #E42229;";
+                        mensajeEstado = "Tu pedido ha sido cancelado. Si tienes dudas, por favor contáctanos para más información.";
                     }
 
                     // Reemplazar los valores dinámicos
@@ -356,30 +379,65 @@ namespace Marimon.Controllers
                                         .Replace("{{MensajeCambio}}", mensajeCambio)
                                         .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto);
 
-                    var subject = $"Estado de tu pedido #{id} actualizado a {estado}";
-
                     // Confirmar la transacción
                     scope.Complete();
+                }
 
-                    // Enviar correo fuera de la transacción para evitar bloqueos
-                    if (venta.Usuario != null && !string.IsNullOrEmpty(venta.Usuario.usu_correo))
+                // Enviar correo fuera de la transacción para evitar bloqueos y reenviar PDF si ya existe
+                if (venta.Usuario != null && !string.IsNullOrEmpty(venta.Usuario.usu_correo))
+                {
+                    try
                     {
-                        try
+                        if (estado == "Completado")
+                        {
+                            var comprobante = await _context.Comprobante
+                                .Include(c => c.Boletas)
+                                .FirstOrDefaultAsync(c => c.VentaId == venta.ven_id);
+
+                            if (comprobante != null && !string.IsNullOrEmpty(comprobante.com_imagen))
+                            {
+                                var pdfPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", comprobante.com_imagen.TrimStart('/'));
+                                if (System.IO.File.Exists(pdfPath))
+                                {
+                                    var pdfBytes = await System.IO.File.ReadAllBytesAsync(pdfPath);
+                                    var fileName = Path.GetFileName(pdfPath);
+
+                                    await emailSender.SendEmailWithAttachmentAsync(
+                                        venta.Usuario.usu_correo,
+                                        subject,
+                                        emailBody,
+                                        pdfBytes,
+                                        fileName,
+                                        "application/pdf"
+                                    );
+                                }
+                                else
+                                {
+                                    await emailSender.SendEmailAsync(venta.Usuario.usu_correo, subject, emailBody);
+                                }
+                            }
+                            else
+                            {
+                                await emailSender.SendEmailAsync(venta.Usuario.usu_correo, subject, emailBody);
+                            }
+                        }
+                        else
                         {
                             await emailSender.SendEmailAsync(venta.Usuario.usu_correo, subject, emailBody);
-                            TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}. Se ha enviado notificación por correo al usuario.";
-                            _logger.LogInformation($"Correo enviado al usuario {venta.Usuario.usu_correo} con el estado '{estado}'.");
                         }
-                        catch (Exception ex)
-                        {
-                            TempData["Error"] = $"El estado de la venta #{id} se actualizó, pero no se pudo enviar el correo: {ex.Message}";
-                            _logger.LogError($"Error al enviar el correo: {ex.Message}");
-                        }
+
+                        TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}. Se ha enviado notificación por correo al usuario.";
+                        _logger.LogInformation($"Correo enviado al usuario {venta.Usuario.usu_correo} con el estado '{estado}'.");
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}. No se envió notificación porque el usuario no tiene correo registrado.";
+                        TempData["Error"] = $"El estado de la venta #{id} se actualizó, pero no se pudo enviar el correo: {ex.Message}";
+                        _logger.LogError($"Error al enviar el correo: {ex.Message}");
                     }
+                }
+                else
+                {
+                    TempData["Mensaje"] = $"El estado de la venta #{id} ha sido actualizado de {estadoAnterior} a {estado}. No se envió notificación porque el usuario no tiene correo registrado.";
                 }
             }
             catch (Exception ex)
@@ -592,6 +650,337 @@ namespace Marimon.Controllers
             await _context.SaveChangesAsync();
             TempData["DeleteMessage"] = "La autoparte se eliminó correctamente.";
             return RedirectToAction("ListaAutopartes", "Admin");
+        }
+
+        private string GenerateComprobanteHtml(Comprobante comprobante)
+        {
+            var comprobanteCompleto = _context.Comprobante
+                .Include(c => c.Venta)
+                .Include(c => c.Boletas)
+                .Include(c => c.Facturas)
+                .FirstOrDefault(c => c.com_id == comprobante.com_id);
+
+            if (comprobanteCompleto == null || comprobanteCompleto.Venta == null)
+                return "<p>Error: Comprobante no válido.</p>";
+
+            var venta = comprobanteCompleto.Venta;
+            var detallesVenta = _context.DetalleVentas
+                .Where(dv => dv.VentaId == venta.ven_id)
+                .Include(dv => dv.Autoparte)
+                .ToList();
+            var usuario = _context.Usuarios.FirstOrDefault(u => u.usu_id == venta.UsuarioId);
+
+            string numeroComprobante = $"{(comprobanteCompleto.tipo_comprobante.ToLower() == "factura" ? "F" : "B")}001-{comprobanteCompleto.com_id.ToString("0000000")}";
+            string fechaEmision = DateTime.Now.ToString("dd/MM/yyyy");
+            decimal subtotal = Math.Round(venta.Total / 1.18m, 2);
+            decimal igv = Math.Round(venta.Total - subtotal, 2);
+
+            var htmlContent = $@"
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Comprobante Electrónico - Marimon</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }}
+        .container {{
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #000;
+            padding: 15px;
+        }}
+        .header {{
+            margin-bottom: 20px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 10px;
+        }}
+        .header-content {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }}
+        .logo-section {{
+            width: 65%;
+        }}
+        .logo {{
+            max-width: 180px;
+            margin-bottom: 10px;
+        }}
+        .document-section {{
+            width: 30%;
+            text-align: center;
+            border: 2px solid #000;
+            padding: 10px;
+        }}
+        .document-title {{
+            font-weight: bold;
+            font-size: 16px;
+            margin: 5px 0;
+        }}
+        .document-number {{
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px 0;
+        }}
+        .client-info {{
+            display: flex;
+            margin-bottom: 20px;
+        }}
+        .client-info-label {{
+            font-weight: bold;
+            width: 150px;
+        }}
+        .invoice-meta {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }}
+        .invoice-meta td {{
+            border: 1px solid #000;
+            padding: 5px 10px;
+        }}
+        .items-table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }}
+        .items-table th, .items-table td {{
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }}
+        .items-table th {{
+            background-color: #f2f2f2;
+        }}
+        .items-table .description {{
+            text-align: left;
+        }}
+        .totals-table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }}
+        .totals-table td {{
+            padding: 5px 10px;
+            text-align: right;
+        }}
+        .amount-in-words {{
+            font-style: italic;
+            margin: 10px 0;
+            border-bottom: 1px solid #000;
+            padding-bottom: 10px;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <div class='header-content'>
+                <div class='logo-section'>
+                    <img src='https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png' alt='Logo Marimon' class='logo'/>
+                    <p>AV. SAN AURELIO N 888 INT B URB AZCARRUNZ - SAN JUAN DE LURIGANCHO - LIMA, LIMA</p>
+                    <p>Teléfono: +51 986418904</p>
+                </div>
+                <div class='document-section'>
+                    <p>RUC: 10403771975</p>
+                    <p class='document-title'>{comprobanteCompleto.tipo_comprobante.ToUpper()} ELECTRÓNICA</p>
+                    <p class='document-number'>{numeroComprobante}</p>
+                </div>
+            </div>
+        </div>
+        <div class='client-info'>
+            <div>";
+            if (comprobanteCompleto.tipo_comprobante.ToLower() == "factura" && comprobanteCompleto.Facturas.Any())
+            {
+                var factura = comprobanteCompleto.Facturas.First();
+                htmlContent += $@"
+                <p><span class='client-info-label'>SEÑOR(es):</span> {factura.fac_razonsocial}</p>
+                <p><span class='client-info-label'>RUC No:</span> {factura.fac_ruc}</p>
+                <p><span class='client-info-label'>RAZÓN SOCIAL:</span> {factura.fac_razonsocial}</p>
+                <p><span class='client-info-label'>DIRECCIÓN:</span> {factura.fac_direccion}</p>";
+            }
+            else if (comprobanteCompleto.tipo_comprobante.ToLower() == "boleta" && comprobanteCompleto.Boletas.Any())
+            {
+                var boleta = comprobanteCompleto.Boletas.First();
+                htmlContent += $@"
+                <p><span class='client-info-label'>SEÑOR(es):</span> {usuario?.usu_nombre} {usuario?.usu_apellido}</p>
+                <p><span class='client-info-label'>DNI No:</span> {boleta.num_identificacion}</p>
+                ";
+            }
+            htmlContent += $@"
+            </div>
+        </div>
+        <table class='invoice-meta'>
+            <tr>
+                <td>Nro INTERNO</td>
+                <td>FECHA EMISIÓN</td>
+                <td>FECHA VENCIMIENTO</td>
+                <td>CONDICIONES</td>
+                <td>GUÍA REMISIÓN</td>
+            </tr>
+            <tr>
+                <td>{venta.ven_id}</td>
+                <td>{fechaEmision}</td>
+                <td>{fechaEmision}</td>
+                <td>CONTADO</td>
+                <td></td>
+            </tr>
+        </table>
+        <table class='items-table'>
+            <thead>
+                <tr>
+                    <th>Cant.</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Pre. Unit.</th>
+                    <th>Sub Total</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>";
+            foreach (var detalle in detallesVenta)
+            {
+                var autoparte = detalle.Autoparte;
+                decimal precioUnitario = Math.Round(autoparte.aut_precio / 1.18m, 2);
+                decimal subTotalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2);
+                decimal totalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2);
+
+                htmlContent += $@"
+                <tr>
+                    <td>{detalle.det_cantidad}</td>
+                    <td>{autoparte.aut_id}</td>
+                    <td class='description'>{autoparte.aut_nombre}</td>
+                    <td class='right'>{precioUnitario:N2}</td>
+                    <td class='right'>{subTotalItem:N2}</td>
+                    <td class='right'>{totalItem:N2}</td>
+                </tr>";
+            }
+            string montoEnPalabras = ConvertirNumeroALetras((double)venta.Total) + " CON " +
+                                     ((int)((venta.Total - Math.Truncate(venta.Total)) * 100)).ToString("00") + "/100 Soles";
+            htmlContent += $@"
+            </tbody>
+        </table>
+        <p class='amount-in-words'>SON: {montoEnPalabras}</p>
+        <table class='totals-table'>
+            <tr>
+                <td>SUB TOTAL</td>
+                <td>S/</td>
+                <td>{venta.Total:N2}</td>
+            </tr>
+            <tr>
+                <td><strong>IMPORTE TOTAL</strong></td>
+                <td><strong>S/</strong></td>
+                <td><strong>{venta.Total:N2}</strong></td>
+            </tr>
+        </table>
+        <div class='observations'>
+            El {comprobanteCompleto.tipo_comprobante} numero {numeroComprobante}, ha sido aceptada | Hash : djX1dU9cIagNcDqUHUo71ua0vkc=
+        </div>
+    </div>
+</body>
+</html>";
+            return htmlContent;
+        }
+
+        private string ConvertirNumeroALetras(double valor)
+        {
+            string Num2Text = "";
+            valor = Math.Truncate(valor);
+            if (valor == 0) Num2Text = "CERO";
+            else if (valor == 1) Num2Text = "UNO";
+            else if (valor == 2) Num2Text = "DOS";
+            else if (valor == 3) Num2Text = "TRES";
+            else if (valor == 4) Num2Text = "CUATRO";
+            else if (valor == 5) Num2Text = "CINCO";
+            else if (valor == 6) Num2Text = "SEIS";
+            else if (valor == 7) Num2Text = "SIETE";
+            else if (valor == 8) Num2Text = "OCHO";
+            else if (valor == 9) Num2Text = "NUEVE";
+            else if (valor == 10) Num2Text = "DIEZ";
+            else if (valor == 11) Num2Text = "ONCE";
+            else if (valor == 12) Num2Text = "DOCE";
+            else if (valor == 13) Num2Text = "TRECE";
+            else if (valor == 14) Num2Text = "CATORCE";
+            else if (valor == 15) Num2Text = "QUINCE";
+            else if (valor < 20) Num2Text = "DIECI" + ConvertirNumeroALetras(valor - 10);
+            else if (valor == 20) Num2Text = "VEINTE";
+            else if (valor < 30) Num2Text = "VEINTI" + ConvertirNumeroALetras(valor - 20);
+            else if (valor == 30) Num2Text = "TREINTA";
+            else if (valor == 40) Num2Text = "CUARENTA";
+            else if (valor == 50) Num2Text = "CINCUENTA";
+            else if (valor == 60) Num2Text = "SESENTA";
+            else if (valor == 70) Num2Text = "SETENTA";
+            else if (valor == 80) Num2Text = "OCHENTA";
+            else if (valor == 90) Num2Text = "NOVENTA";
+            else if (valor < 100)
+            {
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 10) * 10) + " Y " + ConvertirNumeroALetras(valor % 10);
+            }
+            else if (valor == 100) Num2Text = "CIEN";
+            else if (valor < 200) Num2Text = "CIENTO " + ConvertirNumeroALetras(valor - 100);
+            else if ((valor == 200) || (valor == 300) || (valor == 400) || (valor == 600) || (valor == 800))
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 100)) + "CIENTOS";
+            else if (valor == 500) Num2Text = "QUINIENTOS";
+            else if (valor == 700) Num2Text = "SETECIENTOS";
+            else if (valor == 900) Num2Text = "NOVECIENTOS";
+            else if (valor < 1000)
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 100) * 100) + " " + ConvertirNumeroALetras(valor % 100);
+            else if (valor == 1000) Num2Text = "MIL";
+            else if (valor < 2000) Num2Text = "MIL " + ConvertirNumeroALetras(valor % 1000);
+            else if (valor < 1000000)
+            {
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 1000)) + " MIL";
+                if ((valor % 1000) > 0) Num2Text += " " + ConvertirNumeroALetras(valor % 1000);
+            }
+            else if (valor == 1000000) Num2Text = "UN MILLON";
+            else if (valor < 2000000) Num2Text = "UN MILLON " + ConvertirNumeroALetras(valor % 1000000);
+            else if (valor < 1000000000000)
+            {
+                Num2Text = ConvertirNumeroALetras(Math.Truncate(valor / 1000000)) + " MILLONES";
+                if ((valor % 1000000) > 0) Num2Text += " " + ConvertirNumeroALetras(valor % 1000000);
+            }
+            return Num2Text;
+        }
+
+        private byte[] ConvertHtmlToPdf(string htmlContent)
+        {
+            var doc = new DinkToPdf.HtmlToPdfDocument()
+            {
+                GlobalSettings = {
+            ColorMode = DinkToPdf.ColorMode.Color,
+            Orientation = DinkToPdf.Orientation.Portrait,
+            PaperSize = DinkToPdf.PaperKind.A4
+        },
+                Objects = {
+            new DinkToPdf.ObjectSettings() {
+                HtmlContent = htmlContent,
+                WebSettings = { DefaultEncoding = "utf-8" }
+            }
+        }
+            };
+            // Debes tener _converter inyectado en el constructor
+            return _converter.Convert(doc);
+        }
+
+        private string SavePdfToFile(byte[] pdfBytes, int comprobanteId, string tipoComprobante)
+        {
+            string directorio = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "comprobantes");
+            if (!Directory.Exists(directorio))
+            {
+                Directory.CreateDirectory(directorio);
+            }
+            string nombreArchivo = $"{tipoComprobante.ToLower()}_{comprobanteId}.pdf";
+            string rutaArchivo = Path.Combine(directorio, nombreArchivo);
+            System.IO.File.WriteAllBytes(rutaArchivo, pdfBytes);
+            return $"/comprobantes/{nombreArchivo}";
         }
     }
 }
