@@ -305,31 +305,41 @@ namespace Marimon.Controllers
                     var emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
 
                     // Determinar las clases CSS según el estado
+                    string stylePendiente = "opacity:0.4; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                    string styleCompletado = "opacity:0.4; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
+                    string styleCancelado = "opacity:0.4; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;";
                     string claseEstadoTexto = "";
-                    string clasePendiente = "";
-                    string claseCompletado = "";
-                    string claseCancelado = "";
+                    string colCancelado = "";
 
-                    switch (estado)
+                    string mensajeEstado = "";
+                    if (estado == "Pendiente")
+                        mensajeEstado = "Tu pedido está pendiente de confirmación. Estamos revisando tu pago y te notificaremos cuando se confirme.";
+                    else if (estado == "Completado")
+                        mensajeEstado = "¡Tu pedido ha sido completado exitosamente! Ya puedes acercarte a recogerlo en el local.";
+                    else if (estado == "Cancelado")
+                        mensajeEstado = "Tu pedido ha sido cancelado. Si tienes dudas, por favor contáctanos para más información.";
+                    
+                    string mensajeCambio = $"El estado de tu pedido <strong>#{id}</strong> ha cambiado a:";
+
+
+                    if (estado == "Pendiente")
                     {
-                        case "Pendiente":
-                            claseEstadoTexto = "estado-pendiente";
-                            clasePendiente = "active active-pendiente";
-                            claseCompletado = "";
-                            claseCancelado = "hidden";
-                            break;
-                        case "Completado":
-                            claseEstadoTexto = "estado-completado";
-                            clasePendiente = "";
-                            claseCompletado = "active active-completado";
-                            claseCancelado = "hidden";
-                            break;
-                        case "Cancelado":
-                            claseEstadoTexto = "estado-cancelado";
-                            clasePendiente = "";
-                            claseCompletado = "";
-                            claseCancelado = "active active-cancelado";
-                            break;
+                        stylePendiente = "opacity:1; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                        claseEstadoTexto = "color: #F39C12;";
+                    }
+                    else if (estado == "Completado")
+                    {
+                        styleCompletado = "opacity:1; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
+                        claseEstadoTexto = "color: #27ae60;";
+                    }
+                    else if (estado == "Cancelado")
+                    {
+                        colCancelado = @"<td style=""opacity:1; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;"">
+                            <img src=""https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fel-tiempo-de-entrega.png?alt=media&token=3eed4a09-a993-40fc-9989-4abcc4c2359b.jpg""
+                                alt=""Cancelado"" width=""50"" height=""50"" style=""display:block; margin:0 auto 10px auto;"">
+                            Cancelado
+                        </td>";
+                        claseEstadoTexto = "color: #E42229;";
                     }
 
                     // Reemplazar los valores dinámicos
@@ -338,10 +348,13 @@ namespace Marimon.Controllers
                                         .Replace("{{Estado}}", estado)
                                         .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
                                         .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
-                                        .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto)
-                                        .Replace("{{ClasePendiente}}", clasePendiente)
-                                        .Replace("{{ClaseCompletado}}", claseCompletado)
-                                        .Replace("{{ClaseCancelado}}", claseCancelado);
+                                        .Replace("{{StylePendiente}}", stylePendiente)
+                                        .Replace("{{StyleCompletado}}", styleCompletado)
+                                        .Replace("{{StyleCancelado}}", styleCancelado)
+                                        .Replace("{{ColCancelado}}", colCancelado)
+                                        .Replace("{{MensajeEstado}}", mensajeEstado)
+                                        .Replace("{{MensajeCambio}}", mensajeCambio)
+                                        .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto);
 
                     var subject = $"Estado de tu pedido #{id} actualizado a {estado}";
 
