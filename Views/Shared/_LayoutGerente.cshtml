@@ -7,11 +7,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - - Panel del Gerente</title>
+    <title>Marimon - Panel del Gerente</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/gerente.css" asp-append-version="true" />
-    <link rel="shortcut icon" href="images/logo_icon.png">
+    <!-- Icono que se muestra en la web -->
+    <link rel="shortcut icon" href="/images/logo_icon.png">
 
     <!-- Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
@@ -62,15 +63,17 @@
     <header>
         <div class="contenedor-menu">
             <!-- Logo -->
-            <a href="/Gerente" class="logo-contenedor">
+            <a asp-area="" asp-controller="Gerente" asp-action="Index" class="logo-contenedor">
                 <img src="~/images/logo_marimonWhite.png" alt="Logo Marimon" class="logo-img">
             </a>
 
             <!-- Título centrado -->
-            <a href="/Gerente" class="titulo-header">Módulo de Operaciones</a>
+            <a asp-area="" asp-controller="Gerente" asp-action="Index" class="titulo-header">Módulo de Operaciones</a>
 
             <!-- Botón de cerrar sesión -->
-            <a href="/Identity/Account/Logout" class="logout-btn">Cerrar sesión</a>
+            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <i  class="fas fa-sign-out-alt"></i> <button>Cerrar Sesión</button>
+            </form>
         </div>
     </header>
 
@@ -82,9 +85,9 @@
 
     <footer>
         <div class="footer-content">
-            <div class="footer-left">Copyright © 2025 Marimon S.A.</div>
-            <div class="footer-center">Liderando con visión, guiando con estrategia</div>
-            <div class="footer-right">Developed by Equipo Scrum</div>
+            <div class="footer-left">Copyright 2025 © Marimon</div>
+            <div class="footer-center">Comprometidos con la calidad y el servicio</div>
+            <div class="footer-right">Developed by "G03 - ISW2"</div>
         </div>
     </footer>
 
