@@ -2,12 +2,12 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Marimon - Panel del Gerente</title>
+    <title>Panel del Gerente - Marimon</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/gerente.css" asp-append-version="true" />
@@ -71,8 +71,9 @@
             <a asp-area="" asp-controller="Gerente" asp-action="Index" class="titulo-header">Módulo de Operaciones</a>
 
             <!-- Botón de cerrar sesión -->
-            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <i  class="fas fa-sign-out-alt"></i> <button>Cerrar Sesión</button>
+            <form asp-area="Identity" asp-page="/Account/Logout"
+                asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <i class="fas fa-sign-out-alt"></i> <button>Cerrar Sesión</button>
             </form>
         </div>
     </header>
