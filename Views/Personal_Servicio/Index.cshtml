@@ -1,5 +1,5 @@
 @{
-    Layout = "_LayoutServicio"; 
+    Layout = "_LayoutServicio";
     ViewData["Title"] = "Módulo de Servicios - Administración";
 }
 
@@ -13,7 +13,8 @@
             <a href="@Url.Action("ConsultarServicios", "Personal_Servicio")" class="modulo-item-link">
                 <div class="modulo-item">
                     <div class="card-content">
-                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Ftrabajador-fabrica-caracter-masculino-gerente-linea-ensamblaje_1316704-8108.jpg?alt=media&token=540d0f52-91b9-4c6a-ae59-a2be20a48eb3.jpg" alt="Servicios">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Ftrabajador-fabrica-caracter-masculino-gerente-linea-ensamblaje_1316704-8108.jpg?alt=media&token=540d0f52-91b9-4c6a-ae59-a2be20a48eb3.jpg"
+                            alt="Servicios">
                     </div>
                     <div class="card-footer">
                         <span>CONSULTAR SERVICIOS</span>
@@ -24,7 +25,7 @@
             <a href="@Url.Action("LServicio", "Personal_Servicio")" class="modulo-item-link">
                 <div class="modulo-item">
                     <div class="card-content">
-                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2F7482.jpg?alt=media&token=f7b9774c-e2ec-487a-8c50-6b7462e90168.jpg" alt="Listar Servicios">
+                        <img src="https://fleethub.de/wp-content/uploads/2020/10/Wartung.png" alt="Listar Servicios">
                     </div>
                     <div class="card-footer">
                         <span>SERVICIOS</span>
@@ -32,34 +33,18 @@
                 </div>
             </a>
 
-            <!-- Gestionar Servicio -->
-            <div class="modulo-item">
-                <div class="card-content flujo-section">
-                    <a href="#" class="flujo-column-link">
-                        <div class="flujo-column">
-                            <div class="flujo-item">
-                                <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-1.png?alt=media&token=c164c118-ff0c-433a-80c7-b0b2b2ec666b.jpg" alt="Modificar" class="small-icon">
-                            </div>
-                            <div class="flujo-badge-container">
-                                <span class="flujo-badge entrada">MODIFICAR</span>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="#" class="flujo-column-link">
-                        <div class="flujo-column">
-                            <div class="flujo-item">
-                                <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fclipboard-image-3.png?alt=media&token=ff84c240-0f32-45c1-bb7e-c219e430e687.jpg" alt="Eliminar" class="small-icon">
-                            </div>
-                            <div class="flujo-badge-container">
-                                <span class="flujo-badge salida">ELIMINAR</span>
-                            </div>
-                        </div>
-                    </a>
+            <a href="#" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="https://png.pngtree.com/png-vector/20220624/ourmid/pngtree-simple-line-icon-set-of-factory-for-website-mobile-app-and-png-image_5328149.png"
+                            alt="Orden de trabajo automotriz"
+                            style="object-fit: contain; max-height: 150px; margin: 0 auto; display: block;">
+                    </div>
+                    <div class="card-footer">
+                        <span>ORDEN DE TRABAJO</span>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    <span class="flujo-text">GESTIÓN DE SERVICIOS</span>
-                </div>
-            </div>
+            </a>
 
             <!-- Reportes -->
             <a href="@Url.Action("Reportes", "Personal_Servicio")" class="modulo-item-link">
