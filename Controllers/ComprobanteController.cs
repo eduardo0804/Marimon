@@ -334,23 +334,21 @@ namespace Marimon.Controllers
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
-                LineItems = new List<SessionLineItemOptions>
+                LineItems = carrito.CarritoAutopartes.Select(item => new SessionLineItemOptions
                 {
-                    new SessionLineItemOptions
+                    PriceData = new SessionLineItemPriceDataOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
+                        Currency = "pen", // Moneda peruana (soles)
+                        UnitAmount = (long)(item.Autoparte.aut_precio * 100), // Stripe trabaja en centavos
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-                            Currency = "pen", // Moneda peruana (soles)
-                            UnitAmount = (long)(carrito.car_total * 100), // Stripe trabaja en centavos
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = "Compra en Marimon Autopartes",
-                                Description = $"Pedido #{venta.ven_id}"
-                            },
+                            Name = item.Autoparte.aut_nombre,
+                            Description = item.Autoparte.aut_descripcion, 
+                            Images = new List<string> { item.Autoparte.aut_imagen } 
                         },
-                        Quantity = 1,
-                    }
-                },
+                    },
+                    Quantity = item.car_cantidad, // Cantidad del producto
+                }).ToList(),
                 Mode = "payment",
                 SuccessUrl = $"{Request.Scheme}://{Request.Host}/Comprobante/PagoExitoso?session_id={{CHECKOUT_SESSION_ID}}",
 
@@ -377,43 +375,50 @@ namespace Marimon.Controllers
                 var emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
 
                 // Definir clases CSS según el estado
+                string stylePendiente = "opacity:0.4; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                string styleCompletado = "opacity:0.4; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
+                string styleCancelado = "opacity:0.4; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;";
                 string claseEstadoTexto = "";
-                string clasePendiente = "";
-                string claseCompletado = "";
-                string claseCancelado = "";
+                string colCancelado = "";
+                string mensajeCambio = $"El estado de tu pedido <strong>#{ventaId}</strong> esta";
+                string mensajeEstado = "";
 
-                switch (estado)
+                if (estado == "Pendiente")
                 {
-                    case "Pendiente":
-                        claseEstadoTexto = "estado-pendiente";
-                        clasePendiente = "active active-pendiente";
-                        claseCompletado = "";
-                        claseCancelado = "hidden";
-                        break;
-                    case "Completado":
-                        claseEstadoTexto = "estado-completado";
-                        clasePendiente = "";
-                        claseCompletado = "active active-completado";
-                        claseCancelado = "hidden";
-                        break;
-                    case "Cancelado":
-                        claseEstadoTexto = "estado-cancelado";
-                        clasePendiente = "";
-                        claseCompletado = "";
-                        claseCancelado = "active active-cancelado";
-                        break;
+                    stylePendiente = "opacity:1; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                    mensajeEstado = "Tu pedido está pendiente de confirmación. Estamos revisando tu pago y te notificaremos cuando se confirme.";
+                    claseEstadoTexto = "color: #F39C12;";
+                }
+                else if (estado == "Completado")
+                {
+                    styleCompletado = "opacity:1; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
+                    claseEstadoTexto = "color: #27ae60;";
+                    mensajeEstado = "¡Tu pedido ha sido completado exitosamente! Ya puedes acercarte a recogerlo en el local.";
+                }
+                else if (estado == "Cancelado")
+                {
+                    colCancelado = @"<td style=""opacity:1; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;"">
+                        <img src=""https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fel-tiempo-de-entrega.png?alt=media&token=3eed4a09-a993-40fc-9989-4abcc4c2359b.jpg""
+                            alt=""Cancelado"" width=""50"" height=""50"" style=""display:block; margin:0 auto 10px auto;"">
+                        Cancelado
+                    </td>";
+                    claseEstadoTexto = "color: #E42229;";
+                    mensajeEstado = "Tu pedido ha sido cancelado. Si tienes dudas, por favor contáctanos para más información.";
                 }
 
-                // Reemplazar valores dinámicos en la plantilla
                 emailBody = emailBody.Replace("{{UserName}}", nombreUsuario ?? "Cliente")
-                                     .Replace("{{PedidoId}}", ventaId.ToString())
-                                     .Replace("{{Estado}}", estado)
-                                     .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
-                                     .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
-                                     .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto)
-                                     .Replace("{{ClasePendiente}}", clasePendiente)
-                                     .Replace("{{ClaseCompletado}}", claseCompletado)
-                                     .Replace("{{ClaseCancelado}}", claseCancelado);
+                                        .Replace("{{PedidoId}}", ventaId.ToString())
+                                        .Replace("{{Estado}}", estado)
+                                        .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
+                                        .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
+                                        .Replace("{{StylePendiente}}", stylePendiente)
+                                        .Replace("{{StyleCompletado}}", styleCompletado)
+                                        .Replace("{{StyleCancelado}}", styleCancelado)
+                                        .Replace("{{ColCancelado}}", colCancelado)
+                                        .Replace("{{MensajeEstado}}", mensajeEstado)
+                                        .Replace("{{MensajeCambio}}", mensajeCambio)
+                                        .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto);
+
 
                 var subject = $"Estado de tu pedido #{ventaId} actualizado a {estado}";
 
