@@ -334,23 +334,21 @@ namespace Marimon.Controllers
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
-                LineItems = new List<SessionLineItemOptions>
+                LineItems = carrito.CarritoAutopartes.Select(item => new SessionLineItemOptions
                 {
-                    new SessionLineItemOptions
+                    PriceData = new SessionLineItemPriceDataOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
+                        Currency = "pen", // Moneda peruana (soles)
+                        UnitAmount = (long)(item.Autoparte.aut_precio * 100), // Stripe trabaja en centavos
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-                            Currency = "pen", // Moneda peruana (soles)
-                            UnitAmount = (long)(carrito.car_total * 100), // Stripe trabaja en centavos
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = "Compra en Marimon Autopartes",
-                                Description = $"Pedido #{venta.ven_id}"
-                            },
+                            Name = item.Autoparte.aut_nombre,
+                            Description = item.Autoparte.aut_descripcion, 
+                            Images = new List<string> { item.Autoparte.aut_imagen } 
                         },
-                        Quantity = 1,
-                    }
-                },
+                    },
+                    Quantity = item.car_cantidad, // Cantidad del producto
+                }).ToList(),
                 Mode = "payment",
                 SuccessUrl = $"{Request.Scheme}://{Request.Host}/Comprobante/PagoExitoso?session_id={{CHECKOUT_SESSION_ID}}",
 
@@ -383,24 +381,19 @@ namespace Marimon.Controllers
                 string claseEstadoTexto = "";
                 string colCancelado = "";
                 string mensajeCambio = $"El estado de tu pedido <strong>#{ventaId}</strong> esta";
-
                 string mensajeEstado = "";
-                    if (estado == "Pendiente")
-                        mensajeEstado = "Tu pedido está pendiente de confirmación. Estamos revisando tu pago y te notificaremos cuando se confirme.";
-                    else if (estado == "Completado")
-                        mensajeEstado = "¡Tu pedido ha sido completado exitosamente! Ya puedes acercarte a recogerlo en el local.";
-                    else if (estado == "Cancelado")
-                        mensajeEstado = "Tu pedido ha sido cancelado. Si tienes dudas, por favor contáctanos para más información.";
 
                 if (estado == "Pendiente")
                 {
                     stylePendiente = "opacity:1; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                    mensajeEstado = "Tu pedido está pendiente de confirmación. Estamos revisando tu pago y te notificaremos cuando se confirme.";
                     claseEstadoTexto = "color: #F39C12;";
                 }
                 else if (estado == "Completado")
                 {
                     styleCompletado = "opacity:1; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
                     claseEstadoTexto = "color: #27ae60;";
+                    mensajeEstado = "¡Tu pedido ha sido completado exitosamente! Ya puedes acercarte a recogerlo en el local.";
                 }
                 else if (estado == "Cancelado")
                 {
@@ -410,6 +403,7 @@ namespace Marimon.Controllers
                         Cancelado
                     </td>";
                     claseEstadoTexto = "color: #E42229;";
+                    mensajeEstado = "Tu pedido ha sido cancelado. Si tienes dudas, por favor contáctanos para más información.";
                 }
 
                 emailBody = emailBody.Replace("{{UserName}}", nombreUsuario ?? "Cliente")
