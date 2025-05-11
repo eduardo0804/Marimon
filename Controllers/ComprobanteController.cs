@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using System.Drawing;
 using System.IO;
 using Microsoft.Extensions.Options;
+using System.Globalization;
 using Stripe;
 using Stripe.Checkout;
 
@@ -276,20 +277,7 @@ namespace Marimon.Controllers
         //STRIPE
         [HttpPost]
         public async Task<IActionResult> ProcesarPago(string tipoComprobante, string metodoPago, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion)
-        {
-            // Si el método de pago es Yape, procesa directamente
-            if (metodoPago == "yape")
-            {
-                // Almacenar datos en TempData para recuperarlos en PagoYape
-                TempData["tipoComprobante"] = tipoComprobante;
-                TempData["num_identificacion"] = num_identificacion;
-                TempData["fac_razon"] = fac_razon;
-                TempData["fac_ruc"] = fac_ruc;
-                TempData["fac_direccion"] = fac_direccion;
-                
-                return RedirectToAction("PagoYape");
-            }
-                    
+        {        
             // Si es tarjeta, crea una sesión de Stripe
             var identityUserId = _userManager.GetUserId(User);
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
@@ -308,6 +296,23 @@ namespace Marimon.Controllers
             {
                 return BadRequest("El carrito está vacío.");
             }
+
+
+            // Si el método de pago es Yape, procesa directamente
+            if (metodoPago == "yape")
+            {
+                // Almacenar datos en TempData para recuperarlos en PagoYape
+                TempData["tipoComprobante"] = tipoComprobante;
+                TempData["num_identificacion"] = num_identificacion;
+                TempData["fac_razon"] = fac_razon;
+                TempData["fac_ruc"] = fac_ruc;
+                TempData["fac_direccion"] = fac_direccion;
+                
+                // Guardar el total en TempData
+                TempData["totalPago"] = carrito.car_total.ToString(CultureInfo.InvariantCulture);
+
+                return RedirectToAction("PagoYape");
+            }
             
             // Crear venta temporal (pendiente de pago)
             var venta = new Venta
@@ -322,7 +327,7 @@ namespace Marimon.Controllers
             _context.Venta.Add(venta);
             await _context.SaveChangesAsync();
             
-            // Guardar datos de comprobante temporalmente (puedes usar TempData o sesión)
+            // Guardar datos de comprobante temporalmente
             TempData["tipoComprobante"] = tipoComprobante;
             TempData["num_identificacion"] = num_identificacion;
             TempData["fac_razon"] = fac_razon;
@@ -1079,7 +1084,8 @@ namespace Marimon.Controllers
                 NumIdentificacion = TempData["num_identificacion"]?.ToString(),
                 RazonSocial = TempData["fac_razon"]?.ToString(),
                 Ruc = TempData["fac_ruc"]?.ToString(),
-                Direccion = TempData["fac_direccion"]?.ToString()
+                Direccion = TempData["fac_direccion"]?.ToString(),
+                TotalPago = Convert.ToDecimal(TempData["totalPago"], CultureInfo.InvariantCulture)
             };
             
             // Mantener los datos en TempData para el siguiente request
@@ -1088,7 +1094,7 @@ namespace Marimon.Controllers
             TempData.Keep("fac_razon");
             TempData.Keep("fac_ruc");
             TempData.Keep("fac_direccion");
-            
+            TempData.Keep("totalPago"); // Mantener el total
             return View(viewModel);
         }
 
