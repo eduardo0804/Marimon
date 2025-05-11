@@ -9,68 +9,64 @@
     ViewData["Title"] = "Finaliza tu Compra - Marimon";
 }
 
-<!-- FORMULARIO -->
 <form action="@Url.Action("ProcesarPago", "Comprobante")" method="post" class="needs-validation" novalidate>
-    <div class="container my-5">
+    <div class="container py-5">
         <!-- Cabecera -->
-        <div class="row mb-4">
-            <div class="col-lg-7">
-                <div class="titulo-con-flecha">
-                    <a href="@Url.Action("Index", "Carrito")" class="flecha-retroceso">
+        <div class="row checkout-header animated-card" style="animation-delay: 0.1s;">
+            <div class="col-lg-7 mb-3 mb-lg-0">
+                <div class="d-flex align-items-center">
+                    <a href="@Url.Action("Index", "Carrito")" class="back-btn me-3">
                         <i class="bi bi-arrow-left-circle-fill"></i>
                     </a>
                     <h2 class="fw-bold text-dark mb-0">Finaliza tu Compra</h2>
                 </div>
             </div>
-            <div class="col-md-5 text-end text-success d-flex align-items-center justify-content-end gap-2">
-                <i class="bi bi-shield-check fs-4"></i>
-                <span class="fw-semibold">Compra Segura</span>
+            <div class="col-lg-5 d-flex justify-content-lg-end justify-content-center">
+                <div class="secure-badge">
+                    <i class="bi bi-shield-check fs-5"></i>
+                    <span>Compra 100% Segura</span>
+                </div>
             </div>
         </div>
 
         <div class="row">
-            <!-- Resumen de Pedido (siempre visible) -->
-            <div class="col-lg-5 order-lg-2 mb-4">
-                <div class="card shadow-sm border-0 rounded-4 bg-white p-4 sticky-top" id="resumenPedido"
-                    style="top: 20px;">
-                    <h4 class="fw-bold mb-4">Resumen de Pedido</h4>
-                    <div class="border-top border-bottom py-2 mb-3" style="max-height: 240px; overflow-y: auto;">
+            <!-- Resumen de Pedido (Order Summary) -->
+            <div class="col-lg-5 order-lg-2">
+                <div class="card p-4 order-summary animated-card" style="animation-delay: 0.2s;">
+                    <div class="summary-header">
+                        <h3 class="summary-title">Resumen de Pedido</h3>
+                    </div>
+
+                    <div class="summary-items" style="max-height: 380px; overflow-y: auto;">
                         @foreach (var item in carrito)
                         {
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="d-flex align-items-center">
-                                    <!-- Imagen del producto -->
-                                    <div class="me-2" style="width: 50px; height: 50px; min-width: 50px;">
-                                        @if (!string.IsNullOrEmpty(item.ImagenUrl))
-                                        {
-                                            <img src="@item.ImagenUrl" class="img-fluid rounded" alt="@item.Nombre"
-                                                style="object-fit: cover; width: 100%; height: 100%;">
-                                        }
-                                        else
-                                        {
-                                            <div class="bg-light rounded d-flex justify-content-center align-items-center"
-                                                style="width: 100%; height: 100%;">
-                                                <i class="bi bi-image text-muted"></i>
-                                            </div>
-                                        }
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold text-dark">@item.Nombre</div>
-                                        <small class="text-muted">Cantidad: @item.Cantidad</small>
-                                    </div>
+                            <div class="cart-item">
+                                <div class="item-image">
+                                    @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                                    {
+                                        <img src="@item.ImagenUrl" alt="@item.Nombre">
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex justify-content-center align-items-center h-100 bg-light">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    }
                                 </div>
-                                <div class="fw-bold text-dark">
+                                <div class="item-info">
+                                    <div class="item-name">@item.Nombre</div>
+                                    <div class="item-quantity">Cantidad: @item.Cantidad</div>
+                                </div>
+                                <div class="item-price">
                                     S/.@String.Format("{0:0.00}", item.PrecioUnitario * item.Cantidad)
                                 </div>
                             </div>
                         }
                     </div>
 
-                    <div class="pt-2">
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-bold fs-5">Total:</span>
-                            <span class="fw-bold fs-5 text-dark">S/.@String.Format("{0:0.00}", total)</span>
-                        </div>
+                    <div class="summary-total">
+                        <span class="total-label">TOTAL:</span>
+                        <span class="total-amount">S/.@String.Format("{0:0.00}", total)</span>
                     </div>
                 </div>
             </div>
@@ -78,158 +74,185 @@
             <!-- Formulario principal -->
             <div class="col-lg-7 order-lg-1">
                 <!-- Tipo de comprobante -->
-                <div class="card p-4 shadow-sm bg-light rounded-4 border-0 mb-4">
-                    <div class="form-label fw-semibold fs-4 text-center mb-3">Seleccione el Tipo de Comprobante</div>
-                    <div class="d-flex justify-content-center gap-5">
-                        <div class="form-check form-check-lg">
-                            <input class="form-check-input fs-4" type="radio" name="tipoComprobante" value="boleta"
-                                id="boleta" checked>
-                            <label class="form-check-label fs-5 ms-2" for="boleta">Boleta</label>
+                <div class="card p-4 mb-4 animated-card" style="animation-delay: 0.3s;">
+                    <h4 class="text-center fw-bold mb-4">Selecciona el Tipo de Comprobante</h4>
+
+                    <div class="custom-radio-container">
+                        <div class="custom-radio-btn">
+                            <input type="radio" id="boleta" name="tipoComprobante" value="boleta" checked>
+                            <label for="boleta">
+                                <i class="bi bi-receipt fs-1 mb-3 text-primary"></i>
+                                <span class="option-title">Boleta</span>
+                                <small class="text-muted mt-2">Para personas naturales</small>
+                            </label>
                         </div>
-                        <div class="form-check form-check-lg">
-                            <input class="form-check-input fs-4" type="radio" name="tipoComprobante" value="factura"
-                                id="factura">
-                            <label class="form-check-label fs-5 ms-2" for="factura">Factura</label>
+
+                        <div class="custom-radio-btn">
+                            <input type="radio" id="factura" name="tipoComprobante" value="factura">
+                            <label for="factura">
+                                <i class="bi bi-file-earmark-text fs-1 mb-3 text-primary"></i>
+                                <span class="option-title">Factura</span>
+                                <small class="text-muted mt-2">Para empresas o negocios</small>
+                            </label>
                         </div>
                     </div>
                 </div>
 
                 <!-- Datos para Boleta -->
-                <div id="camposBoleta" class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label for="nombre" class="form-label fw-semibold">Nombre *</label>
-                        <input type="text"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="nombre"
-                            name="usu_nombre" placeholder="Ingrese su nombre" value="@usuario.usu_nombre" readonly>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="apellidos" class="form-label fw-semibold">Apellidos *</label>
-                        <input type="text"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="apellidos" name="usu_apellido" placeholder="Ingrese sus apellidos"
-                            value="@usuario.usu_apellido" readonly>
-                    </div>
-                    <!-- Tipo de documento -->
-                    <div class="col-md-6 mb-3">
-                        <label for="tipoDocumento" class="form-label fw-semibold">Tipo de Documento *</label>
-                        <select class="form-select form-select-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="tipoDocumento" name="tipoDocumento" required>
-                            <option selected disabled value="">Seleccione</option>
-                            <option value="DNI">DNI</option>
-                            <option value="CE">Carnet de Extranjería</option>
-                            <option value="Pasaporte">Pasaporte</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            Seleccione un tipo de documento válido.
-                        </div>
-                    </div>
+                <div id="camposBoleta" class="card p-4 mb-4 animated-card" style="animation-delay: 0.4s;">
+                    <h4 class="fw-bold mb-4">Datos Personales</h4>
 
-                    <!-- Número de documento -->
-                    <div class="col-md-6 mb-3">
-                        <label for="numeroDocumento" class="form-label fw-semibold">N° de Documento *</label>
-                        <input type="text"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="numeroDocumento" name="num_identificacion" placeholder="Ingrese su número de documento"
-                            required pattern="^\d{8}$|^\d{9}$|^[A-Z0-9]{6,12}$"
-                            title="DNI: 8 dígitos, CE: 9 dígitos, Pasaporte: 6-12 caracteres alfanuméricos">
-                        <div class="invalid-feedback">
-                            Ingrese un número de Documento Válido:
-                            <ul class="mb-0 ps-4">
-                                <li>DNI: 8 dígitos</li>
-                                <li>Carnet de Extranjería: 9 dígitos</li>
-                                <li>Pasaporte: 6 a 12 caracteres alfanuméricos</li>
-                            </ul>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nombre" class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" id="nombre" name="usu_nombre"
+                                value="@usuario.usu_nombre" readonly>
                         </div>
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label for="correo" class="form-label fw-semibold">Correo Electrónico *</label>
-                        <input type="email"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="correo"
-                            name="usu_correo" placeholder="ejemplo@correo.com" value="@usuario.usu_correo" readonly>
+                        <div class="col-md-6 mb-3">
+                            <label for="apellidos" class="form-label">Apellidos *</label>
+                            <input type="text" class="form-control" id="apellidos" name="usu_apellido"
+                                value="@usuario.usu_apellido" readonly>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="tipoDocumento" class="form-label">Tipo de Documento *</label>
+                            <select class="form-select" id="tipoDocumento" name="tipoDocumento" required>
+                                <option selected disabled value="">Seleccione</option>
+                                <option value="DNI">DNI</option>
+                                <option value="CE">Carnet de Extranjería</option>
+                                <option value="Pasaporte">Pasaporte</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Seleccione un tipo de documento válido.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="numeroDocumento" class="form-label">N° de Documento *</label>
+                            <input type="text" class="form-control" id="numeroDocumento" name="num_identificacion"
+                                placeholder="Ingrese su número de documento" required
+                                pattern="^\d{8}$|^\d{9}$|^[A-Z0-9]{6,12}$">
+                            <div class="invalid-feedback">
+                                Ingrese un número válido: DNI (8 dígitos), CE (9 dígitos), Pasaporte (6-12 caracteres)
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="correo" class="form-label">Correo Electrónico *</label>
+                            <input type="email" class="form-control" id="correo" name="usu_correo"
+                                value="@usuario.usu_correo" readonly>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Datos para Factura -->
-                <div id="camposFactura" class="row mb-4" style="display: none;">
-                    <div class="col-md-6 mb-3">
-                        <label for="nombreFactura" class="form-label fw-semibold">Nombre *</label>
-                        <input type="text"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="nombreFactura" name="usu_nombre" placeholder="Ingrese su nombre"
-                            value="@usuario.usu_nombre" readonly>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="apellidosFactura" class="form-label fw-semibold">Apellidos *</label>
-                        <input type="text"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="apellidosFactura" name="usu_apellido" placeholder="Ingrese sus apellidos"
-                            value="@usuario.usu_apellido" readonly>
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label for="correoFactura" class="form-label fw-semibold">Correo Electrónico *</label>
-                        <input type="email"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="correoFactura" name="usu_correo" placeholder="ejemplo@correo.com"
-                            value="@usuario.usu_correo" readonly>
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label for="razonSocial" class="form-label fw-semibold">Razón Social *</label>
-                        <input type="text"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="razonSocial" name="fac_razonsocial" placeholder="Ingrese razón social" required
-                            pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\.\,\-]{3,100}$"
-                            oninvalid="this.setCustomValidity('Ingrese una razón social válida (mínimo 3 caracteres, sin caracteres especiales no permitidos)')"
-                            oninput="this.setCustomValidity('')">
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label for="ruc" class="form-label fw-semibold">N° de R.U.C. *</label>
-                        <input type="text"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle" id="ruc"
-                            name="fac_ruc" placeholder="Ingrese número de RUC" required pattern="^\d{11}$"
-                            oninvalid="this.setCustomValidity('El RUC debe contener exactamente 11 dígitos numéricos')"
-                            oninput="this.setCustomValidity('')">
-                    </div>
+                <div id="camposFactura" class="card p-4 mb-4 animated-card"
+                    style="display: none; animation-delay: 0.4s;">
+                    <h4 class="fw-bold mb-4">Datos de Facturación</h4>
 
-                    <div class="col-12 mb-3">
-                        <label for="direccion" class="form-label fw-semibold">Dirección Fiscal o Comercial *</label>
-                        <input type="text"
-                            class="form-control form-control-lg shadow-sm rounded-3 border-secondary-subtle"
-                            id="direccion" name="fac_direccion" placeholder="Ingrese dirección" required
-                            pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\.\,\-\#]{5,150}$"
-                            oninvalid="this.setCustomValidity('Ingrese una dirección válida (mínimo 5 caracteres, puede incluir #, -, ., ,)')"
-                            oninput="this.setCustomValidity('')">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nombreFactura" class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" id="nombreFactura" name="usu_nombre"
+                                value="@usuario.usu_nombre" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="apellidosFactura" class="form-label">Apellidos *</label>
+                            <input type="text" class="form-control" id="apellidosFactura" name="usu_apellido"
+                                value="@usuario.usu_apellido" readonly>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="correoFactura" class="form-label">Correo Electrónico *</label>
+                            <input type="email" class="form-control" id="correoFactura" name="usu_correo"
+                                value="@usuario.usu_correo" readonly>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="razonSocial" class="form-label">Razón Social *</label>
+                            <input type="text" class="form-control" id="razonSocial" name="fac_razonsocial"
+                                placeholder="Ingrese razón social" required
+                                pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\.\,\-]{3,100}$">
+                            <div class="invalid-feedback">
+                                Ingrese una razón social válida (mínimo 3 caracteres)
+                            </div>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="ruc" class="form-label">N° de R.U.C. *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-secondary-subtle">
+                                    <i class="bi bi-building"></i>
+                                </span>
+                                <input type="text" class="form-control" id="ruc" name="fac_ruc"
+                                    placeholder="Ingrese número de RUC" required pattern="^\d{11}$">
+                                <div class="invalid-feedback">
+                                    El RUC debe contener exactamente 11 dígitos numéricos
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="direccion" class="form-label">Dirección Fiscal o Comercial *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-secondary-subtle">
+                                    <i class="bi bi-geo-alt"></i>
+                                </span>
+                                <input type="text" class="form-control" id="direccion" name="fac_direccion"
+                                    placeholder="Ingrese dirección fiscal completa" required
+                                    pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\.\,\-\#]{5,150}$">
+                                <div class="invalid-feedback">
+                                    Ingrese una dirección válida (mínimo 5 caracteres)
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Entrega -->
-                <div class="card p-4 border-success border-2 rounded-4 mb-4 shadow-sm bg-success bg-opacity-10">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="bi bi-geo-alt-fill text-success fs-4 me-2"></i>
-                        <h5 class="m-0 fw-bold text-success">Entrega en Tienda</h5>
+                <div class="card pickup-card p-4 mb-4 animated-card" style="animation-delay: 0.5s;">
+                    <div class="pickup-content d-flex align-items-start">
+                        <div class="pickup-icon">
+                            <i class="bi bi-shop"></i>
+                        </div>
+                        <div>
+                            <h5 class="pickup-title">Entrega en Tienda</h5>
+                            <p class="pickup-address">
+                                <i class="bi bi-geo-alt-fill me-1"></i>
+                                Jr. Gral. Felipe Santiago Salaverry 44, Lima 15022
+                            </p>
+                            <span class="badge bg-success mt-2">
+                                <i class="bi bi-check-circle-fill me-1"></i> Disponible para recojo
+                            </span>
+                        </div>
                     </div>
-                    <p class="mb-0 ps-4 text-dark">Recojo disponible en: <strong>Jr. Gral. Felipe Santiago Salaverry 44,
-                            Lima 15022</strong></p>
                 </div>
 
                 <!-- Método de pago -->
-                <div class="card p-4 shadow-sm bg-light rounded-4 border-0 mb-4">
-                    <div class="form-label fw-semibold fs-4 text-center mb-3">Seleccione el Método de Pago</div>
-                    <div class="d-flex justify-content-center gap-5">
-                        <div class="form-check form-check-lg">
-                            <input class="form-check-input fs-4" type="radio" name="metodoPago" value="tarjeta"
-                                id="pagoTarjeta" checked>
-                            <label class="form-check-label fs-5 ms-2" for="pagoTarjeta">
-                                <div class="d-flex align-items-center">
-                                    <span>Tarjeta de Crédito/Débito</span>
+                <div class="card p-4 mb-4 animated-card" style="animation-delay: 0.6s;">
+                    <h4 class="text-center fw-bold mb-4">Selecciona el Método de Pago</h4>
+
+                    <div class="custom-radio-container">
+                        <div class="custom-radio-btn">
+                            <input type="radio" id="pagoTarjeta" name="metodoPago" value="tarjeta" checked>
+                            <label for="pagoTarjeta">
+                                <i class="bi bi-credit-card fs-1 mb-3 text-primary"></i>
+                                <span class="option-title">Tarjeta de Crédito/Débito</span>
+                                <div class="d-flex gap-2 mt-3">
+                                    <i class="bi bi-credit-card-2-front fs-5"></i>
+                                    <i class="bi bi-credit-card fs-5"></i>
                                 </div>
                             </label>
                         </div>
-                        <div class="form-check form-check-lg">
-                            <input class="form-check-input fs-4" type="radio" name="metodoPago" value="yape"
-                                id="pagoYape">
-                            <label class="form-check-label fs-5 ms-2" for="pagoYape">
-                                <div class="d-flex align-items-center">
-                                    <span>Yape + Deposito Bancarios</span>
+
+                        <div class="custom-radio-btn">
+                            <input type="radio" id="pagoYape" name="metodoPago" value="yape">
+                            <label for="pagoYape">
+                                <i class="bi bi-phone fs-1 mb-3 text-primary"></i>
+                                <span class="option-title">Yape + Depósito Bancario</span>
+                                <div class="d-flex gap-2 mt-3">
+                                    <i class="bi bi-bank fs-5"></i>
+                                    <i class="bi bi-phone-fill fs-5"></i>
                                 </div>
                             </label>
                         </div>
@@ -237,22 +260,27 @@
                 </div>
 
                 <!-- Nota -->
-                <div class="alert alert-warning mt-3 rounded-4 shadow-sm ps-4">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <strong>Nota:</strong> De momento no hay servicio de envio a domicilio, solo recojo en tienda.
+                <div class="note-alert alert p-3 mb-4 animated-card" style="animation-delay: 0.7s;">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill fs-3 me-3 text-warning"></i>
+                        <div>
+                            <strong>Nota importante:</strong>
+                            <p class="mb-0">De momento no hay servicio de envío a domicilio, solo recojo en tienda.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Botón para Stripe -->
-                <div id="botonStripe" class="text-center">
-                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 rounded-pill shadow">
-                        <i class="bi bi-credit-card-fill me-2"></i>CONTINUAR PAGO
+                <div id="botonStripe" class="text-center mb-5 animated-card" style="animation-delay: 0.8s;">
+                    <button type="submit" class="btn btn-marimon">
+                        <i class="bi bi-credit-card-fill me-2"></i>CONTINUAR CON EL PAGO
                     </button>
                 </div>
 
                 <!-- Botón para Yape -->
-                <div id="botonYape" class="text-center" style="display: none;">
-                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 rounded-pill shadow">
-                        <i class="bi bi-phone-fill me-2"></i>CONTINUAR PAGO
+                <div id="botonYape" class="text-center mb-5" style="display: none; animation-delay: 0.8s;">
+                    <button type="submit" class="btn btn-marimon">
+                        <i class="bi bi-phone-fill me-2"></i>CONTINUAR CON EL PAGO
                     </button>
                 </div>
             </div>
