@@ -194,12 +194,52 @@
         opacity: 0.8;
     }
     
-    /* Custom Radio Buttons */
+    /* Contenedor principal del radio */
     .custom-radio-container {
+        color: var(--black);
         display: flex;
         flex-wrap: wrap;
         gap: 1.5rem;
         justify-content: center;
+    }
+
+    /* Estilo base para cada opción */
+    .radio-option {
+        border: 2px solid transparent;
+        border-radius: 10px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: border 0.3s, box-shadow 0.3s;
+        text-align: center;
+    }
+
+    /* Íconos en color negro */
+    .radio-option i, 
+    .radio-option svg {
+        color: black !important;
+    }
+
+    /* Estilo cuando una opción está seleccionada */
+    .radio-option.selected {
+        border: 2px solid black;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Check en la esquina superior derecha (negro) */
+    .radio-option.selected::after {
+        content: '✔';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: black;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
     }
     
     .custom-radio-btn {
@@ -460,4 +500,22 @@
             padding: 12px 24px;
             font-size: 0.95rem;
         }
+    }
+
+    .btn-marimon {
+        background-color: #000 !important; /* fondo negro */
+        color: #fff !important;            /* texto blanco */
+        border: none;
+    }
+
+    .btn-marimon i {
+        color: #fff !important;            /* icono blanco */
+    }
+
+    .icono-opcion {
+        color: #000 !important;
+    }
+
+    .check-icono {
+        color: #000 !important;
     }

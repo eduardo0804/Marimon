@@ -4,148 +4,204 @@
     Layout = "_LayoutPago";
     ViewData["Title"] = "Pago con Yape - Marimon";
 }
+
 <link rel="stylesheet" href="~/css/pagandoyape.css" asp-append-version="true" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<div class="glass-card p-4 p-lg-5 text-black">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-10 col-xl-9">
-                <div class="card-container">
-                    <div class="glass-card p-4 p-lg-5">
-                        <!-- Header -->
-                        <div class="text-center mb-4 fade-in fade-in-1">
-                            <div class="logo-container">
-                                <img src="/images/yape-150x150.png" alt="Marimon Logo" class="img-fluid"
+<style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    ol,
+    ul,
+    li,
+    button,
+    input,
+    label,
+    .form-control,
+    .btn,
+    .bi {
+        font-family: 'Nunito', sans-serif !important;
+        color: #000000 !important;
+    }
+
+    /* Botones principales: blanco */
+    .btn-marimon,
+    .btn-outline {
+        color: white !important;
+    }
+
+    .btn-marimon i,
+    .btn-outline i {
+        color: white !important;
+    }
+
+    /* Números de instrucciones y textos importantes */
+    ol li,
+    .form-section h5,
+    .alert-important strong,
+    .alert-important div,
+    .alert-important ul li {
+        color: #000000 !important;
+    }
+</style>
+
+<div class="p-4 p-lg-5 text-black">
+        <div class="container py-5">
+                <div class="row justify-content-center">
+                        <div class="col-lg-10 col-xl-9">
+                                <div class="card-container">
+                                        <div class="p-4 p-lg-5">
+                                                <div class="text-center mb-4 fade-in fade-in-1">
+                                                        <div class="logo-container">
+                                                                <img src="/images/yape-150x150.png" alt="Marimon Logo"
+                                    class="img-fluid"                                    
                                     onerror="this.src='/images/yape-logo.png'">
-                            </div>
-                            <h2 class="page-title">Pago con Yape</h2>
-                        </div>
+                                                            </div>
+                                                        <h2 class="page-title">Pago con Yape</h2>
+                                                    </div>
 
-                        <!-- QR debajo del título -->
-                        <div class="row justify-content-center mb-4 fade-in fade-in-2">
-                            <div class="col-md-6 text-center">
-                                <div class="qr-box">
-                                    <img src="/images/QRYAPE.jpeg" alt="Código QR Yape" class="img-fluid shadow">
-                                </div>
-                                <h3 class="company-name mt-3">Marimon Autopartes</h3>
-                                <p class="phone-number" style="color: black;">
-                                    <i class="bi bi-phone me-2"></i>961 582 804
-                                </p>
+                                                <div class="row justify-content-center mb-4 fade-in fade-in-2">
+                                                        <div class="col-md-6 text-center">
+                                                                <div class="qr-box">
+                                                                        <img src="/images/QRYAPE.jpeg"
+                                        alt="Código QR Yape" class="img-fluid shadow">
+                                                                    </div>
+                                                                <h3 class="company-name mt-3">Marimon Autopartes</h3>
+                                                                <p class="phone-number">
+                                                                        <i class="bi bi-phone me-2"></i>961 582 804
+                                                                    </p>
+                                                            </div>
+                                                    </div>
 
-                            </div>
-                        </div>
+                                                <div class="row fade-in fade-in-3">
+                                                        <div class="col-12">
+                                                                <div class="payment-methods mb-4">
+                                                                        <h5><i class="bi bi-list-check"></i>
+                                        Instrucciones</h5>
+                                                                        <ol>
+                                                                                <li>Escanea el código QR con Yape.</li>
+                                                                                <li>Realiza el pago del monto total.
+                                        </li>
+                                                                                <li>Toma una captura de pantalla del
+                                            pago.</li>
+                                                                                <li>Sube la imagen en el formulario.
+                                        </li>
+                                                                            </ol>
+                                                                        <div class="bcp-info">
+                                                                                <h6><i class="bi bi-bank"></i>
+                                            ¿Transferencia BCP?</h6>
+                                                                                <p>Cuenta: <span
+                                                class="account-number">25575353391071</span></p>
+                                                                            </div>
+                                                                    </div>
 
-                        <!-- Instrucciones y Formulario -->
-                        <div class="row fade-in fade-in-3">
-                            <div class="col-12">
-                                <div class="payment-methods mb-4">
-                                    <h5><i class="bi bi-list-check"></i>Instrucciones</h5>
-                                    <ol>
-                                        <li>Escanea el código QR con Yape.</li>
-                                        <li>Realiza el pago del monto total.</li>
-                                        <li>Toma una captura de pantalla del pago.</li>
-                                        <li>Sube la imagen en el formulario.</li>
-                                    </ol>
-                                    <div class="bcp-info">
-                                        <h6><i class="bi bi-bank"></i>¿Transferencia BCP?</h6>
-                                        <p>Cuenta: <span class="account-number">25575353391071</span></p>
+                                                                <form
+                                    action="@Url.Action("ConfirmarPagoYape", "Comprobante")" method="post"              
+                                                              enctype="multipart/form-data" class="needs-validation"
+                                    novalidate>
+                                                                        <input type="hidden" name="tipoComprobante"
+                                        value="@Model.TipoComprobante" />
+                                                                        <input type="hidden" name="num_identificacion"
+                                        value="@Model.NumIdentificacion" />
+                                                                        <input type="hidden" name="fac_razon"
+                                        value="@Model.RazonSocial" />
+                                                                        <input type="hidden" name="fac_ruc"
+                                        value="@Model.Ruc" />
+                                                                        <input type="hidden" name="fac_direccion"
+                                        value="@Model.Direccion" />
+
+                                                                        <div class="mb-4">
+                                                                                <label class="custom-file-upload">
+                                                                                        <i
+                                                class="bi bi-cloud-arrow-up"></i>
+                                                                                        <div class="file-text">Sube tu
+                                                comprobante de pago</div>
+                                                                                        <div class="file-subtext">JPG,
+                                                JPEG, PNG (Máx: 5MB)</div>
+                                                                                        <input type="file"
+                                                class="form-control" id="comprobanteFile"                              
+                                                                  name="comprobanteFile" accept="image/*" required>
+                                                                                    </label>
+                                                                                <img id="imagePreview"
+                                            class="file-preview" src="#" alt="Vista previa" style="display:none;">
+                                                                            </div>
+
+                                                                        <div class="alert-important">
+                                                                                <i
+                                            class="bi bi-exclamation-triangle-fill"></i>
+                                                                                <div>
+                                                                                        <strong>Importante:</strong>
+                                            Asegúrate que tu comprobante muestre:
+                                                                                        <ul>
+                                                                                                <li>Número de operación
+                                                </li>
+                                                                                                <li>Fecha y hora del
+                                                    pago</li>
+                                                                                                <li>Monto transferido
+                                                </li>
+                                                                                            </ul>
+                                                                                    </div>
+                                                                            </div>
+
+                                                                        <div class="d-grid gap-3 mt-4">
+                                                                                <button type="submit"
+                                            class="btn btn-marimon">
+                                                                                        <i
+                                                class="bi bi-check-circle-fill"></i> Confirmar Pago
+                                                                                    </button>
+                                                                                <a
+                                            href="@Url.Action("Index", "Comprobante")" class="btn btn-outline">
+                                                                                        <i class="bi bi-arrow-left"></i>
+                                            Volver
+                                                                                    </a>
+                                                                            </div>
+                                                                    </form>
+
+                                                            </div>
+                                                    </div>
+
+                                            </div> <!-- /.card-container -->
                                     </div>
-                                </div>
-
-                                <div class="form-section fade-in fade-in-4">
-                                    <h5 style="color: black;"><i class="bi bi-upload"></i>Confirma tu Pago</h5>
-
-                                    <form action="@Url.Action("ConfirmarPagoYape", "Comprobante")" method="post"
-                                        enctype="multipart/form-data" class="needs-validation" novalidate>
-                                        <!-- Hidden fields -->
-                                        <input type="hidden" name="tipoComprobante" value="@Model.TipoComprobante" />
-                                        <input type="hidden" name="num_identificacion"
-                                            value="@Model.NumIdentificacion" />
-                                        <input type="hidden" name="fac_razon" value="@Model.RazonSocial" />
-                                        <input type="hidden" name="fac_ruc" value="@Model.Ruc" />
-                                        <input type="hidden" name="fac_direccion" value="@Model.Direccion" />
-
-                                        <!-- File Upload -->
-                                        <div class="mb-4">
-                                            <label class="custom-file-upload">
-                                                <i class="bi bi-cloud-arrow-up"></i>
-                                                <div class="file-text" style="color: #000000;">Sube tu comprobante de
-                                                    pago</div>
-                                                <div class="file-subtext" style="color: #000000;">JPG, JPEG, PNG (Máx:
-                                                    5MB)</div>
-
-                                                <input type="file" class="form-control" id="comprobanteFile"
-                                                    name="comprobanteFile" accept="image/*" required>
-                                            </label>
-                                            <img id="imagePreview" class="file-preview" src="#" alt="Vista previa">
-                                        </div>
-
-                                        <div class="alert-important">
-                                            <i class="bi bi-exclamation-triangle-fill"></i>
-                                            <div>
-                                                <div style="color: #000000;">
-                                                    <strong>Importante:</strong> Asegúrate que tu comprobante muestre:
-                                                </div>
-                                                <ul>
-                                                    <li>Número de operación</li>
-                                                    <li>Fecha y hora del pago</li>
-                                                    <li>Monto transferido</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                        <div class="d-grid gap-3 mt-4">
-                                            <button type="submit" class="btn btn-marimon">
-                                                <i class="bi bi-check-circle-fill"></i>Confirmar Pago
-                                            </button>
-                                            <a href="@Url.Action("Index", "Comprobante")" class="btn btn-outline">
-                                                <i class="bi bi-arrow-left"></i>Volver
-                                            </a>
-
-                                        </div>
-                                    </form>
-                                </div>
                             </div>
-                        </div>
-
-                    </div> <!-- /.glass-card -->
-                </div> <!-- /.card-container -->
+                    </div>
             </div>
-        </div>
-    </div>
+</div>
 
-    <script>
-        // Vista previa de imagen
-        document.getElementById('comprobanteFile').addEventListener('change', function (e) {
-            const preview = document.getElementById('imagePreview');
-            const file = e.target.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    preview.src = event.target.result;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(file);
-            } else {
-                preview.style.display = 'none';
+<script>
+    document.getElementById('comprobanteFile').addEventListener('change', function (e) {
+        const preview = document.getElementById('imagePreview');
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                preview.src = event.target.result;
+                preview.style.display = 'block';
             }
-        });
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    });
 
-        // Validación de formulario
-        (function () {
-            'use strict';
-            window.addEventListener('load', function () {
-                var forms = document.getElementsByClassName('needs-validation');
-                Array.prototype.filter.call(forms, function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (form.checkValidity() === false) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-            }, false);
-        })();
-    </script>
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
