@@ -168,7 +168,7 @@
     }
 
     .payment-methods ol li::marker {
-        color: var(--white);
+        color: var(--black);
     }
 
     .bcp-info {
@@ -238,7 +238,7 @@
     .form-control-lg {
         border-radius: 1rem;
         padding: 0.8rem 1.2rem;
-        background: rgba(255, 255, 255, 0.9);
+        background: black;
         border: 2px solid rgba(255, 255, 255, 0.1);
         font-size: 1rem;
         transition: all 0.3s ease;
@@ -450,3 +450,4 @@
 .btn-outline {
     color: #ffffff !important;
 }
+
