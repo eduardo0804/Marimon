@@ -48,7 +48,6 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
             .Include(venta => venta.MetodoPago)
             .OrderByDescending(venta => venta.ven_fecha)
             .ToListAsync();
-
             return Page();
         }
     }
