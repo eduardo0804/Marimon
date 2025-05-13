@@ -21,9 +21,29 @@ header {
   display: flex;
   align-items: center;
   text-decoration: none;
+  position: relative;
 }
 .logo-img {
   height: 45px;
+  transition: opacity 0.3s ease;
+}
+/* Logo hover effect */
+.logo-contenedor img:first-child {
+  position: relative;
+  z-index: 2;
+}
+.logo-contenedor img:last-child {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  opacity: 0;
+}
+.logo-contenedor:hover img:first-child {
+  opacity: 0;
+}
+.logo-contenedor:hover img:last-child {
+  opacity: 1;
 }
 .titulo-header {
   position: absolute;
