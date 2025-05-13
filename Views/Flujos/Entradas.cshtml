@@ -3,6 +3,7 @@
     ViewData["Title"] = "Registro de Entradas";
     Layout = "_LayoutVentas";
 }
+<style>form i.fas {color: black;}</style>
 <link rel="stylesheet" href="~/css/entrada.css" asp-append-version="true" />
 <!-- Contenido Principal -->
 <div class="container">
@@ -63,68 +64,66 @@
                 <div class="card-body p-4">
                     <form asp-action="RegistrarEntrada" asp-controller="Personal_Ventas" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                        <div class="mb-4">
-                            <label for="CategoriaId" class="form-label fw-semibold">Categoría de artículo</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
-                                <select id="categoriaSelect" class="form-select py-2" name="CategoriaId"
-                                    asp-items="ViewBag.Categorias" onchange="cargarProductos()">
-                                    <option value="">-- Seleccionar Categoría --</option>
-                                </select>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="CategoriaId" class="form-label fw-semibold">Categoría de artículo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
+                                    <select id="categoriaSelect" class="form-select py-2" name="CategoriaId"
+                                        asp-items="ViewBag.Categorias" onchange="cargarProductos()">
+                                        <option value="">-- Seleccionar Categoría --</option>
+                                    </select>
+                                </div>
+                                <span class="text-danger"></span>
                             </div>
-                            <span class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="AutoparteId" class="form-label fw-semibold">Producto</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-box"></i></span>
-                                <select id="productoSelect" class="form-select py-2" name="AutoparteId" disabled>
-                                    <option value="">-- Primero seleccione una categoría --</option>
-                                </select>
+                            <div class="col-12">
+                                <label for="AutoparteId" class="form-label fw-semibold">Producto</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-box"></i></span>
+                                    <select id="productoSelect" class="form-select py-2" name="AutoparteId" disabled>
+                                        <option value="">-- Primero seleccione una categoría --</option>
+                                    </select>
+                                </div>
+                                <span class="text-danger"></span>
                             </div>
-                            <span class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="ent_cantidad" class="form-label fw-semibold">Cantidad</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
-                                <input name="ent_cantidad" id="ent_cantidad" type="number" class="form-control py-2"
-                                    min="1" value="1">
-                                <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('ent_cantidad').stepUp()">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('ent_cantidad').stepDown()">
-                                    <i class="fas fa-minus"></i>
-                                </button>
+                            <div class="col-12">
+                                <label for="ent_cantidad" class="form-label fw-semibold">Cantidad</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
+                                    <input name="ent_cantidad" id="ent_cantidad" type="number" class="form-control py-2"
+                                        min="1" value="1">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="document.getElementById('ent_cantidad').stepUp()">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="document.getElementById('ent_cantidad').stepDown()">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                                <span class="text-danger"></span>
                             </div>
-                            <span class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="ent_proveedor" class="form-label fw-semibold">Proveedor (opcional)</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-truck"></i></span>
-                                <input name="ent_proveedor" id="ent_proveedor" type="text" class="form-control py-2"
-                                    placeholder="Nombre del proveedor">
+                            <div class="col-12">
+                                <label for="ent_proveedor" class="form-label fw-semibold">Proveedor (opcional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-truck"></i></span>
+                                    <input name="ent_proveedor" id="ent_proveedor" type="text" class="form-control py-2"
+                                        placeholder="Nombre del proveedor">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    <button type="submit"
+                                        class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
+                                        id="submitButton">
+                                        <i class="fas fa-plus-circle me-2"></i>REGISTRAR ENTRADA
+                                        <span class="hover-overlay"></span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
                         <!-- Campo oculto para la fecha -->
                         <input type="hidden" name="ent_fechaent" value="@DateOnly.FromDateTime(DateTime.Now)" />
-
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit"
-                                class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
-                                id="submitButton">
-                                <i class="fas fa-plus-circle me-2"></i>REGISTRAR ENTRADA
-                                <span class="hover-overlay"></span>
-                            </button>
-                        </div>
                     </form>
                 </div>
             </div>

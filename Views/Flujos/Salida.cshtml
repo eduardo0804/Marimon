@@ -6,7 +6,7 @@
     var salidasAgrupadas = ViewBag.SalidasAgrupadas as IEnumerable<dynamic>;
 
 }
-
+<style>form i.fas {color: black;}</style>
 <!-- Contenido Principal -->
 <div class="container">
     <ol class="breadcrumb">
@@ -65,67 +65,67 @@
                 <div class="card-header bg-white py-3 border-bottom">
                     <h5 class="text-center mb-0 fw-bold">REGISTRAR SALIDA</h5>
                 </div>
-                <div class="card-body p-4">
+                 <div class="card-body p-4">
                     <form asp-action="RegistrarSalida" asp-controller="Personal_Ventas" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                        <div class="mb-4">
-                            <label for="CategoriaId" class="form-label fw-semibold">Categoría de artículo</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
-                                <select id="categoriaSelect" class="form-select py-2" name="CategoriaId"
-                                    asp-items="ViewBag.Categorias" onchange="cargarProductos()">
-                                    <option value="">-- Seleccionar Categoría --</option>
-                                </select>
-                            </div>
-                            <span class="text-danger"></span>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="CategoriaId" class="form-label fw-semibold">Categoría de artículo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
+                                    <select id="categoriaSelect" class="form-select py-2" name="CategoriaId"
+                                        asp-items="ViewBag.Categorias" onchange="cargarProductos()">
+                                        <option value="">-- Seleccionar Categoría --</option>
+                                    </select>
+                                </div>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label for="AutoparteId" class="form-label fw-semibold">Autoparte</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-box"></i></span>
+                                        <select id="productoSelect" class="form-select py-2" name="AutoparteId" disabled>
+                                            <option value="">-- Primero seleccione una categoría --</option>
+                                        </select>
+                                    </div>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label for="sal_cantidad" class="form-label fw-semibold">Cantidad</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
+                                        <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2"
+                                            min="1" value="1">
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            onclick="document.getElementById('sal_cantidad').stepUp()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            onclick="document.getElementById('sal_cantidad').stepDown()">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-danger py-2 text-white fw-bold" id="submitButton">
+                                            <i class="fas fa-plus-circle me-2"></i>REGISTRAR SALIDA
+                                        </button>
+                                    </div>
+                                </div>
                         </div>
-
-                        <div class="mb-4">
-                            <label for="AutoparteId" class="form-label fw-semibold">Autoparte</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-box"></i></span>
-                                <select id="productoSelect" class="form-select py-2" name="AutoparteId" disabled>
-                                    <option value="">-- Primero seleccione una categoría --</option>
-                                </select>
-                            </div>
-                            <span class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="sal_cantidad" class="form-label fw-semibold">Cantidad</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
-                                <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2"
-                                    min="1" value="1">
-                                <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('sal_cantidad').stepUp()">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('sal_cantidad').stepDown()">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                            <span class="text-danger"></span>
-                        </div>
-
                         <!-- Campo oculto para la fecha -->
                         <input type="hidden" name="sal_fechasalida" value="@DateOnly.FromDateTime(DateTime.Now)" />
-
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-danger py-2 text-white fw-bold" id="submitButton">
-                                <i class="fas fa-plus-circle me-2"></i>REGISTRAR SALIDA
-                            </button>
-                        </div>
                     </form>
                 </div>
             </div>
         </div>
 
         <!-- Tabla de registros (Columna derecha) -->
-        <!-- Tabla de registros (Columna derecha) -->
         <div class="col-lg-7 mb-4">
+            <div class="card shadow-sm border-0 rounded-lg h-100">
+
             <div class="row">
                 <div class="col-4">
                     <p class="text-center mb-0 fw-bold py-2">LISTA DE SALIDAS</p>
@@ -134,13 +134,12 @@
                     <p class="text-center mb-0 fw-bold py-2">||</p>
                 </div>
                 <div class="col-4">
-                    <p class="text-center mb-0 fw-bold py-2"> <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">VER SALIDAS PRESENCIALES</a> </p>
+                    <p class="text-center mb-0 fw-bold py-2"> <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" style="color: black;">VER SALIDAS PRESENCIALES</a> </p>
 
                 </div>
             </div>
             
-
-            <div class="accordion" id="salidasAccordion">
+            <div class="accordion" id="salidasAccordion"  style="max-height: 400px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; background: #fff;">
                 @if (salidasAgrupadas != null)
                 {
                     int index = 0;
@@ -254,18 +253,13 @@
                             </div>
                         }
                     </div>
-
                 </div>
-
-
-                
+            </div>
             </div>
         </div>
-
     </div>
 </div>
 
-<!-- Modal para cambiar estado -->
 <!-- Modal para cambiar estado -->
 <div class="modal fade" id="estadoModal" tabindex="-1" aria-labelledby="estadoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
