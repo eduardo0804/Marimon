@@ -1,122 +1,92 @@
-@model Marimon.Models.Comprobante
-@{
-    ViewData["Title"] = "Pago Exitoso";
-}
+<!DOCTYPE html>
+<html lang="es">
 
-@section Styles {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Exitoso</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/graciasYape.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-}
+</head>
 
-<div class="container success-container">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="success-card">
-                <div class="card-row">
-                    <div class="image-column">
-                        <div class="image-overlay"></div>
-                        <img src="/images/autoparte_gracias.jpg" alt="Marimon" class="autoparte-image">
-                    </div>
-                    <div class="content-column">
-                        <h1 class="text-center">¡Gracias por tu Compra!</h1>
+<body>
+    <div class="success-container">
+        <div class="success-card">
+            <div class="success-badge">
+                <i class="fas fa-check"></i>
+            </div>
 
-                        <p class="success-description">
-                            En breve, nuestro equipo comenzará a preparar tu pedido, seleccionando cuidadosamente la
-                            autoparte para asegurarnos de que cumpla con los más altos estándares de calidad. Mientras
-                            tanto, relájate y espera con confianza la llegada del componente que mantendrá tu vehículo
-                            en óptimas condiciones.
-                        </p>
-
-                        <p class="success-description">
-                            Gracias de nuevo por confiar en nosotros para satisfacer. Estamos
-                            deseando que tengas una <span class="highlight-text">satisfacción tremenda</span>.
-                        </p>
-
-                        <div class="order-info">
-                            <div class="order-row">
-                                <span class="order-label"><i class="fas fa-hashtag"></i> Número de pedido:</span>
-                                <span class="order-value">#ORD-@(new Random().Next(10000, 99999))</span>
-                            </div>
-                            <div class="order-row">
-                                <span class="order-label"><i class="far fa-calendar-alt"></i> Fecha:</span>
-                                <span class="order-value">@DateTime.Now.ToString("dd MMMM, yyyy")</span>
-                            </div>
-                            <div class="order-row">
-                                <span class="order-label"><i class="fas fa-flag-checkered"></i> Estado:</span>
-                                <span class="order-value" style="color: var(--primary-dark);">
-                                    <i class="fas fa-check-circle"></i> Confirmado
-                                </span>
-                            </div>
-                        </div>
-
-                        <p class="success-description">
-                            <strong>¡Disfruta de tu compra!</strong> Te notificaremos cuando tu pedido sea enviado.
-                        </p>
-
-                        <div class="d-flex justify-content-center">
-                            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary-custom">
-                                <i class="fas fa-store btn-icon"></i> Volver a la Tienda
-                            </a>
-                        </div>
-
-                        <div class="mt-3">
-                            <span class="badge-custom">
-                                <i class="fas fa-truck-fast"></i> Envío Express
-                            </span>
-                            <span class="badge-custom">
-                                <i class="fas fa-medal"></i> Calidad Garantizada
-                            </span>
-                            <span class="badge-custom">
-                                <i class="fas fa-user-gear"></i> Especialistas
-                            </span>
-                        </div>
-                    </div>
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+                <div class="success-rings">
+                    <div class="ring ring1"></div>
+                    <div class="ring ring2"></div>
+                    <div class="ring ring3"></div>
                 </div>
+            </div>
+
+            <h1 class="success-title">¡Pago Completado con Éxito!</h1>
+
+            <div class="success-message">
+                <p>Tu compra ha sido procesada correctamente.</p>
+            </div>
+
+            <div class="receipt-info">
+                <div class="receipt-row">
+                    <span class="receipt-label">Número de Comprobante:</span>
+                    <span class="receipt-value boleta">BOLETA-0000226</span>
+                </div>
+                <div class="receipt-divider"></div>
+                <div class="receipt-message">
+                    <i class="fas fa-envelope"></i>
+                    <p>Te hemos enviado el comprobante a tu correo electrónico.</p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="#" class="btn btn-store">
+                    <i class="fas fa-store"></i>
+                    <span>Volver a la tienda</span>
+                </a>
+                <a href="#" class="btn btn-download">
+                    <i class="fas fa-download"></i>
+                    <span>Descargar Comprobante</span>
+                </a>
+            </div>
+
+            <div class="badge-row">
+                <span class="custom-badge">
+                    <i class="fas fa-heart"></i> Compra Segura
+                </span>
+                <span class="custom-badge">
+                    <i class="fas fa-truck"></i> Envío Rápido
+                </span>
+                <span class="custom-badge">
+                    <i class="fas fa-medal"></i> Calidad Garantizada
+                </span>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Desactivar cualquier verificación automática del carrito
-            window.onbeforeunload = null;
-
-            // Desactivar cualquier temporizador existente
-            var existingTimers = window.setTimeout(function () { }, 0);
-            while (existingTimers--) {
-                window.clearTimeout(existingTimers);
-            }
-
-            // Prevenir cualquier solicitud AJAX periódica
-            $.ajaxSetup({
-                beforeSend: function (xhr, settings) {
-                    // Comprobar si la URL contiene 'Carrito' y cancelar esas solicitudes
-                    if (settings.url && settings.url.includes('Carrito')) {
-                        xhr.abort();
-                        return false;
-                    }
-                }
-            });
-
-            // Efecto visual para mejorar la experiencia
             $(".success-card").hide().fadeIn(800);
 
-            // Confetti mejorado para celebrar la compra exitosa
+            setTimeout(function () {
+                $(".ring").addClass("animate");
+            }, 300);
+
             setTimeout(function () {
                 confetti({
                     particleCount: 150,
                     spread: 80,
                     origin: { y: 0.6 },
                     colors: ['#E42229', '#D42025', '#626C66', '#ffda3a'],
-                    zIndex: 1000,
                     disableForReducedMotion: true
                 });
 
-                // Segunda ráfaga de confeti
                 setTimeout(function () {
                     confetti({
                         particleCount: 50,
@@ -136,55 +106,37 @@
                 }, 700);
             }, 500);
 
-            // Efecto de brillo para el botón
-            $(".btn-primary-custom").hover(
-                function () {
-                    $(this).css("box-shadow", "0 10px 20px rgba(228, 34, 41, 0.4), 0 0 0 2px rgba(228, 34, 41, 0.1)");
-                },
-                function () {
-                    $(this).css("box-shadow", "0 8px 15px rgba(228, 34, 41, 0.25)");
-                }
-            );
-
-            // Efecto hover avanzado para la imagen
-            $(".image-column").hover(
-                function () {
-                    $(this).find(".autoparte-image").css({
-                        "transform": "scale(1.08)",
-                        "filter": "contrast(1.3) saturate(1.2)"
-                    });
-                    $(this).find(".image-overlay").css({
-                        "background": "linear-gradient(220deg, rgba(0,0,0,0.75) 0%, rgba(228,34,41,0.5) 50%, rgba(0,0,0,0.3) 100%)"
-                    });
-                },
-                function () {
-                    $(this).find(".autoparte-image").css({
-                        "transform": "scale(1)",
-                        "filter": "contrast(1.2) saturate(1.1)"
-                    });
-                    $(this).find(".image-overlay").css({
-                        "background": "linear-gradient(220deg, rgba(0,0,0,0.85) 0%, rgba(228,34,41,0.6) 50%, rgba(0,0,0,0.4) 100%)"
-                    });
-                }
-            );
-
-            // Efecto hover para las insignias
-            $(".badge-custom").hover(
+            $(".btn").hover(
                 function () {
                     $(this).css({
-                        "transform": "translateY(-2px) scale(1.05)",
-                        "background-color": "rgba(228, 34, 41, 0.1)",
-                        "color": "var(--primary)"
+                        "transform": "translateY(-2px)",
+                        "box-shadow": "0 4px 8px rgba(0,0,0,0.1)"
                     });
                 },
                 function () {
                     $(this).css({
-                        "transform": "translateY(0) scale(1)",
-                        "background-color": "var(--gray-light)",
-                        "color": "var(--gray)"
+                        "transform": "translateY(0)",
+                        "box-shadow": "none"
+                    });
+                }
+            );
+
+            $(".custom-badge").hover(
+                function () {
+                    $(this).css({
+                        "background-color": "#f0f0f0",
+                        "transform": "scale(1.05)"
+                    });
+                },
+                function () {
+                    $(this).css({
+                        "background-color": "#f8f8f8",
+                        "transform": "scale(1)"
                     });
                 }
             );
         });
     </script>
-}
+</body>
+
+</html>
