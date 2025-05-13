@@ -1,6 +1,202 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Política de Privacidad";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/privacy.css" asp-append-version="true" />
+}
+
+<div class="privacy-container">
+    <div class="privacy-header">
+        <h1><i class="fas fa-shield-alt"></i> @ViewData["Title"]</h1>
+        <p>Tu confianza es nuestra prioridad. Conoce cómo protegemos tus datos.</p>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-info-circle"></i>
+            <h2>Introducción</h2>
+        </div>
+        <p><strong>MARIMON S.A.C.</strong> (en adelante, "MARIMON"), identificada con RUC [Su RUC], con domicilio fiscal en [Su dirección], ha desarrollado esta Política de Privacidad y Protección de Datos Personales para garantizar el tratamiento adecuado de la información que recopilamos de nuestros usuarios.</p>
+        <div class="info-box">
+            <p><strong>Compromiso de privacidad:</strong> Cumplimos estrictamente con la Ley N° 29733 de Protección de Datos Personales y su Reglamento (D.S. N° 003-2013-JUS). Tu información está segura con nosotros.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-check-circle"></i>
+            <h2>Consentimiento Informado</h2>
+        </div>
+        <p>Al usar nuestros servicios, autorizas a MARIMON a procesar tus datos personales según esta política. Este consentimiento es:</p>
+        <ul class="privacy-list">
+            <li><strong>Libre:</strong> Sin ningún tipo de coacción</li>
+            <li><strong>Expreso:</strong> Manifestado claramente</li>
+            <li><strong>Voluntario:</strong> Por tu propia decisión</li>
+            <li><strong>Informado:</strong> Con pleno conocimiento del uso de tus datos</li>
+        </ul>
+        <p style="margin-top: 20px;"><em>Consideramos que has dado tu consentimiento al hacer clic en "Aceptar", marcar casillas de verificación o continuar con el uso de nuestros servicios.</em></p>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-database"></i>
+            <h2>Datos Personales que Recopilamos</h2>
+        </div>
+        <p>En MARIMON consideramos datos personales toda información que permita identificarte, incluyendo:</p>
+        <div class="rights-grid">
+            <div class="right-item">
+                <h3><i class="fas fa-user"></i> Datos de Identificación</h3>
+                <p>Nombre completo, DNI/CE, fecha de nacimiento</p>
+            </div>
+            <div class="right-item">
+                <h3><i class="fas fa-envelope"></i> Datos de Contacto</h3>
+                <p>Email, teléfono, dirección postal</p>
+            </div>
+            <div class="right-item">
+                <h3><i class="fas fa-credit-card"></i> Datos Comerciales</h3>
+                <p>Historial de compras, preferencias, métodos de pago</p>
+            </div>
+            <div class="right-item">
+                <h3><i class="fas fa-laptop"></i> Datos Técnicos</h3>
+                <p>IP, navegador, sistema operativo, cookies</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-cogs"></i>
+            <h2>Finalidades del Tratamiento</h2>
+        </div>
+        <p>Utilizamos tus datos personales para:</p>
+        <ul class="privacy-list">
+            <li>Procesar tus pedidos y gestionar pagos</li>
+            <li>Personalizar tu experiencia de compra</li>
+            <li>Enviarte promociones y ofertas especiales (con tu consentimiento)</li>
+            <li>Mejorar nuestros productos y servicios</li>
+            <li>Cumplir con obligaciones legales y fiscales</li>
+            <li>Realizar análisis estadísticos y estudios de mercado</li>
+            <li>Garantizar la seguridad de nuestras plataformas</li>
+            <li>Atender tus consultas y reclamos</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-user-shield"></i>
+            <h2>Tus Derechos ARCO</h2>
+        </div>
+        <p>Como titular de tus datos personales, tienes derecho a:</p>
+        <div class="rights-grid">
+            <div class="right-item">
+                <h3><i class="fas fa-eye"></i> Acceso</h3>
+                <p>Conocer qué datos tenemos sobre ti y cómo los tratamos</p>
+            </div>
+            <div class="right-item">
+                <h3><i class="fas fa-edit"></i> Rectificación</h3>
+                <p>Corregir datos inexactos o incompletos</p>
+            </div>
+            <div class="right-item">
+                <h3><i class="fas fa-trash-alt"></i> Cancelación</h3>
+                <p>Solicitar la eliminación de tus datos cuando no sean necesarios</p>
+            </div>
+            <div class="right-item">
+                <h3><i class="fas fa-ban"></i> Oposición</h3>
+                <p>Oponerte al tratamiento de tus datos en cualquier momento</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-clipboard-list"></i>
+            <h2>Procedimiento para Ejercer tus Derechos</h2>
+        </div>
+        <p>Para ejercer cualquiera de tus derechos, sigue estos pasos:</p>
+        <div class="step-process">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Envía tu solicitud</strong>
+                    <p>Correo: privacidad@marimon.com.pe<br>
+                    Oficina: [Dirección de tu oficina]</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Incluye la documentación necesaria</strong>
+                    <ul class="privacy-list">
+                        <li>Copia de tu DNI o CE</li>
+                        <li>Descripción clara de tu solicitud</li>
+                        <li>Datos de contacto para notificaciones</li>
+                        <li>Documentos que respalden tu petición (si aplica)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Recibe nuestra respuesta</strong>
+                    <p>Te responderemos en un plazo máximo de 20 días hábiles</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-lock"></i>
+            <h2>Seguridad de tus Datos</h2>
+        </div>
+        <p>En MARIMON implementamos medidas de seguridad de última generación:</p>
+        <ul class="privacy-list">
+            <li><strong>Cifrado SSL/TLS:</strong> Toda la información se transmite de forma segura</li>
+            <li><strong>Acceso restringido:</strong> Solo personal autorizado puede acceder a tus datos</li>
+            <li><strong>Monitoreo 24/7:</strong> Vigilancia constante contra amenazas</li>
+            <li><strong>Actualizaciones regulares:</strong> Sistemas siempre al día</li>
+            <li><strong>Copias de seguridad:</strong> Tu información está respaldada periódicamente</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-cookie-bite"></i>
+            <h2>Uso de Cookies</h2>
+        </div>
+        <p>Nuestro sitio web utiliza cookies para mejorar tu experiencia:</p>
+        <ul class="privacy-list">
+            <li><strong>Cookies esenciales:</strong> Necesarias para el funcionamiento del sitio</li>
+            <li><strong>Cookies de análisis:</strong> Nos ayudan a entender cómo usas nuestro sitio</li>
+            <li><strong>Cookies de marketing:</strong> Personalizan las ofertas según tus intereses</li>
+        </ul>
+        <div class="info-box">
+            <p>Puedes gestionar las cookies desde la configuración de tu navegador. Ten en cuenta que desactivar algunas cookies puede afectar la funcionalidad del sitio.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-clock"></i>
+            <h2>Plazo de Conservación</h2>
+        </div>
+        <p>Conservamos tus datos personales:</p>
+        <ul class="privacy-list">
+            <li>Durante la relación comercial y el tiempo necesario para cumplir con las finalidades descritas</li>
+            <li>Por el período requerido por ley (obligaciones fiscales, contables, etc.)</li>
+            <li>Hasta que ejerzas tu derecho de cancelación o revocación del consentimiento</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <i class="fas fa-sync-alt"></i>
+            <h2>Actualizaciones de esta Política</h2>
+        </div>
+        <p>MARIMON se reserva el derecho de actualizar esta política cuando sea necesario. Los cambios serán publicados en nuestro sitio web y, cuando sean significativos, te notificaremos por email.</p>
+        <p><strong>Te recomendamos revisar esta página periódicamente para estar al tanto de cualquier actualización.</strong></p>
+    </div>
+
+</div>

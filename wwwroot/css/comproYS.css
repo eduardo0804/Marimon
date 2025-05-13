@@ -1,0 +1,138 @@
+.terms-container {
+    background-color: #f8f8f8;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    border-left: 4px solid var(--gray-color);
+    transition: all 0.3s ease;
+}
+
+.terms-container:hover {
+    border-left-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.terms-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.custom-checkbox {
+    position: relative;
+    min-width: 22px;
+    height: 22px;
+    border: 2px solid var(--gray-color);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+.custom-checkbox:hover {
+    border-color: var(--primary-color);
+}
+
+.custom-checkbox.checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.custom-checkbox.checked:after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.form-check-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(228, 34, 41, 0.25);
+}
+
+.terms-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.terms-link {
+    color: var(--dark-color) !important;
+    font-weight: 600;
+    position: relative;
+    text-decoration: none !important;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.terms-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--primary-color);
+    transform-origin: bottom right;
+    transform: scaleX(1);
+    transition: transform 0.3s ease-out;
+}
+
+.terms-link:hover {
+    color: var(--primary-color) !important;
+}
+
+.terms-link:hover i {
+    transform: translate(2px, -2px);
+}
+
+.terms-link i {
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+    color: var(--primary-color) !important;
+}
+
+/* Shake animation for validation */
+@keyframes shake {
+    0%, 100% {transform: translateX(0);}
+    20%, 60% {transform: translateX(-5px);}
+    40%, 80% {transform: translateX(5px);}
+}
+
+.terms-container.shake {
+    animation: shake 0.5s ease;
+    border-left-color: var(--primary-color);
+}
+
+/* Ripple effect for checkbox */
+.ripple {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(228, 34, 41, 0.1);
+    transform: scale(0);
+    transition: none;
+    pointer-events: none;
+}
+
+.ripple.animate {
+    animation: ripple 0.5s ease-out;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Variables CSS (asegúrate de que estén definidas) */
+:root {
+    --primary-color: #E42229;
+    --dark-color: #000000;
+    --gray-color: #626C66;
+    --border-radius: 16px;
+}

@@ -1,79 +1,575 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+@section Styles {
+    <link rel="stylesheet" href="~/css/terminos.css" asp-append-version="true" />
+}
 @{
-    ViewData["Title"] = "Términos y Condiciones - AUTOMOTRIZ MARIMON S.A.C";
+    ViewData["Title"] = "Términos y Condiciones - Marimon Automotriz";
 }
 
-<div class="container terminos-container">
-    <div class="row">
-        <div class="col-12">
-            <div class="terminos-header">
-                <h2 class="text-center">Términos y Condiciones</h2>
+<div class="terms-page">
+    <!-- Header Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Términos y Condiciones</h1>
+                <p class="hero-subtitle">Última actualización: @DateTime.Now.ToString("d 'de' MMMM 'de' yyyy")</p>
             </div>
         </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-10 offset-md-1">
-            <div class="terminos-content">
-                <p>
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-                    incididunt ut labore et dolor"
-                </p>
-                
-                <p>
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-                    incididunt ut labore et dolor"
-                </p>
-                
-                <p>
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-                    incididunt ut labore et dolor"
-                </p>
-                
-                <p>
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-                    incididunt ut labore et dolor"
-                </p>
+    </section>
+
+    <!-- Main Content -->
+    <section class="terms-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    <!-- Sidebar Navigation -->
+                    <div class="terms-sidebar">
+                        <div class="sidebar-title">
+                            <i class="fas fa-list"></i>
+                            <span>Contenido</span>
+                        </div>
+                        <nav class="terms-nav">
+                            <ul>
+                                <li><a href="#informacion-general" class="nav-link active">1. Información General</a></li>
+                                <li><a href="#servicios" class="nav-link">2. Servicios Ofrecidos</a></li>
+                                <li><a href="#cotizaciones" class="nav-link">3. Cotizaciones</a></li>
+                                <li><a href="#condiciones" class="nav-link">4. Condiciones de Servicio</a></li>
+                                <li><a href="#repuestos" class="nav-link">5. Repuestos</a></li>
+                                <li><a href="#pagos" class="nav-link">6. Pagos</a></li>
+                                <li><a href="#responsabilidades" class="nav-link">7. Responsabilidades</a></li>
+                                <li><a href="#datos" class="nav-link">8. Protección de Datos</a></li>
+                                <li><a href="#propiedad" class="nav-link">9. Propiedad Intelectual</a></li>
+                                <li><a href="#cancelaciones" class="nav-link">10. Cancelaciones</a></li>
+                                <li><a href="#contacto" class="nav-link">11. Contacto</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="col-lg-9 col-md-8">
+                    <!-- Terms Content -->
+                    <div class="terms-text">
+                        <!-- Section 1 -->
+                        <section id="informacion-general" class="terms-section">
+                            <h2>
+                                <i class="fas fa-info-circle"></i>
+                                1. Información General
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>1.1 Identificación de la empresa</h3>
+                                <div class="info-box">
+                                    <p><strong>Razón Social:</strong> AUTOMOTRIZ MARIMON S.A.C</p>
+                                    <p><strong>RUC:</strong> 20123456789</p>
+                                    <p><strong>Domicilio Legal:</strong> Av. Angamos Este Nro. 1686 a.H. Casa Huertas</p>
+                                    <p><strong>Email:</strong> automotrizmarimon@gmail.com</p>
+                                    <p><strong>Teléfono:</strong> +51 995 256 967</p>
+                                </div>
+
+                                <h3>1.2 Aceptación de términos</h3>
+                                <p>
+                                    Al acceder y utilizar el sitio web www.marimon.com.pe, usted acepta cumplir 
+                                    y estar sujeto a los siguientes términos y condiciones de uso. Si no está 
+                                    de acuerdo con estos términos, no utilice este sitio.
+                                </p>
+                            </div>
+                        </section>
+
+                        <!-- Section 2 -->
+                        <section id="servicios" class="terms-section">
+                            <h2>
+                                <i class="fas fa-tools"></i>
+                                2. Servicios Ofrecidos
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>2.1 Descripción de servicios</h3>
+                                <p>Marimon ofrece los siguientes servicios automotrices:</p>
+                                
+                                <div class="services-grid">
+                                    <div class="service-item">
+                                        <i class="fas fa-laptop-code"></i>
+                                        <span>Diagnóstico computarizado</span>
+                                    </div>
+                                    <div class="service-item">
+                                        <i class="fas fa-wrench"></i>
+                                        <span>Mantenimiento preventivo</span>
+                                    </div>
+                                    <div class="service-item">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Reparación de motor</span>
+                                    </div>
+                                    <div class="service-item">
+                                        <i class="fas fa-bolt"></i>
+                                        <span>Electricidad automotriz</span>
+                                    </div>
+                                    <div class="service-item">
+                                        <i class="fas fa-paint-brush"></i>
+                                        <span>Planchado y pintura</span>
+                                    </div>
+                                    <div class="service-item">
+                                        <i class="fas fa-car"></i>
+                                        <span>Alineación y balanceo</span>
+                                    </div>
+                                    <div class="service-item">
+                                        <i class="fas fa-oil-can"></i>
+                                        <span>Cambio de aceite</span>
+                                    </div>
+                                    <div class="service-item">
+                                        <i class="fas fa-truck"></i>
+                                        <span>Servicio de grúa</span>
+                                    </div>
+                                </div>
+
+                                <h3>2.2 Alcance de los servicios</h3>
+                                <p>
+                                    Los servicios se prestan exclusivamente en nuestras instalaciones, 
+                                    salvo el servicio de grúa y auxilio mecánico que puede realizarse 
+                                    en la ubicación del cliente.
+                                </p>
+                            </div>
+                        </section>
+
+                        <!-- Section 3 -->
+                        <section id="cotizaciones" class="terms-section">
+                            <h2>
+                                <i class="fas fa-calculator"></i>
+                                3. Cotizaciones y Presupuestos
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>3.1 Naturaleza de las cotizaciones</h3>
+                                <div class="highlight-box">
+                                    <ul>
+                                        <li>Las cotizaciones tienen una validez de <strong>15 días</strong> calendario</li>
+                                        <li>Los precios están expresados en <strong>soles peruanos (S/)</strong></li>
+                                        <li>Los precios <strong>no incluyen IGV</strong>, salvo indicación contraria</li>
+                                        <li>Las cotizaciones son referenciales hasta la inspección física</li>
+                                    </ul>
+                                </div>
+
+                                <h3>3.2 Diagnóstico previo</h3>
+                                <p>
+                                    Para servicios de reparación, se requiere un diagnóstico previo que puede 
+                                    tener un costo, el cual será comunicado al cliente antes de proceder.
+                                </p>
+                            </div>
+                        </section>
+
+                        <!-- Section 4 -->
+                        <section id="condiciones" class="terms-section">
+                            <h2>
+                                <i class="fas fa-clipboard-check"></i>
+                                4. Condiciones de Servicio
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>4.1 Recepción de vehículos</h3>
+                                <div class="process-steps">
+                                    <div class="step">
+                                        <div class="step-number">1</div>
+                                        <p>Presentar tarjeta de propiedad y DNI</p>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">2</div>
+                                        <p>Inventario del estado del vehículo</p>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <p>Informar desperfectos conocidos</p>
+                                    </div>
+                                </div>
+
+                                <h3>4.2 Garantía de servicios</h3>
+                                <div class="warranty-grid">
+                                    <div class="warranty-item">
+                                        <h4>Mantenimiento</h4>
+                                        <p>3 meses o 5,000 km</p>
+                                    </div>
+                                    <div class="warranty-item">
+                                        <h4>Reparaciones</h4>
+                                        <p>6 meses o 10,000 km</p>
+                                    </div>
+                                    <div class="warranty-item">
+                                        <h4>Repuestos</h4>
+                                        <p>Según fabricante</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section 5 -->
+                        <section id="repuestos" class="terms-section">
+                            <h2>
+                                <i class="fas fa-cube"></i>
+                                5. Repuestos y Materiales
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>5.1 Calidad de repuestos</h3>
+                                <p>
+                                    Utilizamos repuestos originales o alternativos de calidad certificada. 
+                                    El cliente puede solicitar tipo específico de repuesto.
+                                </p>
+
+                                <h3>5.2 Propiedad de repuestos usados</h3>
+                                <div class="warning-box">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <p>
+                                        Los repuestos reemplazados permanecen a disposición del cliente por 
+                                        <strong>7 días</strong>. Transcurrido este plazo, Marimon puede disponer de ellos.
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section 6 -->
+                        <section id="pagos" class="terms-section">
+                            <h2>
+                                <i class="fas fa-credit-card"></i>
+                                6. Pagos y Facturación
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>6.1 Formas de pago</h3>
+                                <div class="payment-methods">
+                                    <div class="payment-item">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <span>Efectivo</span>
+                                    </div>
+                                    <div class="payment-item">
+                                        <i class="fas fa-credit-card"></i>
+                                        <span>Tarjetas</span>
+                                    </div>
+                                    <div class="payment-item">
+                                        <i class="fas fa-university"></i>
+                                        <span>Transferencias</span>
+                                    </div>
+                                    <div class="payment-item">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>Yape / Plin</span>
+                                    </div>
+                                </div>
+
+                                <h3>6.2 Condiciones de pago</h3>
+                                <ul>
+                                    <li><strong>Servicios menores:</strong> Pago al contado al retirar</li>
+                                    <li><strong>Servicios mayores:</strong> 50% adelanto, 50% al entregar</li>
+                                    <li><strong>Clientes corporativos:</strong> Según acuerdo comercial</li>
+                                </ul>
+                            </div>
+                        </section>
+
+                        <!-- Section 7 -->
+                        <section id="responsabilidades" class="terms-section">
+                            <h2>
+                                <i class="fas fa-shield-alt"></i>
+                                7. Responsabilidades y Limitaciones
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>7.1 Responsabilidad de Marimon</h3>
+                                <p>
+                                    Nos responsabilizamos por daños causados por negligencia de nuestro personal. 
+                                    Contamos con seguro de responsabilidad civil. No nos responsabilizamos por 
+                                    objetos dejados dentro del vehículo.
+                                </p>
+
+                                <h3>7.2 Vehículos no reclamados</h3>
+                                <div class="timeline">
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker">30 días</div>
+                                        <p>Se generan cargos de almacenamiento</p>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker">90 días</div>
+                                        <p>Se inician acciones legales</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section 8 -->
+                        <section id="datos" class="terms-section">
+                            <h2>
+                                <i class="fas fa-lock"></i>
+                                8. Protección de Datos Personales
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>8.1 Recopilación de datos</h3>
+                                <p>Recopilamos información personal para:</p>
+                                <ul>
+                                    <li>Prestación de servicios</li>
+                                    <li>Facturación</li>
+                                    <li>Comunicación de promociones (con consentimiento)</li>
+                                    <li>Cumplimiento de obligaciones legales</li>
+                                </ul>
+
+                                <h3>8.2 Derechos del titular</h3>
+                                <div class="info-box">
+                                    <p>
+                                        Usted tiene derecho a acceder, rectificar, cancelar u oponerse al 
+                                        tratamiento de sus datos personales según la <strong>Ley N° 29733</strong>.
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section 9 -->
+                        <section id="propiedad" class="terms-section">
+                            <h2>
+                                <i class="fas fa-copyright"></i>
+                                9. Propiedad Intelectual
+                            </h2>
+                            
+                            <div class="section-content">
+                                <p>
+                                    Todo el contenido del sitio, incluyendo textos, imágenes, logos, diseños 
+                                    y software, es propiedad de Marimon o sus licenciantes y está protegido 
+                                    por las leyes de propiedad intelectual del Perú.
+                                </p>
+                            </div>
+                        </section>
+
+                        <!-- Section 10 -->
+                        <section id="cancelaciones" class="terms-section">
+                            <h2>
+                                <i class="fas fa-times-circle"></i>
+                                10. Política de Cancelaciones
+                            </h2>
+                            
+                            <div class="section-content">
+                                <h3>10.1 Cancelación por el cliente</h3>
+                                <div class="cancellation-policy">
+                                    <div class="policy-item">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <div>
+                                            <strong>24 horas antes</strong>
+                                            <p>Sin penalidad</p>
+                                        </div>
+                                    </div>
+                                    <div class="policy-item">
+                                        <i class="fas fa-exclamation-circle text-warning"></i>
+                                        <div>
+                                            <strong>Mismo día</strong>
+                                            <p>Penalidad del 10%</p>
+                                        </div>
+                                    </div>
+                                    <div class="policy-item">
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                        <div>
+                                            <strong>Servicios iniciados</strong>
+                                            <p>No se aceptan cancelaciones</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Section 11 -->
+                        <section id="contacto" class="terms-section">
+                            <h2>
+                                <i class="fas fa-envelope"></i>
+                                11. Información de Contacto
+                            </h2>
+                            
+                            <div class="section-content">
+                                <div class="contact-card">
+                                    <h3>AUTOMOTRIZ MARIMON S.A.C</h3>
+                                    <div class="contact-info">
+                                        <div class="contact-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>Av. Angamos Este Nro. 1686 a.H. Casa Huertas</span>
+                                        </div>
+                                        <div class="contact-item">
+                                            <i class="fas fa-phone"></i>
+                                            <span>+51 994 061 278</span>
+                                        </div>
+                                        <div class="contact-item">
+                                            <i class="fab fa-whatsapp"></i>
+                                            <span>+51 994 061 278</span>
+                                        </div>
+                                        <div class="contact-item">
+                                            <i class="fas fa-envelope"></i>
+                                            <span>automotrizmarimon@gmail.com</span>
+                                        </div>
+                                        <div class="contact-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span>Lunes a Sábado, 8:00 AM - 10:00 PM</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Footer -->
+                        <div class="terms-footer">
+                            <div class="footer-content">
+                                <i class="fas fa-check-double"></i>
+                                <p>
+                                    Al utilizar nuestros servicios, usted confirma que ha leído, 
+                                    entendido y aceptado estos términos y condiciones.
+                                </p>
+                                <small>Fecha de entrada en vigor: @DateTime.Now.ToString("d 'de' MMMM 'de' yyyy")</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>
 
-@section Styles {
-    <style>
-
-        
-        .terminos-container {
-            padding: 50px 0;
-            font-family: 'Nunito', sans-serif;
-        }
-        
-        .terminos-header {
-            background-color: #ed1c24;
-            color: white;
-            padding: 20px;
-            border-radius: 5px 5px 0 0;
-        }
-        
-        .terminos-header h2 {
-            margin: 0;
-            font-weight: bold;
-        }
-        
-        .terminos-content {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .terminos-content p {
-            margin-bottom: 25px;
-            line-height: 1.6;
-            color: #333;
-        }
-    </style>
+@section Scripts {
+   <script>
+       // Sticky Navigation Active State
+       document.addEventListener('DOMContentLoaded', function() {
+           const sections = document.querySelectorAll('.terms-section');
+           const navLinks = document.querySelectorAll('.terms-nav .nav-link');
+           
+           function setActiveLink() {
+               let currentSection = '';
+               
+               sections.forEach(section => {
+                   const sectionTop = section.offsetTop;
+                   const sectionHeight = section.clientHeight;
+                   
+                   if (pageYOffset >= sectionTop - 100) {
+                       currentSection = section.getAttribute('id');
+                   }
+               });
+               
+               navLinks.forEach(link => {
+                   link.classList.remove('active');
+                   if (link.getAttribute('href') === '#' + currentSection) {
+                       link.classList.add('active');
+                   }
+               });
+           }
+           
+           window.addEventListener('scroll', setActiveLink);
+           
+           // Smooth scroll on link click
+           navLinks.forEach(link => {
+               link.addEventListener('click', function(e) {
+                   e.preventDefault();
+                   const targetId = this.getAttribute('href');
+                   const targetSection = document.querySelector(targetId);
+                   
+                   if (targetSection) {
+                       const offsetTop = targetSection.offsetTop - 20;
+                       window.scrollTo({
+                           top: offsetTop,
+                           behavior: 'smooth'
+                       });
+                   }
+               });
+           });
+           
+           // Copy contact info to clipboard
+           const contactItems = document.querySelectorAll('.contact-item');
+           
+           contactItems.forEach(item => {
+               item.style.cursor = 'pointer';
+               item.addEventListener('click', function() {
+                   const text = this.querySelector('span').textContent;
+                   navigator.clipboard.writeText(text).then(() => {
+                       // Show tooltip
+                       const tooltip = document.createElement('div');
+                       tooltip.className = 'copy-tooltip';
+                       tooltip.textContent = '¡Copiado!';
+                       tooltip.style.cssText = `
+                           position: absolute;
+                           background: #27ae60;
+                           color: white;
+                           padding: 5px 10px;
+                           border-radius: 4px;
+                           font-size: 0.8rem;
+                           top: -30px;
+                           left: 50%;
+                           transform: translateX(-50%);
+                           animation: tooltipFade 2s ease;
+                       `;
+                       
+                       this.style.position = 'relative';
+                       this.appendChild(tooltip);
+                       
+                       setTimeout(() => tooltip.remove(), 2000);
+                   });
+               });
+               
+               item.addEventListener('mouseenter', function() {
+                   this.style.backgroundColor = '#e9ecef';
+                   this.style.borderRadius = '8px';
+                   this.style.padding = '5px';
+                   this.style.margin = '-5px';
+               });
+               
+               item.addEventListener('mouseleave', function() {
+                   this.style.backgroundColor = 'transparent';
+               });
+           });
+           
+           // Add print button
+           const heroContent = document.querySelector('.hero-content');
+           const printButton = document.createElement('button');
+           printButton.innerHTML = '<i class="fas fa-print"></i> Imprimir';
+           printButton.className = 'btn-print';
+           printButton.style.cssText = `
+               background: white;
+               color: var(--primary-color);
+               border: none;
+               padding: 10px 20px;
+               border-radius: 25px;
+               margin-top: 20px;
+               cursor: pointer;
+               font-weight: 600;
+               transition: all 0.3s ease;
+           `;
+           
+           printButton.addEventListener('click', () => window.print());
+           heroContent.appendChild(printButton);
+           
+           // Back to top button
+           const backToTop = document.createElement('button');
+           backToTop.innerHTML = '<i class="fas fa-arrow-up"></i>';
+           backToTop.className = 'back-to-top';
+           backToTop.style.cssText = `
+               position: fixed;
+               bottom: 30px;
+               right: 30px;
+               background: var(--primary-color);
+               color: white;
+               border: none;
+               width: 50px;
+               height: 50px;
+               border-radius: 50%;
+               cursor: pointer;
+               display: none;
+               transition: all 0.3s ease;
+               box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+               z-index: 1000;
+           `;
+           
+           backToTop.addEventListener('click', () => {
+               window.scrollTo({
+                   top: 0,
+                   behavior: 'smooth'
+               });
+           });
+           
+           document.body.appendChild(backToTop);
+           
+           window.addEventListener('scroll', () => {
+               if (window.pageYOffset > 300) {
+                   backToTop.style.display = 'block';
+               } else {
+                   backToTop.style.display = 'none';
+               }
+           });
+       });
+   </script>
 }

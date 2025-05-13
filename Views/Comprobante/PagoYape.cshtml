@@ -96,20 +96,20 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-4 terms-container fade-in fade-in-3">
+                               @* <div class="mt-4 terms-container fade-in fade-in-3">
                                     <div class="terms-check">
                                         <div class="custom-checkbox" id="customCheckbox"></div>
                                         <input type="checkbox" class="form-check-input" id="aceptaTerminos" required
                                             style="display: none;">
                                         <div class="terms-text">
                                             He leído y acepto los
-                                            <a href="Home\Terminos.cshtml" target="_blank" class="terms-link">
+                                            <a  href="@Url.Action("Terminos", "Home")" target="_blank" class="terms-link">
                                                 Términos y Condiciones
                                                 <i class="bi bi-box-arrow-up-right"></i>
                                             </a>
                                         </div>
                                     </div>
-                                </div>
+                                </div> *@
 
                                 <div class="d-grid gap-3 mt-4">
                                     <button type="submit" class="btn btn-marimon" id="confirmBtn">
