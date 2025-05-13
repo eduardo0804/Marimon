@@ -36,8 +36,7 @@
                 <div class="receipt-info">
                     <div class="receipt-row">
                         <span class="receipt-label">Número de Comprobante:</span>
-                        <span
-                            class="receipt-value">@(Model.tipo_comprobante.ToUpper())-@Model.com_id.ToString("0000000")</span>
+                        <span class="receipt-value">@Model.com_id.ToString("000")</span>
                     </div>
                     <div class="receipt-divider"></div>
                     <div class="receipt-message">
