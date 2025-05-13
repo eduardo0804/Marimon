@@ -4,7 +4,9 @@
 }
 
 @section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/graciasYape.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 }
 
 <div class="container success-container">
@@ -17,7 +19,7 @@
                         <img src="/images/autoparte_gracias.jpg" alt="Marimon" class="autoparte-image">
                     </div>
                     <div class="content-column">
-                        <h1 style="color: red" class="text-center">¡Gracias por tu compra!</h1>
+                        <h1 class="text-center">¡Gracias por tu Compra!</h1>
 
                         <p class="success-description">
                             En breve, nuestro equipo comenzará a preparar tu pedido, seleccionando cuidadosamente la
@@ -33,15 +35,15 @@
 
                         <div class="order-info">
                             <div class="order-row">
-                                <span class="order-label">Número de pedido:</span>
+                                <span class="order-label"><i class="fas fa-hashtag"></i> Número de pedido:</span>
                                 <span class="order-value">#ORD-@(new Random().Next(10000, 99999))</span>
                             </div>
                             <div class="order-row">
-                                <span class="order-label">Fecha:</span>
+                                <span class="order-label"><i class="far fa-calendar-alt"></i> Fecha:</span>
                                 <span class="order-value">@DateTime.Now.ToString("dd MMMM, yyyy")</span>
                             </div>
                             <div class="order-row">
-                                <span class="order-label">Estado:</span>
+                                <span class="order-label"><i class="fas fa-flag-checkered"></i> Estado:</span>
                                 <span class="order-value" style="color: var(--primary-dark);">
                                     <i class="fas fa-check-circle"></i> Confirmado
                                 </span>
@@ -60,13 +62,13 @@
 
                         <div class="mt-3">
                             <span class="badge-custom">
-                                <i class="fas fa-check-circle"></i> Envío Express
+                                <i class="fas fa-truck-fast"></i> Envío Express
                             </span>
                             <span class="badge-custom">
-                                <i class="fas fa-check-circle"></i> Calidad Garantizada
+                                <i class="fas fa-medal"></i> Calidad Garantizada
                             </span>
                             <span class="badge-custom">
-                                <i class="fas fa-check-circle"></i> Especialistas
+                                <i class="fas fa-user-gear"></i> Especialistas
                             </span>
                         </div>
                     </div>
@@ -77,6 +79,7 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
         $(document).ready(function () {
             // Desactivar cualquier verificación automática del carrito
@@ -102,25 +105,84 @@
             // Efecto visual para mejorar la experiencia
             $(".success-card").hide().fadeIn(800);
 
-            // Confetti para celebrar la compra exitosa
+            // Confetti mejorado para celebrar la compra exitosa
             setTimeout(function () {
-                if (typeof confetti !== 'undefined') {
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#E42229', '#D42025', '#626C66', '#ffda3a'],
+                    zIndex: 1000,
+                    disableForReducedMotion: true
+                });
+
+                // Segunda ráfaga de confeti
+                setTimeout(function () {
                     confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 },
-                        colors: ['#E42229', '#D42025', '#626C66']
+                        particleCount: 50,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 0, y: 0.6 },
+                        colors: ['#E42229', '#ffda3a'],
                     });
-                }
+
+                    confetti({
+                        particleCount: 50,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 1, y: 0.6 },
+                        colors: ['#D42025', '#626C66'],
+                    });
+                }, 700);
             }, 500);
 
-            // Efecto hover para la imagen
-            $(".image-column").hover(
+            // Efecto de brillo para el botón
+            $(".btn-primary-custom").hover(
                 function () {
-                    $(this).find(".autoparte-image").css("transform", "scale(1.05)");
+                    $(this).css("box-shadow", "0 10px 20px rgba(228, 34, 41, 0.4), 0 0 0 2px rgba(228, 34, 41, 0.1)");
                 },
                 function () {
-                    $(this).find(".autoparte-image").css("transform", "scale(1)");
+                    $(this).css("box-shadow", "0 8px 15px rgba(228, 34, 41, 0.25)");
+                }
+            );
+
+            // Efecto hover avanzado para la imagen
+            $(".image-column").hover(
+                function () {
+                    $(this).find(".autoparte-image").css({
+                        "transform": "scale(1.08)",
+                        "filter": "contrast(1.3) saturate(1.2)"
+                    });
+                    $(this).find(".image-overlay").css({
+                        "background": "linear-gradient(220deg, rgba(0,0,0,0.75) 0%, rgba(228,34,41,0.5) 50%, rgba(0,0,0,0.3) 100%)"
+                    });
+                },
+                function () {
+                    $(this).find(".autoparte-image").css({
+                        "transform": "scale(1)",
+                        "filter": "contrast(1.2) saturate(1.1)"
+                    });
+                    $(this).find(".image-overlay").css({
+                        "background": "linear-gradient(220deg, rgba(0,0,0,0.85) 0%, rgba(228,34,41,0.6) 50%, rgba(0,0,0,0.4) 100%)"
+                    });
+                }
+            );
+
+            // Efecto hover para las insignias
+            $(".badge-custom").hover(
+                function () {
+                    $(this).css({
+                        "transform": "translateY(-2px) scale(1.05)",
+                        "background-color": "rgba(228, 34, 41, 0.1)",
+                        "color": "var(--primary)"
+                    });
+                },
+                function () {
+                    $(this).css({
+                        "transform": "translateY(0) scale(1)",
+                        "background-color": "var(--gray-light)",
+                        "color": "var(--gray)"
+                    });
                 }
             );
         });

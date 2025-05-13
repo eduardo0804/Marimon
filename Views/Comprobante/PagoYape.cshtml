@@ -25,20 +25,19 @@
                             <img src="/images/yape-150x150.png" alt="Yape Logo" class="img-fluid"
                                 onerror="this.src='/images/yape-logo.png'" width="100">
                         </div>
-                        <h2 class="page-header">Pago con Yape</h2>
                     </div>
 
                     <div class="row justify-content-center mb-4 fade-in fade-in-2">
                         <div class="col-md-7 text-center">
-                            <div class="qr-box pulse">
+                            <div class="qr-box">
                                 <img src="/images/QRYAPE.jpeg" alt="Código QR Yape" class="img-fluid">
                             </div>
                             <div class="total-container">
                                 <span class="total-label">TOTAL A PAGAR:</span>
                                 <span class="total-amount">S/.@String.Format("{0:0.00}", Model.TotalPago)</span>
                             </div>
-                            <h3 class="company-name mt-3">Marimon Autopartes</h3>
-                            <p class="phone-number animate__animated animate__pulse animate__infinite">
+                            <h3 class="company-name mt-3">Automotriz Marimon</h3>
+                            <p class="phone-number">
                                 <i class="bi bi-phone"></i>961 582 804
                             </p>
                         </div>
@@ -76,6 +75,12 @@
                                         <i class="bi bi-cloud-arrow-up"></i>
                                         <div class="file-text">Sube tu comprobante de pago</div>
                                         <div class="file-subtext">JPG, JPEG, PNG (Máx: 5MB)</div>
+                                        <div class="alert alert-danger d-none" id="fileErrorAlert" role="alert">
+                                            El archivo es demasiado grande. Por favor, sube una imagen de menos de 5MB.
+                                        </div>
+                                        <div class="alert alert-danger d-none" id="fileRequiredAlert" role="alert">
+                                            Debes adjuntar una imagen del comprobante de pago para continuar.
+                                        </div>
                                         <input type="file" class="form-control" id="comprobanteFile"
                                             name="comprobanteFile" accept="image/*" required>
                                     </label>
@@ -96,29 +101,14 @@
                                     </div>
                                 </div>
 
-                                @* <div class="mt-4 terms-container fade-in fade-in-3">
-                                    <div class="terms-check">
-                                        <div class="custom-checkbox" id="customCheckbox"></div>
-                                        <input type="checkbox" class="form-check-input" id="aceptaTerminos" required
-                                            style="display: none;">
-                                        <div class="terms-text">
-                                            He leído y acepto los
-                                            <a  href="@Url.Action("Terminos", "Home")" target="_blank" class="terms-link">
-                                                Términos y Condiciones
-                                                <i class="bi bi-box-arrow-up-right"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div> *@
-
                                 <div class="d-grid gap-3 mt-4">
                                     <button type="submit" class="btn btn-marimon" id="confirmBtn">
                                         <i class="bi bi-check-circle-fill me-2"></i>
                                         <span>Confirmar Pago</span>
                                     </button>
-                                    <button type="button" onclick="history.back()" class="btn btn-outline">
+                                    <a href="@Url.Action("Index", "Comprobante")" class="btn btn-outline" id="backBtn">
                                         <i class="bi bi-arrow-left me-2"></i> Volver
-                                    </button>
+                                    </a>
                                 </div>
                             </form>
                         </div>
@@ -130,19 +120,28 @@
 </div>
 
 <script>
-    // File preview functionality
+    // File validation and preview functionality
     document.getElementById('comprobanteFile').addEventListener('change', function (e) {
         const preview = document.getElementById('imagePreview');
+        const fileErrorAlert = document.getElementById('fileErrorAlert');
+        const fileRequiredAlert = document.getElementById('fileRequiredAlert');
         const file = e.target.files[0];
+
+        // Reset alerts
+        fileErrorAlert.classList.add('d-none');
+        fileRequiredAlert.classList.add('d-none');
+
         if (file) {
-            // Validate file size
-            if (file.size > 5 * 1024 * 1024) {
-                alert('El archivo es demasiado grande. Por favor, sube una imagen de menos de 5MB.');
+            // Validate file size (5MB limit)
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 5) {
+                fileErrorAlert.classList.remove('d-none');
                 this.value = '';
                 preview.style.display = 'none';
                 return;
             }
 
+            // Display file preview
             const reader = new FileReader();
             reader.onload = function (event) {
                 preview.src = event.target.result;
@@ -155,24 +154,28 @@
         }
     });
 
-    // Form validation
+    // Form validation with file validation
     (function () {
         'use strict';
         window.addEventListener('load', function () {
             var forms = document.getElementsByClassName('needs-validation');
             Array.prototype.filter.call(forms, function (form) {
                 form.addEventListener('submit', function (event) {
+                    const fileInput = document.getElementById('comprobanteFile');
+                    const fileRequiredAlert = document.getElementById('fileRequiredAlert');
+
+                    // Check if file is attached
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        fileRequiredAlert.classList.remove('d-none');
+                        fileInput.focus();
+                        return;
+                    }
+
                     if (form.checkValidity() === false) {
                         event.preventDefault();
                         event.stopPropagation();
-
-                        // Check if terms checkbox is causing validation error
-                        if (!document.getElementById('aceptaTerminos').checked) {
-                            document.querySelector('.terms-container').classList.add('shake');
-                            setTimeout(() => {
-                                document.querySelector('.terms-container').classList.remove('shake');
-                            }, 600);
-                        }
 
                         // Animate the form shake if invalid
                         form.classList.add('animate__animated', 'animate__shakeX');
@@ -243,9 +246,4 @@
             });
         });
     });
-
-    // Stop QR pulse animation after 10 seconds
-    setTimeout(() => {
-        document.querySelector('.qr-box').classList.remove('pulse');
-    }, 10000);
 </script>
