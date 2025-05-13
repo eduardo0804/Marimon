@@ -2,42 +2,74 @@
 @{
     ViewData["Title"] = "Pago Exitoso";
 }
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-success text-white text-center">
-                    <h3 class="my-2">¡Transacción Exitosa!</h3>
-                </div>
-                <div class="card-body text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
-                    </div>
-                    <h2 class="card-title mb-3">¡Gracias por tu compra!</h2>
 
-                    <div class="alert alert-success py-3">
-                        <h5><i class="fas fa-check-double mr-2"></i> ¡Pago procesado correctamente!</h5>
+@section Styles {
+    <link rel="stylesheet" href="~/css/graciasYape.css" asp-append-version="true" />
+}
+
+<div class="container success-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="success-card">
+                <div class="card-row">
+                    <div class="image-column">
+                        <div class="image-overlay"></div>
+                        <img src="images\autoparte_gracias.jpg" alt="Marimon" class="autoparte-image">
                     </div>
-                    
-                   
-                    <p class="card-text mb-4">
-                        Estamos procesando tu pedido con mucho cuidado. Recibirás una notificación cuando 
-                        esté listo para entrega o envío. ¡Gracias por elegirnos!
-                    </p>
-                    
-                    <hr class="my-4" />
-                    
-                    <div class="mt-4">
-                        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary">
-                            <i class="fas fa-store mr-1"></i> Volver a la tienda
-                        </a>
-                        <a asp-area="Identity" asp-page="/Account/Manage/Pedidos" class="btn btn-outline-secondary ml-3">
-                            <i class="fas fa-list-alt mr-1"></i> Ver mis compras
-                        </a>
+                    <div class="content-column">
+                        <h1 class="success-title">¡Gracias por tu compra!</h1>
+
+                        <p class="success-description">
+                            En breve, nuestro equipo comenzará a preparar tu pedido, seleccionando cuidadosamente la
+                            autoparte para asegurarnos de que cumpla con los más altos estándares de calidad. Mientras
+                            tanto, relájate y espera con confianza la llegada del componente que mantendrá tu vehículo
+                            en óptimas condiciones.
+                        </p>
+
+                        <p class="success-description">
+                            Gracias de nuevo por confiar en nosotros para satisfacer. Estamos
+                            deseando que tengas una<span class="highlight-text">satisfacción tremenda</span>.
+                        </p>
+
+                        <div class="order-info">
+                            <div class="order-row">
+                                <span class="order-label">Número de pedido:</span>
+                                <span class="order-value">#ORD-@(new Random().Next(10000, 99999))</span>
+                            </div>
+                            <div class="order-row">
+                                <span class="order-label">Fecha:</span>
+                                <span class="order-value">@DateTime.Now.ToString("dd MMMM, yyyy")</span>
+                            </div>
+                            <div class="order-row">
+                                <span class="order-label">Estado:</span>
+                                <span class="order-value" style="color: var(--primary-dark);">
+                                    <i class="fas fa-check-circle"></i> Confirmado
+                                </span>
+                            </div>
+                        </div>
+
+                        <p class="success-description">
+                            <strong>¡Disfruta de tu compra!</strong> Te notificaremos cuando tu pedido sea enviado.
+                        </p>
+
+                        <div class="d-flex justify-content-center">
+                            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary-custom">
+                                <i class="fas fa-store btn-icon"></i> Volver a la tienda
+                            </a>
+                        </div>
+
+                        <div class="mt-3">
+                            <span class="badge-custom">
+                                <i class="fas fa-check-circle"></i> Envío Express
+                            </span>
+                            <span class="badge-custom">
+                                <i class="fas fa-check-circle"></i> Calidad Garantizada
+                            </span>
+                            <span class="badge-custom">
+                                <i class="fas fa-check-circle"></i> Especialistas en Autopartes
+                            </span>
+                        </div>
                     </div>
-                </div>
-                <div class="card-footer text-center text-muted">
-                    <small>Si tienes alguna pregunta sobre tu pedido, no dudes en contactarnos.</small>
                 </div>
             </div>
         </div>
@@ -46,20 +78,19 @@
 
 @section Scripts {
     <script>
-        // Desactivar cualquier verificación automática del carrito
-        $(document).ready(function() {
-            // Desactivar cualquier redirección automática
+        $(document).ready(function () {
+            // Desactivar cualquier verificación automática del carrito
             window.onbeforeunload = null;
-            
+
             // Desactivar cualquier temporizador existente
-            var existingTimers = window.setTimeout(function() {}, 0);
+            var existingTimers = window.setTimeout(function () { }, 0);
             while (existingTimers--) {
                 window.clearTimeout(existingTimers);
             }
-            
+
             // Prevenir cualquier solicitud AJAX periódica
             $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
+                beforeSend: function (xhr, settings) {
                     // Comprobar si la URL contiene 'Carrito' y cancelar esas solicitudes
                     if (settings.url && settings.url.includes('Carrito')) {
                         xhr.abort();
@@ -67,20 +98,31 @@
                     }
                 }
             });
-            
+
             // Efecto visual para mejorar la experiencia
-            $(".card").hide().fadeIn(800);
-            
+            $(".success-card").hide().fadeIn(800);
+
             // Confetti para celebrar la compra exitosa
-            setTimeout(function() {
+            setTimeout(function () {
                 if (typeof confetti !== 'undefined') {
                     confetti({
                         particleCount: 100,
                         spread: 70,
-                        origin: { y: 0.6 }
+                        origin: { y: 0.6 },
+                        colors: ['#E42229', '#D42025', '#626C66']
                     });
                 }
             }, 500);
+
+            // Efecto hover para la imagen
+            $(".image-column").hover(
+                function () {
+                    $(this).find(".autoparte-image").css("transform", "scale(1.05)");
+                },
+                function () {
+                    $(this).find(".autoparte-image").css("transform", "scale(1)");
+                }
+            );
         });
     </script>
 }
