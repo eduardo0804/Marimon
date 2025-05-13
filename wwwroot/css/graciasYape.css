@@ -50,7 +50,7 @@
         z-index: 1;
     }
     
-    .coffee-image {
+    .autoparte-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -60,9 +60,6 @@
         transition: all 0.5s ease;
     }
     
-    .coffee-image:hover {
-        transform: scale(1.05);
-    }
     
     .content-column {
         flex: 1;
@@ -202,3 +199,13 @@
             padding: 2rem;
         }
     }
+
+    @section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/graciasYape.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+    </style>
+}
