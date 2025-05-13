@@ -1113,11 +1113,11 @@ namespace Marimon.Controllers
             string fac_razon = TempData["fac_razon"]?.ToString();
             string fac_ruc = TempData["fac_ruc"]?.ToString();
             string fac_direccion = TempData["fac_direccion"]?.ToString();
-            
+
             // Validar tipo de archivo (solo imágenes)
             string[] permitidos = { ".jpg", ".jpeg", ".png" };
             var extension = Path.GetExtension(comprobanteFile.FileName).ToLowerInvariant();
-            
+
             if (!permitidos.Contains(extension))
             {
                 return BadRequest("El archivo debe ser una imagen (JPG, JPEG o PNG).");
@@ -1132,23 +1132,24 @@ namespace Marimon.Controllers
             // Obtener el usuario actual
             var identityUserId = _userManager.GetUserId(User);
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
-            
+
             if (usuario == null)
             {
                 return Unauthorized("Usuario no encontrado.");
             }
-            
+
             // Obtener el carrito
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
                     .ThenInclude(cp => cp.Autoparte)
                 .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
-            
+
             if (carrito == null || !carrito.CarritoAutopartes.Any())
             {
-                return BadRequest("El carrito está vacío.");
+                // Si el carrito está vacío, redirige a una página amigable
+                return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
             }
-            
+
             // Crear venta
             var venta = new Venta
             {
@@ -1158,15 +1159,16 @@ namespace Marimon.Controllers
                 Total = carrito.car_total,
                 Estado = "Pendiente"
             };
-            
+
             _context.Venta.Add(venta);
             await _context.SaveChangesAsync();
-            
+
             // Crear el comprobante
             var comprobante = new Comprobante
             {
                 tipo_comprobante = tipoComprobante,
-                VentaId = venta.ven_id
+                VentaId = venta.ven_id,
+                com_imagen = ""
             };
             _context.Comprobante.Add(comprobante);
             await _context.SaveChangesAsync();
@@ -1177,7 +1179,7 @@ namespace Marimon.Controllers
             }
 
             // Crear Boleta o Factura según corresponda
-            if (tipoComprobante.ToLower() == "boleta")
+            if (tipoComprobante?.ToLower() == "boleta")
             {
                 var boleta = new Boleta
                 {
@@ -1186,7 +1188,7 @@ namespace Marimon.Controllers
                 };
                 _context.Boleta.Add(boleta);
             }
-            else if (tipoComprobante.ToLower() == "factura")
+            else if (tipoComprobante?.ToLower() == "factura")
             {
                 var factura = new Factura
                 {
@@ -1197,7 +1199,7 @@ namespace Marimon.Controllers
                 };
                 _context.Factura.Add(factura);
             }
-            
+
             // Crear detalles de venta y actualizar stock
             foreach (var item in carrito.CarritoAutopartes)
             {
@@ -1208,7 +1210,7 @@ namespace Marimon.Controllers
                     det_cantidad = item.car_cantidad
                 };
                 _context.DetalleVentas.Add(detalle);
-                
+
                 // Reducir stock
                 var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
                 if (autoparte != null)
@@ -1216,7 +1218,7 @@ namespace Marimon.Controllers
                     autoparte.aut_cantidad -= item.car_cantidad;
                     _context.Autopartes.Update(autoparte);
                 }
-                
+
                 // Crear salida
                 var salida = new Salida
                 {
@@ -1227,37 +1229,44 @@ namespace Marimon.Controllers
                 };
                 _context.Salida.Add(salida);
             }
-            
+
             // Guardar imagen del comprobante
-            // Obtener la ruta física del directorio de evidencias
             string evidenciasDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "evidencias");
-            
-            // Crear el directorio si no existe
             if (!Directory.Exists(evidenciasDir))
             {
                 Directory.CreateDirectory(evidenciasDir);
             }
-            
-            // Generar un nombre único para el archivo
             string nombreArchivo = $"evidencias_{comprobante.com_id}{extension}";
             string rutaCompleta = Path.Combine(evidenciasDir, nombreArchivo);
-            
-            // Guardar el archivo
+
             using (var stream = new FileStream(rutaCompleta, FileMode.Create))
             {
                 await comprobanteFile.CopyToAsync(stream);
             }
-            
-            // Guardar la ruta del comprobante en la base de datos
+
             comprobante.com_evidencia = "/evidencias/" + nombreArchivo;
             _context.Comprobante.Update(comprobante);
-            
+
             // Limpiar el carrito
             _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
             await _context.SaveChangesAsync();
-            
-            // Redireccionar a la vista de éxito
-            return View("PagoExitosoYape", comprobante);
+
+            // Redirigir usando el patrón POST-Redirect-GET para evitar reenvíos
+            return RedirectToAction("PagoYapeExitoso", new { id = comprobante.com_id });
+        }
+
+        // Nueva acción para mostrar la vista de éxito
+        public async Task<IActionResult> PagoYapeExitoso(int id)
+        {
+            var comprobanteCompleto = await _context.Comprobante
+                .Include(c => c.Boletas)
+                .Include(c => c.Facturas)
+                .FirstOrDefaultAsync(c => c.com_id == id);
+
+            if (comprobanteCompleto == null)
+                return RedirectToAction("Index", "Home");
+
+            return View("PagoExitosoYape", comprobanteCompleto);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
