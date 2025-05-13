@@ -1,14 +1,14 @@
 @model Marimon.Models.Entradas
 @{
     ViewData["Title"] = "Registro de Entradas";
-    Layout = "_LayoutAdmin";
+    Layout = "_LayoutVentas";
 }
-
+<link rel="stylesheet" href="~/css/entrada.css" asp-append-version="true" />
 <!-- Contenido Principal -->
-<div class="container mt-4">
+<div class="container">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="/personal_ventas">Modulo de Autopartes</a>
+            <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">Registro de Entradas</li>
     </ol>
@@ -215,261 +215,119 @@
         </div>
     </div>
 
-@section Scripts {
-        <script>
-            // Función para cargar productos por categoría
-            function cargarProductos() {
-                var categoriaId = document.getElementById("categoriaSelect").value;
-                var productoSelect = document.getElementById("productoSelect");
+<script>
+    // Función para cargar productos por categoría
+    function cargarProductos() {
+        var categoriaId = document.getElementById("categoriaSelect").value;
+        var productoSelect = document.getElementById("productoSelect");
 
-                // Limpiar el select de productos
-                productoSelect.innerHTML = "";
+        // Limpiar el select de productos
+        productoSelect.innerHTML = "";
 
-                if (!categoriaId) {
-                    // Si no hay categoría seleccionada
-                    productoSelect.innerHTML = "<option value=''>-- Primero seleccione una categoría --</option>";
-                    productoSelect.disabled = true;
-                    return;
+        if (!categoriaId) {
+            // Si no hay categoría seleccionada
+            productoSelect.innerHTML = "<option value=''>-- Primero seleccione una categoría --</option>";
+            productoSelect.disabled = true;
+            return;
+        }
+
+        // Habilitar el select de productos
+        productoSelect.disabled = false;
+
+        // Llamada AJAX para obtener los productos de la categoría seleccionada
+        fetch(`/Personal_Ventas/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
                 }
-
-                // Habilitar el select de productos
-                productoSelect.disabled = false;
-
-                // Llamada AJAX para obtener los productos de la categoría seleccionada
-                fetch(`/Personal_Ventas/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error en la respuesta del servidor');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.length === 0) {
-                            productoSelect.innerHTML = "<option value=''>No hay productos disponibles</option>";
-                        } else {
-                            productoSelect.innerHTML = "<option value=''>-- Seleccionar Producto --</option>";
-                            data.forEach(producto => {
-                                var option = document.createElement("option");
-                                option.value = producto.aut_id;
-                                option.text = producto.aut_nombre;
-                                productoSelect.appendChild(option);
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error al cargar los productos:", error);
-                        productoSelect.innerHTML = "<option value=''>Error al cargar productos</option>";
-                    });
-            }
-
-            // Efecto de hover para el botón
-            document.addEventListener('DOMContentLoaded', function () {
-                // Aplicar el estilo directamente al botón
-                const submitButton = document.getElementById('submitButton');
-                if (submitButton) {
-                    // Asegurarse de que el botón sea visible y tenga el color correcto
-                    submitButton.style.backgroundColor = '#d42025';
-                    submitButton.style.display = 'block';
-                    submitButton.style.width = '100%';
-
-                    submitButton.addEventListener('mouseover', function () {
-                        this.style.backgroundColor = '#b91d21';
-                        this.style.transform = 'translateY(-2px)';
-                        this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-                    });
-
-                    submitButton.addEventListener('mouseout', function () {
-                        this.style.backgroundColor = '#d42025';
-                        this.style.transform = 'translateY(0)';
-                        this.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+                return response.json();
+            })
+            .then(data => {
+                if (data.length === 0) {
+                    productoSelect.innerHTML = "<option value=''>No hay productos disponibles</option>";
+                } else {
+                    productoSelect.innerHTML = "<option value=''>-- Seleccionar Producto --</option>";
+                    data.forEach(producto => {
+                        var option = document.createElement("option");
+                        option.value = producto.aut_id;
+                        option.text = producto.aut_nombre;
+                        productoSelect.appendChild(option);
                     });
                 }
+            })
+            .catch(error => {
+                console.error("Error al cargar los productos:", error);
+                productoSelect.innerHTML = "<option value=''>Error al cargar productos</option>";
             });
-
-            // Función de búsqueda en la tabla
-            document.getElementById('searchInput').addEventListener('keyup', function () {
-                let searchText = this.value.toLowerCase();
-                let table = document.getElementById('entriesTable');
-                let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
-                for (let i = 0; i < rows.length; i++) {
-                    let found = false;
-                    let cells = rows[i].getElementsByTagName('td');
-
-                    for (let j = 0; j < cells.length; j++) {
-                        let cellText = cells[j].innerText.toLowerCase();
-                        if (cellText.indexOf(searchText) > -1) {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (found) {
-                        rows[i].style.display = '';
-                    } else {
-                        rows[i].style.display = 'none';
-                    }
-                }
-            });
-
-            // Validación del formulario
-            document.querySelector('form').addEventListener('submit', function (e) {
-                const productoSelect = document.getElementById('productoSelect');
-                const cantidadInput = document.getElementById('ent_cantidad');
-
-                if (productoSelect.value === '') {
-                    e.preventDefault();
-                    alert('Por favor seleccione un producto');
-                    return false;
-                }
-
-                if (cantidadInput.value < 1) {
-                    e.preventDefault();
-                    alert('La cantidad debe ser mayor a 0');
-                    return false;
-                }
-
-                return true;
-            });
-        </script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-        <style>
-            /* Estilos generales incluidos directamente */
 
-            /* Estilos para el botón de registro */
-            .btn-registro {
-                background-color: #d42025 !important;
-                color: white !important;
-                transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
+    // Efecto de hover para el botón
+    document.addEventListener('DOMContentLoaded', function () {
+        // Aplicar el estilo directamente al botón
+        const submitButton = document.getElementById('submitButton');
+        if (submitButton) {
+            // Asegurarse de que el botón sea visible y tenga el color correcto
+            submitButton.style.backgroundColor = '#d42025';
+            submitButton.style.display = 'block';
+            submitButton.style.width = '100%';
+
+            submitButton.addEventListener('mouseover', function () {
+                this.style.backgroundColor = '#b91d21';
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+            });
+
+            submitButton.addEventListener('mouseout', function () {
+                this.style.backgroundColor = '#d42025';
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+            });
+        }
+    });
+
+    // Función de búsqueda en la tabla
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        let searchText = this.value.toLowerCase();
+        let table = document.getElementById('entriesTable');
+        let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            let found = false;
+            let cells = rows[i].getElementsByTagName('td');
+
+            for (let j = 0; j < cells.length; j++) {
+                let cellText = cells[j].innerText.toLowerCase();
+                if (cellText.indexOf(searchText) > -1) {
+                    found = true;
+                    break;
+                }
             }
 
-            .btn-registro:hover {
-                background-color: #b91d21 !important;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            if (found) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
             }
+        }
+    });
 
-            .btn-registro .hover-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(255, 255, 255, 0.2);
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
+    // Validación del formulario
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const productoSelect = document.getElementById('productoSelect');
+        const cantidadInput = document.getElementById('ent_cantidad');
 
-            .btn-registro:hover .hover-overlay {
-                opacity: 1;
-            }
+        if (productoSelect.value === '') {
+            e.preventDefault();
+            alert('Por favor seleccione un producto');
+            return false;
+        }
 
-            .admin-container {
-                max-width: 1500px;
-                margin: 0 auto;
-                background-color: #fff;
-                border-radius: 8px;
-                overflow: hidden;
-                margin-top: 20px;
-                margin-bottom: 20px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
+        if (cantidadInput.value < 1) {
+            e.preventDefault();
+            alert('La cantidad debe ser mayor a 0');
+            return false;
+        }
 
-            /* Header */
-            .modulo-header {
-                width: 100%;
-            }
-
-            .modulo-title-bar {
-                background-color: #d42025;
-                color: white;
-                padding: 15px 25px;
-                text-align: left;
-            }
-
-            .modulo-title {
-                margin: 0;
-                font-size: 24px;
-                font-weight: 600;
-            }
-
-            /* Footer de las tarjetas */
-            .card-footer {
-                background-color: #f8f9fa;
-                color: #6c757d;
-                padding: 12px;
-                text-align: center;
-            }
-
-            /* Footer principal */
-            .modulo-footer {
-                background-color: #d42025;
-                color: white;
-                padding: 15px 25px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .modulo-footer a {
-                color: white;
-                text-decoration: none;
-            }
-
-            .modulo-footer a:hover {
-                text-decoration: underline;
-            }
-
-            /* Estilos específicos para esta página */
-            .avatar-item {
-                width: 36px;
-                height: 36px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                background-color: #f8f9fa;
-                border-radius: 4px;
-            }
-
-            .pagination .page-item.active .page-link {
-                background-color: #d42025;
-                border-color: #d42025;
-            }
-
-            .pagination .page-link {
-                color: #d42025;
-            }
-
-            /* Transiciones suaves */
-            .form-control,
-            .form-select,
-            .btn {
-                transition: all 0.3s ease;
-            }
-
-            /* Animación para alertas */
-            .alert {
-                animation: fadeInDown 0.5s ease;
-            }
-
-
-
-            /* Asegurarse de que el botón de registro sea visible y destacado */
-            #submitButton {
-                background-color: #d42025 !important;
-                border: none;
-                cursor: pointer;
-                font-weight: bold;
-                padding: 12px 20px;
-                border-radius: 5px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                display: block;
-                width: 100%;
-            }
-        </style>
-}
+        return true;
+    });
+</script>
