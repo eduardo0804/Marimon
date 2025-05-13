@@ -1,17 +1,17 @@
 @model Marimon.Models.Salida
 @{
     ViewData["Title"] = "Registro de Salidas";
-    Layout = "_LayoutAdmin";
+    Layout = "_LayoutVentas";
 
     var salidasAgrupadas = ViewBag.SalidasAgrupadas as IEnumerable<dynamic>;
 
 }
 
 <!-- Contenido Principal -->
-<div class="container mt-4">
+<div class="container">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="/personal_ventas">Modulo de Autopartes</a>
+            <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">Registro de Salidas</li>
     </ol>
