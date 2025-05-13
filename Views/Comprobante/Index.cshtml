@@ -8,10 +8,8 @@
     Layout = "_LayoutPago";
     ViewData["Title"] = "Finaliza tu Compra - Marimon";
 }
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<form id="miFormulario" action="@Url.Action("ProcesarPago", "Comprobante")" method="post" class="needs-validation"
-    novalidate>
+<form action="@Url.Action("ProcesarPago", "Comprobante")" method="post" class="needs-validation" novalidate>
     <div class="container py-5">
         <!-- Cabecera -->
         <div class="row checkout-header animated-card" style="animation-delay: 0.1s;">
@@ -60,16 +58,15 @@
                                     <div class="item-quantity">Cantidad: @item.Cantidad</div>
                                 </div>
                                 <div class="item-price">
-                                    S/.@String.Format("{0:0.00}", item.PrecioUnitario * item.Cantidad)
+                                    S/@String.Format("{0:0.00}", item.PrecioUnitario * item.Cantidad)
                                 </div>
                             </div>
                         }
                     </div>
 
-                    <div class="">
-                        <span class="">TOTAL:</span>
-                        <span class="">S/.@String.Format("{0:0.00}", total)</span>
-                        <!-- DISEÑA ZORRA -->
+                    <div class="" style="margin-top: 10px;">
+                        <strong class="">TOTAL:</strong>
+                        <strong class="">S/@String.Format("{0:0.00}", total)</strong>
                     </div>
                 </div>
             </div>
@@ -133,16 +130,11 @@
                             <input type="text" class="form-control" id="numeroDocumento" name="num_identificacion"
                                 placeholder="Ingrese su número de documento" required
                                 pattern="^\d{8}$|^\d{9}$|^[A-Z0-9]{6,12}$">
-                            <div class="invalid-feedback" id="dniErrorMessage">
-                                El DNI debe ser de 8 dígitos.
+                            <div class="invalid-feedback">
+                                Ingrese un número válido: DNI (8 dígitos), CE (9 dígitos), Pasaporte (6-12 caracteres)
                             </div>
-                            <div class="invalid-feedback" id="ceErrorMessage">
-                                El Carnet de Extranjería debe ser de 9 dígitos.
-                            </div>
-                            <div class="invalid-feedback" id="pasaporteErrorMessage">
-                                El Pasaporte debe ser entre 6 y 12 caracteres alfanuméricos.
-                            </div>
-                        </div>    
+                        </div>
+
                         <div class="col-12">
                             <label for="correo" class="form-label">Correo Electrónico *</label>
                             <input type="email" class="form-control" id="correo" name="usu_correo"
@@ -242,52 +234,50 @@
                         <div class="custom-radio-btn">
                             <input type="radio" id="pagoTarjeta" name="metodoPago" value="tarjeta" checked>
                             <label for="pagoTarjeta">
-                                <i class="bi bi-credit-card text-dark fs-2"></i> <!-- Tarjeta -->
-                                <span class="option-title">Tarjeta de Crédito/Débito</span>
-                                <div class="d-flex gap-2 mt-3">
-                                    <i class="bi bi-credit-card-2-front fs-5"></i>
-                                    <i class="bi bi-credit-card fs-5"></i>
+                                <div class="d-flex gap-2">
+                                    <i class="bi bi-credit-card-2-front fs-2"></i>
+                                    <i class="bi bi-credit-card fs-2"></i>
                                 </div>
+                                <span class="option-title text-center">Tarjeta de Crédito/Débito</span>
                             </label>
                         </div>
 
                         <div class="custom-radio-btn">
                             <input type="radio" id="pagoYape" name="metodoPago" value="yape">
                             <label for="pagoYape">
-                                <i class="bi bi-bank text-dark fs-2"></i> <!-- Banco/Yape -->
-                                <span class="option-title">Yape + Depósito Bancario</span>
-                                <div class="d-flex gap-2 mt-3">
-                                    <i class="bi bi-bank fs-5"></i>
-                                    <i class="bi bi-phone-fill fs-5"></i>
+                                <div class="d-flex gap-2">
+                                    <i class="bi bi-bank fs-2"></i>
+                                    <i class="bi bi-phone-fill fs-2"></i>
                                 </div>
+                                <span class="option-title text-center">Yape + Depósito Bancario</span>
                             </label>
                         </div>
                     </div>
                 </div>
 
                 <!-- Nota -->
-                <div class="note-alert alert p-3 mb-4 animated-card" style="animation-delay: 0.7s;">
+                <div class="note-alert alert animated-card" style="animation-delay: 0.7s;">
                     <div class="d-flex align-items-center">
                         <i class="bi bi-exclamation-triangle-fill fs-3 me-3 text-warning"></i>
                         <div class="alert alert-warning" role="alert">
-                            <strong>Nota importante:</strong> De momento no hay servicio de envío a domicilio, solo
-                            recojo en tienda.
+                            <strong>Importante:</strong> En este momento no contamos con servicio de envío a domicilio.
+                            Todas las compras deben ser recogidas en tienda física.
                         </div>
 
                     </div>
                 </div>
 
                 <!-- Botón para Stripe -->
-                <div id="botonStripe" class="text-center mb-5 animated-card" style="animation-delay: 0.8s;">
+                <div id="botonStripe" class="text-center animated-card">
                     <button type="submit" class="btn btn-marimon">
-                        <i class="bi bi-credit-card-fill me-2"></i>CONTINUAR CON EL PAGO
+                        <i class="bi bi-credit-card-fill me-2"></i>Pagar con Tarjeta
                     </button>
                 </div>
 
                 <!-- Botón para Yape -->
-                <div id="botonYape" class="text-center mb-5" style="display: none; animation-delay: 0.8s;">
+                <div id="botonYape" class="text-center mb-5 animated-card" style="display: none;">
                     <button type="submit" class="btn btn-marimon">
-                        <i class="bi bi-phone-fill me-2"></i>CONTINUAR CON EL PAGO
+                        <i class="bi bi-phone-fill me-2"></i>Pagar con Yape o Transferencia
                     </button>
                 </div>
             </div>
@@ -295,89 +285,3 @@
     </div>
 </form>
 <script src="~/js/comprobante.js" asp-append-version="true"></script>
-
-<script>
-document.getElementById('miFormulario').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevenir el envío inicialmente
-
-    var formulario = this;
-    var esValido = true;
-
-    // Detectar tipo de comprobante
-    var tipoComprobante = formulario.querySelector('input[name="tipoComprobante"]:checked').value;
-
-    if (tipoComprobante === 'boleta') {
-        var tipoDocumento = formulario.querySelector('#tipoDocumento').value;
-        var numeroDocumento = formulario.querySelector('#numeroDocumento');
-        var numeroDocumentoValue = numeroDocumento.value.trim();
-
-        // Limpiar errores previos
-        document.getElementById('dniErrorMessage').style.display = 'none';
-        document.getElementById('ceErrorMessage').style.display = 'none';
-        document.getElementById('pasaporteErrorMessage').style.display = 'none';
-        numeroDocumento.classList.remove('is-invalid');
-
-        // Validación por tipo de documento
-        if (tipoDocumento === 'DNI') {
-            if (!/^\d{8}$/.test(numeroDocumentoValue)) {
-                numeroDocumento.classList.add('is-invalid');
-                document.getElementById('dniErrorMessage').style.display = 'block';
-                esValido = false;
-            }
-        } else if (tipoDocumento === 'CE') {
-            if (!/^\d{9}$/.test(numeroDocumentoValue)) {
-                numeroDocumento.classList.add('is-invalid');
-                document.getElementById('ceErrorMessage').style.display = 'block';
-                esValido = false;
-            }
-        } else if (tipoDocumento === 'Pasaporte') {
-            if (!/^[A-Z0-9]{6,12}$/.test(numeroDocumentoValue)) {
-                numeroDocumento.classList.add('is-invalid');
-                document.getElementById('pasaporteErrorMessage').style.display = 'block';
-                esValido = false;
-            }
-        }
-
-        if (tipoDocumento === '') {
-            formulario.querySelector('#tipoDocumento').classList.add('is-invalid');
-            esValido = false;
-        } else {
-            formulario.querySelector('#tipoDocumento').classList.remove('is-invalid');
-        }
-
-    } else if (tipoComprobante === 'factura') {
-        // Validaciones para factura
-        var ruc = formulario.querySelector('#ruc');
-        var razonSocial = formulario.querySelector('#razonSocial');
-        var direccion = formulario.querySelector('#direccion');
-
-        ruc.classList.remove('is-invalid');
-        razonSocial.classList.remove('is-invalid');
-        direccion.classList.remove('is-invalid');
-
-        if (!/^\d{11}$/.test(ruc.value.trim())) {
-            ruc.classList.add('is-invalid');
-            esValido = false;
-        }
-
-        if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\.\,\-]{3,100}$/.test(razonSocial.value.trim())) {
-            razonSocial.classList.add('is-invalid');
-            esValido = false;
-        }
-
-        if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\.\,\-\#]{5,150}$/.test(direccion.value.trim())) {
-            direccion.classList.add('is-invalid');
-            esValido = false;
-        }
-    }
-
-    // Enviar si es válido
-    if (esValido) {
-        formulario.submit();
-    }
-});
-</script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
