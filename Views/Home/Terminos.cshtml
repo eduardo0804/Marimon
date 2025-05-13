@@ -14,7 +14,6 @@
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">Términos y Condiciones</h1>
-                <p class="hero-subtitle">Última actualización: @DateTime.Now.ToString("d 'de' MMMM 'de' yyyy")</p>
             </div>
         </div>
     </section>
@@ -88,40 +87,40 @@
                                 <h3>2.1 Descripción de servicios</h3>
                                 <p>Marimon ofrece los siguientes servicios automotrices:</p>
                                 
-                                <div class="services-grid">
-                                    <div class="service-item">
-                                        <i class="fas fa-laptop-code"></i>
-                                        <span>Diagnóstico computarizado</span>
-                                    </div>
-                                    <div class="service-item">
-                                        <i class="fas fa-wrench"></i>
-                                        <span>Mantenimiento preventivo</span>
-                                    </div>
-                                    <div class="service-item">
-                                        <i class="fas fa-cog"></i>
-                                        <span>Reparación de motor</span>
-                                    </div>
-                                    <div class="service-item">
-                                        <i class="fas fa-bolt"></i>
-                                        <span>Electricidad automotriz</span>
-                                    </div>
-                                    <div class="service-item">
-                                        <i class="fas fa-paint-brush"></i>
-                                        <span>Planchado y pintura</span>
-                                    </div>
-                                    <div class="service-item">
-                                        <i class="fas fa-car"></i>
-                                        <span>Alineación y balanceo</span>
-                                    </div>
-                                    <div class="service-item">
-                                        <i class="fas fa-oil-can"></i>
-                                        <span>Cambio de aceite</span>
-                                    </div>
-                                    <div class="service-item">
-                                        <i class="fas fa-truck"></i>
-                                        <span>Servicio de grúa</span>
-                                    </div>
-                                </div>
+                               <div class="services-grid">
+    <div class="service-item">
+        <i class="fas fa-robot"></i>
+        <span>Mecatrónica y Electrónica</span>
+    </div>
+    <div class="service-item">
+        <i class="fas fa-snowflake"></i>
+        <span>Sistema de Refrigeración</span>
+    </div>
+    <div class="service-item">
+        <i class="fas fa-wind"></i>
+        <span>Aire Acondicionado</span>
+    </div>
+    <div class="service-item">
+        <i class="fas fa-tools"></i>
+        <span>Mantenimientos y Frenos</span>
+    </div>
+    <div class="service-item">
+        <i class="fas fa-search"></i>
+        <span>Diagnóstico y Scanner</span>
+    </div>
+    <div class="service-item">
+        <i class="fas fa-spray-can"></i>
+        <span>Servicio de Planchado y Pintura Automotriz</span>
+    </div>
+    <div class="service-item">
+        <i class="fas fa-gas-pump"></i>
+        <span>Conversión a GLP</span>
+    </div>
+    <div class="service-item">
+        <i class="fas fa-gas-pump"></i>
+        <span>Conversión a GNV</span>
+    </div>
+</div>
 
                                 <h3>2.2 Alcance de los servicios</h3>
                                 <p>
@@ -249,7 +248,7 @@
                                     </div>
                                     <div class="payment-item">
                                         <i class="fas fa-mobile-alt"></i>
-                                        <span>Yape / Plin</span>
+                                        <span>Yape</span>
                                     </div>
                                 </div>
 
@@ -512,47 +511,6 @@
                    this.style.backgroundColor = 'transparent';
                });
            });
-           
-           // Add print button
-           const heroContent = document.querySelector('.hero-content');
-           const printButton = document.createElement('button');
-           printButton.innerHTML = '<i class="fas fa-print"></i> Imprimir';
-           printButton.className = 'btn-print';
-           printButton.style.cssText = `
-               background: white;
-               color: var(--primary-color);
-               border: none;
-               padding: 10px 20px;
-               border-radius: 25px;
-               margin-top: 20px;
-               cursor: pointer;
-               font-weight: 600;
-               transition: all 0.3s ease;
-           `;
-           
-           printButton.addEventListener('click', () => window.print());
-           heroContent.appendChild(printButton);
-           
-           // Back to top button
-           const backToTop = document.createElement('button');
-           backToTop.innerHTML = '<i class="fas fa-arrow-up"></i>';
-           backToTop.className = 'back-to-top';
-           backToTop.style.cssText = `
-               position: fixed;
-               bottom: 30px;
-               right: 30px;
-               background: var(--primary-color);
-               color: white;
-               border: none;
-               width: 50px;
-               height: 50px;
-               border-radius: 50%;
-               cursor: pointer;
-               display: none;
-               transition: all 0.3s ease;
-               box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-               z-index: 1000;
-           `;
            
            backToTop.addEventListener('click', () => {
                window.scrollTo({
