@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Marimon.Controllers
 {
@@ -786,7 +788,7 @@ namespace Marimon.Controllers
             <div class='header-content'>
                 <div class='logo-section'>
                     <img src='https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png' alt='Logo Marimon' class='logo'/>
-                    <p>AV. SAN AURELIO N 888 INT B URB AZCARRUNZ - SAN JUAN DE LURIGANCHO - LIMA, LIMA</p>
+                    <p>JR. GRAL. FELIPE SANTIAGO SALAVERRY 44, Lima 15022</p>
                     <p>Teléfono: +51 986418904</p>
                 </div>
                 <div class='document-section'>
@@ -796,8 +798,10 @@ namespace Marimon.Controllers
                 </div>
             </div>
         </div>
+        
         <div class='client-info'>
             <div>";
+            // Datos de cliente según tipo de comprobante
             if (comprobanteCompleto.tipo_comprobante.ToLower() == "factura" && comprobanteCompleto.Facturas.Any())
             {
                 var factura = comprobanteCompleto.Facturas.First();
@@ -815,9 +819,11 @@ namespace Marimon.Controllers
                 <p><span class='client-info-label'>DNI No:</span> {boleta.num_identificacion}</p>
                 ";
             }
+
             htmlContent += $@"
             </div>
         </div>
+        
         <table class='invoice-meta'>
             <tr>
                 <td>Nro INTERNO</td>
@@ -834,6 +840,7 @@ namespace Marimon.Controllers
                 <td></td>
             </tr>
         </table>
+        
         <table class='items-table'>
             <thead>
                 <tr>
@@ -846,6 +853,8 @@ namespace Marimon.Controllers
                 </tr>
             </thead>
             <tbody>";
+
+            // Detalles de productos
             foreach (var detalle in detallesVenta)
             {
                 var autoparte = detalle.Autoparte;
@@ -863,26 +872,41 @@ namespace Marimon.Controllers
                     <td class='right'>{totalItem:N2}</td>
                 </tr>";
             }
+
+            // Convertir a palabras (ejemplo básico)
             string montoEnPalabras = ConvertirNumeroALetras((double)venta.Total) + " CON " +
                                      ((int)((venta.Total - Math.Truncate(venta.Total)) * 100)).ToString("00") + "/100 Soles";
+
             htmlContent += $@"
             </tbody>
         </table>
+        
         <p class='amount-in-words'>SON: {montoEnPalabras}</p>
+        
         <table class='totals-table'>
             <tr>
                 <td>SUB TOTAL</td>
                 <td>S/</td>
                 <td>{venta.Total:N2}</td>
             </tr>
+          
             <tr>
                 <td><strong>IMPORTE TOTAL</strong></td>
                 <td><strong>S/</strong></td>
                 <td><strong>{venta.Total:N2}</strong></td>
             </tr>
         </table>
+        
+        <div class='qr-section'>
+            <div style='flex-grow: 1; padding-left: 20px;'>
+                <p style='margin-top: 0;'><strong>Representación impresa de la {comprobanteCompleto.tipo_comprobante} electrónica</strong></p>
+                <p>Autorizado mediante resolución Nro:</p>
+            </div>
+        </div>";
+        var hash = GenerarHash(comprobanteCompleto.Venta.StripeSessionId ?? comprobanteCompleto.Venta.ven_id.ToString());
+        htmlContent += $@"
         <div class='observations'>
-            El {comprobanteCompleto.tipo_comprobante} numero {numeroComprobante}, ha sido aceptada | Hash : djX1dU9cIagNcDqUHUo71ua0vkc=
+            El {comprobanteCompleto.tipo_comprobante} numero {numeroComprobante}, ha sido aceptada | Hash : {hash}
         </div>
     </div>
 </body>
@@ -948,6 +972,15 @@ namespace Marimon.Controllers
                 if ((valor % 1000000) > 0) Num2Text += " " + ConvertirNumeroALetras(valor % 1000000);
             }
             return Num2Text;
+        }
+        private string GenerarHash(string valor)
+        {
+            using (var sha = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(valor);
+                var hash = sha.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
+            }
         }
 
         private byte[] ConvertHtmlToPdf(string htmlContent)

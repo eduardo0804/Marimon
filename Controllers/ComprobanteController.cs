@@ -19,6 +19,8 @@ using Microsoft.Extensions.Options;
 using System.Globalization;
 using Stripe;
 using Stripe.Checkout;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Marimon.Controllers
 {
@@ -450,9 +452,18 @@ namespace Marimon.Controllers
             {
                 return NotFound("No se encontró la venta asociada a esta sesión de pago.");
             }
+
+             var comprobante = await _context.Comprobante
+                .Include(c => c.Boletas)
+                .Include(c => c.Facturas)
+                .FirstOrDefaultAsync(c => c.VentaId == venta.ven_id);
             
             if (session.PaymentStatus == "paid")
             {
+                if (comprobante != null)
+                {
+                    return View("PagoExitoso", comprobante);
+                }
                 // El pago fue exitoso, continuar con el proceso de registro de comprobante
                 string tipoComprobante = TempData["tipoComprobante"]?.ToString();
                 string num_identificacion = TempData["num_identificacion"]?.ToString();
@@ -462,10 +473,11 @@ namespace Marimon.Controllers
                 
                 // Aquí reutilizamos gran parte de la lógica de RegistrarComprobante
                 // Crear el comprobante
-                var comprobante = new Comprobante
+                comprobante = new Comprobante
                 {
                     tipo_comprobante = tipoComprobante,
-                    VentaId = venta.ven_id
+                    VentaId = venta.ven_id,
+                    com_evidencia = string.Empty
                 };
                 _context.Comprobante.Add(comprobante);
                 await _context.SaveChangesAsync();
@@ -801,7 +813,7 @@ namespace Marimon.Controllers
             <div class='header-content'>
                 <div class='logo-section'>
                     <img src='https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png' alt='Logo Marimon' class='logo'/>
-                    <p>AV. SAN AURELIO N 888 INT B URB AZCARRUNZ - SAN JUAN DE LURIGANCHO - LIMA, LIMA</p>
+                    <p>JR. GRAL. FELIPE SANTIAGO SALAVERRY 44, Lima 15022</p>
                     <p>Teléfono: +51 986418904</p>
                 </div>
                 <div class='document-section'>
@@ -915,10 +927,11 @@ namespace Marimon.Controllers
                 <p style='margin-top: 0;'><strong>Representación impresa de la {comprobanteCompleto.tipo_comprobante} electrónica</strong></p>
                 <p>Autorizado mediante resolución Nro:</p>
             </div>
-        </div>
-            
+        </div>";
+        var hash = GenerarHash(comprobanteCompleto.Venta.StripeSessionId ?? comprobanteCompleto.Venta.ven_id.ToString());
+        htmlContent += $@"
         <div class='observations'>
-            El {comprobanteCompleto.tipo_comprobante} numero {numeroComprobante}, ha sido aceptada | Hash : djX1dU9cIagNcDqUHUo71ua0vkc=
+            El {comprobanteCompleto.tipo_comprobante} numero {numeroComprobante}, ha sido aceptada | Hash : {hash}
         </div>
     </div>
 </body>
@@ -1031,6 +1044,15 @@ namespace Marimon.Controllers
             {
                 Console.WriteLine($"Error generando QR: {ex.Message}");
                 return "";
+            }
+        }
+        private string GenerarHash(string valor)
+        {
+            using (var sha = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(valor);
+                var hash = sha.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
             }
         }
         private byte[] ConvertHtmlToPdf(string htmlContent)
