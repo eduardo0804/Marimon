@@ -62,17 +62,17 @@ header {
   color: #000000;
 }
 /* Cerrar sesión - Aplicando estilos al botón */
-form {
+header form {
   display: flex;
   align-items: center;
 }
-form i.fas {
+header form i.fas {
   color: #ffffff;
   font-size: 20px; /* Mismo tamaño que el texto del botón */
   margin-right: 5px;
   transition: color 0.3s ease; /* Transición para el ícono */
 }
-form button {
+header form button {
   background: transparent;
   border: none;
   color: #ffffff;
@@ -83,8 +83,8 @@ form button {
   font-family: inherit;
   transition: color 0.3s ease; /* Transición suave para el cambio de color */
 }
-form:hover button,
-form:hover i.fas {
+header form:hover button,
+header form:hover i.fas {
   color: #000000;
 }
 /*FOOTER*/
@@ -129,7 +129,7 @@ footer {
   .contenedor-menu {
     padding: 0 15px;
   }
-  
+
   .logo-img {
     height: 34px;
   }
@@ -141,19 +141,20 @@ footer {
   form button {
     font-size: 16px; /* Puedes cambiar este valor según tus preferencias */
   }
-  
+
   form i.fas {
     font-size: 16px; /* Mantiene el mismo tamaño que el texto del botón */
   }
-  
-  
+
   .footer-content {
     flex-direction: column;
     padding: 15px;
     gap: 8px;
   }
-  
-  .footer-left, .footer-center, .footer-right {
+
+  .footer-left,
+  .footer-center,
+  .footer-right {
     text-align: center;
   }
 }
@@ -161,21 +162,21 @@ footer {
   .logo-img {
     height: 30px;
   }
-  
+
   .titulo-header {
     font-size: 12px; /* Puedes cambiar este valor según tus preferencias */
     letter-spacing: 2px;
     /* Mantiene la misma posición en el centro */
   }
-  
+
   form button {
     font-size: 12px; /* Puedes cambiar este valor según tus preferencias */
   }
-  
+
   form i.fas {
     font-size: 12px; /* Mantiene el mismo tamaño que el texto del botón */
   }
-  
+
   .footer-content {
     gap: 5px;
     font-size: 12px;
