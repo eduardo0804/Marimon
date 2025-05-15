@@ -84,8 +84,21 @@
                                         <input type="file" class="form-control" id="comprobanteFile"
                                             name="comprobanteFile" accept="image/*" required>
                                     </label>
-                                    <img id="imagePreview" class="file-preview" src="#" alt="Vista previa"
-                                        style="display:none;">
+                                    <div class="image-preview-container"
+                                        style="position: relative; width: 50%; margin: 0 auto; display: flex; justify-content: center;">
+                                        <img id="imagePreview" class="file-preview" src="#" alt="Vista previa"
+                                            style="display:none;">
+                                        <button type="button" id="removeImage" class="btn btn-danger position-absolute"
+                                            style="display:none; top:15px; right:15px; border-radius:50%; padding:8px 10px; z-index:100;"
+                                            title="Eliminar imagen" aria-label="Eliminar imagen" onclick="document.getElementById('comprobanteFile').value=''; 
+                                            document.getElementById('imagePreview').style.display='none';
+                                            this.style.display='none';
+                                            document.getElementById('fileErrorAlert').classList.add('d-none');
+                                            document.getElementById('fileRequiredAlert').classList.add('d-none');
+                                            return false;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div class="alert-important">
@@ -106,7 +119,8 @@
                                         <i class="bi bi-check-circle-fill me-2"></i>
                                         <span>Confirmar Pago</span>
                                     </button>
-                                    <a href="javascript:void(0);" class="btn btn-outline" id="backBtn" onclick="history.back();">
+                                    <a href="javascript:void(0);" class="btn btn-outline" id="backBtn"
+                                        onclick="history.back();">
                                         <i class="bi bi-arrow-left me-2"></i> Volver
                                     </a>
                                 </div>
@@ -123,6 +137,7 @@
     // File validation and preview functionality
     document.getElementById('comprobanteFile').addEventListener('change', function (e) {
         const preview = document.getElementById('imagePreview');
+        const removeButton = document.getElementById('removeImage');
         const fileErrorAlert = document.getElementById('fileErrorAlert');
         const fileRequiredAlert = document.getElementById('fileRequiredAlert');
         const file = e.target.files[0];
@@ -138,6 +153,7 @@
                 fileErrorAlert.classList.remove('d-none');
                 this.value = '';
                 preview.style.display = 'none';
+                removeButton.style.display = 'none';
                 return;
             }
 
@@ -146,11 +162,13 @@
             reader.onload = function (event) {
                 preview.src = event.target.result;
                 preview.style.display = 'block';
+                removeButton.style.display = 'block';
                 preview.classList.add('animate__animated', 'animate__fadeIn');
             }
             reader.readAsDataURL(file);
         } else {
             preview.style.display = 'none';
+            removeButton.style.display = 'none'; // Asegurar que el botón esté oculto
         }
     });
 
