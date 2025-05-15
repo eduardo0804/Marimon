@@ -4,7 +4,7 @@
     Layout = "_LayoutVentas";
 }
 <style>form i.fas {color: black;}</style>
-<link rel="stylesheet" href="~/css/entrada.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/entrada-salida.css" asp-append-version="true" />
 <!-- Contenido Principal -->
 <div class="container">
     <ol class="breadcrumb">
@@ -114,10 +114,8 @@
                             <div class="col-12">
                                 <div class="d-grid">
                                     <button type="submit"
-                                        class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
-                                        id="submitButton">
-                                        <i class="fas fa-plus-circle me-2"></i>REGISTRAR ENTRADA
-                                        <span class="hover-overlay"></span>
+                                        class="btn btn-registrar">
+                                        <i style="color: black;" class="fas fa-plus-circle me-2"></i>Registrar Entrada
                                     </button>
                                 </div>
                             </div>
@@ -259,30 +257,6 @@
                 productoSelect.innerHTML = "<option value=''>Error al cargar productos</option>";
             });
     }
-
-    // Efecto de hover para el botón
-    document.addEventListener('DOMContentLoaded', function () {
-        // Aplicar el estilo directamente al botón
-        const submitButton = document.getElementById('submitButton');
-        if (submitButton) {
-            // Asegurarse de que el botón sea visible y tenga el color correcto
-            submitButton.style.backgroundColor = '#d42025';
-            submitButton.style.display = 'block';
-            submitButton.style.width = '100%';
-
-            submitButton.addEventListener('mouseover', function () {
-                this.style.backgroundColor = '#b91d21';
-                this.style.transform = 'translateY(-2px)';
-                this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-            });
-
-            submitButton.addEventListener('mouseout', function () {
-                this.style.backgroundColor = '#d42025';
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
-            });
-        }
-    });
 
     // Función de búsqueda en la tabla
     document.getElementById('searchInput').addEventListener('keyup', function () {

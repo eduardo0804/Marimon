@@ -522,7 +522,7 @@ namespace Marimon.Controllers
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "La autoparte se registró correctamente.";
 
-                return Content("<script>window.parent.location.href = '/Admin/ListaAutopartes';</script>", "text/html");
+                return Content("<script>window.parent.location.href = '/Personal_Ventas/ListaAutopartes';</script>", "text/html");
             }
             catch (Exception ex)
             {
@@ -623,7 +623,7 @@ namespace Marimon.Controllers
             await _context.SaveChangesAsync();
 
             TempData["EditMessage"] = "La autoparte se actualizó correctamente.";
-            return RedirectToAction("ListaAutopartes", "Admin");
+            return RedirectToAction("ListaAutopartes", "Personal_Ventas");
         }
 
         [HttpPost]
@@ -651,7 +651,7 @@ namespace Marimon.Controllers
             _context.Autopartes.Remove(autoparte);
             await _context.SaveChangesAsync();
             TempData["DeleteMessage"] = "La autoparte se eliminó correctamente.";
-            return RedirectToAction("ListaAutopartes", "Admin");
+            return RedirectToAction("ListaAutopartes", "Personal_Ventas");
         }
 
         private string GenerateComprobanteHtml(Comprobante comprobante)

@@ -111,6 +111,7 @@
 
 
   <!-- Tabla de autopartes -->
+  <div class="accordion" id="salidasAccordion"  style="max-height: 400px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; background: #fff;">
   <div class="table-container">
     <div class="table-responsive">
       <table class="modern-table">
@@ -150,9 +151,9 @@
                   <div class="image-container">
                     <img src="@item.aut_imagen" alt="Imagen" class="table-image" />
                     <div class="image-overlay">
-                      @* <a href="@item.aut_imagen" target="_blank" class="image-zoom"> *@
-                      @*   <i class="fas fa-search-plus"></i> *@
-                      @* </a> *@
+                      <a style="text-decoration: none;" href="@item.aut_imagen" target="_blank" class="image-zoom">
+                        <i style="color:white;" class="fas fa-search-plus"></i>
+                      </a>
                     </div>
                   </div>
                 }
@@ -166,7 +167,7 @@
                   <button class="btn-action btn-edit" onclick="loadEditModal('@item.aut_id');" title="Modificar">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <form asp-action="Eliminar" asp-controller="Admin" asp-route-id="@item.aut_id" method="post"
+                  <form asp-action="Eliminar" asp-controller="Personal_Ventas" asp-route-id="@item.aut_id" method="post"
                     class="delete-form">
                     <button type="button" class="btn-action btn-delete" onclick="confirmDelete(this)" title="Eliminar">
                       <i class="fas fa-trash-alt"></i>
