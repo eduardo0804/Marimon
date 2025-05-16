@@ -7,8 +7,8 @@
 
 <div class="login_container">
     <div class="login_form">
-        <h3>Iniciar sesión con</h3>
-        
+        <h3>Iniciar Sesión Con</h3>
+
         <!-- Sección de iniciar sesión con proveedores externos -->
         <div class="login_option">
             @{
@@ -16,18 +16,21 @@
                 {
                     <div class="option">
                         <p class="no-providers">
-                            No hay servicios de autenticación externos configurados. 
-                            <a href="https://go.microsoft.com/fwlink/?LinkID=532715">Más información sobre la configuración de servicios externos</a>.
+                            No hay servicios de autenticación externos configurados.
+                            <a href="https://go.microsoft.com/fwlink/?LinkID=532715">Más información sobre la configuración de
+                                servicios externos</a>.
                         </p>
                     </div>
                 }
                 else
                 {
                     <div class="option">
-                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl"
+                            method="post" class="form-horizontal">
                             @foreach (var provider in Model.ExternalLogins!)
                             {
-                                <button type="submit" class="social-login-btn" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                <button type="submit" class="social-login-btn" name="provider" value="@provider.Name"
+                                    title="Log in using your @provider.DisplayName account">
                                     @if (provider.Name.ToLower().Contains("google"))
                                     {
                                         <div class="google-icon"></div>
@@ -40,33 +43,35 @@
                 }
             }
         </div>
-        
+
         <p class="separator">
             <span>o</span>
         </p>
-        
+
         <!-- Sección de iniciar sesión con cuenta local -->
         <section class="local-login">
             <form id="account" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                
+
                 <!-- Email input box -->
                 <div class="input_box">
-                    <label asp-for="Input.Email">Correo electrónico</label>
-                    <input asp-for="Input.Email" autocomplete="username" aria-required="true" placeholder="Ingresa tu correo electrónico" />
+                    <label asp-for="Input.Email">Correo Electrónico</label>
+                    <input asp-for="Input.Email" autocomplete="username" aria-required="true"
+                        placeholder="Ingresa tu correo electrónico" />
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                
+
                 <!-- Password input box -->
                 <div class="input_box">
                     <div class="password_title">
                         <label asp-for="Input.Password">Contraseña</label>
-                        <a id="forgot-password" asp-page="./ForgotPassword">¿Olvidaste tu contraseña?</a>
+                        <a id="forgot-password" asp-page="./ForgotPassword">¿Olvidaste tu Contraseña?</a>
                     </div>
-                    <input asp-for="Input.Password" autocomplete="current-password" aria-required="true" placeholder="Ingresa tu contraseña" />
+                    <input asp-for="Input.Password" autocomplete="current-password" aria-required="true"
+                        placeholder="Ingresa tu contraseña" />
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
-                
+
                 <!-- Remember me checkbox -->
                 <div class="checkbox">
                     <label asp-for="Input.RememberMe">
@@ -74,14 +79,15 @@
                         Recuérdame
                     </label>
                 </div>
-                
+
                 <!-- Login button -->
-                <button id="login-submit" type="submit">Iniciar sesión</button>
-                
-                <p class="sign_up">¿No tienes una cuenta? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Registrarse</a></p>
+                <button id="login-submit" type="submit">Iniciar Sesión</button>
+
+                <p class="sign_up">¿No tienes una cuenta? <a asp-page="./Register"
+                        asp-route-returnUrl="@Model.ReturnUrl">Registrarse</a></p>
             </form>
         </section>
-        
+
         <!-- Información de depuración (mantenida del original) -->
         <div class="debug-info">
             <div class="alert alert-info">
@@ -101,7 +107,7 @@
         </div>
     </div>
 
-    
+
     <div class="login_image">
         <img src="~/images/login.jpeg" alt="Imagen de la empresa" />
     </div>
