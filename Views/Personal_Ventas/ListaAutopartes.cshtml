@@ -8,8 +8,8 @@
 
 <link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
 
-<div class="container py-4">
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+<div class="container">
+  <div class="toast-container bottom-0 end-0 p-3">
     <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header bg-success text-white">
         <strong class="me-auto">Éxito</strong>
@@ -48,7 +48,7 @@
     </div>
   </div>
   <!-- Encabezado con imagen y texto -->
-  <div class="row align-items-center mb-4">
+  <div class="row align-items-center">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
@@ -111,9 +111,7 @@
 
 
   <!-- Tabla de autopartes -->
-  <div class="accordion" id="salidasAccordion"  style="max-height: 400px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; background: #fff;">
-  <div class="table-container">
-    <div class="table-responsive">
+  <div class="table-container" style="max-height: 260px; overflow-y: auto;overflow-x: auto; border-radius: 8px; border: 1px solid #eee; background: #fff;">
       <table class="modern-table">
         <thead>
           <tr>

@@ -37,7 +37,7 @@ namespace Marimon.Controllers
             _hostingEnvironment = hostingEnvironment;
             _emailSender = emailSender;
             _emailSettings = emailSettings; // Añade esta asignación
-            _converter = converter; 
+            _converter = converter;
         }
 
         // GET: Personal_VentasController
@@ -182,7 +182,7 @@ namespace Marimon.Controllers
                     Cantidad = s.sal_cantidad,
                     FechaSalida = s.sal_fechasalida,
                     VentaId = 0,
-                    Estado = "Presencial"
+                    Estado = "Completado"
                 })
                 .ToList();
 
@@ -310,77 +310,97 @@ namespace Marimon.Controllers
                     venta.Estado = estado;
                     await _context.SaveChangesAsync();
 
-                    // Cargar el contenido del archivo HTML
-                    var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "EstadosPedido.html");
-                    emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+                    bool esStripe = !string.IsNullOrEmpty(venta.StripeSessionId);
+                    bool esCancelacion = estado == "Cancelado";
 
-                    // Determinar las clases CSS según el estado
-                    string stylePendiente = "opacity:0.4; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
-                    string styleCompletado = "opacity:0.4; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
-                    string styleCancelado = "opacity:0.4; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;";
-                    string claseEstadoTexto = "";
-                    string colCancelado = "";
-                    subject = $"Estado de tu pedido #{id} actualizado a {estado}";
-                    string mensajeEstado = "";
-                    string mensajeCambio = $"El estado de tu pedido <strong>#{id}</strong> ha cambiado a:";
-
-                    if (estado == "Pendiente")
+                    if (esStripe && esCancelacion)
                     {
-                        stylePendiente = "opacity:1; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
-                        claseEstadoTexto = "color: #F39C12;";
-                        mensajeEstado = "Tu pedido está pendiente de confirmación. Estamos revisando tu pago y te notificaremos cuando se confirme.";
+                        // Usar plantilla de cancelación específica para Stripe
+                        var cancelacionTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "Cancelacion.html");
+                        emailBody = await System.IO.File.ReadAllTextAsync(cancelacionTemplatePath);
+                        subject = $"Cancelación de tu pedido #{id} - Marimon Autopartes";
+
+                        // Reemplazar los valores dinámicos en la plantilla de cancelación
+                        emailBody = emailBody.Replace("{nombreCompleto}", venta.Usuario?.usu_nombre + " " + venta.Usuario?.usu_apellido)
+                                        .Replace("{ventaID}", id.ToString())
+                                        .Replace("{montoTotal}", venta.Total.ToString("0.00"))
+                                        .Replace("{{CallbackUrl}}", "http://localhost:5031/Catalogo");
+
                     }
-                    else if (estado == "Completado")
+                    else
                     {
-                        styleCompletado = "opacity:1; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
-                        claseEstadoTexto = "color: #27ae60;";
-                        mensajeEstado = "¡Tu pedido ha sido completado exitosamente! Puedes acercarte a nuestro local para recogerlo. <br><b>Adjuntamos tu boleta electrónica en este correo para tu comodidad y respaldo.</b> ¡Gracias por confiar en Marimon!";
-                        // Buscar el comprobante relacionado
-                        var comprobante = await _context.Comprobante
-                            .Include(c => c.Boletas)
-                            .FirstOrDefaultAsync(c => c.VentaId == venta.ven_id);
 
-                        if (comprobante != null)
+                        // Cargar el contenido del archivo HTML
+                        var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "EstadosPedido.html");
+                        emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                        // Determinar las clases CSS según el estado
+                        string stylePendiente = "opacity:0.4; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                        string styleCompletado = "opacity:0.4; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
+                        string styleCancelado = "opacity:0.4; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;";
+                        string claseEstadoTexto = "";
+                        string colCancelado = "";
+                        subject = $"Estado de tu pedido #{id} actualizado a {estado}";
+                        string mensajeEstado = "";
+                        string mensajeCambio = $"El estado de tu pedido <strong>#{id}</strong> ha cambiado a:";
+
+                        if (estado == "Pendiente")
                         {
-                            // Generar HTML y PDF SOLO si com_imagen está vacío o el archivo no existe
-                            if (string.IsNullOrEmpty(comprobante.com_imagen) ||
-                                !System.IO.File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", comprobante.com_imagen?.TrimStart('/'))))
-                            {
-                                var htmlContent = GenerateComprobanteHtml(comprobante);
-                                var pdfBytes = ConvertHtmlToPdf(htmlContent);
-                                var rutaPdf = SavePdfToFile(pdfBytes, comprobante.com_id, comprobante.tipo_comprobante);
+                            stylePendiente = "opacity:1; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                            claseEstadoTexto = "color: #F39C12;";
+                            mensajeEstado = "Tu pedido está pendiente de confirmación. Estamos revisando tu pago y te notificaremos cuando se confirme.";
+                        }
+                        else if (estado == "Completado")
+                        {
+                            styleCompletado = "opacity:1; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
+                            claseEstadoTexto = "color: #27ae60;";
+                            mensajeEstado = "¡Tu pedido ha sido completado exitosamente! Puedes acercarte a nuestro local para recogerlo. <br><b>Adjuntamos tu boleta electrónica en este correo para tu comodidad y respaldo.</b> ¡Gracias por confiar en Marimon!";
+                            // Buscar el comprobante relacionado
+                            var comprobante = await _context.Comprobante
+                                .Include(c => c.Boletas)
+                                .FirstOrDefaultAsync(c => c.VentaId == venta.ven_id);
 
-                                comprobante.com_imagen = rutaPdf;
-                                _context.Update(comprobante);
-                                await _context.SaveChangesAsync();
+                            if (comprobante != null)
+                            {
+                                // Generar HTML y PDF SOLO si com_imagen está vacío o el archivo no existe
+                                if (string.IsNullOrEmpty(comprobante.com_imagen) ||
+                                    !System.IO.File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", comprobante.com_imagen?.TrimStart('/'))))
+                                {
+                                    var htmlContent = GenerateComprobanteHtml(comprobante);
+                                    var pdfBytes = ConvertHtmlToPdf(htmlContent);
+                                    var rutaPdf = SavePdfToFile(pdfBytes, comprobante.com_id, comprobante.tipo_comprobante);
+
+                                    comprobante.com_imagen = rutaPdf;
+                                    _context.Update(comprobante);
+                                    await _context.SaveChangesAsync();
+                                }
                             }
                         }
-                    }
-                    else if (estado == "Cancelado")
-                    {
-                        colCancelado = @"<td style=""opacity:1; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;"">
+                        else if (estado == "Cancelado")
+                        {
+                            colCancelado = @"<td style=""opacity:1; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;"">
                     <img src=""https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fel-tiempo-de-entrega.png?alt=media&token=3eed4a09-a993-40fc-9989-4abcc4c2359b.jpg""
                         alt=""Cancelado"" width=""50"" height=""50"" style=""display:block; margin:0 auto 10px auto;"">
                     Cancelado
                 </td>";
-                        claseEstadoTexto = "color: #E42229;";
-                        mensajeEstado = "Tu pedido ha sido cancelado. Si tienes dudas, por favor contáctanos para más información.";
+                            claseEstadoTexto = "color: #E42229;";
+                            mensajeEstado = "Tu pedido ha sido cancelado. Si tienes dudas, por favor contáctanos para más información.";
+                        }
+
+                        // Reemplazar los valores dinámicos
+                        emailBody = emailBody.Replace("{{UserName}}", venta.Usuario?.usu_nombre ?? "Cliente")
+                                            .Replace("{{PedidoId}}", id.ToString())
+                                            .Replace("{{Estado}}", estado)
+                                            .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
+                                            .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
+                                            .Replace("{{StylePendiente}}", stylePendiente)
+                                            .Replace("{{StyleCompletado}}", styleCompletado)
+                                            .Replace("{{StyleCancelado}}", styleCancelado)
+                                            .Replace("{{ColCancelado}}", colCancelado)
+                                            .Replace("{{MensajeEstado}}", mensajeEstado)
+                                            .Replace("{{MensajeCambio}}", mensajeCambio)
+                                            .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto);
                     }
-
-                    // Reemplazar los valores dinámicos
-                    emailBody = emailBody.Replace("{{UserName}}", venta.Usuario?.usu_nombre ?? "Cliente")
-                                        .Replace("{{PedidoId}}", id.ToString())
-                                        .Replace("{{Estado}}", estado)
-                                        .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
-                                        .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
-                                        .Replace("{{StylePendiente}}", stylePendiente)
-                                        .Replace("{{StyleCompletado}}", styleCompletado)
-                                        .Replace("{{StyleCancelado}}", styleCancelado)
-                                        .Replace("{{ColCancelado}}", colCancelado)
-                                        .Replace("{{MensajeEstado}}", mensajeEstado)
-                                        .Replace("{{MensajeCambio}}", mensajeCambio)
-                                        .Replace("{{ClaseEstadoTexto}}", claseEstadoTexto);
-
                     // Confirmar la transacción
                     scope.Complete();
                 }
@@ -455,7 +475,81 @@ namespace Marimon.Controllers
             throw new NotImplementedException();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ObtenerDatosVenta(int ventaId)
+        {
+            try
+            {
+                var venta = await _context.Venta
+                    .Include(v => v.Usuario)
+                    .Include(v => v.MetodoPago)
+                    .FirstOrDefaultAsync(v => v.ven_id == ventaId);
 
+                if (venta == null)
+                {
+                    return Json(new { error = "Venta no encontrada" });
+                }
+
+                var comprobante = await _context.Comprobante
+                    .Include(c => c.Boletas)
+                    .Include(c => c.Facturas)
+                    .FirstOrDefaultAsync(c => c.VentaId == ventaId);
+
+                string cliente = venta.Usuario?.usu_nombre + " " + venta.Usuario?.usu_apellido;
+                string documento = "";
+                string evidenciaUrl = "";
+                bool esStripe = false;
+
+                esStripe = !string.IsNullOrEmpty(venta.StripeSessionId);
+
+                if (comprobante != null)
+                {
+                    if (comprobante.Facturas != null && comprobante.Facturas.Any())
+                    {
+                        var factura = comprobante.Facturas.First();
+                        cliente = factura.fac_razonsocial;
+                        documento = "RUC: " + factura.fac_ruc;
+                    }
+                    else if (comprobante.Boletas != null && comprobante.Boletas.Any())
+                    {
+                        var boleta = comprobante.Boletas.First();
+                        documento = "DNI: " + boleta.num_identificacion;
+                    }
+
+                    // Obtener la URL de la evidencia solo para pagos que no son por Stripe
+                    if (!esStripe && !string.IsNullOrEmpty(comprobante.com_evidencia))
+                    {
+                        evidenciaUrl = comprobante.com_evidencia;
+                        if (!evidenciaUrl.StartsWith("http") && !evidenciaUrl.StartsWith("/"))
+                        {
+                            evidenciaUrl = "/" + evidenciaUrl;
+                        }
+                    }
+                }
+
+                // Obtener el nombre del método de pago
+                string metodoPago = venta.MetodoPago?.pag_metodo ?? "No especificado";
+                if (esStripe)
+                {
+                    metodoPago += " (Stripe)";
+                }
+
+                return Json(new
+                {
+                    cliente = cliente,
+                    documento = documento,
+                    total = venta.Total.ToString("0.00"),
+                    evidenciaUrl = evidenciaUrl,
+                    esStripe = esStripe,
+                    metodoPago = metodoPago
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener datos de la venta {VentaId}", ventaId);
+                return Json(new { error = "Error al procesar la solicitud: " + ex.Message });
+            }
+        }
 
 
 
@@ -903,8 +997,8 @@ namespace Marimon.Controllers
                 <p>Autorizado mediante resolución Nro:</p>
             </div>
         </div>";
-        var hash = GenerarHash(comprobanteCompleto.Venta.StripeSessionId ?? comprobanteCompleto.Venta.ven_id.ToString());
-        htmlContent += $@"
+            var hash = GenerarHash(comprobanteCompleto.Venta.StripeSessionId ?? comprobanteCompleto.Venta.ven_id.ToString());
+            htmlContent += $@"
         <div class='observations'>
             El {comprobanteCompleto.tipo_comprobante} numero {numeroComprobante}, ha sido aceptada | Hash : {hash}
         </div>

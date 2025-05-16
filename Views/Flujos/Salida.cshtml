@@ -263,29 +263,69 @@
 
 <!-- Modal para cambiar estado -->
 <div class="modal fade" id="estadoModal" tabindex="-1" aria-labelledby="estadoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <!-- Agregada clase modal-dialog-centered -->
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <form asp-controller="Personal_Ventas" asp-action="CambiarEstadoAvanzado" method="post">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="estadoModalLabel">Cambiar Estado</h5>
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="estadoModalLabel">
+                        <i class="fas fa-edit me-2"></i>Cambiar Estado de Venta
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Selecciona el nuevo estado para esta salida:</p>
-                    <input type="hidden" id="salidaIdInput" name="id" />
-                    <div class="mb-3">
-                        <label for="estadoSelect" class="form-label">Estado</label>
-                        <select id="estadoSelect" name="estado" class="form-select">
-                            <option value="Completado">Completado</option>
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="Cancelado">Cancelado</option>
-                        </select>
+                    <div class="row" id="modalContentRow">
+                        <!-- Panel izquierdo - Información de venta -->
+                        <div id="infoVentaPanel" class="col-md-6">
+                            <div class="card border-0 shadow-sm mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="fas fa-info-circle me-2" style="color: white;"></i>Información de la Venta
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Venta ID:</strong> <span id="ventaIdDisplay">-</span></p>
+                                    <p><strong>Cliente:</strong> <span id="clienteDisplay">-</span></p>
+                                    <p><strong>Documento:</strong> <span id="documentoDisplay">-</span></p>
+                                    <p><strong>Total:</strong> <span id="totalDisplay">-</span></p>
+                                    <p><strong>Método de pago:</strong> <span id="metodoPagoDisplay">-</span></p>
+
+                                    <div class="mb-3">
+                                        <label for="estadoSelect" class="form-label fw-bold">Actualizar Estado:</label>
+                                        <select id="estadoSelect" name="estado" class="form-select">
+                                            <option value="Completado">Completado</option>
+                                            <option value="Pendiente">Pendiente</option>
+                                            <option value="Cancelado">Cancelado</option>
+                                        </select>
+                                    </div>
+                                    <input type="hidden" id="salidaIdInput" name="id" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel derecho - Evidencia de pago (solo para pagos no-Stripe) -->
+                        <div id="evidenciaContainer" class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fas fa-image me-2" style="color: white;"></i>Evidencia de Pago
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="mb-3" id="evidenciaImageContainer">
+                                        <img id="evidenciaImage" src="" alt="Evidencia de pago" 
+                                            class="img-fluid rounded shadow" style="max-height: 300px;" />
+                                    </div>
+                                    <a id="evidenciaEnlace" href="#" target="_blank" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-search-plus me-1" style="color: white;"></i>Ver imagen completa
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1" style="color: white;"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1" style="color: white;"></i>Guardar Cambios
+                    </button>
                 </div>
             </form>
         </div>
@@ -346,12 +386,86 @@
             const button = event.relatedTarget;
             const estado = button.getAttribute('data-estado');
             const salidaId = button.getAttribute('data-id');
-
+            
             // Configurar el modal con los datos actuales
             const input = document.getElementById('salidaIdInput');
             const select = document.getElementById('estadoSelect');
             input.value = salidaId;
-            select.value = estado;
+            
+            // Mostrar el ID de la venta
+            document.getElementById('ventaIdDisplay').textContent = salidaId;
+            
+            // Cargar datos adicionales de la venta usando AJAX
+            fetch(`/Personal_Ventas/ObtenerDatosVenta?ventaId=${salidaId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('clienteDisplay').textContent = data.cliente || '-';
+                    document.getElementById('documentoDisplay').textContent = data.documento || '-';
+                    document.getElementById('totalDisplay').textContent = `S/ ${data.total || '0.00'}`;
+                    document.getElementById('metodoPagoDisplay').textContent = data.metodoPago || '-';
+                    
+                    // Referencias a elementos del DOM
+                    const infoVentaPanel = document.getElementById('infoVentaPanel');
+                    const evidenciaContainer = document.getElementById('evidenciaContainer');
+                    const evidenciaImage = document.getElementById('evidenciaImage');
+                    const evidenciaEnlace = document.getElementById('evidenciaEnlace');
+                    
+                    // Configurar opciones del select de estado según el método de pago
+                    select.innerHTML = ''; 
+                    
+                    if (data.esStripe) {
+                        const optionCompletado = document.createElement('option');
+                        optionCompletado.value = 'Completado';
+                        optionCompletado.textContent = 'Completado';
+                        
+                        const optionCancelado = document.createElement('option');
+                        optionCancelado.value = 'Cancelado';
+                        optionCancelado.textContent = 'Cancelado';
+                        
+                        select.appendChild(optionCompletado);
+                        select.appendChild(optionCancelado);
+                        
+                        evidenciaContainer.style.display = 'none';
+                        infoVentaPanel.className = 'col-md-8 mx-auto';
+                    } else {
+                        // Para pagos Yape/otros: todas las opciones
+                        const optionCompletado = document.createElement('option');
+                        optionCompletado.value = 'Completado';
+                        optionCompletado.textContent = 'Completado';
+                        
+                        const optionPendiente = document.createElement('option');
+                        optionPendiente.value = 'Pendiente';
+                        optionPendiente.textContent = 'Pendiente';
+                        
+                        const optionCancelado = document.createElement('option');
+                        optionCancelado.value = 'Cancelado';
+                        optionCancelado.textContent = 'Cancelado';
+                        
+                        select.appendChild(optionCompletado);
+                        select.appendChild(optionPendiente);
+                        select.appendChild(optionCancelado);
+                        
+                        infoVentaPanel.className = 'col-md-6';
+                        
+                        if (data.evidenciaUrl && data.evidenciaUrl !== '') {
+                            evidenciaContainer.style.display = 'block';
+                            evidenciaImage.src = data.evidenciaUrl;
+                            evidenciaEnlace.href = data.evidenciaUrl;
+                        } else {
+                            evidenciaContainer.style.display = 'none';
+                        }
+                    }
+                    
+                    select.value = estado;
+                })
+                .catch(error => {
+                    console.error("Error al cargar los datos de la venta:", error);
+                });
         });
     </script>
     @{
