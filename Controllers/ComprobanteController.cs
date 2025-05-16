@@ -37,10 +37,10 @@ namespace Marimon.Controllers
 
 
 
-        public ComprobanteController(ApplicationDbContext context, 
-                                    ILogger<ComprobanteController> logger, 
-                                    UserManager<IdentityUser> userManager, 
-                                    IConverter converter, 
+        public ComprobanteController(ApplicationDbContext context,
+                                    ILogger<ComprobanteController> logger,
+                                    UserManager<IdentityUser> userManager,
+                                    IConverter converter,
                                     IEmailSenderWithAttachments emailSender,
                                     IOptions<StripeSettings> stripeSettings)
         {
@@ -81,6 +81,13 @@ namespace Marimon.Controllers
                 Cantidad = item.car_cantidad,
                 ImagenUrl = item.Autoparte.aut_imagen
             }).ToList();
+
+            ViewBag.TipoComprobante = TempData["tipoComprobante"]?.ToString();
+            ViewBag.TipoDocumento = TempData["tipoDocumento"]?.ToString();
+            ViewBag.NumIdentificacion = TempData["num_identificacion"]?.ToString();
+            ViewBag.FacRazon = TempData["fac_razon"]?.ToString();
+            ViewBag.FacRuc = TempData["fac_ruc"]?.ToString();
+            ViewBag.FacDireccion = TempData["fac_direccion"]?.ToString();
 
             // Crear el tuple 
             var modelo = new Tuple<Usuario, List<Carrito.CarritoItem>>(usuario, carritoItems);
@@ -278,22 +285,29 @@ namespace Marimon.Controllers
 
         //STRIPE
         [HttpPost]
-        public async Task<IActionResult> ProcesarPago(string tipoComprobante, string metodoPago, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion)
-        {        
+        public async Task<IActionResult> ProcesarPago(string tipoComprobante, string tipoDocumento, string metodoPago, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion)
+        {
+            TempData["tipoComprobante"] = tipoComprobante;
+            TempData["tipoDocumento"] = tipoDocumento;
+            TempData["num_identificacion"] = num_identificacion;
+            TempData["fac_razon"] = fac_razon;
+            TempData["fac_ruc"] = fac_ruc;
+            TempData["fac_direccion"] = fac_direccion;
+
             // Si es tarjeta, crea una sesión de Stripe
             var identityUserId = _userManager.GetUserId(User);
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
-            
+
             if (usuario == null)
             {
                 return Unauthorized("Usuario no encontrado.");
             }
-            
+
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
                     .ThenInclude(cp => cp.Autoparte)
                 .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
-            
+
             if (carrito == null || !carrito.CarritoAutopartes.Any())
             {
                 return BadRequest("El carrito está vacío.");
@@ -305,17 +319,18 @@ namespace Marimon.Controllers
             {
                 // Almacenar datos en TempData para recuperarlos en PagoYape
                 TempData["tipoComprobante"] = tipoComprobante;
+                TempData["tipoDocumento"] = tipoDocumento;
                 TempData["num_identificacion"] = num_identificacion;
                 TempData["fac_razon"] = fac_razon;
                 TempData["fac_ruc"] = fac_ruc;
                 TempData["fac_direccion"] = fac_direccion;
-                
+
                 // Guardar el total en TempData
                 TempData["totalPago"] = carrito.car_total.ToString(CultureInfo.InvariantCulture);
 
                 return RedirectToAction("PagoYape");
             }
-            
+
             // Crear venta temporal (pendiente de pago)
             var venta = new Venta
             {
@@ -325,10 +340,10 @@ namespace Marimon.Controllers
                 Estado = "Completado",
                 Total = carrito.car_total
             };
-            
+
             _context.Venta.Add(venta);
             await _context.SaveChangesAsync();
-            
+
             // Guardar datos de comprobante temporalmente
             TempData["tipoComprobante"] = tipoComprobante;
             TempData["num_identificacion"] = num_identificacion;
@@ -336,7 +351,7 @@ namespace Marimon.Controllers
             TempData["fac_ruc"] = fac_ruc;
             TempData["fac_direccion"] = fac_direccion;
             TempData["ventaId"] = venta.ven_id;
-            
+
             // Crear sesión de Stripe
             var options = new SessionCreateOptions
             {
@@ -350,8 +365,8 @@ namespace Marimon.Controllers
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = item.Autoparte.aut_nombre,
-                            Description = item.Autoparte.aut_descripcion, 
-                            Images = new List<string> { item.Autoparte.aut_imagen } 
+                            Description = item.Autoparte.aut_descripcion,
+                            Images = new List<string> { item.Autoparte.aut_imagen }
                         },
                     },
                     Quantity = item.car_cantidad, // Cantidad del producto
@@ -362,14 +377,14 @@ namespace Marimon.Controllers
                 //SuccessUrl = Url.Action("PagoExitoso", "Comprobante", new { session_id = "{CHECKOUT_SESSION_ID}" }, Request.Scheme),
                 CancelUrl = Url.Action("Index", "Comprobante", null, Request.Scheme)
             };
-            
+
             var service = new SessionService();
             var session = service.Create(options);
-            
+
             // Guardar el ID de sesión en la venta
             venta.StripeSessionId = session.Id;
             await _context.SaveChangesAsync();
-            
+
             return Redirect(session.Url);
         }
 
@@ -444,20 +459,20 @@ namespace Marimon.Controllers
             // Verificar el estado del pago
             var service = new SessionService();
             var session = service.Get(session_id);
-            
+
             // Buscar la venta asociada a esta sesión de Stripe
             var venta = await _context.Venta.FirstOrDefaultAsync(v => v.StripeSessionId == session_id);
-            
+
             if (venta == null)
             {
                 return NotFound("No se encontró la venta asociada a esta sesión de pago.");
             }
 
-             var comprobante = await _context.Comprobante
-                .Include(c => c.Boletas)
-                .Include(c => c.Facturas)
-                .FirstOrDefaultAsync(c => c.VentaId == venta.ven_id);
-            
+            var comprobante = await _context.Comprobante
+               .Include(c => c.Boletas)
+               .Include(c => c.Facturas)
+               .FirstOrDefaultAsync(c => c.VentaId == venta.ven_id);
+
             if (session.PaymentStatus == "paid")
             {
                 if (comprobante != null)
@@ -470,7 +485,7 @@ namespace Marimon.Controllers
                 string fac_razon = TempData["fac_razon"]?.ToString();
                 string fac_ruc = TempData["fac_ruc"]?.ToString();
                 string fac_direccion = TempData["fac_direccion"]?.ToString();
-                
+
                 // Aquí reutilizamos gran parte de la lógica de RegistrarComprobante
                 // Crear el comprobante
                 comprobante = new Comprobante
@@ -481,13 +496,13 @@ namespace Marimon.Controllers
                 };
                 _context.Comprobante.Add(comprobante);
                 await _context.SaveChangesAsync();
-                
+
                 // Obtener el carrito y crear salidas
                 var carrito = await _context.Carritos
                     .Include(c => c.CarritoAutopartes)
                         .ThenInclude(cp => cp.Autoparte)
                     .FirstOrDefaultAsync(c => c.UsuarioId == venta.UsuarioId);
-                
+
                 // Crear detalles de venta y salidas
                 foreach (var item in carrito.CarritoAutopartes)
                 {
@@ -498,7 +513,7 @@ namespace Marimon.Controllers
                         det_cantidad = item.car_cantidad
                     };
                     _context.DetalleVentas.Add(detalle);
-                    
+
                     // Reducir stock
                     var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
                     if (autoparte != null)
@@ -506,7 +521,7 @@ namespace Marimon.Controllers
                         autoparte.aut_cantidad -= item.car_cantidad;
                         _context.Autopartes.Update(autoparte);
                     }
-                    
+
                     // Crear salida
                     var salida = new Salida
                     {
@@ -517,7 +532,7 @@ namespace Marimon.Controllers
                     };
                     _context.Salida.Add(salida);
                 }
-                
+
                 // Crear Boleta o Factura
                 if (tipoComprobante.ToLower() == "boleta")
                 {
@@ -539,13 +554,13 @@ namespace Marimon.Controllers
                     };
                     _context.Factura.Add(factura);
                 }
-                
+
                 await _context.SaveChangesAsync();
-                
+
                 // Limpiar el carrito
                 _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
                 await _context.SaveChangesAsync();
-                
+
                 // Generar el PDF
                 var htmlContent = GenerateComprobanteHtml(comprobante);
                 var pdfBytes = ConvertHtmlToPdf(htmlContent);
@@ -557,11 +572,11 @@ namespace Marimon.Controllers
                 comprobante.com_imagen = rutaPdf;
                 _context.Update(comprobante);
                 await _context.SaveChangesAsync();
-                
+
                 // Enviar por correo
                 var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == venta.UsuarioId);
                 var user = await _userManager.FindByIdAsync(usuario.usu_id);
-                
+
                 if (user != null && !string.IsNullOrEmpty(user.Email))
                 {
                     // Código para enviar el correo (igual que en RegistrarComprobante)
@@ -607,11 +622,11 @@ namespace Marimon.Controllers
                         // Continuar aunque falle el envío
                     }
                 }
-                
+
                 // Mostrar vista de éxito
                 return View("PagoExitoso", comprobante);
             }
-            
+
             return View("Error", "El pago no se completó correctamente.");
         }
 
@@ -928,8 +943,8 @@ namespace Marimon.Controllers
                 <p>Autorizado mediante resolución Nro:</p>
             </div>
         </div>";
-        var hash = GenerarHash(comprobanteCompleto.Venta.StripeSessionId ?? comprobanteCompleto.Venta.ven_id.ToString());
-        htmlContent += $@"
+            var hash = GenerarHash(comprobanteCompleto.Venta.StripeSessionId ?? comprobanteCompleto.Venta.ven_id.ToString());
+            htmlContent += $@"
         <div class='observations'>
             El {comprobanteCompleto.tipo_comprobante} numero {numeroComprobante}, ha sido aceptada | Hash : {hash}
         </div>
@@ -1089,10 +1104,10 @@ namespace Marimon.Controllers
             // Crear nombre del archivo y ruta
             string nombreArchivo = $"{tipoComprobante.ToLower()}_{comprobanteId}.pdf";
             string rutaArchivo = Path.Combine(directorio, nombreArchivo);
-            
+
             // Guardar el archivo
             System.IO.File.WriteAllBytes(rutaArchivo, pdfBytes);
-            
+
             // Devolver la ruta relativa para guardar en la BD
             return $"/comprobantes/{nombreArchivo}";
         }
@@ -1109,7 +1124,7 @@ namespace Marimon.Controllers
                 Direccion = TempData["fac_direccion"]?.ToString(),
                 TotalPago = Convert.ToDecimal(TempData["totalPago"], CultureInfo.InvariantCulture)
             };
-            
+
             // Mantener los datos en TempData para el siguiente request
             TempData.Keep("tipoComprobante");
             TempData.Keep("num_identificacion");

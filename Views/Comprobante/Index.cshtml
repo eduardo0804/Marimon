@@ -83,7 +83,7 @@
                     <h4 class="text-center fw-bold mb-4">Selecciona el Tipo de Comprobante</h4>
                     <div class="custom-radio-container">
                         <div class="custom-radio-btn">
-                            <input type="radio" id="boleta" name="tipoComprobante" value="boleta" checked>
+                            <input type="radio" id="boleta" name="tipoComprobante" value="boleta" checked @(ViewBag.TipoComprobante == "boleta" ? "selected" : "")>
                             <label for="boleta">
                                 <i class="bi bi-receipt text-dark fs-2"></i> <!-- Boleta -->
                                 <span class="option-title">Boleta</span>
@@ -92,7 +92,7 @@
                         </div>
 
                         <div class="custom-radio-btn">
-                            <input type="radio" id="factura" name="tipoComprobante" value="factura">
+                            <input type="radio" id="factura" name="tipoComprobante" value="factura" @(ViewBag.TipoComprobante == "factura" ? "checked" : "")>
                             <label for="factura">
                                 <i class="bi bi-file-earmark-text text-dark fs-2"></i> <!-- Factura -->
                                 <span class="option-title">Factura</span>
@@ -122,9 +122,9 @@
                             <label for="tipoDocumento" class="form-label">Tipo de Documento *</label>
                             <select class="form-select" id="tipoDocumento" name="tipoDocumento" required>
                                 <option selected disabled value="">Seleccione</option>
-                                <option value="DNI">DNI</option>
-                                <option value="CE">Carnet de Extranjería</option>
-                                <option value="Pasaporte">Pasaporte</option>
+                                <option value="DNI" selected="@(ViewBag.TipoDocumento == "DNI")">DNI</option>
+                                <option value="CE" selected="@(ViewBag.TipoDocumento == "CE")">Carnet de Extranjería</option>
+                                <option value="Pasaporte" selected="@(ViewBag.TipoDocumento == "Pasaporte")">Pasaporte</option>
                             </select>
                             <div class="invalid-feedback">
                                 Seleccione un tipo de documento válido.
@@ -134,7 +134,7 @@
                         <!-- Número de Documento -->
                         <div class="col-md-6 mb-3">
                             <label for="numeroDocumento" class="form-label">N° de Documento *</label>
-                            <input type="text" class="form-control" id="numeroDocumento" name="num_identificacion" required>
+                            <input type="text" class="form-control" id="numeroDocumento" name="num_identificacion" value="@ViewBag.NumIdentificacion" required>
                             <div class="invalid-feedback" id="dniErrorMessage">
                                 El DNI debe ser de 8 dígitos.
                             </div>
@@ -173,7 +173,7 @@
 
                         <div class="col-12 mb-3">
                             <label for="razonSocial" class="form-label">Razón Social *</label>
-                            <input type="text" class="form-control" id="razonSocial" name="fac_razon"
+                            <input type="text" class="form-control" id="razonSocial" name="fac_razon" value="@ViewBag.FacRazon"
                                 placeholder="Ingrese razón social" required
                                 pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\.\,\-]{3,100}$">
                             <div class="invalid-feedback">
@@ -187,7 +187,7 @@
                                 @* <span class="input-group-text bg-light border-secondary-subtle">
                                     <i class="bi bi-building"></i>
                                 </span> *@
-                                <input type="text" class="form-control" id="ruc" name="fac_ruc"
+                                <input type="text" class="form-control" id="ruc" name="fac_ruc" value="@ViewBag.FacRuc" 
                                     placeholder="Ingrese número de RUC" required pattern="^\d{11}$">
                                 <div class="invalid-feedback">
                                     El RUC debe contener exactamente 11 dígitos numéricos
@@ -201,7 +201,7 @@
                                 @* <span class="input-group-text bg-light border-secondary-subtle">
                                     <i class="bi bi-geo-alt"></i>
                                 </span> *@
-                                <input type="text" class="form-control" id="direccion" name="fac_direccion"
+                                <input type="text" class="form-control" id="direccion" name="fac_direccion" value="@ViewBag.FacDireccion"
                                     placeholder="Ingrese dirección fiscal completa" required
                                     pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\.\,\-\#]{5,150}$">
                                 <div class="invalid-feedback">
