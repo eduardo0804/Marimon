@@ -7,7 +7,7 @@
 
 <div class="register_container">
     <div class="register_form">
-        <h3>Crear una nueva cuenta</h3>
+        <h3>Crear Una Nueva Cuenta</h3>
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
@@ -24,26 +24,30 @@
             </div>
 
             <div class="input_box">
-                <label asp-for="Input.Email">Correo electrónico</label>
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="correo@ejemplo.com" />
+                <label asp-for="Input.Email">Correo Electrónico</label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true"
+                    placeholder="correo@ejemplo.com" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
 
             <div class="input_box">
                 <label asp-for="Input.Password">Contraseña</label>
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Contraseña" />
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true"
+                    placeholder="Contraseña" />
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
 
             <div class="input_box">
-                <label asp-for="Input.ConfirmPassword">Confirmar contraseña</label>
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Confirmar contraseña" />
+                <label asp-for="Input.ConfirmPassword">Confirmar Contraseña</label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password"
+                    aria-required="true" placeholder="Confirmar contraseña" />
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
 
             <button id="registerSubmit" type="submit">Registrarse</button>
 
-            <p class="sign_up">¿Ya tienes cuenta? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Iniciar Sesión</a></p>
+            <p class="sign_up">¿Ya tienes cuenta? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Iniciar
+                    Sesión</a></p>
         </form>
     </div>
 
