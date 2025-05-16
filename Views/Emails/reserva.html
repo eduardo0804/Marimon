@@ -2,13 +2,16 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
-            text-align: center;
+            color: #333333;
+            line-height: 1.6;
         }
 
         .email-container {
@@ -18,7 +21,6 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
 
         .email-header {
@@ -28,19 +30,13 @@
         }
 
         .email-header img {
-            max-width: 150px;
+            max-width: 180px;
         }
 
         .email-body {
-            padding: 20px;
+            padding: 30px;
             color: #333333;
-            text-align: center;
         }
-
-        .email-body h1 {
-            color: black;
-        }
-
         .email-footer {
             background-color: #f4f4f4;
             text-align: center;
@@ -49,31 +45,85 @@
             color: #888888;
         }
 
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            margin-top: 20px;
-            background-color: #E42229;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+        .hero-section {
+            background-color: #f8f8f8;
+            border-left: 4px solid #E42229;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
         }
 
-        .button-text {
+        .hero-section h1 {
+            color: #E42229;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .info-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        .info-table td {
+            padding: 10px;
+            vertical-align: top;
+        }
+
+        .info-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .detail-box {
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 5px;
+            border-left: 3px solid #E42229;
+        }
+
+        .icon {
             display: inline-block;
-            padding: 10px 20px;
-            margin-top: 20px;
+            width: 20px;
+            text-align: center;
+            margin-right: 5px;
+            color: #E42229;
+        }
+
+        .tips-section {
+            background-color: #f0f7ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 25px 0;
+        }
+
+        .tips-section h3 {
+            color: #0066cc;
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
             background-color: #E42229;
             color: #ffffff !important;
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
-
+            text-align: center;
         }
 
-        .button:hover {
-            background-color: #D42025;
+        @media only screen and (max-width: 600px) {
+            .email-body {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -84,48 +134,62 @@
             <img src="{{LogoUrl}}" alt="Marimon Logo">
         </div>
         <div class="email-body">
-            <h1>¡Reserva Confirmada!</h1>
-            <p>Hola {{UserName}},</p>
-            <p>
-                Tu reserva ha sido registrada correctamente.<br>
-                <b>Detalles de tu reserva:</b>
-            </p>
-            <table style="margin:0 auto 20px auto;border-collapse:collapse;">
+            <div class="hero-section">
+                <h1>¡Reserva Confirmada!</h1>
+                <p>Tu servicio ha sido programado exitosamente</p>
+            </div>
+
+            <p>Hola <strong>{{UserName}}</strong>,</p>
+            
+            <p>Hemos recibido tu solicitud y confirmamos que tu reserva para servicio automotriz ha sido registrada correctamente. A continuación, encontrarás los detalles:</p>
+
+            <table class="info-table">
                 <tr>
-                    <td style="padding:4px 8px;"><b>Servicio:</b></td>
-                    <td style="padding:4px 8px;">{{Servicio}}</td>
+                    <td width="40%"><span class="icon">🔧</span><strong>Servicio:</strong></td>
+                    <td>{{Servicio}}</td>
                 </tr>
                 <tr>
-                    <td style="padding:4px 8px;"><b>Fecha:</b></td>
-                    <td style="padding:4px 8px;">{{Fecha}}</td>
+                    <td><span class="icon">📅</span><strong>Fecha:</strong></td>
+                    <td>{{Fecha}}</td>
                 </tr>
                 <tr>
-                    <td style="padding:4px 8px;"><b>Hora:</b></td>
-                    <td style="padding:4px 8px;">{{Hora}}</td>
+                    <td><span class="icon">🕒</span><strong>Hora:</strong></td>
+                    <td>{{Hora}}</td>
                 </tr>
                 <tr>
-                    <td style="padding:4px 8px;"><b>Placa:</b></td>
-                    <td style="padding:4px 8px;">{{Placa}}</td>
+                    <td><span class="icon">🚗</span><strong>Placa:</strong></td>
+                    <td>{{Placa}}</td>
                 </tr>
                 <tr>
-                    <td style="padding:4px 8px;"><b>Teléfono:</b></td>
-                    <td style="padding:4px 8px;">{{Telefono}}</td>
+                    <td><span class="icon">📱</span><strong>Teléfono:</strong></td>
+                    <td>{{Telefono}}</td>
                 </tr>
                 <tr>
-                    <td style="padding:4px 8px;vertical-align:top;"><b>📝 Detalles adicionales:</b></td>
-                    <td style="padding:8px 8px; background:#f9f9f9; border-radius:4px; color:#333;">
-                        {{Descripcion}}
+                    <td><span class="icon">📝</span><strong>Detalles adicionales:</strong></td>
+                    <td>
+                        <div class="detail-box">
+                            {{Descripcion}}
+                        </div>
                     </td>
                 </tr>
             </table>
-            <p>
-                Si necesitas realizar algún cambio o tienes alguna pregunta, no dudes en contactarnos.<br>
-                ¡Gracias por confiar en Marimon!
-            </p>
+
+            <div class="tips-section">
+                <h3>Recomendaciones para tu visita</h3>
+                <ul>
+                    <li>Por favor, llega con 10-15 minutos de anticipación para completar el registro.</li>
+                    <li>Asegúrate de traer la tarjeta de propiedad del vehículo.</li>
+                    <li>Si necesitas cancelar o reprogramar, comunícate con nosotros con al menos 24 horas de anticipación.</li>
+                </ul>
+            </div>
+
+            <p>Si necesitas realizar algún cambio o tienes alguna pregunta, no dudes en contactarnos. Te esperamos en nuestro local para brindarte el mejor servicio.</p>
+
+            <p>¡Gracias por confiar en Marimon !</p>
         </div>
         <div class="email-footer">
-            <p>Marimon © 2025. Todos los derechos reservados.</p>
-        </div>
+        <p>Marimon © 2025. Todos los derechos reservados.</p>
+    </div>
     </div>
 </body>
 

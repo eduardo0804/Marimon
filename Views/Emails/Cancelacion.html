@@ -1,0 +1,43 @@
+<html>
+    <body style='font-family: Arial, sans-serif; line-height: 1.6;'>
+        <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;'>
+            <div style='text-align: center; margin-bottom: 20px;'>
+                <img src='https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png'
+                    alt='Marimon Logo' style='max-width: 200px;' />
+            </div>
+            <div style='background-color: #f8f8f8; border-left: 4px solid #e62020; padding: 15px; margin-bottom: 20px;'>
+                <h2 style='color: #e62020; margin-top: 0;'>Pedido Cancelado</h2>
+                <p style='font-size: 16px; margin-bottom: 0;'>Información importante sobre tu compra</p>
+            </div>
+            
+            <p>Estimado/a <strong>{nombreCompleto}</strong>,</p>
+            
+            <p>Lamentamos informarte que tu pedido N° <strong>#{ventaID}</strong> ha sido cancelado por motivos operativos.</p>
+            
+            <p>Como realizaste el pago mediante tarjeta (Stripe), ya hemos procesado la solicitud de reembolso completo.</p>
+            
+            <div style='background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;'>
+                <h3 style='margin-top: 0; color: #333;'>Resumen de la cancelación:</h3>
+                <ul style='padding-left: 20px; color: #555;'>
+                    <li>Pedido: <strong>#{ventaID}</strong></li>
+                    <li>Monto reembolsado: <strong>S/ {montoTotal}</strong></li>
+                    <li>Método de pago: <strong>Tarjeta (Stripe)</strong></li>
+                </ul>
+            </div>
+            
+            <h3 style='color: #444;'>Información del reembolso:</h3>
+            <p>El reembolso ha sido procesado a través de Stripe y se reflejará en el mismo método de pago que utilizaste para realizar la compra. Ten en cuenta que:</p>
+            <ul style='padding-left: 20px; color: #555;'>
+                <li>El reembolso puede tardar hasta <strong>30 hábiles</strong> en reflejarse en tu estado de cuenta, dependiendo de tu entidad bancaria.</li>
+                <li>Recibirás una notificación de Stripe cuando el reembolso se haya completado.</li>
+                <li>El concepto aparecerá como <strong>"Reembolso - Marimon"</strong> en tu estado de cuenta.</li>
+            </ul>
+            
+            <div style='text-align: center; margin: 30px 0;'>
+                <a href='{{CallbackUrl}}' style='background-color: #e62020; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;'>Ver productos disponibles</a>
+            </div>
+            
+            <p>Nos disculpamos sinceramente por cualquier inconveniente que esta situación te haya causado. En Marimon valoramos tu preferencia y estamos comprometidos a brindarte el mejor servicio posible.</p>
+        </div>
+    </body>
+</html>

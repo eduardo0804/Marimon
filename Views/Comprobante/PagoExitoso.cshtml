@@ -1,0 +1,141 @@
+@model Marimon.Models.Comprobante
+@{
+    ViewData["Title"] = "Pago Exitoso";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/graciasStipe.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+}
+
+<div class="container success-container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="success-card" style="position: relative;">
+                <div class="success-badge">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fadasdscarro.png?alt=media&token=0634f7cd-cb65-4e33-99a0-be780f19ecda"
+                        alt="Auto" style="height: 50px; width: auto;" />
+                </div>
+
+                <div class="success-icon" style="margin: 0 auto 1.2rem auto; display: flex; justify-content: center;">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="success-rings">
+                        <div class="ring ring1"></div>
+                        <div class="ring ring2"></div>
+                        <div class="ring ring3"></div>
+                    </div>
+                </div>
+
+                <h1 class="success-title">¡Pago Completado con Éxito!</h1>
+
+                <div class="success-message">
+                    <p>Tu compra ha sido procesada correctamente.</p>
+                </div>
+
+                <div class="receipt-info">
+                    <div class="receipt-row">
+                        <span class="receipt-label">Número de Comprobante:</span>
+                        <span class="receipt-value">@Model.com_id.ToString("000")</span>
+                    </div>
+                    <div class="receipt-divider"></div>
+                    <div class="receipt-message">
+                        <i class="fas fa-envelope"></i>
+                        <p>Te hemos enviado el comprobante a tu correo electrónico.</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-store">
+                        <i class="fas fa-store"></i>
+                        <span>Volver a la Tienda</span>
+                    </a>
+                    <a href="@Model.com_imagen" class="btn btn-download" download>
+                        <i class="fas fa-download"></i>
+                        <span>Descargar Comprobante</span>
+                    </a>
+                </div>
+
+                <div class="success-footer">
+                    <div class="badge-row">
+                        <span class="custom-badge">
+                            <i class="fas fa-shield-alt"></i> Compra Segura
+                        </span>
+                        <span class="custom-badge">
+                            <i class="fas fa-medal"></i> Calidad Garantizada
+                        </span>
+                        <span class="custom-badge">
+                            <i class="fas fa-thumbs-up"></i> Servicio Confiable
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Efecto visual para mejorar la experiencia
+            $(".success-card").hide().fadeIn(800);
+
+            // Animar los anillos de éxito
+            setTimeout(function () {
+                $(".ring").addClass("animate");
+            }, 300);
+
+            // Confetti para celebrar la compra exitosa
+            setTimeout(function () {
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#E42229', '#D42025', '#626C66', '#ffda3a'],
+                    zIndex: 1000,
+                    disableForReducedMotion: true
+                });
+
+                // Segunda ráfaga de confeti
+                setTimeout(function () {
+                    confetti({
+                        particleCount: 50,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 0, y: 0.6 },
+                        colors: ['#E42229', '#ffda3a'],
+                    });
+
+                    confetti({
+                        particleCount: 50,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 1, y: 0.6 },
+                        colors: ['#D42025', '#626C66'],
+                    });
+                }, 700);
+            }, 500);
+
+            // Efectos hover para los botones
+            $(".btn").hover(
+                function () {
+                    $(this).addClass("btn-hover");
+                },
+                function () {
+                    $(this).removeClass("btn-hover");
+                }
+            );
+
+            // Efecto hover para las insignias
+            $(".custom-badge").hover(
+                function () {
+                    $(this).addClass("badge-hover");
+                },
+                function () {
+                    $(this).removeClass("badge-hover");
+                }
+            );
+        });
+    </script>
+}

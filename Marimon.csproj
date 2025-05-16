@@ -31,6 +31,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <!--Google-->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.3" />
+    <PackageReference Include="Stripe.net" Version="48.0.2" />
 
   </ItemGroup>
 

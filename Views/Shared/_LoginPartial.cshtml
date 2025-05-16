@@ -7,7 +7,7 @@
 @{
     var usuario = Context.Usuarios.FirstOrDefault(u => u.usu_id == UserManager.GetUserId(User));
     string nombreMostrar = User.Identity?.Name!;
-    
+
     if (usuario != null)
     {
         if (!string.IsNullOrEmpty(usuario.usu_nombrePerfil))
@@ -22,26 +22,29 @@
 }
 <link rel="stylesheet" href="~/css/menus.css" />
 <nav class="segundo_menu">
-    <a href="#" class="cart-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito" aria-controls="offcanvasCarrito">
+    <a href="#" class="cart-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito"
+        aria-controls="offcanvasCarrito">
         <i class="fa-solid fa-cart-shopping"></i>
     </a>
     @if (SignInManager.IsSignedIn(User))
     {
         <!-- Dropdown para usuario logueado -->
         <div class="dropdown-user">
-            <a class="desktop-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@nombreMostrar <i class="fa-solid fa-user"></i></a>
+            <a class="desktop-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@nombreMostrar <i
+                    class="fa-solid fa-user"></i></a>
             <ul class="drop-menu-user">
                 <li>
                     <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">Mis Pedidos</a>
                 </li>
                 <li>
-                    <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis citas</a>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis Citas</a>
                 </li>
                 <li>
                     <a asp-area="Identity" asp-page="/Account/Manage/Index">Favoritos</a>
                 </li>
                 <li>
-                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <form asp-area="Identity" asp-page="/Account/Logout"
+                        asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                         <button type="submit">Salir</button>
                     </form>
                 </li>

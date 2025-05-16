@@ -3,7 +3,7 @@
 <link href="/css/styleReEdi.css" rel="stylesheet" type="text/css">
 
 <div class="container" style="max-width: 100%;">
-    <form asp-controller="Admin" asp-action="Create" method="post" enctype="multipart/form-data" class="modern-form">
+    <form asp-controller="Personal_Ventas" asp-action="Create" method="post" enctype="multipart/form-data" class="modern-form">
         <div class="form-floating mb-3">
             <input asp-for="aut_nombre" class="form-control" id="aut_nombre" placeholder="Nombre" required />
             <label for="aut_nombre">Nombre <span class="text-danger">*</span></label>
@@ -115,7 +115,7 @@
                 modal.hide();
                 
                 // Recargamos la página con la notificación de TempData
-                window.location.href = '/Admin/ListaAutopartes';
+                window.location.href = '/Personal_Ventas/ListaAutopartes';
             }
         })
         .catch(error => {

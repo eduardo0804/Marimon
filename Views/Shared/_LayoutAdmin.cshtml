@@ -1,7 +1,8 @@
 ﻿@{
     Layout = null;
     var path = Context.Request.Path.Value.ToLower();
-    var mostrarFlecha = !(path == "/admin" || path == "/admin/" || path == "/personal_ventas" || path == "/personal_ventas/");
+    var mostrarFlecha = !(path == "/admin" || path == "/admin/" || path == "/personal_ventas" || path ==
+    "/personal_ventas/");
 }
 
 <!DOCTYPE html>
@@ -24,7 +25,7 @@
 
         .nav-link:hover,
         .nav-link.active {
-            background-color: #d42025;
+            background-color: #FD0028;
             color: white;
         }
     </style>
@@ -32,15 +33,15 @@
 
 <body class="bg-light d-flex flex-column min-vh-100">
     <!-- Cabecera -->
-    <header style="background-color: red; color: white; padding: 10px 20px; margin: 0;">
+    <header style="background-color: #FD0028; color: white; padding: 10px 20px; margin: 0;">
         <div class="contenedor-menu" style="display: flex; align-items: center; justify-content: space-between;">
-            @if (mostrarFlecha)
+            @* @if (mostrarFlecha)
                 {
                     <a href="javascript:window.history.back();" title="Volver atrás"
                         style="color: white; font-size: 24px; margin-right: 16px;">
                         <i class="fas fa-arrow-left"></i>
                     </a>
-                }
+                } *@
             <!-- Logo -->
             <a href="/Personal_Ventas" class="logo-contenedor"
                 style="display: flex; align-items: center; text-decoration: none;">
@@ -66,7 +67,7 @@
 
     <!-- Pie de página -->
     <!-- Footer -->
-    <footer style="background-color: #D42025; color: white; padding: 10px 20px;">
+    <footer style="background-color: #FD0028; color: white; padding: 10px 20px;">
         <div class="footer-content"
             style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <div class="footer-left">

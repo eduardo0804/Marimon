@@ -9,13 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/Marimon.styles.css" asp-append-version="true" />
 
-
+    <!-- Icono que se muestra en la web -->
     <link rel="shortcut icon" href="/images/logo_icon.png">
-
 
     <!-- Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    @RenderSection("Styles", required: false)
 </head>
 <style>
     body {
@@ -171,7 +171,7 @@
                     </div>
                     <div>
                         <strong>Dirección:</strong><br>
-                        Av. Angamos Este Nro. 1686 a.H. Casa Huertas
+                        Jr. Gral. Felipe Santiago Salaverry 44, Lima 15022
                     </div>
                 </div>
             </div>
@@ -182,7 +182,8 @@
             <div class="bottom-content">
                 <div>Copyright &#169; 2025 <a asp-controller="Home" asp-action="Index"
                         style="color: white; text-decoration: none;">Marimon</a></div>
-                @* <div><a href="#">Términos y Condiciones</a></div> *@
+                <div><a href="@Url.Action("Terminos", "Home")">Términos y Condiciones</a></div>
+                <div><a href="@Url.Action("Privacy", "Home")">Política y Privacidad</a></div>
                 <div>Developed by <strong>G03 - ISW2</strong></div>
             </div>
         </div>
@@ -200,7 +201,169 @@
                 });
         });
     </script>
+    <script>
+        // File preview functionality
+        document.getElementById('comprobanteFile').addEventListener('change', function (e) {
+            const preview = document.getElementById('imagePreview');
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('El archivo es demasiado grande. Por favor, sube una imagen de menos de 5MB.');
+                    this.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
 
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    preview.src = event.target.result;
+                    preview.style.display = 'block';
+                    preview.classList.add('animate__animated', 'animate__fadeIn');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        // Form validation
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.getElementsByClassName('needs-validation');
+                Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            // Check if terms checkbox is causing validation error
+                            if (!document.getElementById('aceptaTerminos').checked) {
+                                document.querySelector('.terms-container').classList.add('shake');
+                                setTimeout(() => {
+                                    document.querySelector('.terms-container').classList.remove('shake');
+                                }, 600);
+                            }
+
+                            // Animate the form shake if invalid
+                            form.classList.add('animate__animated', 'animate__shakeX');
+                            setTimeout(() => {
+                                form.classList.remove('animate__animated', 'animate__shakeX');
+                            }, 1000);
+                        } else {
+                            // Show loading spinner when form is valid and submitted
+                            document.querySelector('.payment-progress').style.display = 'flex';
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+        // Copy account number to clipboard
+        document.getElementById('accountNumber').addEventListener('click', function () {
+            const copyText = this.textContent;
+            navigator.clipboard.writeText(copyText).then(() => {
+                const copyMsg = document.querySelector('.copy-msg');
+                copyMsg.style.display = 'inline';
+                this.classList.add('copied');
+
+                setTimeout(() => {
+                    copyMsg.style.display = 'none';
+                    this.classList.remove('copied');
+                }, 2000);
+            });
+        });
+
+        // Custom checkbox functionality
+        document.getElementById('customCheckbox').addEventListener('click', function () {
+            const checkbox = document.getElementById('aceptaTerminos');
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                this.classList.add('checked');
+            } else {
+                this.classList.remove('checked');
+            }
+        });
+
+        // Add ripple effect to custom checkbox
+        let ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        document.getElementById('customCheckbox').appendChild(ripple);
+
+        document.getElementById('customCheckbox').addEventListener('mousedown', function (e) {
+            const x = e.clientX - e.target.getBoundingClientRect().left;
+            const y = e.clientY - e.target.getBoundingClientRect().top;
+
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            ripple.classList.add('animate');
+
+            setTimeout(() => {
+                ripple.classList.remove('animate');
+            }, 500);
+        });
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        function actualizarSidebarCarrito() {
+            fetch('/Carrito/Side')
+                .then(response => response.text())
+                .then(html => {
+                    // Crear un elemento temporal para parsear el HTML
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+
+                    // Extraer el contenido del offcanvas del HTML
+                    const nuevoOffcanvas = temp.querySelector('#offcanvasCarrito');
+
+                    // Obtener el offcanvas actual
+                    const offcanvasActual = document.querySelector('#offcanvasCarrito');
+
+                    if (nuevoOffcanvas && offcanvasActual) {
+                        // Reemplazar solo el contenido interno (preservando el offcanvas abierto)
+                        offcanvasActual.querySelector('.offcanvas-header').innerHTML =
+                            nuevoOffcanvas.querySelector('.offcanvas-header').innerHTML;
+
+                        offcanvasActual.querySelector('.offcanvas-body').innerHTML =
+                            nuevoOffcanvas.querySelector('.offcanvas-body').innerHTML;
+
+                        // Actualizar el contador en el navbar (si existe)
+                        const cantidadTotal = temp.querySelector('#offcanvasCarritoLabel')?.textContent.match(/\((\d+)\)/)?.[1] || "0";
+                        const contadorCarrito = document.getElementById('contador-carrito');
+                        if (contadorCarrito) {
+                            contadorCarrito.textContent = cantidadTotal;
+                            contadorCarrito.style.display = cantidadTotal === "0" ? 'none' : 'inline-block';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error al actualizar el sidebar del carrito:', error));
+        }
+
+        // Para mostrar el offcanvas después de añadir un producto
+        function mostrarSidebarCarrito() {
+            const offcanvasCarrito = document.getElementById('offcanvasCarrito');
+            if (offcanvasCarrito) {
+                const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasCarrito) ||
+                    new bootstrap.Offcanvas(offcanvasCarrito);
+                offcanvasInstance.show();
+            }
+        }
+        // Stop QR pulse animation after 10 seconds
+        setTimeout(() => {
+            document.querySelector('.qr-box').classList.remove('pulse');
+        }, 10000);
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!--<script src="~/js/site.js" asp-append-version="true"></script> -->

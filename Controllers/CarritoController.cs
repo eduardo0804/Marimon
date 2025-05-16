@@ -89,7 +89,9 @@ namespace Marimon.Controllers
                 var autoparte = await _context.Autopartes.FindAsync(autoparteId);
                 if (autoparte == null)
                 {
-                    return NotFound();
+                    return Request.Headers["X-Requested-With"] == "XMLHttpRequest"
+                        ? Json(new { success = false, message = "Producto no encontrado" })
+                        : NotFound();
                 }
 
                 // Obtener el usu_id a partir del IdentityUser logueado
@@ -97,7 +99,9 @@ namespace Marimon.Controllers
                 var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
                 if (usuario == null)
                 {
-                    return Unauthorized();
+                    return Request.Headers["X-Requested-With"] == "XMLHttpRequest"
+                        ? Json(new { success = false, message = "Usuario no autenticado" })
+                        : Unauthorized();
                 }
 
                 var userId = usuario.usu_id;
@@ -133,11 +137,25 @@ namespace Marimon.Controllers
 
                 await _context.SaveChangesAsync();
 
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Producto añadido al carrito",
+                        cantidadTotal = carrito.CarritoAutopartes.Sum(ca => ca.car_cantidad)
+                    });
+                }
+
                 return RedirectToAction("Index", "Catalogo");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al añadir producto al carrito.");
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Error interno del servidor" });
+                }
                 return StatusCode(500, "Error interno del servidor.");
             }
         }

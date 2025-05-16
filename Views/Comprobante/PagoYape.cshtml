@@ -1,0 +1,267 @@
+@model Marimon.Models.PagoYapeViewModel
+
+@{
+    Layout = "_LayoutPago";
+    ViewData["Title"] = "Pago con Yape - Marimon";
+}
+
+<link rel="stylesheet" href="~/css/pagandoyape.css" asp-append-version="true" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            <div class="card-container">
+                <div class="p-4 p-lg-5">
+                    <!-- Payment progress overlay -->
+                    <div class="payment-progress">
+                        <div class="spinner"></div>
+                        <div class="progress-text">Procesando su pago...</div>
+                    </div>
+
+                    <div class="text-center mb-4 fade-in fade-in-1">
+                        <div class="logo-container">
+                            <img src="/images/yape-150x150.png" alt="Yape Logo" class="img-fluid"
+                                onerror="this.src='/images/yape-logo.png'" width="100">
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center mb-4 fade-in fade-in-2">
+                        <div class="col-md-7 text-center">
+                            <div class="qr-box">
+                                <img src="/images/QRYAPE.jpeg" alt="Código QR Yape" class="img-fluid">
+                            </div>
+                            <div class="total-container">
+                                <span class="total-label">TOTAL A PAGAR:</span>
+                                <span class="total-amount">S/.@String.Format("{0:0.00}", Model.TotalPago)</span>
+                            </div>
+                            <h3 class="company-name mt-3">Automotriz Marimon</h3>
+                            <p class="phone-number">
+                                <i class="bi bi-phone"></i>961 582 804
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row fade-in fade-in-3">
+                        <div class="col-12">
+                            <div class="payment-methods mb-4">
+                                <h5><i class="bi bi-list-check"></i>Instrucciones</h5>
+                                <ol>
+                                    <li>Escanea el código QR con tu aplicación Yape.</li>
+                                    <li>Realiza el pago del monto total indicado.</li>
+                                    <li>Toma una captura de pantalla del comprobante de pago.</li>
+                                    <li>Sube la imagen en el formulario a continuación.</li>
+                                </ol>
+                                <div class="bcp-info">
+                                    <h6><i class="bi bi-bank"></i>¿Prefieres transferencia BCP?</h6>
+                                    <p>Cuenta: <span class="account-number" id="accountNumber">25575353391071</span>
+                                        <span class="copy-msg"
+                                            style="display:none; font-size: 0.8rem; margin-left: 8px; color: var(--success-color) !important;">¡Copiado!</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <form action="@Url.Action("ConfirmarPagoYape", "Comprobante")" method="post"
+                                enctype="multipart/form-data" class="needs-validation" id="paymentForm" novalidate>
+                                <input type="hidden" name="tipoComprobante" value="@Model.TipoComprobante" />
+                                <input type="hidden" name="num_identificacion" value="@Model.NumIdentificacion" />
+                                <input type="hidden" name="fac_razon" value="@Model.RazonSocial" />
+                                <input type="hidden" name="fac_ruc" value="@Model.Ruc" />
+                                <input type="hidden" name="fac_direccion" value="@Model.Direccion" />
+
+                                <div class="mb-4">
+                                    <label class="custom-file-upload">
+                                        <i class="bi bi-cloud-arrow-up"></i>
+                                        <div class="file-text">Sube tu comprobante de pago</div>
+                                        <div class="file-subtext">JPG, JPEG, PNG (Máx: 5MB)</div>
+                                        <div class="alert alert-danger d-none" id="fileErrorAlert" role="alert">
+                                            El archivo es demasiado grande. Por favor, sube una imagen de menos de 5MB.
+                                        </div>
+                                        <div class="alert alert-danger d-none" id="fileRequiredAlert" role="alert">
+                                            Debes adjuntar una imagen del comprobante de pago para continuar.
+                                        </div>
+                                        <input type="file" class="form-control" id="comprobanteFile"
+                                            name="comprobanteFile" accept="image/*" required>
+                                    </label>
+                                    <div class="image-preview-container"
+                                        style="position: relative; width: 50%; margin: 0 auto; display: flex; justify-content: center;">
+                                        <img id="imagePreview" class="file-preview" src="#" alt="Vista previa"
+                                            style="display:none;">
+                                        <button type="button" id="removeImage" class="btn btn-danger position-absolute"
+                                            style="display:none; top:15px; right:15px; border-radius:50%; padding:8px 10px; z-index:100;"
+                                            title="Eliminar imagen" aria-label="Eliminar imagen" onclick="document.getElementById('comprobanteFile').value=''; 
+                                            document.getElementById('imagePreview').style.display='none';
+                                            this.style.display='none';
+                                            document.getElementById('fileErrorAlert').classList.add('d-none');
+                                            document.getElementById('fileRequiredAlert').classList.add('d-none');
+                                            return false;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="alert-important">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <div>
+                                        <strong>Importante:</strong>
+                                        Asegúrate que tu comprobante muestre claramente:
+                                        <ul>
+                                            <li>Número de operación</li>
+                                            <li>Fecha y hora del pago</li>
+                                            <li>Monto transferido</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-3 mt-4">
+                                    <button type="submit" class="btn btn-marimon" id="confirmBtn">
+                                        <i class="bi bi-check-circle-fill me-2"></i>
+                                        <span>Confirmar Pago</span>
+                                    </button>
+                                    <a href="javascript:void(0);" class="btn btn-outline" id="backBtn"
+                                        onclick="history.back();">
+                                        <i class="bi bi-arrow-left me-2"></i> Volver
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // File validation and preview functionality
+    document.getElementById('comprobanteFile').addEventListener('change', function (e) {
+        const preview = document.getElementById('imagePreview');
+        const removeButton = document.getElementById('removeImage');
+        const fileErrorAlert = document.getElementById('fileErrorAlert');
+        const fileRequiredAlert = document.getElementById('fileRequiredAlert');
+        const file = e.target.files[0];
+
+        // Reset alerts
+        fileErrorAlert.classList.add('d-none');
+        fileRequiredAlert.classList.add('d-none');
+
+        if (file) {
+            // Validate file size (5MB limit)
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 5) {
+                fileErrorAlert.classList.remove('d-none');
+                this.value = '';
+                preview.style.display = 'none';
+                removeButton.style.display = 'none';
+                return;
+            }
+
+            // Display file preview
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                preview.src = event.target.result;
+                preview.style.display = 'block';
+                removeButton.style.display = 'block';
+                preview.classList.add('animate__animated', 'animate__fadeIn');
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+            removeButton.style.display = 'none'; // Asegurar que el botón esté oculto
+        }
+    });
+
+    // Form validation with file validation
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    const fileInput = document.getElementById('comprobanteFile');
+                    const fileRequiredAlert = document.getElementById('fileRequiredAlert');
+
+                    // Check if file is attached
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        fileRequiredAlert.classList.remove('d-none');
+                        fileInput.focus();
+                        return;
+                    }
+
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        // Animate the form shake if invalid
+                        form.classList.add('animate__animated', 'animate__shakeX');
+                        setTimeout(() => {
+                            form.classList.remove('animate__animated', 'animate__shakeX');
+                        }, 1000);
+                    } else {
+                        // Show loading spinner when form is valid and submitted
+                        document.querySelector('.payment-progress').style.display = 'flex';
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Copy account number to clipboard
+    document.getElementById('accountNumber').addEventListener('click', function () {
+        const copyText = this.textContent;
+        navigator.clipboard.writeText(copyText).then(() => {
+            const copyMsg = document.querySelector('.copy-msg');
+            copyMsg.style.display = 'inline';
+            this.classList.add('copied');
+
+            setTimeout(() => {
+                copyMsg.style.display = 'none';
+                this.classList.remove('copied');
+            }, 2000);
+        });
+    });
+
+    // Custom checkbox functionality
+    document.getElementById('customCheckbox').addEventListener('click', function () {
+        const checkbox = document.getElementById('aceptaTerminos');
+        checkbox.checked = !checkbox.checked;
+
+        if (checkbox.checked) {
+            this.classList.add('checked');
+        } else {
+            this.classList.remove('checked');
+        }
+    });
+
+    // Add ripple effect to custom checkbox
+    let ripple = document.createElement('span');
+    ripple.classList.add('ripple');
+    document.getElementById('customCheckbox').appendChild(ripple);
+
+    document.getElementById('customCheckbox').addEventListener('mousedown', function (e) {
+        const x = e.clientX - e.target.getBoundingClientRect().left;
+        const y = e.clientY - e.target.getBoundingClientRect().top;
+
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        ripple.classList.add('animate');
+
+        setTimeout(() => {
+            ripple.classList.remove('animate');
+        }, 500);
+    });
+
+    // Add smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>

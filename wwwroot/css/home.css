@@ -542,3 +542,21 @@
 .iti {
   width: 100%;
 }
+#loginRequeridoModal .modal-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.service-image:hover {
+  transform: scale(1.05);
+}
+
+.image-container {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.badge {
+  font-size: 0.9rem;
+  border-radius: 0.5rem;
+}

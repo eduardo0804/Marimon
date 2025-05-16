@@ -1,0 +1,230 @@
+:root {
+            --primary: #E42229;
+            --primary-dark: #D42025;
+            --success: #30b730;
+            --dark-gray: #626C66;
+            --light-gray: #f5f5f5;
+            --yellow: #ffda3a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        body {
+            background-color: #f7f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .success-container {
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .success-card {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .success-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 0 0 0 16px;
+        }
+        
+        .success-badge i {
+            font-size: 20px;
+        }
+        
+        .success-icon {
+            margin: 20px auto 30px;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .success-icon i {
+            font-size: 46px;
+            color: var(--success);
+            position: relative;
+            z-index: 5;
+        }
+        
+        .success-rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .ring {
+            position: absolute;
+            border: 1px solid rgba(48, 183, 48, 0.2);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .ring1 {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .ring2 {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .ring3 {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .success-message p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+        
+        .receipt-info {
+            background-color: var(--light-gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .receipt-label {
+            color: #666;
+        }
+        
+        .receipt-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .receipt-value.boleta {
+            background-color: #ffeeee;
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .receipt-divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 15px 0;
+        }
+        
+        .receipt-message {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+        
+        .receipt-message i {
+            color: #888;
+        }
+        
+        .receipt-message p {
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-store {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-download {
+            background-color: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .badge-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .custom-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #f8f8f8;
+            color: #666;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .custom-badge i {
+            color: var(--primary);
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+        
+        .animate {
+            animation: pulse 2s infinite;
+        }

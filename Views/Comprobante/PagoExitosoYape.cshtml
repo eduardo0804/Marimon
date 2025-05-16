@@ -1,0 +1,167 @@
+@model Marimon.Models.Comprobante
+@{
+    ViewData["Title"] = "Pago Exitoso";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/graciasStipe.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container success-container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="success-card" style="position: relative;">
+                    <div class="success-badge">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fadasdscarro.png?alt=media&token=0634f7cd-cb65-4e33-99a0-be780f19ecda"
+                            alt="Auto" style="height: 50px; width: auto;" />
+                    </div>
+
+                    <div class="success-icon"
+                        style="margin: 0 auto 1.2rem auto; display: flex; justify-content: center;">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="success-rings">
+                            <div class="ring ring1"></div>
+                            <div class="ring ring2"></div>
+                            <div class="ring ring3"></div>
+                        </div>
+                    </div>
+
+                    <h1 class="success-title">¡Pago Completado con Éxito!</h1>
+
+                    <div class="success-message">
+                        <p>Hemos recibido tu comprobante de pago.</p>
+                        <p>En breve, nuestro equipo validará la transacción y te notificaremos por correo electrónico.
+                        </p>
+                        <p>Gracias por confiar en Marimon Autopartes.</p>
+                    </div>
+
+                    <div class="receipt-info">
+                        <div class="receipt-row">
+                            <span class="receipt-label">Número de Comprobante:</span>
+                            <span class="receipt-value boleta">
+                                @(!string.IsNullOrEmpty(Model.com_evidencia) ?
+                                                                System.IO.Path.GetFileNameWithoutExtension(Model.com_evidencia).Replace("evidencias_",
+                                                                "") :
+                                                                Model.com_id.ToString())
+                            </span>
+                        </div>
+                        <div class="receipt-divider"></div>
+                        <div class="receipt-message">
+                            <i class="fas fa-envelope"></i>
+                            <p>Te avisaremos por correo cuando tu pago sea validado y tu compra esté lista.</p>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons mt-4">
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-store">
+                            <i class="fas fa-store"></i>
+                            <span>Volver a la Tienda</span>
+                        </a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/Pedidos"
+                            class="btn btn-outline-secondary ml-3">
+                            <i class="fas fa-list-alt mr-1"></i>
+                            <span>Mis Pedidos</span>
+                        </a>
+                    </div>
+
+                    <div class="success-footer mt-4">
+                        <div class="badge-row">
+                            <span class="custom-badge">
+                                <i class="fas fa-shield-alt"></i> Compra Segura
+                            </span>
+                            <span class="custom-badge">
+                                <i class="fas fa-medal"></i> Calidad Garantizada
+                            </span>
+                            <span class="custom-badge">
+                                <i class="fas fa-thumbs-up"></i> Servicio Confiable
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".success-card").hide().fadeIn(800);
+
+            setTimeout(function () {
+                $(".ring").addClass("animate");
+            }, 300);
+
+            setTimeout(function () {
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#E42229', '#D42025', '#626C66', '#ffda3a'],
+                    disableForReducedMotion: true
+                });
+
+                setTimeout(function () {
+                    confetti({
+                        particleCount: 50,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 0, y: 0.6 },
+                        colors: ['#E42229', '#ffda3a'],
+                    });
+
+                    confetti({
+                        particleCount: 50,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 1, y: 0.6 },
+                        colors: ['#D42025', '#626C66'],
+                    });
+                }, 700);
+            }, 500);
+
+            $(".btn").hover(
+                function () {
+                    $(this).css({
+                        "transform": "translateY(-2px)",
+                        "box-shadow": "0 4px 8px rgba(0,0,0,0.1)"
+                    });
+                },
+                function () {
+                    $(this).css({
+                        "transform": "translateY(0)",
+                        "box-shadow": "none"
+                    });
+                }
+            );
+
+            $(".custom-badge").hover(
+                function () {
+                    $(this).css({
+                        "background-color": "#f0f0f0",
+                        "transform": "scale(1.05)"
+                    });
+                },
+                function () {
+                    $(this).css({
+                        "background-color": "#f8f8f8",
+                        "transform": "scale(1)"
+                    });
+                }
+            );
+        });
+    </script>
+</body>
+
+</html>

@@ -1,75 +1,514 @@
-/* comprobante.css */
+:root {
+  --primary: #e42229;
+  --primary-dark: #d42025;
+  --secondary: #626c66;
+  --white: #ffffff;
+  --black: #000000;
+}
 
 body {
-    font-family: Arial, sans-serif;
-    margin: 40px;
-    color: #333;
+  background-color: #f8f9fa;
+  font-family: "Poppins", sans-serif;
 }
 
-header {
-    display: flex;
-    align-items: center;
-    border-bottom: 2px solid #4CAF50;
-    padding-bottom: 10px;
-    margin-bottom: 30px;
+/* Animaciones y efectos */
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-header img {
-    width: 120px;
-    margin-right: 20px;
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(228, 34, 41, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(228, 34, 41, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(228, 34, 41, 0);
+  }
 }
 
-header h1 {
-    font-size: 24px;
-    margin: 0;
-    color: #4CAF50;
+.animated-card {
+  animation: slideInUp 0.5s ease-out forwards;
 }
 
-h2 {
-    color: #4CAF50;
+/* Cards */
+.card {
+  border: none;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s ease;
+  overflow: hidden;
 }
 
-p {
-    font-size: 14px;
-    margin: 4px 0;
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
 }
 
-table {
+/* Botones */
+.btn-marimon {
+  background-color: var(--black) !important;
+  color: var(--white) !important;
+  width: 100%;
+  border: none;
+  border-radius: 5px !important;
+  padding: 15px !important;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-marimon::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.6s;
+  z-index: -1;
+}
+
+.btn-marimon:hover::before {
+  left: 100%;
+}
+
+.btn-marimon:active {
+  transform: translateY(1px);
+}
+
+/* Header */
+.checkout-header {
+  margin-bottom: 2rem;
+  border-bottom: 3px solid #f2f2f2;
+  padding-bottom: 1.5rem;
+}
+
+.back-btn {
+  color: var(--primary);
+  transition: all 0.3s ease;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.back-btn:hover {
+  color: var(--primary-dark);
+  transform: translateX(-5px);
+}
+
+.secure-badge {
+  background: linear-gradient(45deg, #28a745, #20c997);
+  color: white;
+  border-radius: 50px;
+  padding: 8px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+  transition: all 0.3s ease;
+}
+
+.secure-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* Selección tipo de comprobante y pago */
+.payment-selector {
+  position: relative;
+}
+
+.payment-option {
+  padding: 2rem 1.5rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  text-align: center;
+}
+
+.payment-option.active {
+  border-color: var(--primary);
+  background-color: rgba(228, 34, 41, 0.05);
+}
+
+.payment-option:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.payment-option img {
+  height: 40px;
+  margin-bottom: 1rem;
+}
+
+.option-title {
+  font-weight: 700;
+  margin-bottom: 0;
+  font-size: 1.1rem;
+}
+
+/* Form Elements */
+.form-label {
+  font-weight: 600;
+  color: var(--secondary);
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.25rem rgba(228, 34, 41, 0.15);
+}
+
+/* Form Elements Disabled/Readonly */
+.form-control:disabled,
+.form-control[readonly] {
+  background-color: #f8f9fa;
+  opacity: 0.8;
+}
+
+/* Contenedor principal del radio */
+.custom-radio-container {
+  color: var(--black);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+/* Estilo base para cada opción */
+.radio-option {
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: border 0.3s, box-shadow 0.3s;
+  text-align: center;
+}
+
+/* Íconos en color negro */
+.radio-option i,
+.radio-option svg {
+  color: black !important;
+}
+
+/* Estilo cuando una opción está seleccionada */
+.radio-option.selected {
+  border: 2px solid black;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Check en la esquina superior derecha (negro) */
+.radio-option.selected::after {
+  content: "✔";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: black;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.custom-radio-btn {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.custom-radio-btn input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-radio-btn label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 1.5rem 1rem;
+  border-radius: 12px;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+}
+
+.custom-radio-btn input:checked + label {
+  border-color: var(--primary);
+  background-color: rgba(228, 34, 41, 0.05);
+  box-shadow: 0 5px 15px rgba(228, 34, 41, 0.1);
+}
+
+.custom-radio-btn label:hover {
+  border-color: #adb5bd;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.custom-radio-btn input:checked + label::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 16px;
+  box-shadow: 0 3px 10px rgba(228, 34, 41, 0.3);
+  animation: pulse 1.5s infinite;
+}
+
+.custom-radio-btn input:checked + label::after {
+  content: "✓";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Order Summary */
+.order-summary {
+  position: sticky;
+  transition: all 0.4s ease;
+}
+
+.order-summary:hover {
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.summary-header {
+  border-bottom: 2px solid #f2f2f2;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+
+.summary-title {
+  font-weight: 800;
+  color: var(--black);
+  position: relative;
+  display: inline-block;
+}
+
+.summary-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -12px;
+  width: 50px;
+  height: 4px;
+  background-color: var(--primary);
+  border-radius: 2px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 2px solid #f2f2f2;
+  transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.item-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-right: 15px;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-info {
+  flex-grow: 1;
+}
+
+.item-name {
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 3px;
+  font-size: 0.95rem;
+}
+
+.item-quantity {
+  color: var(--secondary);
+  font-size: 0.85rem;
+}
+
+.item-price {
+  font-weight: 700;
+  color: var(--black);
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed #f2f2f2;
+}
+
+.total-label {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--black);
+}
+
+.total-amount {
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+/* Store Pickup */
+.pickup-card {
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  border-left: 5px solid #2e7d32;
+  position: relative;
+  overflow: hidden;
+}
+
+.pickup-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(46, 125, 50, 0.1) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  z-index: 0;
+}
+
+.pickup-content {
+  position: relative;
+  z-index: 1;
+}
+
+.pickup-icon {
+  font-size: 2.5rem;
+  color: #2e7d32;
+  margin-right: 1.5rem;
+}
+
+.pickup-title {
+  font-weight: 700;
+  color: #2e7d32;
+  margin-bottom: 0.5rem;
+}
+
+.pickup-address {
+  margin-bottom: 0;
+  color: #3e4a37;
+}
+
+/* Note */
+.note-alert {
+  border-radius: 12px;
+  height: fit-content;
+  margin: 0 !important;
+  padding: 10px 0 !important;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .order-summary {
+    position: static;
+    margin-bottom: 2rem;
+  }
+
+  .custom-radio-container {
+    flex-direction: column;
+  }
+
+  .custom-radio-btn {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
+  }
 }
 
-table, th, td {
-    border: 1px solid #aaa;
+@media (max-width: 767.98px) {
+  .checkout-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .secure-badge {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .btn-marimon {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+  }
 }
 
-th {
-    background-color: #f2f2f2;
-    text-align: left;
-    padding: 8px;
+.icono-opcion {
+  color: #000 !important;
 }
 
-td {
-    padding: 8px;
-}
-
-.total {
-    text-align: right;
-    font-weight: bold;
-    margin-top: 20px;
-    font-size: 16px;
-}
-
-.comprobante-info {
-    margin-bottom: 20px;
-}
-
-footer {
-    margin-top: 40px;
-    font-size: 12px;
-    color: #666;
-    text-align: center;
-    border-top: 1px solid #ddd;
-    padding-top: 10px;
+.check-icono {
+  color: #000 !important;
 }

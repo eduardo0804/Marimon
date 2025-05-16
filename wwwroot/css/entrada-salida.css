@@ -1,0 +1,148 @@
+.btn-registrar,
+.btn-salida {
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  font-weight: 200 !important;
+  padding: 10px 0 !important;
+  position: relative !important;
+  text-align: center !important;
+  color: black !important;
+  border: 1px solid #d42025 !important;
+  border-radius: 3px !important;
+  box-shadow: 0 0 0 0 transparent !important;
+  transition: all 0.2s ease-in;
+  overflow: hidden !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-registrar:hover,
+.btn-salida:hover {
+  color: white !important;
+  box-shadow: 0 0 30px 0 rgba(212, 32, 37, 0.5) !important;
+  background-color: #d42025 !important;
+  transition: all 0.2s ease-out !important;
+}
+
+.btn-registrar:hover i,
+.btn-salida:hover i {
+  color: white !important;
+}
+
+.btn-registrar:active,
+.btn-salida:active {
+  box-shadow: 0 0 0 0 transparent !important;
+  transition: box-shadow 0.2s ease-in !important;
+}
+
+.btn-registrar::before,
+.btn-salida::before {
+  content: "" !important;
+  display: block !important;
+  width: 0px !important;
+  height: 86% !important;
+  position: absolute !important;
+  top: 7% !important;
+  left: 0% !important;
+  opacity: 0 !important;
+  background: white !important;
+  box-shadow: 0 0 15px 3px white !important;
+  transform: skewX(-20deg) !important;
+}
+.input-group i {
+  color: black !important;
+}
+
+.btn-outline-secondary:hover i {
+  color: white !important;
+}
+
+.admin-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.modulo-header {
+    width: 100%;
+}
+
+.modulo-title-bar {
+    background-color: #d42025;
+    color: white;
+    padding: 15px 25px;
+    text-align: left;
+}
+
+.modulo-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Footer de las tarjetas */
+.card-footer {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    padding: 12px;
+    text-align: center;
+}
+
+/* Footer principal */
+.modulo-footer {
+    background-color: #d42025;
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modulo-footer a {
+    color: white;
+    text-decoration: none;
+}
+
+.modulo-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos específicos para esta página */
+.avatar-item {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #d42025;
+    border-color: #d42025;
+}
+
+.pagination .page-link {
+    color: #d42025;
+}
+
+/* Transiciones suaves */
+.form-control,
+.form-select,
+.btn {
+    transition: all 0.3s ease;
+}
+
+/* Animación para alertas */
+.alert {
+    animation: fadeInDown 0.5s ease;
+}

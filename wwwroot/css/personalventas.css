@@ -6,7 +6,6 @@ header {
   position: relative;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
 .contenedor-menu {
   max-width: 1650px;
   padding: 0 30px;
@@ -17,18 +16,35 @@ header {
   justify-content: space-between;
   position: relative;
 }
-
 /* Logo */
 .logo-contenedor {
   display: flex;
   align-items: center;
   text-decoration: none;
+  position: relative;
 }
-
 .logo-img {
   height: 45px;
+  transition: opacity 0.3s ease;
 }
-
+/* Logo hover effect */
+.logo-contenedor img:first-child {
+  position: relative;
+  z-index: 2;
+}
+.logo-contenedor img:last-child {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  opacity: 0;
+}
+.logo-contenedor:hover img:first-child {
+  opacity: 0;
+}
+.logo-contenedor:hover img:last-child {
+  opacity: 1;
+}
 .titulo-header {
   position: absolute;
   left: 50%;
@@ -40,20 +56,37 @@ header {
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 10px; /* Espacio entre letras */
+  transition: color 0.3s ease; /* Transición suave para el cambio de color */
 }
-
-/* Cerrar sesión */
-.logout-btn {
+.titulo-header:hover {
+  color: #000000;
+}
+/* Cerrar sesión - Aplicando estilos al botón */
+header form {
+  display: flex;
+  align-items: center;
+}
+header form i.fas {
   color: #ffffff;
-  text-decoration: none;
+  font-size: 20px; /* Mismo tamaño que el texto del botón */
+  margin-right: 5px;
+  transition: color 0.3s ease; /* Transición para el ícono */
+}
+header form button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
   font-weight: 700;
   font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.3s ease; /* Transición suave para el cambio de color */
 }
-
-.logout-btn:hover {
-  text-decoration: underline;
+header form:hover button,
+header form:hover i.fas {
+  color: #000000;
 }
-
 /*FOOTER*/
 footer {
   margin-top: auto;
@@ -61,7 +94,6 @@ footer {
   color: #ffffff;
   font-size: 14px;
 }
-
 .footer-content {
   max-width: 1650px;
   padding: 15px 30px;
@@ -70,23 +102,83 @@ footer {
   justify-content: space-between;
   align-items: center;
 }
-
 .footer-left,
 .footer-center,
 .footer-right {
   flex: 1;
 }
-
 .footer-left {
   text-align: left;
 }
-
 .footer-center {
   text-align: center;
   font-weight: 600;
   font-style: italic;
 }
-
 .footer-right {
   text-align: right;
+}
+/* ======= RESPONSIVE DESIGN ======= */
+@media screen and (max-width: 1077px) {
+  .titulo-header {
+    font-size: 20px; /* Puedes cambiar este valor según tus preferencias */
+    letter-spacing: 5px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .contenedor-menu {
+    padding: 0 15px;
+  }
+
+  .logo-img {
+    height: 34px;
+  }
+  .titulo-header {
+    font-size: 16px; /* Puedes cambiar este valor según tus preferencias */
+    letter-spacing: 3px;
+    /* Mantiene la misma posición que en desktop */
+  }
+  form button {
+    font-size: 16px; /* Puedes cambiar este valor según tus preferencias */
+  }
+
+  form i.fas {
+    font-size: 16px; /* Mantiene el mismo tamaño que el texto del botón */
+  }
+
+  .footer-content {
+    flex-direction: column;
+    padding: 15px;
+    gap: 8px;
+  }
+
+  .footer-left,
+  .footer-center,
+  .footer-right {
+    text-align: center;
+  }
+}
+@media screen and (max-width: 480px) {
+  .logo-img {
+    height: 30px;
+  }
+
+  .titulo-header {
+    font-size: 12px; /* Puedes cambiar este valor según tus preferencias */
+    letter-spacing: 2px;
+    /* Mantiene la misma posición en el centro */
+  }
+
+  form button {
+    font-size: 12px; /* Puedes cambiar este valor según tus preferencias */
+  }
+
+  form i.fas {
+    font-size: 12px; /* Mantiene el mismo tamaño que el texto del botón */
+  }
+
+  .footer-content {
+    gap: 5px;
+    font-size: 12px;
+  }
 }

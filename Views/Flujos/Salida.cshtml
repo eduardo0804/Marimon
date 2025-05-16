@@ -1,25 +1,39 @@
 @model Marimon.Models.Salida
 @{
     ViewData["Title"] = "Registro de Salidas";
-    Layout = "_LayoutAdmin";
-}
+    Layout = "_LayoutVentas";
 
+    var salidasAgrupadas = ViewBag.SalidasAgrupadas as IEnumerable<dynamic>;
+
+}
+<link rel="stylesheet" href="~/css/entrada-salida.css" asp-append-version="true" />
+<style>form i.fas {color: black;}</style>
 <!-- Contenido Principal -->
-<div class="container mt-4">
+<div class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Registro de Salidas</li>
+    </ol>
+
+
     <!-- Título y descripción -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow border-0 rounded-lg overflow-hidden">
                 <div class="card-body d-flex p-0">
                     <div class="bg-danger text-white p-4 d-flex align-items-center justify-content-center"
-                        style="background-color: #d42025 !important; min-width: 120px;">
+                        style="min-width: 120px;">
                         <img src="~/images/salida.png" alt="Imagen almacén" class="img-fluid"
                             style="max-width: 80px;" />
                     </div>
                     <div class="p-4">
                         <h2 class="fw-bold mb-2">Registro de Salidas</h2>
-                        <p class="text-muted mb-0">En esta sección podrá registrar las salidas de autopartes del
-                            inventario. Seleccione los productos que desea retirar y registre la cantidad.</p>
+                        <p class="text-muted mb-0">
+                            En esta sección podrá registrar las salidas de autopartes del
+                            inventario. Seleccione los productos que desea retirar y registre la cantidad.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -52,61 +66,58 @@
                 <div class="card-header bg-white py-3 border-bottom">
                     <h5 class="text-center mb-0 fw-bold">REGISTRAR SALIDA</h5>
                 </div>
-                <div class="card-body p-4">
-                    <form asp-action="RegistrarSalida" asp-controller="Admin" method="post">
+                 <div class="card-body p-4">
+                    <form asp-action="RegistrarSalida" asp-controller="Personal_Ventas" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                        <div class="mb-4">
-                            <label for="CategoriaId" class="form-label fw-semibold">Categoría de artículo</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
-                                <select id="categoriaSelect" class="form-select py-2" name="CategoriaId"
-                                    asp-items="ViewBag.Categorias" onchange="cargarProductos()">
-                                    <option value="">-- Seleccionar Categoría --</option>
-                                </select>
-                            </div>
-                            <span class="text-danger"></span>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="CategoriaId" class="form-label fw-semibold">Categoría de artículo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
+                                    <select id="categoriaSelect" class="form-select py-2" name="CategoriaId"
+                                        asp-items="ViewBag.Categorias" onchange="cargarProductos()">
+                                        <option value="">-- Seleccionar Categoría --</option>
+                                    </select>
+                                </div>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label for="AutoparteId" class="form-label fw-semibold">Autoparte</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-box"></i></span>
+                                        <select id="productoSelect" class="form-select py-2" name="AutoparteId" disabled>
+                                            <option value="">-- Primero seleccione una categoría --</option>
+                                        </select>
+                                    </div>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label for="sal_cantidad" class="form-label fw-semibold">Cantidad</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
+                                        <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2"
+                                            min="1" value="1">
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            onclick="document.getElementById('sal_cantidad').stepUp()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            onclick="document.getElementById('sal_cantidad').stepDown()">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-salida">
+                                            <i style="color: black;" class="fas fa-plus-circle me-2"></i>Registrar Salida
+                                        </button>
+                                    </div>
+                                </div>
                         </div>
-
-                        <div class="mb-4">
-                            <label for="AutoparteId" class="form-label fw-semibold">Autoparte</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-box"></i></span>
-                                <select id="productoSelect" class="form-select py-2" name="AutoparteId" disabled>
-                                    <option value="">-- Primero seleccione una categoría --</option>
-                                </select>
-                            </div>
-                            <span class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="sal_cantidad" class="form-label fw-semibold">Cantidad</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-cubes"></i></span>
-                                <input name="sal_cantidad" id="sal_cantidad" type="number" class="form-control py-2" min="1"
-                                    value="1">
-                                <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('sal_cantidad').stepUp()">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary"
-                                    onclick="document.getElementById('sal_cantidad').stepDown()">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                            <span class="text-danger"></span>
-                        </div>
-
                         <!-- Campo oculto para la fecha -->
                         <input type="hidden" name="sal_fechasalida" value="@DateOnly.FromDateTime(DateTime.Now)" />
-
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn py-2 text-white fw-bold position-relative overflow-hidden btn-registro"
-                                id="submitButton">
-                                <i class="fas fa-plus-circle me-2"></i>REGISTRAR SALIDA
-                                <span class="hover-overlay"></span>
-                            </button>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -115,89 +126,215 @@
         <!-- Tabla de registros (Columna derecha) -->
         <div class="col-lg-7 mb-4">
             <div class="card shadow-sm border-0 rounded-lg h-100">
-                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold">HISTORIAL DE SALIDAS</h5>
-                    <!-- #region 
-                    <div class="input-group" style="width: 250px;">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                    -->
+
+            <div class="row">
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2">LISTA DE SALIDAS</p>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                        <table class="table table-hover mb-0" id="entriesTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="border-0 ps-3">ID</th>
-                                    <th class="border-0">Autoparte</th>
-                                    <th class="border-0">Cantidad</th>
-                                    <th class="border-0">Imagen</th>
-                                    <th class="border-0">Fecha</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (ViewBag.ListaSalidas != null)
-                                {
-                                    @foreach (var salida in ViewBag.ListaSalidas)
-                                    {
-                                        <tr class="align-middle">
-                                            <td class="ps-3 fw-semibold">@salida.sal_id</td>
-                                            <td>@salida.Autoparte.aut_nombre</td>
-                                            <td><span class="badge bg-success rounded-pill">@salida.sal_cantidad</span></td>
-                                            <td>
-                                                <div class="avatar-item">
-                                                   <img src="@salida.Autoparte.aut_imagen" alt="@salida.Autoparte.aut_nombre"
-                                                        title="@salida.Autoparte.aut_nombre" class="rounded" width="36" />
-                                                </div>
-                                            </td>
-                                            <td>@salida.sal_fechasalida.ToString("dd-MM-yyyy")</td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="5" class="text-center py-3">No hay registros de salidas disponibles</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2">||</p>
                 </div>
-                <!-- #region 
-                <div class="card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center">
-                    <span class="text-muted">Mostrando @(ViewBag.ListaEntradas != null ? ViewBag.ListaEntradas.Count : 0) entradas</span>
-                    @if (ViewBag.ListaEntradas != null && ViewBag.ListaEntradas.Count > 0)
+                <div class="col-4">
+                    <p class="text-center mb-0 fw-bold py-2"> <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" style="color: black;">VER SALIDAS PRESENCIALES</a> </p>
+
+                </div>
+            </div>
+            
+            <div class="accordion" id="salidasAccordion"  style="max-height: 400px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; background: #fff;">
+                @if (salidasAgrupadas != null)
+                {
+                    int index = 0;
+                    foreach (dynamic grupo in salidasAgrupadas)
                     {
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                        <div class="accordion-item mb-2 border rounded">
+                            <h2 class="accordion-header d-flex" id="heading-@index">
+                                <button class="accordion-button @(index > 0 ? "collapsed" : "") flex-grow-1" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapse-@index" aria-expanded="@(index == 0)"
+                                    aria-controls="collapse-@index">
+                                    <span class="fw-bold">Venta ID:</span> @grupo.VentaId
+                                </button>
+
+                                @{
+                                    var estado = (string)grupo.Estado;
+                                    var badgeClass = estado == "Completado" ? "bg-success" :
+                                    estado == "Pendiente" ? "bg-warning text-dark" :
+                                    estado == "Cancelado" ? "bg-danger" : "bg-secondary";
+                                }
+                                <div class="d-flex align-items-center me-3">
+                                    <span class="badge @badgeClass rounded-pill fs-6" id="badge-@index" style="cursor: pointer;"
+                                        data-bs-toggle="modal" data-bs-target="#estadoModal" data-id="@grupo.VentaId"
+                                        data-estado="@estado">
+                                        @estado
+                                    </span>
+                                </div>
+                            </h2>
+
+                            <div id="collapse-@index" class="accordion-collapse collapse @(index == 0 ? "show" : "")"
+                                aria-labelledby="heading-@index" data-bs-parent="#salidasAccordion">
+                                <div class="accordion-body bg-light">
+                                    <ul class="list-group list-group-flush">
+                                        @foreach (var salida in grupo.Salidas)
+                                        {
+                                            <li
+                                                class="list-group-item d-flex justify-content-between align-items-center bg-light border-bottom">
+                                                <div>
+                                                    <div class="fw-bold">@salida.Autoparte.aut_nombre</div>
+                                                    <small class="text-muted">Salida ID: @salida.sal_id</small>
+                                                </div>
+                                                <span class="badge bg-primary rounded-pill">@salida.sal_cantidad</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        index++;
                     }
+                }
+                else
+                {
+                    <div class="alert alert-info" role="alert">
+                        No hay salidas disponibles.
+                    </div>
+                }
+
+                <!-- Salidas sin VentaId -->
+                <div class="offcanvas offcanvas-end bg-black text-light" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" data-bs-backdrop="true">
+
+                    <div class="offcanvas-header border-bottom border-secondary">
+                        <h5 class="offcanvas-title fw-light text-light" id="offcanvasRightLabel">
+                            <i class="bi bi-box-seam me-2"></i>Salidas Presenciales
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body bg-black">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <i class="bi bi-clipboard-data me-2"></i><h4 class="fw-light text-light mb-0"></i>Todas las salidas hechas en tienda</h4>
+                        </div>
+
+                        @if (ViewBag.SalidasSinVenta != null && ViewBag.SalidasSinVenta.Count > 0)
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var salida in ViewBag.SalidasSinVenta)
+                                {
+                                    <li class="list-group-item bg-black text-light border-secondary d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-semibold">@salida.Producto</div>
+                                            <small class="text-secondary">
+                                                <i class="bi bi-upc-scan me-1"></i>ID: @salida.SalidaId
+                                            </small>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="mx-4">
+                                                <i class="bi bi-box me-1"></i>@salida.Cantidad   
+                                            </span>
+                                            <span class="badge bg-success text-light">
+                                                <i class="bi bi-check-circle me-1"></i>@salida.Estado
+                                            </span>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            @* <div class="d-grid gap-2 mt-4"> *@
+                            @*     <button class="btn btn-outline-light btn-sm" type="button"> *@
+                            @*         <i class="bi bi-printer me-2"></i>Imprimir reporte *@
+                            @*     </button> *@
+                            @* </div> *@
+                        }
+                        else
+                        {
+                            <div class="alert alert-dark bg-dark text-center border border-secondary">
+                                <i class="bi bi-cart-x me-2 fs-4"></i>
+                                <p class="mb-0">No hay salidas sin venta disponibles</p>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Actualizar
+                                </button>
+                            </div>
+                        }
+                    </div>
                 </div>
-                -->
+            </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Modal para cambiar estado -->
+<div class="modal fade" id="estadoModal" tabindex="-1" aria-labelledby="estadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form asp-controller="Personal_Ventas" asp-action="CambiarEstadoAvanzado" method="post">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="estadoModalLabel">
+                        <i class="fas fa-edit me-2"></i>Cambiar Estado de Venta
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="modalContentRow">
+                        <!-- Panel izquierdo - Información de venta -->
+                        <div id="infoVentaPanel" class="col-md-6">
+                            <div class="card border-0 shadow-sm mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="fas fa-info-circle me-2" style="color: white;"></i>Información de la Venta
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Venta ID:</strong> <span id="ventaIdDisplay">-</span></p>
+                                    <p><strong>Cliente:</strong> <span id="clienteDisplay">-</span></p>
+                                    <p><strong>Documento:</strong> <span id="documentoDisplay">-</span></p>
+                                    <p><strong>Total:</strong> <span id="totalDisplay">-</span></p>
+                                    <p><strong>Método de pago:</strong> <span id="metodoPagoDisplay">-</span></p>
+
+                                    <div class="mb-3">
+                                        <label for="estadoSelect" class="form-label fw-bold">Actualizar Estado:</label>
+                                        <select id="estadoSelect" name="estado" class="form-select">
+                                            <option value="Completado">Completado</option>
+                                            <option value="Pendiente">Pendiente</option>
+                                            <option value="Cancelado">Cancelado</option>
+                                        </select>
+                                    </div>
+                                    <input type="hidden" id="salidaIdInput" name="id" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel derecho - Evidencia de pago (solo para pagos no-Stripe) -->
+                        <div id="evidenciaContainer" class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fas fa-image me-2" style="color: white;"></i>Evidencia de Pago
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="mb-3" id="evidenciaImageContainer">
+                                        <img id="evidenciaImage" src="" alt="Evidencia de pago" 
+                                            class="img-fluid rounded shadow" style="max-height: 300px;" />
+                                    </div>
+                                    <a id="evidenciaEnlace" href="#" target="_blank" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-search-plus me-1" style="color: white;"></i>Ver imagen completa
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1" style="color: white;"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1" style="color: white;"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
+
         // Función para cargar productos por categoría
         function cargarProductos() {
             var categoriaId = document.getElementById("categoriaSelect").value;
@@ -217,7 +354,7 @@
             productoSelect.disabled = false;
 
             // Llamada AJAX para obtener los productos de la categoría seleccionada
-            fetch(`/Admin/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
+            fetch(`/Personal_Ventas/ObtenerProductosPorCategoria?categoriaId=${categoriaId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Error en la respuesta del servidor');
@@ -243,214 +380,95 @@
                 });
         }
 
-        // Efecto de hover para el botón
-        document.addEventListener('DOMContentLoaded', function() {
-            // Aplicar el estilo directamente al botón
-            const submitButton = document.getElementById('submitButton');
-            if (submitButton) {
-                // Asegurarse de que el botón sea visible y tenga el color correcto
-                submitButton.style.backgroundColor = '#d42025';
-                submitButton.style.display = 'block';
-                submitButton.style.width = '100%';
-                
-                submitButton.addEventListener('mouseover', function() {
-                    this.style.backgroundColor = '#b91d21';
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-                });
-                
-                submitButton.addEventListener('mouseout', function() {
-                    this.style.backgroundColor = '#d42025';
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
-                });
-            }
-        });
-
-        // Función de búsqueda en la tabla
-        document.getElementById('searchInput').addEventListener('keyup', function () {
-            let searchText = this.value.toLowerCase();
-            let table = document.getElementById('entriesTable');
-            let rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                let found = false;
-                let cells = rows[i].getElementsByTagName('td');
-
-                for (let j = 0; j < cells.length; j++) {
-                    let cellText = cells[j].innerText.toLowerCase();
-                    if (cellText.indexOf(searchText) > -1) {
-                        found = true;
-                        break;
+        // Configuración del modal de estados
+        const estadoModal = document.getElementById('estadoModal');
+        estadoModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const estado = button.getAttribute('data-estado');
+            const salidaId = button.getAttribute('data-id');
+            
+            // Configurar el modal con los datos actuales
+            const input = document.getElementById('salidaIdInput');
+            const select = document.getElementById('estadoSelect');
+            input.value = salidaId;
+            
+            // Mostrar el ID de la venta
+            document.getElementById('ventaIdDisplay').textContent = salidaId;
+            
+            // Cargar datos adicionales de la venta usando AJAX
+            fetch(`/Personal_Ventas/ObtenerDatosVenta?ventaId=${salidaId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
                     }
-                }
-
-                if (found) {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-        });
-
-        // Validación del formulario
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const productoSelect = document.getElementById('productoSelect');
-            const cantidadInput = document.getElementById('sal_cantidad');
-            
-            if (productoSelect.value === '') {
-                e.preventDefault();
-                alert('Por favor seleccione un producto');
-                return false;
-            }
-            
-            if (model.AutoparteId == null || model.sal_cantidad < 1) {
-    TempData["Error"] = "Debe seleccionar un producto válido y una cantidad mayor a 0.";
-    return RedirectToAction("Salidas");
-}
-
-            
-            return true;
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('clienteDisplay').textContent = data.cliente || '-';
+                    document.getElementById('documentoDisplay').textContent = data.documento || '-';
+                    document.getElementById('totalDisplay').textContent = `S/ ${data.total || '0.00'}`;
+                    document.getElementById('metodoPagoDisplay').textContent = data.metodoPago || '-';
+                    
+                    // Referencias a elementos del DOM
+                    const infoVentaPanel = document.getElementById('infoVentaPanel');
+                    const evidenciaContainer = document.getElementById('evidenciaContainer');
+                    const evidenciaImage = document.getElementById('evidenciaImage');
+                    const evidenciaEnlace = document.getElementById('evidenciaEnlace');
+                    
+                    // Configurar opciones del select de estado según el método de pago
+                    select.innerHTML = ''; 
+                    
+                    if (data.esStripe) {
+                        const optionCompletado = document.createElement('option');
+                        optionCompletado.value = 'Completado';
+                        optionCompletado.textContent = 'Completado';
+                        
+                        const optionCancelado = document.createElement('option');
+                        optionCancelado.value = 'Cancelado';
+                        optionCancelado.textContent = 'Cancelado';
+                        
+                        select.appendChild(optionCompletado);
+                        select.appendChild(optionCancelado);
+                        
+                        evidenciaContainer.style.display = 'none';
+                        infoVentaPanel.className = 'col-md-8 mx-auto';
+                    } else {
+                        // Para pagos Yape/otros: todas las opciones
+                        const optionCompletado = document.createElement('option');
+                        optionCompletado.value = 'Completado';
+                        optionCompletado.textContent = 'Completado';
+                        
+                        const optionPendiente = document.createElement('option');
+                        optionPendiente.value = 'Pendiente';
+                        optionPendiente.textContent = 'Pendiente';
+                        
+                        const optionCancelado = document.createElement('option');
+                        optionCancelado.value = 'Cancelado';
+                        optionCancelado.textContent = 'Cancelado';
+                        
+                        select.appendChild(optionCompletado);
+                        select.appendChild(optionPendiente);
+                        select.appendChild(optionCancelado);
+                        
+                        infoVentaPanel.className = 'col-md-6';
+                        
+                        if (data.evidenciaUrl && data.evidenciaUrl !== '') {
+                            evidenciaContainer.style.display = 'block';
+                            evidenciaImage.src = data.evidenciaUrl;
+                            evidenciaEnlace.href = data.evidenciaUrl;
+                        } else {
+                            evidenciaContainer.style.display = 'none';
+                        }
+                    }
+                    
+                    select.value = estado;
+                })
+                .catch(error => {
+                    console.error("Error al cargar los datos de la venta:", error);
+                });
         });
     </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <style>
-        /* Estilos generales incluidos directamente */
-        
-        /* Estilos para el botón de registro */
-        .btn-registro {
-            background-color: #d42025 !important;
-            color: white !important;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-registro:hover {
-            background-color: #b91d21 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn-registro .hover-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .btn-registro:hover .hover-overlay {
-            opacity: 1;
-        }
-        
-        .admin-container {
-            max-width: 1500px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Header */
-        .modulo-header {
-            width: 100%;
-        }
-
-        .modulo-title-bar {
-            background-color: #d42025;
-            color: white;
-            padding: 15px 25px;
-            text-align: left;
-        }
-
-        .modulo-title {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        /* Footer de las tarjetas */
-        .card-footer {
-            background-color: #f8f9fa;
-            color: #6c757d;
-            padding: 12px;
-            text-align: center;
-        }
-
-        /* Footer principal */
-        .modulo-footer {
-            background-color: #d42025;
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modulo-footer a {
-            color: white;
-            text-decoration: none;
-        }
-
-        .modulo-footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Estilos específicos para esta página */
-        .avatar-item {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: #d42025;
-            border-color: #d42025;
-        }
-
-        .pagination .page-link {
-            color: #d42025;
-        }
-
-        /* Transiciones suaves */
-        .form-control,
-        .form-select,
-        .btn {
-            transition: all 0.3s ease;
-        }
-
-        /* Animación para alertas */
-        .alert {
-            animation: fadeInDown 0.5s ease;
-        }
-        
-
-      
-        /* Asegurarse de que el botón de registro sea visible y destacado */
-        #submitButton {
-            background-color: #d42025 !important;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            padding: 12px 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: block;
-            width: 100%;
-        }
-    </style>
 }

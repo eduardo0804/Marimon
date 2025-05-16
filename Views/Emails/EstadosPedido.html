@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-header {
+            background-color: black;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .email-header img {
+            max-width: 150px;
+        }
+
+        .email-body {
+            padding: 20px;
+            color: #333333;
+            text-align: center;
+        }
+
+        .email-body h1 {
+            color: black;
+        }
+
+        .status-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .status-step {
+            display: flex;
+            flex-direction: column;
+            /* Apilar imagen y texto */
+            align-items: center;
+            /* Centrar horizontalmente */
+            font-size: 14px;
+            color: #888;
+            margin: 0 15px;
+            opacity: 0.4;
+            /* Elementos no activos aparecerán con menor opacidad */
+        }
+
+        .status-step img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+
+        /* Clases para el H2 del estado principal */
+        .estado-texto {
+            font-weight: bold;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .estado-pendiente {
+            color: #F39C12;
+            /* Amarillo para Pendiente */
+        }
+
+        .estado-completado {
+            color: #27ae60;
+            /* Verde para Completado */
+        }
+
+        .estado-cancelado {
+            color: #E74C3C;
+            /* Rojo para Cancelado */
+        }
+
+        /* Clases para activar los status-step (iconos y texto debajo) */
+        .status-step.active {
+            opacity: 1;
+            font-weight: bold;
+        }
+
+        .status-step.active-pendiente {
+            color: #F39C12;
+        }
+
+        .status-step.active-completado {
+            color: #27ae60;
+        }
+
+        .status-step.active-cancelado {
+            color: #E74C3C;
+        }
+
+        .hidden {
+            display: none !important;
+            /* Para ocultar el estado Cancelado si no aplica */
+        }
+
+        .email-footer {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #888888;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #E42229;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background-color: #D42025;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <img src="{{LogoUrl}}" alt="Marimon Logo">
+        </div>
+        <div class="email-body">
+            <h1>¡Estado de tu pedido!</h1>
+            <p>Hola {{UserName}},</p>
+            <p>{{MensajeCambio}}</p>
+            <h2 class="estado-texto" style="{{ClaseEstadoTexto}}">{{Estado}}</h2>
+            <p>{{MensajeEstado}}</p>
+            <div class="status-container">
+                <table align="center" cellpadding="0" cellspacing="0" style="margin:20px auto; text-align:center;">
+                    <tr>
+                        <td style="{{StylePendiente}}">
+                            <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fpedido.png?alt=media&token=5ee9139d-4292-4e9e-9cec-b81e6a187efa.jpg"
+                                alt="Pendiente" width="50" height="50" style="display:block; margin:0 auto 10px auto;">
+                            Pendiente
+                        </td>
+                        <td style="{{StyleCompletado}}">
+                            <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fentrega.png?alt=media&token=82dd484b-d894-46b0-82f0-550398fe144f.jpg"
+                                alt="Completado" width="50" height="50" style="display:block; margin:0 auto 10px auto;">
+                            Completado
+                        </td>
+                        {{ColCancelado}}
+                    </tr>
+                </table>
+            </div>
+            <p>Para más detalles, accede a tu cuenta en nuestro sistema:</p>
+            <a href="{{CallbackUrl}}" class="button">Ver Pedido</a>
+        </div>
+        <div class="email-footer">
+            <p>Marimon © 2025. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+
+</html>

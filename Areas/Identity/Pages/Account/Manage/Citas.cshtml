@@ -1,10 +1,13 @@
 @page
+@using Marimon.Enums
 @model Marimon.Areas.Identity.Pages.Account.Manage.Citas
 @{
     ViewData["Title"] = "Citas";
 }
 
 <link rel="stylesheet" href="~/css/perfil_usuario.css" asp-append-version="true" />
+<!-- Add Font Awesome for the trash icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="user-profile-container">
     <div class="profile-header">
@@ -12,14 +15,14 @@
     </div>
     <div class="profile-content">
         <div class="sidebar">
-            <div class="sidebar-menu-item ">
+            <div class="sidebar-menu-item">
                 <a asp-area="Identity" asp-page="/Account/Manage/Index">Detalle de la cuenta</a>
             </div>
             <div class="sidebar-menu-item">
-                <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">Mis pedidos</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">Mis Pedidos</a>
             </div>
             <div class="sidebar-menu-item active">
-                <span>Mis citas</span>
+                <span>Mis Citas</span>
             </div>
             <div class="sidebar-menu-item exit">
                 <form asp-area="Identity" asp-page="/Account/Logout"
@@ -34,15 +37,17 @@
             {
                 <div class="alert alert-success success-message position-fixed" role="alert">
                     @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove();"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                        onclick="this.parentElement.remove();"></button>
                 </div>
             }
 
             @if (TempData["Error"] != null)
             {
-                <div class="alert alert-success success-message position-fixed" role="alert">
+                <div class="alert alert-danger success-message position-fixed" role="alert">
                     @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove();"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                        onclick="this.parentElement.remove();"></button>
                 </div>
             }
             @if (Model.ReservasUsuario != null && Model.ReservasUsuario.Any())
@@ -50,13 +55,14 @@
                 <table class="table table-striped mt-4">
                     <thead>
                         <tr>
-                            <th>ID Cita</th>
-                            <th>Placa</th>
-                            <th>Teléfono</th>
-                            <th>Fecha</th>
-                            <th>Hora</th>
-                            <th>Servicio</th>
-                            <th></th>
+                            <th>ID CITA</th>
+                            <th>PLACA</th>
+                            <th>TELÉFONO</th>
+                            <th>FECHA</th>
+                            <th>HORA</th>
+                            <th>SERVICIO</th>
+                            <th>ELIMINAR</th>
+                            <th>ESTADO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,11 +74,34 @@
                                 <td>@reserva.res_telefono</td>
                                 <td>@reserva.res_fecha.ToString("dd/MM/yyyy")</td>
                                 <td>@reserva.res_hora</td>
-                                <td>@reserva.Servicio?.ser_nombre</td> 
+                                <td>@reserva.Servicio?.ser_nombre</td>
                                 <td>
                                     <form method="post" asp-page-handler="CancelarCita" asp-route-id="@reserva.res_id">
-                                        <button type="submit" class="btn btn-danger">Eliminar Cita</button>
+                                        <button type="submit" class="btn-delete" title="Eliminar Cita">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
                                     </form>
+                                </td>
+                                <td>
+                                    @switch (reserva.Estado)
+                                    {
+                                        case EstadoReserva.Pendiente:
+                                            <span class="badge bg-warning text-dark">Pendiente</span>
+                                            break;
+                                        case EstadoReserva.Confirmada:
+                                            <span class="badge bg-primary">Confirmada</span>
+                                            break;
+                                        case EstadoReserva.Cancelada:
+                                            <span class="badge bg-danger">Cancelada</span>
+                                            break;
+                                        case EstadoReserva.Completada:
+                                            <span class="badge bg-success">Completada</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">Estado desconocido</span>
+                                            break;
+                                    }
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -87,19 +116,19 @@
         </div>
     </div>
 </div>
-</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const successMessage = document.querySelector(".success-message");
-        if (successMessage) {
-            setTimeout(() => {
-                successMessage.classList.add("hide");
-                setTimeout(() => successMessage.remove(), 500);
-            }, 10000);
-        }
-    });
+        document.addEventListener("DOMContentLoaded", function () {
+            const successMessage = document.querySelector(".success-message");
+            if (successMessage) {
+                setTimeout(() => {
+                    successMessage.classList.add("hide");
+                    setTimeout(() => successMessage.remove(), 500);
+                }, 10000);
+            }
+        });
     </script>
-<script src="~/js/home.js" asp-append-version="true"></script>
+    <script src="~/js/home.js" asp-append-version="true"></script>
 }

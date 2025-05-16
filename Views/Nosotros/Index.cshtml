@@ -1,8 +1,8 @@
 @{
-    ViewData["Title"] = "Nosotros - AUTOMOTRIZ MARIMON S.A.C";
+    ViewData["Title"] = "Nosotros";
 }
 
-    
+
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -177,21 +177,21 @@
 
 
 
-    <script>
-        // Aquí puedes agregar cualquier JavaScript que necesites
-        $(document).ready(function () {
-            // Por ejemplo, para cambiar los dots de la imagen automáticamente
-            let currentDot = 0;
-            const dots = $('.dot');
+<script>
+    // Aquí puedes agregar cualquier JavaScript que necesites
+    $(document).ready(function () {
+        // Por ejemplo, para cambiar los dots de la imagen automáticamente
+        let currentDot = 0;
+        const dots = $('.dot');
 
-            setInterval(function () {
-                dots.removeClass('active');
-                currentDot = (currentDot + 1) % dots.length;
-                $(dots[currentDot]).addClass('active');
-            }, 3000);
-        });
-    </script>
-    
+        setInterval(function () {
+            dots.removeClass('active');
+            currentDot = (currentDot + 1) % dots.length;
+            $(dots[currentDot]).addClass('active');
+        }, 3000);
+    });
+</script>
+
 <div class="container nosotros-container">
     <div class="row header-section">
         <div class="col-md-6">

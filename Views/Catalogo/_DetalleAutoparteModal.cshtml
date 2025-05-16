@@ -121,15 +121,11 @@
                         {
                             @if (@Model.aut_cantidad > 0)
                             {
-                                <form asp-controller="Carrito" asp-action="AñadirAlCarrito" method="post"
-                                    onsubmit="mostrarToast()">
-                                    <input type="hidden" name="autoparteId" value="@Model.aut_id" />
-                                    <input type="hidden" name="cantidad" value="1" min="1" class="form-control" />
-                                    <button class="btn btn-whatsapp w-100"
-                                            style="text-decoration: none; display: inline-block; text-align: center; background-color: black" type="submit">
-                                        Añadir al Carrito
-                                    </button>
-                                </form>
+                                <button class="btn btn-whatsapp w-100"
+                                    style="text-decoration: none; display: inline-block; text-align: center; background-color: black"
+                                    type="button" onclick="añadirAlCarritoAsync(@Model.aut_id, 1)">
+                                    Añadir al Carrito
+                                </button>
                             }
                             else
                             {
@@ -191,7 +187,43 @@
                 })
                 .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
         }
+        function añadirAlCarritoAsync(autoparteId, cantidad) {
+            const formData = new FormData();
+            formData.append('autoparteId', autoparteId);
+            formData.append('cantidad', cantidad);
 
+            fetch('/Carrito/AñadirAlCarrito', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        mostrarToast();
+
+                        // Actualizar y mostrar el sidebar del carrito
+                        actualizarSidebarCarrito();
+
+                        // Mostrar el sidebar del carrito (descomenta para que se abra automáticamente)
+                        // mostrarSidebarCarrito();
+                    } else {
+                        console.error('Error:', data.message);
+                        alert('No se pudo añadir al carrito: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ocurrió un error al añadir el producto al carrito');
+                });
+        }
     </script>
 </body>
 
