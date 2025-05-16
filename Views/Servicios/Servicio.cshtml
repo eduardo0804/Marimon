@@ -245,6 +245,290 @@
     </div>
 </div>
 
+<!-- Sección de Reseñas -->
+<div class="container-fluid mt-5 px-4">
+    <div class="row my-5">
+        <div class="col-12 text-center mb-4" data-aos="fade-up">
+            <h3 class="fw-bold">Reseñas del Servicio</h3>
+            <div style="width:60px;height:4px;background:#D42025;margin:auto;border-radius:2px;"></div>
+        </div>
+
+        <!-- Listado de Reseñas -->
+        <div class="col-lg-6 mb-5" data-aos="fade-right">
+            <div class="bg-white rounded-4 shadow-lg p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="mb-0">Opiniones de nuestros clientes</h5>
+                    <span class="badge bg-danger py-2 px-3">@ViewBag.TotalResenias reseñas</span>
+                </div>
+
+                <div id="reseniasList" class="resenias-list" style="max-height: 500px; overflow-y: auto;">
+                    @if (ViewBag.Resenias != null && ViewBag.Resenias.Count > 0)
+                    {
+                        foreach (var resenia in ViewBag.Resenias)
+                        {
+                            <div class="resenia-item mb-4 pb-3 border-bottom" id="resenia-@resenia.res_id" data-aos="fade-up">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-secondary text-white me-3">
+                                            @resenia.usuario_nombre.Substring(0, 1)@resenia.usuario_apellido.Substring(0, 1)
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">@resenia.usuario_nombre @resenia.usuario_apellido</h6>
+                                            <small class="text-muted">@resenia.res_fecha.ToString("dd/MM/yyyy")</small>
+                                        </div>
+                                    </div>
+                                    <div class="rating">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= resenia.res_valoracion)
+                                            {
+                                                <i class="fas fa-star text-warning"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="far fa-star text-warning"></i>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <p class="mb-2">@resenia.res_comentario</p>
+                                @if (resenia.usuario_id == ViewBag.UsuarioId)
+                                {
+                                    <div class="text-end">
+                                        <button class="btn btn-sm btn-outline-danger eliminar-resenia" data-id="@resenia.res_id"
+                                            data-bs-toggle="modal" data-bs-target="#confirmarEliminarModal">
+                                            <i class="fas fa-trash-alt me-1"></i> Eliminar
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="far fa-comment-dots fa-3x text-muted mb-3"></i>
+                            <p class="mb-0">No hay reseñas para este servicio.</p>
+                            <p class="text-muted">¡Sé el primero en comentar!</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario para Agregar Reseña -->
+        <div class="col-lg-6" data-aos="fade-left">
+            <div class="bg-white rounded-4 shadow-lg p-4">
+                <h5 class="mb-4">Comparte tu experiencia</h5>
+
+                <div class="formulario-overlay" id="formularioReseniaOverlay" style="position: relative;">
+                    <div class="formulario-bloqueo" id="formularioReseniaBloqueo"
+                        style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1050;">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <div class="text-center bg-white p-4 rounded shadow">
+                                <h5 class="text-danger mb-3">Inicia sesión para dejar una reseña</h5>
+                                <a href="/Identity/Account/Login" class="btn btn-danger">Iniciar sesión</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="AgregarResenia" asp-controller="Servicios" method="post" class="row g-3"
+                        id="formularioResenia">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ser_id" value="@Model.ser_id" />
+                        <input type="hidden" name="usuario_id" value="@ViewBag.UsuarioId" />
+
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Valoración*</label>
+                            <div class="star-rating">
+                                <input type="hidden" name="valoracion" id="valoracionInput" value="5" required>
+                                <div class="stars d-flex">
+                                    @for (int i = 5; i >= 1; i--)
+                                    {
+                                        <span class="star @(i == 5 ? "active" : "")" data-value="@i">
+                                            <i class="fas fa-star fa-lg"></i>
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="comentario" class="form-label">Tu comentario*</label>
+                            <textarea class="form-control" id="comentario" name="comentario" rows="4" required
+                                placeholder="Cuéntanos tu experiencia con este servicio..."></textarea>
+                            <div class="invalid-feedback">
+                                Por favor, escribe un comentario para continuar.
+                            </div>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="true" id="notificarEmail"
+                                    name="notificarEmail">
+                                <label class="form-check-label" for="notificarEmail">
+                                    Recibir notificaciones por correo sobre respuestas a mi reseña
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-danger w-100 py-3" id="submitResenia">
+                                <i class="fas fa-paper-plane me-2"></i>Publicar Reseña
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar Reseña -->
+<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                <p>¿Estás seguro de que deseas eliminar esta reseña?</p>
+                <p class="text-muted">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form asp-action="EliminarResenia" asp-controller="Servicios" method="post" id="eliminarReseniaForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="res_id" id="reseniaIdEliminar" value="">
+                    <input type="hidden" name="ser_id" value="@Model.ser_id">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Éxito para Reseña Registrada -->
+<div class="modal fade" id="reseniaExitoModal" tabindex="-1" aria-labelledby="reseniaExitoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="reseniaExitoModalLabel">¡Reseña registrada!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <p>Tu reseña ha sido publicada correctamente.</p>
+                <p class="text-muted">Gracias por compartir tu experiencia.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Éxito para Reseña Eliminada -->
+<div class="modal fade" id="reseniaEliminadaModal" tabindex="-1" aria-labelledby="reseniaEliminadaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="reseniaEliminadaModalLabel">Reseña eliminada</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                <p>Tu reseña ha sido eliminada correctamente.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para las reseñas -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Comprobar si el usuario está autenticado para el formulario de reseñas
+        var usuarioAutenticado = @(usuarioAutenticado.ToString().ToLower());
+        if (!usuarioAutenticado) {
+            var bloqueoResenia = document.getElementById('formularioReseniaBloqueo');
+            if (bloqueoResenia) {
+                bloqueoResenia.style.display = 'block';
+            }
+        }
+
+        // Sistema de valoración con estrellas
+        const stars = document.querySelectorAll('.star-rating .star');
+        const valoracionInput = document.getElementById('valoracionInput');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function () {
+                const value = this.dataset.value;
+                valoracionInput.value = value;
+
+                // Resetear todas las estrellas
+                stars.forEach(s => s.classList.remove('active'));
+
+                // Activar las estrellas seleccionadas
+                stars.forEach(s => {
+                    if (parseInt(s.dataset.value) <= parseInt(value)) {
+                        s.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Validación del formulario de reseña
+        const formularioResenia = document.getElementById('formularioResenia');
+        if (formularioResenia) {
+            formularioResenia.addEventListener('submit', function (e) {
+                let isValid = true;
+                const comentario = document.getElementById('comentario');
+
+                if (!comentario.value.trim()) {
+                    comentario.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    comentario.classList.remove('is-invalid');
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // Configurar el ID de la reseña a eliminar en el modal
+        const botonesEliminar = document.querySelectorAll('.eliminar-resenia');
+        botonesEliminar.forEach(boton => {
+            boton.addEventListener('click', function () {
+                const reseniaId = this.dataset.id;
+                document.getElementById('reseniaIdEliminar').value = reseniaId;
+            });
+        });
+
+        // Mostrar modal de éxito si se registró o eliminó una reseña
+        if ('@TempData["ReseniaRegistrada"]' === 'True') {
+            const modalExito = new bootstrap.Modal(document.getElementById('reseniaExitoModal'));
+            modalExito.show();
+        }
+
+        if ('@TempData["ReseniaEliminada"]' === 'True') {
+            const modalEliminada = new bootstrap.Modal(document.getElementById('reseniaEliminadaModal'));
+            modalEliminada.show();
+        }
+
+        // Animación para nuevas reseñas (cuando se agregan dinámicamente)
+        function animateNewReview(element) {
+            element.classList.add('resenia-item-new');
+            setTimeout(() => {
+                element.classList.remove('resenia-item-new');
+            }, 2000);
+        }
+    });
+</script>
+
 <script>
     AOS.init({ once: true });
     function mostrarModalLogin() {
