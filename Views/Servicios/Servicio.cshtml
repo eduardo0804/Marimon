@@ -59,7 +59,8 @@
                 <p>¿Deseas agregar tu cita a tu calendario?</p>
                 <a id="googleCalendarLink" href="#" target="_blank" class="btn btn-success mb-2 w-100">Agregar a Google
                     Calendar</a>
-                <a id="icsDownloadLink" href="#" class="btn btn-primary w-100">Agregar Otros Calendarios (.ics)</a>
+                <a id="outlookCalendarLink" href="#" target="_blank" class="btn btn-primary w-100">Agregar a Outlook
+                    Calendar</a>
             </div>
         </div>
     </div>
@@ -791,6 +792,52 @@
             preferredCountries: ["pe", "ar", "es", "us", "br"],
             utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"
         });
+        // Referencias a elementos del formulario
+        const fechaInput = document.getElementById('fecha');
+        const horaInput = document.getElementById('hora');
+        const formulario = document.getElementById('formulario');
+        
+        // Guardar fecha y hora al seleccionarlas
+        if (fechaInput) {
+            fechaInput.addEventListener('change', function() {
+                localStorage.setItem('reserva_fecha', this.value);
+            });
+        }
+
+        if (horaInput) {
+            horaInput.addEventListener('change', function() {
+                localStorage.setItem('reserva_hora', this.value);
+            });
+        }
+
+        // Guardar al enviar formulario
+        if (formulario) {
+            formulario.addEventListener('submit', function(e) {
+                // Validación del teléfono
+                const iti = window.intlTelInputGlobals.getInstance(document.getElementById('telefono'));
+                if (!iti.isValidNumber()) {
+                    e.preventDefault();
+                    const errorModal = new bootstrap.Modal(document.getElementById('errorReservaModal'));
+                    document.getElementById('errorReservaMensaje').innerHTML = "El teléfono debe tener el formato internacional correcto.";
+                    errorModal.show();
+                    return false;
+                }
+
+                // Formatear teléfono internacional
+                const numeroIntl = iti.getNumber();
+                const countryCode = iti.getSelectedCountryData().dialCode;
+                const numeroFormateado = numeroIntl.replace('+' + countryCode, '+' + countryCode + ' ');
+                document.getElementById('telefono_internacional').value = numeroFormateado;
+                
+                // Guardar fecha y hora en localStorage
+                const fechaValue = document.getElementById('fecha').value;
+                const horaValue = document.getElementById('hora').value;
+                if (fechaValue && horaValue) {
+                    localStorage.setItem('reserva_fecha', fechaValue);
+                    localStorage.setItem('reserva_hora', horaValue);
+                }
+            });
+        }
         // Inicializa mensaje de éxito
         const successMessage = document.querySelector(".success-message");
         if (successMessage) {
@@ -808,7 +855,6 @@
             return;
         }
         // Inicializar Cruces
-        const fechaInput = document.getElementById('fecha');
         const crucesBtn = document.getElementById('dropdownReservas');
         const listGroup = document.querySelector('.list-group');
         const allItems = Array.from(document.querySelectorAll('.list-group-item[data-fecha]'));
@@ -845,40 +891,45 @@
         }
 
         // Mostrar modal de calendario si la reserva fue exitosa
-        var reservaExitosa = '@TempData["ReservaExitosa"]';
+        const reservaExitosa = '@TempData["ReservaExitosa"]';
         if (reservaExitosa && reservaExitosa !== '') {
-            var calendarioModal = new bootstrap.Modal(document.getElementById('calendarioModal'));
+            const calendarioModal = new bootstrap.Modal(document.getElementById('calendarioModal'));
             calendarioModal.show();
 
+            // Obtener datos guardados en localStorage
+            const fechaGuardada = localStorage.getItem('reserva_fecha');
+            const horaGuardada = localStorage.getItem('reserva_hora');
+
             // Datos para el evento
-            const titulo = 'Reserva Marimon';
-            const descripcion = 'Servicio: @Model.ser_nombre';
+            const nombreServicio = '@Html.Raw(Json.Serialize(Model.ser_nombre))'.replace(/"/g, '');
+            const titulo = `Reserva Marimon - ${nombreServicio}`;
+            const descripcion = `Servicio: ${nombreServicio}`;
             const location = 'Jr. Gral. Felipe Santiago Salaverry 44, Lima 15022, Perú';
 
-            // Usa la fecha seleccionada en el formulario o pásala desde el backend
-            const fecha = new Date(document.getElementById('fecha')?.value || Date.now());
-            const fechaInicio = fecha.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-            const fechaFin = new Date(fecha.getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            // Crear fecha con los valores guardados
+            const fechaHora = new Date();
+            
+            if (fechaGuardada) {
+                const [year, month, day] = fechaGuardada.split('-');
+                fechaHora.setFullYear(parseInt(year), parseInt(month) - 1, parseInt(day));
+            }
 
-            // Google Calendar link
+            if (horaGuardada) {
+                const [hours, minutes] = horaGuardada.split(':');
+                fechaHora.setHours(parseInt(hours), parseInt(minutes), 0);
+            }
+
+            // Formato para Google Calendar
+            const fechaInicio = fechaHora.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            const fechaFin = new Date(fechaHora.getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
             const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&dates=${fechaInicio}/${fechaFin}&details=${encodeURIComponent(descripcion)}&location=${encodeURIComponent(location)}`;
             document.getElementById('googleCalendarLink').href = googleUrl;
 
-            // ICS download link
-            const icsContent = `BEGIN:VCALENDAR
-            VERSION:2.0
-            BEGIN:VEVENT
-            SUMMARY:${titulo}
-            DESCRIPTION:${descripcion}
-            LOCATION:${location}
-            DTSTART:${fechaInicio}
-            DTEND:${fechaFin}
-            END:VEVENT
-            END:VCALENDAR`;
-
-            const blob = new Blob([icsContent], { type: 'text/calendar' });
-            document.getElementById('icsDownloadLink').href = URL.createObjectURL(blob);
-            document.getElementById('icsDownloadLink').download = "reserva.ics";
+            // Formato para Outlook Calendar 
+            const fechaInicioOutlook = fechaHora.toISOString().replace('.000', '');
+            const fechaFinOutlook = new Date(fechaHora.getTime() + 60 * 60 * 1000).toISOString().replace('.000', '');
+            const outlookUrl = `https://outlook.office.com/calendar/action/compose?subject=${encodeURIComponent(titulo)}&startdt=${fechaInicioOutlook}&enddt=${fechaFinOutlook}&body=${encodeURIComponent(descripcion)}&location=${encodeURIComponent(location)}`;
+            document.getElementById('outlookCalendarLink').href = outlookUrl;
         }
     });
 </script>
