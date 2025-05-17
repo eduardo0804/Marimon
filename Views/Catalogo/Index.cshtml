@@ -328,27 +328,27 @@
                 historialElement.appendChild(li);
             });
 
-            // Añadir opción para limpiar historial
-            // if (historialBusquedas.length > 0) {
-            //     const separador = document.createElement('li');
-            //     separador.innerHTML = '<hr class="dropdown-divider">';
-            //     historialElement.appendChild(separador);
+            Añadir opción para limpiar historial
+            if (historialBusquedas.length > 0) {
+                const separador = document.createElement('li');
+                separador.innerHTML = '<hr class="dropdown-divider">';
+                historialElement.appendChild(separador);
 
-            //     const limpiarLi = document.createElement('li');
-            //     const limpiarA = document.createElement('a');
-            //     limpiarA.classList.add('dropdown-item', 'text-danger');
-            //     limpiarA.href = '#';
-            //     limpiarA.textContent = 'Limpiar historial';
-            //     limpiarA.addEventListener('click', function (e) {
-            //         e.preventDefault();
-            //         localStorage.removeItem('historialBusquedas');
-            //         historialBusquedas = [];
-            //         actualizarHistorialUI();
-            //     });
+                const limpiarLi = document.createElement('li');
+                const limpiarA = document.createElement('a');
+                limpiarA.classList.add('dropdown-item', 'text-danger');
+                limpiarA.href = '#';
+                limpiarA.textContent = 'Limpiar historial';
+                limpiarA.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    localStorage.removeItem('historialBusquedas');
+                    historialBusquedas = [];
+                    actualizarHistorialUI();
+                });
 
-            //     limpiarLi.appendChild(limpiarA);
-            //     historialElement.appendChild(limpiarLi);
-            // }
+                limpiarLi.appendChild(limpiarA);
+                historialElement.appendChild(limpiarLi);
+            }
         }
     });
     function cargarDetalleAutoparte(id) {
