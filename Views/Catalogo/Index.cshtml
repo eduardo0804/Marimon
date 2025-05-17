@@ -49,17 +49,16 @@
         </div>
 
         <!-- Columna para alinear el dropdown a la derecha -->
-        @* NO BORRAR *@
-        @* <div class="col-12 text-end"> *@
-        @*     <div class="dropdown"> *@
-        @*         <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="historialBusqueda" data-bs-toggle="dropdown" aria-expanded="false"> *@
-        @*             Búsquedas recientes *@
-        @*         </button> *@
-        @*         <ul class="dropdown-menu" id="historial-busquedas" aria-labelledby="historialBusqueda"> *@
-        @*             <li><a class="dropdown-item text-center" href="#">No hay búsquedas recientes</a></li> *@
-        @*         </ul> *@
-        @*     </div> *@
-        @* </div> *@
+        <div class="col-12 text-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="historialBusqueda" data-bs-toggle="dropdown" aria-expanded="false">
+                    Búsquedas recientes
+                </button>
+                <ul class="dropdown-menu" id="historial-busquedas" aria-labelledby="historialBusqueda">
+                    <li><a class="dropdown-item text-center" href="#">No hay búsquedas recientes</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 
 
@@ -330,26 +329,26 @@
             });
 
             // Añadir opción para limpiar historial
-            if (historialBusquedas.length > 0) {
-                const separador = document.createElement('li');
-                separador.innerHTML = '<hr class="dropdown-divider">';
-                historialElement.appendChild(separador);
+            // if (historialBusquedas.length > 0) {
+            //     const separador = document.createElement('li');
+            //     separador.innerHTML = '<hr class="dropdown-divider">';
+            //     historialElement.appendChild(separador);
 
-                const limpiarLi = document.createElement('li');
-                const limpiarA = document.createElement('a');
-                limpiarA.classList.add('dropdown-item', 'text-danger');
-                limpiarA.href = '#';
-                limpiarA.textContent = 'Limpiar historial';
-                limpiarA.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    localStorage.removeItem('historialBusquedas');
-                    historialBusquedas = [];
-                    actualizarHistorialUI();
-                });
+            //     const limpiarLi = document.createElement('li');
+            //     const limpiarA = document.createElement('a');
+            //     limpiarA.classList.add('dropdown-item', 'text-danger');
+            //     limpiarA.href = '#';
+            //     limpiarA.textContent = 'Limpiar historial';
+            //     limpiarA.addEventListener('click', function (e) {
+            //         e.preventDefault();
+            //         localStorage.removeItem('historialBusquedas');
+            //         historialBusquedas = [];
+            //         actualizarHistorialUI();
+            //     });
 
-                limpiarLi.appendChild(limpiarA);
-                historialElement.appendChild(limpiarLi);
-            }
+            //     limpiarLi.appendChild(limpiarA);
+            //     historialElement.appendChild(limpiarLi);
+            // }
         }
     });
     function cargarDetalleAutoparte(id) {
