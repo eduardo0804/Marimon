@@ -475,6 +475,7 @@ namespace Marimon.Controllers
             throw new NotImplementedException();
         }
 
+<<<<<<< Updated upstream
         [HttpGet]
         public async Task<IActionResult> ObtenerDatosVenta(int ventaId)
         {
@@ -553,18 +554,68 @@ namespace Marimon.Controllers
 
 
 
+=======
+>>>>>>> Stashed changes
         //AUTOPARTE - CRUD
 
         // GET: Admin/ListaAutopartes
-        public async Task<IActionResult> ListaAutopartes()
+        public IActionResult ListaAutopartes(string orden = null, List<int> categorias = null)
         {
-            var autopartes = await _context.Autopartes
-                .Include(a => a.Categoria)  // Cargar la categoría relacionada
-                .OrderBy(a => a.aut_id) // Aquí defines el orden
-                .ToListAsync();
+            var autopartes = _context.Autopartes.Include(a => a.Categoria).AsQueryable();
 
-            return View(autopartes);
+            if (categorias != null && categorias.Any())
+            {
+                autopartes = autopartes.Where(a => categorias.Contains(a.CategoriaId));
+            }
+
+            var ventasOnline = _context.DetalleVentas
+                .GroupBy(d => d.AutoParteId)
+                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(d => d.det_cantidad) });
+
+            var ventasPresenciales = _context.Salida
+                .GroupBy(s => s.AutoparteId)
+                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(s => s.sal_cantidad) });
+
+            var ventasTotales = ventasOnline
+                .Concat(ventasPresenciales)
+                .GroupBy(v => v.AutoparteId)
+                .Select(g => new { AutoparteId = g.Key, Total = g.Sum(x => x.Cantidad) })
+                .ToList();
+
+            if (orden == "asc")
+            {
+                autopartes = autopartes.OrderBy(a => a.aut_precio);
+            }
+            else if (orden == "desc")
+            {
+                autopartes = autopartes.OrderByDescending(a => a.aut_precio);
+            }
+            else if (orden == "mas_vendidas")
+            {
+                autopartes = autopartes
+                    .AsEnumerable()
+                    .OrderByDescending(a =>
+                        ventasTotales.FirstOrDefault(v => v.AutoparteId == a.aut_id)?.Total ?? 0)
+                    .AsQueryable();
+            }
+            else
+            {
+                autopartes = autopartes.OrderBy(a => a.aut_id);
+            }
+
+            var lista = autopartes.ToList();
+
+            // Asignar la cantidad vendida
+            foreach (var autoparte in lista)
+            {
+                autoparte.CantidadVendida = ventasTotales
+                    .FirstOrDefault(v => v.AutoparteId == autoparte.aut_id)?.Total ?? 0;
+            }
+
+            ViewBag.Categorias = _context.Categorias.ToList();
+            return View(lista);
         }
+
         public IActionResult Create()
         {
             ViewBag.Title = "Registrar Autoparte";

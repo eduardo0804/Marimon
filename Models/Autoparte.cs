@@ -5,7 +5,7 @@ using Marimon.Models;
 namespace Marimon.Models
 {
     [Table("Autoparte")]
-    public class Autoparte 
+    public class Autoparte
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -14,12 +14,15 @@ namespace Marimon.Models
         public string? aut_descripcion { get; set; }
         public decimal aut_precio { get; set; }
         public string? aut_especificacion { get; set; }
-        public int aut_cantidad {get;set;}= 0;
-        public string aut_imagen { get; set; }  = string.Empty;
-        public int CategoriaId { get; set; } 
+        public int aut_cantidad { get; set; } = 0;
+        public string aut_imagen { get; set; } = string.Empty;
+        public int CategoriaId { get; set; }
 
         [ForeignKey("CategoriaId")]
         public Categoria? Categoria { get; set; }
-        
+
+        [NotMapped]
+        public int CantidadVendida { get; set; }
+
     }
 }
