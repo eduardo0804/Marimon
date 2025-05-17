@@ -475,7 +475,6 @@ namespace Marimon.Controllers
             throw new NotImplementedException();
         }
 
-<<<<<<< Updated upstream
         [HttpGet]
         public async Task<IActionResult> ObtenerDatosVenta(int ventaId)
         {
@@ -554,8 +553,7 @@ namespace Marimon.Controllers
 
 
 
-=======
->>>>>>> Stashed changes
+
         //AUTOPARTE - CRUD
 
         // GET: Admin/ListaAutopartes

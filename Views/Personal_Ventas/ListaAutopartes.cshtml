@@ -48,15 +48,6 @@
     </div>
   </div>
   <!-- Encabezado con imagen y texto -->
-<<<<<<< Updated upstream
-  <div class="row align-items-center">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Autopartes</li>
-        </ol>
-=======
   <div class="row align-items-center mb-4">
     <ol class="breadcrumb">
       <li class="breadcrumb-item">
@@ -64,7 +55,6 @@
       </li>
       <li class="breadcrumb-item active" aria-current="page">Autopartes</li>
     </ol>
->>>>>>> Stashed changes
     <div class="col-md-6 text-center">
       <img src="~/images/auto.png" alt="Auto" class="img-fluid" />
     </div>
@@ -150,49 +140,6 @@
 
 
   <!-- Tabla de autopartes -->
-<<<<<<< Updated upstream
-  <div class="table-container" style="max-height: 260px; overflow-y: auto;overflow-x: auto; border-radius: 8px; border: 1px solid #eee; background: #fff;">
-      <table class="modern-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Especificaciones</th>
-            <th>Precio (S/)</th>
-            <th>Cantidad</th>
-            <th>Categoría</th>
-            <th>Imagen</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach (var item in Model)
-          {
-            <tr class="table-row">
-              <td data-label="ID">@item.aut_id</td>
-              <td data-label="Nombre">@item.aut_nombre</td>
-              <td data-label="Descripción" class="td-description">
-                <div class="description-content">@item.aut_descripcion</div>
-                <div class="description-tooltip">@item.aut_descripcion</div>
-              </td>
-              <td data-label="Especificaciones" class="td-description">
-                <div class="description-content">@item.aut_especificacion</div>
-                <div class="description-tooltip">@item.aut_especificacion</div>
-              </td>
-              <td data-label="Precio">S/ @item.aut_precio.ToString("F2")</td>
-              <td data-label="Cantidad">@item.aut_cantidad.ToString()</td>
-              <td data-label="Categoría">@item.Categoria?.cat_nombre</td>
-              <td data-label="Imagen">
-                @if (!string.IsNullOrEmpty(item.aut_imagen))
-                {
-                  <div class="image-container">
-                    <img src="@item.aut_imagen" alt="Imagen" class="table-image" />
-                    <div class="image-overlay">
-                      <a style="text-decoration: none;" href="@item.aut_imagen" target="_blank" class="image-zoom">
-                        <i style="color:white;" class="fas fa-search-plus"></i>
-                      </a>
-=======
   <div id="contenedor-autopartes">
     <div class="accordion" id="salidasAccordion"
       style="max-height: 400px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; background: #fff;">
@@ -260,7 +207,6 @@
                           <i class="fas fa-trash-alt"></i>
                         </button>
                       </form>
->>>>>>> Stashed changes
                     </div>
                   </td>
                 </tr>
