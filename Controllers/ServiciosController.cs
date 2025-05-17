@@ -42,6 +42,7 @@ namespace Marimon.Controllers
 
             string nombre = "";
             string apellido = "";
+            string correo = "";
 
             if (User.Identity.IsAuthenticated)
             {
@@ -53,12 +54,14 @@ namespace Marimon.Controllers
                     {
                         nombre = usuario.usu_nombre ?? "";
                         apellido = usuario.usu_apellido ?? "";
+                        correo = usuario.usu_correo ?? "";
                     }
                 }
             }
 
             ViewBag.Nombre = nombre;
             ViewBag.Apellido = apellido;
+            ViewBag.Correo = correo;
 
             // Pasar las reservas al ViewBag
             ViewBag.UsuarioAutenticado = User.Identity.IsAuthenticated;
