@@ -32,75 +32,61 @@ namespace Marimon.Controllers
         public async Task<IActionResult> Detalle(int id)
         {
             var servicio = await _context.Servicio
-                .Include(s => s.Reservas) // Incluye las reservas relacionadas
                 .FirstOrDefaultAsync(s => s.ser_id == id);
 
             if (servicio == null)
-            {
                 return NotFound();
-            }
 
-            string nombre = "";
-            string apellido = "";
-            string correo = "";
+            // Obtener las reseñas relacionadas al servicio con usuario
+            var resenias = await _context.Resenias
+                .Where(r => r.ser_id == id)
+                .Select(r => new
+                {
+                    r.res_id,
+                    r.res_comentario,
+                    r.res_puntuacion,
+                    r.res_fecha,
+                    r.res_gusto,
+                    usuario_id = r.UsuarioId,
+                    usuario_nombre = _context.Usuario.Where(u => u.usu_id == r.UsuarioId).Select(u => u.usu_nombre).FirstOrDefault()
+                })
+                .ToListAsync();
 
+            // Guardamos en ViewBag
+            ViewBag.Resenias = resenias;
+
+            // Usuario autenticado
+            string usuarioId = "";
             if (User.Identity.IsAuthenticated)
             {
                 var identityUser = await _userManager.GetUserAsync(User);
                 if (identityUser != null)
-                {
-                    var usuario = _context.Usuario.FirstOrDefault(u => u.usu_id == identityUser.Id);
-                    if (usuario != null)
-                    {
-                        nombre = usuario.usu_nombre ?? "";
-                        apellido = usuario.usu_apellido ?? "";
-                        correo = usuario.usu_correo ?? "";
-                    }
-                }
+                    usuarioId = identityUser.Id;
             }
-
-            ViewBag.Nombre = nombre;
-            ViewBag.Apellido = apellido;
-            ViewBag.Correo = correo;
-
-            // Pasar las reservas al ViewBag
-            ViewBag.UsuarioAutenticado = User.Identity.IsAuthenticated;
-            ViewBag.TodasLasReservas = _context.Reserva
-            .Include(r => r.Servicio)
-            .Select(r => new
-            {
-                res_fecha = r.res_fecha,
-                res_hora = r.res_hora,
-                ser_nombre = r.Servicio.ser_nombre
-            })
-            .ToList();
+            ViewBag.UsuarioId = usuarioId;
 
             return View("Servicio", servicio);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reservar(int ser_id, string placa, string telefono,string telefono_internacional, DateTime fecha, TimeSpan hora, string detalle)
+        public async Task<IActionResult> Reservar(int ser_id, string placa, string telefono, string telefono_internacional, DateTime fecha, TimeSpan hora, string detalle)
         {
             var usuario = await ObtenerUsuarioAutenticado();
             if (usuario == null)
                 return Unauthorized();
 
-            // 2. Validar entrada de datos
             if (!ValidarFormatoTelefono(telefono_internacional))
             {
                 return MostrarErrorReserva(ser_id, "El teléfono debe tener el formato internacional correcto (ej: +51 932454493).");
             }
 
-            // 3. Validar fecha y hora
             var resultadoValidacion = ValidarFechaHora(fecha, hora);
             if (!resultadoValidacion.esValido)
             {
                 return MostrarErrorReserva(ser_id, resultadoValidacion.mensaje);
             }
 
-            // 4. Verificar reserva existente para la misma fecha
             if (await ExisteReservaParaFecha(usuario.usu_id, fecha))
             {
                 return MostrarErrorReserva(ser_id, "Ya tienes una reserva programada para esta fecha. Solo puedes realizar una reserva por día.");
@@ -163,8 +149,8 @@ namespace Marimon.Controllers
         private async Task<bool> ExisteReservaParaFecha(string usuarioId, DateTime fecha)
         {
             var fechaUtc = DateTime.SpecifyKind(fecha.Date, DateTimeKind.Utc);
-            return await _context.Reserva.AnyAsync(r => 
-                r.UsuarioId == usuarioId && 
+            return await _context.Reserva.AnyAsync(r =>
+                r.UsuarioId == usuarioId &&
                 r.res_fecha.Date == fechaUtc.Date);
         }
 
@@ -218,29 +204,49 @@ namespace Marimon.Controllers
             await _emailSender.SendEmailAsync(user.Email, "Orden de Reserva", emailBody);
         }
 
-        public IActionResult DescargarICS(string titulo, string descripcion, string location, DateTime fecha)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgregarResenia(int ser_id, int res_puntuacion, string res_gusto, string res_comentario)
         {
-            var fechaInicio = fecha.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
-            var fechaFin = fecha.AddHours(1).ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
-            var ics = $@"BEGIN:VCALENDAR
-            VERSION:2.0
-            BEGIN:VEVENT
-            SUMMARY:{titulo}
-            DESCRIPTION:{descripcion}
-            LOCATION:{location}
-            DTSTART:{fechaInicio}
-            DTEND:{fechaFin}
-            END:VEVENT
-            END:VCALENDAR";
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["Error"] = "Debes iniciar sesión para agregar una reseña.";
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
 
-            var bytes = System.Text.Encoding.UTF8.GetBytes(ics);
-            return File(bytes, "text/calendar", "reserva.ics");
-        }
+            var identityUser = await _userManager.GetUserAsync(User);
+            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.usu_id == identityUser.Id);
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View("Error!");
+            if (usuario == null)
+            {
+                TempData["Error"] = "Usuario no encontrado.";
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
+
+            var nuevaResenia = new Resenia
+            {
+                res_puntuacion = res_puntuacion,
+                res_gusto = res_gusto,
+                res_comentario = res_comentario,
+                res_fecha = DateTime.UtcNow,
+                UsuarioId = usuario.usu_id,
+                ser_id = ser_id
+            };
+
+            try
+            {
+                _context.Resenias.Add(nuevaResenia);
+                await _context.SaveChangesAsync();
+
+                TempData["Mensaje"] = "Reseña agregada exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al agregar reseña");
+                TempData["Error"] = "Ocurrió un error al agregar la reseña.";
+            }
+
+            return RedirectToAction("Detalle", new { id = ser_id });
         }
     }
 }

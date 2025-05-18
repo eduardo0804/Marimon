@@ -70,4 +70,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Carrito> Carritos { get; set; }
     public DbSet<CarritoAutoparte> CarritoAutopartes { get; set; } = null!;
     public DbSet<Reclamacion> Reclamacion { get; set; } = null!;
+    public DbSet<Resenia> Resenias { get; set; }
+
 }
