@@ -18,6 +18,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reseniaatuparte.css" asp-append-version="true" />
 
 </head>
 <style>
@@ -153,184 +154,389 @@
                 </div>
             </div>
 
-            <div class="mt-5"></div>
-            <h5 class="mb-4">Reseñas</h5>
-
-            <!-- Formulario para agregar reseñas -->
-            @if (User.Identity.IsAuthenticated)
-            {
-                <form id="formReseniaAutoparte" asp-action="AgregarReseniaAutoparte" asp-controller="Catalogo"
-                    method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="aut_id" value="@Model.aut_id" />
-
-                    <div class="mb-3">
-                        <label for="res_puntuacion" class="form-label">Tu Puntuación:</label>
-                        <select class="form-select" id="res_puntuacion" name="res_puntuacion" required>
-                            <option value="1">1 Estrella</option>
-                            <option value="2">2 Estrellas</option>
-                            <option value="3">3 Estrellas</option>
-                            <option value="4">4 Estrellas</option>
-                            <option value="5">5 Estrellas</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">¿Te gustó esta autoparte?</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="res_gusto" id="gustoSi" value="Si" checked>
-                            <label class="form-check-label" for="gustoSi">Sí</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="res_gusto" id="gustoNo" value="No">
-                            <label class="form-check-label" for="gustoNo">No</label>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="res_comentario" class="form-label">Tu Comentario</label>
-                        <textarea class="form-control" id="res_comentario" name="res_comentario" rows="3"
-                        required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Enviar Reseña</button>
-                </form>
-            }
-            else
-            {
-                <div class="alert alert-warning">
-                    Debes <a href="/Identity/Account/Login">iniciar sesión</a> para agregar una reseña.
+            <div class="container-fluid mt-5 px-4"></div>
+            <div class="row my-5">
+                <div class="col-12 text-center mb-5" data-aos="fade-up">
+                    <h2 class="fw-bold" style="color: #000000; letter-spacing: 1px; text-transform: uppercase;">
+                        Reseñas de Clientes</h2>
+                    <div style="width:80px; height:5px; background:#E42229; margin:auto; border-radius:3px;"></div>
+                    <p class="mt-3 text-muted" style="color: #626C66;">Tu opinión sobre esta autoparte nos ayuda a
+                        mejorar</p>
                 </div>
-            }
 
-            <!-- Lista de reseñas -->
-            <div class="resenias-list">
-                @if (Model.Resenias != null && Model.Resenias.Any())
-                {
-                    foreach (var resenia in Model.Resenias)
-                    {
-                        <div class="resenia-item mb-4 pb-3 border-bottom" id="resenia-@resenia.res_id">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="me-3">
-                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center"
-                                        style="width: 40px; height: 40px;">
-                                        <i class="fas fa-user text-secondary"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-0 fw-bold">@resenia.usuario_nombre</h6>
-                                    <div class="d-flex align-items-center">
-                                        <div class="rating-stars me-2">
-                                            @for (int i = 1; i <= 5; i++)
-                                            {
-                                                <i class="@(i <= resenia.res_puntuacion ? "fas" : "far") fa-star text-warning"></i>
-                                            }
+                <div class="row g-4">
+                    <!-- Columna izquierda para formulario -->
+                    <div class="col-md-6 mb-5">
+                        <div class="bg-white rounded-4 shadow-lg p-5"
+                            style="border-top: 5px solid #E42229; position: relative; overflow: hidden;">
+                            <div
+                                style="position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: rgba(228, 34, 41, 0.1); border-radius: 0 0 0 120px;">
+                            </div>
+
+                            <h4 class="mb-4" style="color: #000000; font-weight: 700;">Comparte tu Experiencia</h4>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <form id="formReseniaAutoparte" asp-action="AgregarReseniaAutoparte"
+                                    asp-controller="Catalogo" method="post" class="row">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="aut_id" value="@Model.aut_id" />
+
+                                    <div class="col-12 mb-4">
+                                        <label class="form-label" style="font-weight: 600; color: #000000;">Tu
+                                            Puntuación:</label>
+                                        <div class="d-flex">
+                                            <input type="hidden" name="res_puntuacion" id="valoracionInput" value="0"
+                                                required>
+                                            <div class="stars d-flex">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <span class="star" data-value="@i"
+                                                        style="font-size: 2.2rem; margin-right: 10px; cursor: pointer; color: #dddddd; transition: color 0.3s ease;">
+                                                        <i class="far fa-star"></i>
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="invalid-feedback" id="valoracionError" style="display: none;">
+                                                Por favor, selecciona una valoración.
+                                            </div>
                                         </div>
-                                        <small class="text-muted">@resenia.res_fecha.ToString("dd/MM/yyyy")</small>
+                                    </div>
+
+                                    <div class="col-12 mb-4">
+                                        <label class="form-label" style="font-weight: 600; color: #000000;">¿Te gustó esta
+                                            autoparte?</label>
+                                        <div class="d-flex gap-4 mt-2">
+                                            <div class="form-check form-check-inline custom-radio">
+                                                <input class="form-check-input" type="radio" name="res_gusto" id="gustoSi"
+                                                    value="Si" checked
+                                                    style="width: 20px; height: 20px; border: 2px solid #E42229;">
+                                                <label class="form-check-label ms-2" for="gustoSi" style="font-size: 1rem;">
+                                                    <i class="fas fa-thumbs-up me-1" style="color: #E42229;"></i> Sí me
+                                                    gustó
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline custom-radio">
+                                                <input class="form-check-input" type="radio" name="res_gusto" id="gustoNo"
+                                                    value="No"
+                                                    style="width: 20px; height: 20px; border: 2px solid #626C66;">
+                                                <label class="form-check-label ms-2" for="gustoNo" style="font-size: 1rem;">
+                                                    <i class="fas fa-thumbs-down me-1" style="color: #626C66;"></i> No me
+                                                    gustó
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mb-4">
+                                        <label for="res_comentario" class="form-label"
+                                            style="font-weight: 600; color: #000000;">Tu Comentario</label>
+                                        <textarea class="form-control" id="res_comentario" name="res_comentario" rows="4"
+                                        required placeholder="Comparte tu experiencia con esta autoparte..."
+                                        style="border-radius: 12px; border: 1px solid #e0e0e0; padding: 15px; resize: none;"></textarea>
+                                        <div class="invalid-feedback" id="comentarioError">
+                                            Por favor, escribe un comentario para continuar.
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-lg w-100 py-3" id="submitResenia"
+                                            style="background-color: #E42229; border: none; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: #FFFFFF;">
+                                            <i class="fas fa-paper-plane me-2"></i> Enviar Reseña
+                                        </button>
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="alert border-0 p-4"
+                                    style="background-color: rgba(228, 34, 41, 0.1); border-radius: 12px;">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="fas fa-exclamation-circle fa-2x" style="color: #E42229;"></i>
+                                        </div>
+                                        <div>
+                                            <h5 style="color: #000000; font-weight: 600;">Acceso requerido</h5>
+                                            <p class="mb-2" style="color: #626C66;">Debes iniciar sesión para agregar una
+                                                reseña.</p>
+                                            <a href="/Identity/Account/Login" class="btn mt-2"
+                                                style="background-color: #E42229; color: #FFFFFF; border-radius: 30px; padding: 8px 20px; font-weight: 600;">
+                                                <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                                @if (currentUserId == resenia.usuario_id)
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha para comentarios existentes -->
+                    <div class="col-md-6">
+                        <div class="bg-white rounded-4 shadow-lg p-5"
+                            style="border-top: 5px solid #626C66; position: relative;">
+                            <div
+                                style="position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: rgba(98, 108, 102, 0.1); border-radius: 0 0 0 120px;">
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 style="color: #000000; font-weight: 700;">Opiniones de Clientes</h4>
+                                <span class="badge rounded-pill"
+                                    style="background-color: #626C66; padding: 8px 15px; font-size: 0.9rem;">
+                                    <i class="fas fa-comments me-1"></i>
+                                    @if (Model.Resenias != null)
+                                    {
+                                        <span>@(Model.Resenias.Count()) reseñas</span>
+                                    }
+                                    else
+                                    {
+                                        <span>0 reseñas</span>
+                                    }
+                                </span>
+                            </div>
+
+                            <div id="reseniasList" class="resenias-list"
+                                style="max-height: 550px; overflow-y: auto; scrollbar-width: thin; padding-right: 10px;">
+                                @if (Model.Resenias != null && Model.Resenias.Any())
                                 {
-                                    <button class="btn btn-sm btn-outline-danger"
-                                        onclick="eliminarResenia(@resenia.res_id, @Model.aut_id)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    foreach (var resenia in Model.Resenias)
+                                    {
+                                        <div class="resenia-item mb-4 p-4 border-bottom"
+                                            style="border-radius: 12px; background-color: #f9f9f9; border: none !important; transition: transform 0.2s ease-in-out; opacity: 0;">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-3">
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                        style="width: 50px; height: 50px; background: linear-gradient(135deg, #E42229, #D42025); color: white;">
+                                                        <i class="fas fa-user-circle fa-2x"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold" style="color: #000000; font-size: 1.1rem;">
+                                                        @resenia.usuario_nombre</h6>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="rating-stars me-2">
+                                                            @for (int i = 1; i <= 5; i++)
+                                                            {
+                                                                <i class="@(i <= resenia.res_puntuacion ? "fas" : "far") fa-star"
+                                                                    style="color: @(i <= resenia.res_puntuacion ? "#E42229" : "#dddddd");"></i>
+                                                            }
+                                                        </div>
+                                                        <small
+                                                            style="color: #626C66;">@resenia.res_fecha.ToString("dd/MM/yyyy")</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 ps-2" style="border-left: 3px solid #E42229; padding-left: 15px;">
+                                                <p class="mb-3" style="color: #000000; line-height: 1.6;">
+                                                    @resenia.res_comentario</p>
+                                                <span class="badge"
+                                                    style="background-color: @(resenia.res_gusto == "Si" ? "#E42229" : "#626C66"); 
+                                                                   padding: 6px 12px; font-size: 0.85rem; border-radius: 30px;">
+                                                    @if (resenia.res_gusto == "Si")
+                                                    {
+                                                        <i class="fas fa-thumbs-up me-1"></i>
+                                                        <span>Me gustó</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fas fa-thumbs-down me-1"></i>
+                                                        <span>No me gustó</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center py-5" id="noComments"
+                                        style="background-color: #f9f9f9; border-radius: 12px; padding: 40px 20px;">
+                                        <i class="far fa-comment-dots fa-4x mb-3" style="color: #E42229;"></i>
+                                        <h5 style="color: #000000; font-weight: 600;">No hay comentarios todavía</h5>
+                                        <p class="text-muted mt-2" style="color: #626C66;">¡Sé el primero en compartir tu
+                                            experiencia!</p>
+                                    </div>
                                 }
                             </div>
-                            <p class="mb-1">@resenia.res_comentario</p>
-                            <span class="badge @(resenia.res_gusto == "Si" ? "bg-success" : "bg-danger")">
-                                @(resenia.res_gusto == "Si" ? "Me gustó" : "No me gustó")
-                            </span>
                         </div>
-                    }
-                }
-                else
-                {
-                    <p class="text-muted">No hay reseñas para esta autoparte.</p>
-                }
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    </div>
 
-    @functions {
-        public string GetStockColor(int stock)
-        {
-            if (stock > 20) return "text-success";
-            if (stock > 10) return "text-warning";
-            return "text-danger";
-        }
-    }
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        function cerrarModal() {
-            document.getElementById("modalAutoparte").style.display = "none";
-            const zoomModal = document.getElementById("zoomModal");
-            if (zoomModal) zoomModal.style.display = "none";
-        }
-
-        function agregarFavorito(icon) {
-            if (icon.classList.contains('fa-regular')) {
-                icon.classList.remove('fa-regular');
-                icon.classList.add('fa-solid');
-            } else {
-                icon.classList.remove('fa-solid');
-                icon.classList.add('fa-regular');
+        @functions {
+            public string GetStockColor(int stock)
+            {
+                if (stock > 20) return "text-success";
+                if (stock > 10) return "text-warning";
+                return "text-danger";
             }
-            var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
-            toast.show();
         }
-        function cargarDetalleAutoparte(id) {
-            fetch(`/Catalogo/DetalleAutoparte/${id}`)
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById("modalContent").innerHTML = html;
-                })
-                .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
-        }
-        function añadirAlCarritoAsync(autoparteId, cantidad) {
-            const formData = new FormData();
-            formData.append('autoparteId', autoparteId);
-            formData.append('cantidad', cantidad);
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-            fetch('/Carrito/AñadirAlCarrito', {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error en la respuesta del servidor');
+        <script>
+            function cerrarModal() {
+                document.getElementById("modalAutoparte").style.display = "none";
+                const zoomModal = document.getElementById("zoomModal");
+                if (zoomModal) zoomModal.style.display = "none";
+            }
+
+            function agregarFavorito(icon) {
+                if (icon.classList.contains('fa-regular')) {
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                } else {
+                    icon.classList.remove('fa-solid');
+                    icon.classList.add('fa-regular');
+                }
+                var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
+                toast.show();
+            }
+            function cargarDetalleAutoparte(id) {
+                fetch(`/Catalogo/DetalleAutoparte/${id}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById("modalContent").innerHTML = html;
+                    })
+                    .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
+            }
+            function añadirAlCarritoAsync(autoparteId, cantidad) {
+                const formData = new FormData();
+                formData.append('autoparteId', autoparteId);
+                formData.append('cantidad', cantidad);
+
+                fetch('/Carrito/AñadirAlCarrito', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            mostrarToast();
+
+                            // Actualizar y mostrar el sidebar del carrito
+                            actualizarSidebarCarrito();
+
+                            // Mostrar el sidebar del carrito (descomenta para que se abra automáticamente)
+                            // mostrarSidebarCarrito();
+                        } else {
+                            console.error('Error:', data.message);
+                            alert('No se pudo añadir al carrito: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Ocurrió un error al añadir el producto al carrito');
+                    });
+            }
+            document.addEventListener('DOMContentLoaded', function () {
+                inicializarFormularioResenia();
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+
+                //Reseña Miau
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Animación para las reseñas
+                    const reseniaItems = document.querySelectorAll('.resenia-item');
+                    reseniaItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                        }, 100 * index);
+                    });
+
+                    // Sistema de valoración por estrellas
+                    const stars = document.querySelectorAll('.star');
+                    const valoracionInput = document.getElementById('valoracionInput');
+
+                    stars.forEach(star => {
+                        // Evento hover
+                        star.addEventListener('mouseover', () => {
+                            const value = star.getAttribute('data-value');
+                            highlightStars(value);
+                        });
+
+                        // Evento click
+                        star.addEventListener('click', () => {
+                            const value = star.getAttribute('data-value');
+                            valoracionInput.value = value;
+                            highlightStars(value, true);
+                        });
+                    });
+
+                    // Resetear estrellas cuando el mouse sale del contenedor
+                    const starsContainer = document.querySelector('.stars');
+                    if (starsContainer) {
+                        starsContainer.addEventListener('mouseleave', () => {
+                            const selectedValue = valoracionInput.value;
+                            highlightStars(selectedValue, true);
+                        });
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        mostrarToast();
 
-                        // Actualizar y mostrar el sidebar del carrito
-                        actualizarSidebarCarrito();
+                    // Función para iluminar las estrellas
+                    function highlightStars(count, permanent = false) {
+                        stars.forEach(star => {
+                            const starValue = parseInt(star.getAttribute('data-value'));
+                            const icon = star.querySelector('i');
 
-                        // Mostrar el sidebar del carrito (descomenta para que se abra automáticamente)
-                        // mostrarSidebarCarrito();
-                    } else {
-                        console.error('Error:', data.message);
-                        alert('No se pudo añadir al carrito: ' + data.message);
+                            if (starValue <= count) {
+                                icon.className = 'fas fa-star';
+                                star.style.color = '#E42229';
+                            } else {
+                                if (!permanent || parseInt(valoracionInput.value) < starValue) {
+                                    icon.className = 'far fa-star';
+                                    star.style.color = '#dddddd';
+                                }
+                            }
+                        });
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Ocurrió un error al añadir el producto al carrito');
+
+                    // Inicializar estrellas con valor 0
+                    highlightStars(0, true);
+
+                    // Validación del formulario
+                    const formReseniaAutoparte = document.getElementById('formReseniaAutoparte');
+                    if (formReseniaAutoparte) {
+                        const comentarioInput = document.getElementById('res_comentario');
+                        const comentarioError = document.getElementById('comentarioError');
+                        const valoracionInput = document.getElementById('valoracionInput');
+                        const valoracionError = document.getElementById('valoracionError');
+
+                        formReseniaAutoparte.addEventListener('submit', function (event) {
+                            let valid = true;
+
+                            // Validar comentario
+                            if (comentarioInput.value.trim() === '') {
+                                comentarioInput.classList.add('is-invalid');
+                                comentarioError.style.display = 'block';
+                                valid = false;
+                            } else {
+                                comentarioInput.classList.remove('is-invalid');
+                                comentarioError.style.display = 'none';
+                            }
+
+                            // Validar puntuación
+                            if (valoracionInput.value === '0') {
+                                valoracionError.style.display = 'block';
+                                valid = false;
+                            } else {
+                                valoracionError.style.display = 'none';
+                            }
+
+                            if (!valid) {
+                                event.preventDefault();
+                            }
+                        });
+                    }
                 });
-        }
-        document.addEventListener('DOMContentLoaded', function () {
-            inicializarFormularioResenia();
-        });
-    </script>
+        </script>
 </body>
 
 </html>
