@@ -1,0 +1,174 @@
+@using Marimon.Enums
+@model Marimon.Models.Reclamacion
+
+@{
+    ViewData["Title"] = "Libro de Reclamaciones";
+    var usuario = ViewBag.Usuario as Marimon.Models.Usuario;
+    var categorias = ViewBag.Categorias as List<Marimon.Models.Categoria>;
+    var productos = ViewBag.Productos as List<Marimon.Models.Autoparte>;
+    var servicios = ViewBag.Servicios as List<Marimon.Models.Servicio>;
+}
+
+<h2>Libro de Reclamaciones</h2>
+
+<form asp-action="CrearReclamacion" asp-controller="Reclamacion" method="post" id="reclamacionForm">
+    <input type="hidden" asp-for="UsuarioId" value="@usuario?.usu_id" />
+
+    <div class="form-group">
+        <label>Nombre</label>
+        <input class="form-control" value="@usuario?.usu_nombre" readonly />
+    </div>
+
+    <div class="form-group">
+        <label>Apellido</label>
+        <input class="form-control" value="@usuario?.usu_apellido" readonly />
+    </div>
+
+    <div class="form-group">
+        <label>Correo</label>
+        <input class="form-control" value="@usuario?.usu_correo" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TipoReclamacion">Tipo de Reclamación</label>
+        <select asp-for="TipoReclamacion" class="form-control">
+            <option value="">-- Seleccione --</option>
+            <option value="@((int)TipoReclamacion.Reclamo)">Reclamo</option>
+            <option value="@((int)TipoReclamacion.Queja)">Queja</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TipoEntidad">Tipo de Entidad</label>
+        <select asp-for="TipoEntidad" class="form-control" id="tipoEntidad">
+            <option value="">-- Seleccione --</option>
+            <option value="@((int)TipoEntidad.Producto)">Producto</option>
+            <option value="@((int)TipoEntidad.Servicio)">Servicio</option>
+        </select>
+    </div>
+
+    <div id="productoSection" style="display:none;">
+        <div class="form-group">
+            <label>Categoría</label>
+            <select class="form-control" id="categoriaSelect">
+                <option value="">-- Seleccione Categoría --</option>
+                @foreach (var cat in categorias)
+                {
+                    <option value="@cat.cat_id">@cat.cat_nombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Producto</label>
+            <select class="form-control" id="productoSelect">
+                <option value="">-- Seleccione Producto --</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="servicioSection" style="display:none;">
+        <div class="form-group">
+            <label>Servicio</label>
+            <select id="servicioSelect" class="form-control">
+                <option value="">-- Seleccione Servicio --</option>
+                @foreach (var ser in servicios)
+                {
+                    <option value="@ser.ser_id">@ser.ser_nombre</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- Añadimos name para que se envíen al servidor -->
+    <input type="hidden" asp-for="EntidadId" id="hiddenEntidadId" name="EntidadId" />
+    <input type="hidden" asp-for="NombreEntidad" id="hiddenNombreEntidad" name="NombreEntidad" />
+
+    <div class="form-group">
+        <label asp-for="Descripcion">Descripción</label>
+        <textarea asp-for="Descripcion" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enviar Reclamación</button>
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tipoEntidad = document.getElementById("tipoEntidad");
+            const productoSection = document.getElementById("productoSection");
+            const servicioSection = document.getElementById("servicioSection");
+            const categoriaSelect = document.getElementById("categoriaSelect");
+            const productoSelect = document.getElementById("productoSelect");
+            const servicioSelect = document.getElementById("servicioSelect");
+            const hiddenEntidadId = document.getElementById("hiddenEntidadId");
+            const hiddenNombreEntidad = document.getElementById("hiddenNombreEntidad");
+
+            const productos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(productos));
+
+            tipoEntidad.addEventListener("change", function () {
+                const tipo = tipoEntidad.value;
+                if (tipo === "1") {
+                    productoSection.style.display = "block";
+                    servicioSection.style.display = "none";
+                } else if (tipo === "2") {
+                    servicioSection.style.display = "block";
+                    productoSection.style.display = "none";
+                } else {
+                    productoSection.style.display = "none";
+                    servicioSection.style.display = "none";
+                }
+
+                categoriaSelect.value = "";
+                productoSelect.innerHTML = '<option value="">-- Seleccione Producto --</option>';
+                servicioSelect.value = "";
+                hiddenEntidadId.value = "";
+                hiddenNombreEntidad.value = "";
+            });
+
+            categoriaSelect.addEventListener("change", function () {
+                const categoriaId = parseInt(this.value);
+                productoSelect.innerHTML = '<option value="">-- Seleccione Producto --</option>';
+
+                if (!isNaN(categoriaId)) {
+                    const productosFiltrados = productos.filter(p => p.categoriaId === categoriaId || p.CategoriaId === categoriaId);
+                    productosFiltrados.forEach(p => {
+                        const option = document.createElement("option");
+                        option.value = p.aut_id;
+                        option.text = p.aut_nombre;
+                        productoSelect.appendChild(option);
+                    });
+                }
+            });
+
+            const form = document.getElementById('reclamacionForm');
+
+            form.addEventListener('submit', function (event) {
+                // Asignar valores ocultos justo antes de enviar
+                let entidadId = "";
+                let nombreEntidad = "";
+
+                if (productoSection.style.display === 'block') {
+                    if (productoSelect.value && productoSelect.value !== "") {
+                        entidadId = productoSelect.value;
+                        nombreEntidad = productoSelect.options[productoSelect.selectedIndex]?.text || "";
+                    }
+                } else if (servicioSection.style.display === 'block') {
+                    if (servicioSelect.value && servicioSelect.value !== "") {
+                        entidadId = servicioSelect.value;
+                        nombreEntidad = servicioSelect.options[servicioSelect.selectedIndex]?.text || "";
+                    }
+                }
+
+                hiddenEntidadId.value = entidadId;
+                hiddenNombreEntidad.value = nombreEntidad;
+
+                // Aquí puedes descomentar el siguiente console.log para depurar
+                // console.log("EntidadId:", entidadId, "NombreEntidad:", nombreEntidad);
+
+                // No hacer preventDefault para que el formulario se envíe normalmente
+            });
+
+        });
+    </script>
+}
