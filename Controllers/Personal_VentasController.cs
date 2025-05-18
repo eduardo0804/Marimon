@@ -551,6 +551,29 @@ namespace Marimon.Controllers
             }
         }
 
+        public IActionResult ManejarVentas(string estado = null)
+        {
+            var ventasQuery = _context.Venta
+                .Include(v => v.Detalles)
+                    .ThenInclude(d => d.Autoparte)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(estado))
+            {
+                ventasQuery = ventasQuery.Where(v => v.Estado == estado);
+            }
+
+            // Para el dropdown de estados únicos
+            var estados = _context.Venta.Select(v => v.Estado).Distinct().ToList();
+            ViewBag.Estados = estados;
+            ViewBag.EstadoSeleccionado = string.IsNullOrEmpty(estado) ? "" : estado;
+
+            return View(ventasQuery.ToList());
+        }
+
+
+
+
 
 
 

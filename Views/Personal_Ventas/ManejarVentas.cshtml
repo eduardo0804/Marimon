@@ -1,0 +1,54 @@
+﻿@model List<Marimon.Models.Venta>
+@{
+    ViewData["Title"] = "Manejo de Ventas";
+    Layout = "_LayoutVentas";
+    var estados = ViewBag.Estados as List<string>;
+    var estadoSeleccionado = ViewBag.EstadoSeleccionado as string;
+}
+
+<h1>Manejo de Ventas</h1>
+<ol class="breadcrumb m-0 py-2">
+    <li class="breadcrumb-item">
+        <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Manejo de Ventas</li>
+</ol>
+<form method="get" asp-action="ManejarVentas" class="mb-3">
+    <div class="d-flex flex-wrap gap-2 justify-content-center">
+        <a href="?estado=" class="btn btn-outline-primary @((string.IsNullOrEmpty(estadoSeleccionado)) ? "active" : "")">Todos</a>
+        @if (estados != null)
+        {
+            foreach (var est in estados)
+            {
+                <a href="?estado=@est" class="btn btn-outline-primary @(estadoSeleccionado == est ? "active" : "")">@est</a>
+            }
+        }
+    </div>
+</form>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>ID Venta</th>
+            <th>Estado</th>
+            <th>Autopartes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var venta in Model)
+        {
+            <tr>
+                <td>@venta.ven_id</td>
+                <td>@venta.Estado</td>
+                <td>
+                    <ul>
+                        @foreach (var detalle in venta.Detalles)
+                        {
+                            <li>@detalle.Autoparte?.aut_nombre (Cantidad: @detalle.det_cantidad)</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
