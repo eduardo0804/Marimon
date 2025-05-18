@@ -1,0 +1,38 @@
+@model List<Marimon.ViewModel.ReseniaViewModel>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var resenia in Model)
+    {
+        <div class="resenia-item mb-4 pb-3 border-bottom">
+            <div class="d-flex align-items-center mb-2">
+                <div class="me-3">
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <i class="fas fa-user text-secondary"></i>
+                    </div>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">@resenia.usuario_nombre</h6>
+                    <div class="d-flex align-items-center">
+                        <div class="rating-stars me-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= resenia.res_puntuacion ? "fas" : "far") fa-star text-warning"></i>
+                            }
+                        </div>
+                        <small class="text-muted">@resenia.res_fecha.ToString("dd/MM/yyyy")</small>
+                    </div>
+                </div>
+            </div>
+            <p class="mb-1">@resenia.res_comentario</p>
+            <span class="badge @(resenia.res_gusto == "Si" ? "bg-success" : "bg-danger")">
+                @(resenia.res_gusto == "Si" ? "Me gustó" : "No me gustó")
+            </span>
+        </div>
+    }
+}
+else
+{
+    <p class="text-muted">No hay reseñas para esta autoparte.</p>
+}
