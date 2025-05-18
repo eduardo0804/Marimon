@@ -32,6 +32,7 @@ namespace Marimon.Controllers
         public async Task<IActionResult> Detalle(int id)
         {
             var servicio = await _context.Servicio
+                .Include(s => s.Reservas) // Incluye las reservas relacionadas
                 .FirstOrDefaultAsync(s => s.ser_id == id);
 
             if (servicio == null)
@@ -52,18 +53,48 @@ namespace Marimon.Controllers
                 })
                 .ToListAsync();
 
-            // Guardamos en ViewBag
+            // Guardamos las reseñas en ViewBag
             ViewBag.Resenias = resenias;
 
-            // Usuario autenticado
+            // Variables para información de usuario
             string usuarioId = "";
+            string nombre = "";
+            string apellido = "";
+            string correo = "";
+
             if (User.Identity.IsAuthenticated)
             {
                 var identityUser = await _userManager.GetUserAsync(User);
                 if (identityUser != null)
+                {
                     usuarioId = identityUser.Id;
+                    var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.usu_id == identityUser.Id);
+                    if (usuario != null)
+                    {
+                        nombre = usuario.usu_nombre ?? "";
+                        apellido = usuario.usu_apellido ?? "";
+                        correo = usuario.usu_correo ?? "";
+                    }
+                }
             }
+
             ViewBag.UsuarioId = usuarioId;
+            ViewBag.Nombre = nombre;
+            ViewBag.Apellido = apellido;
+            ViewBag.Correo = correo;
+
+            ViewBag.UsuarioAutenticado = User.Identity.IsAuthenticated;
+
+            // Obtener todas las reservas para mostrar posibles cruces
+            ViewBag.TodasLasReservas = await _context.Reserva
+                .Include(r => r.Servicio)
+                .Select(r => new
+                {
+                    res_fecha = r.res_fecha,
+                    res_hora = r.res_hora,
+                    ser_nombre = r.Servicio.ser_nombre
+                })
+                .ToListAsync();
 
             return View("Servicio", servicio);
         }
@@ -244,6 +275,48 @@ namespace Marimon.Controllers
             {
                 _logger.LogError(ex, "Error al agregar reseña");
                 TempData["Error"] = "Ocurrió un error al agregar la reseña.";
+            }
+
+            return RedirectToAction("Detalle", new { id = ser_id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarResenia(int res_id, int ser_id)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["Error"] = "Debes iniciar sesión para eliminar una reseña.";
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
+
+            var identityUser = await _userManager.GetUserAsync(User);
+            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.usu_id == identityUser.Id);
+
+            if (usuario == null)
+            {
+                TempData["Error"] = "Usuario no encontrado.";
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
+
+            var resenia = await _context.Resenias.FirstOrDefaultAsync(r => r.res_id == res_id && r.UsuarioId == usuario.usu_id);
+
+            if (resenia == null)
+            {
+                TempData["Error"] = "Reseña no encontrada o no tienes permiso para eliminarla.";
+                return RedirectToAction("Detalle", new { id = ser_id });
+            }
+
+            try
+            {
+                _context.Resenias.Remove(resenia);
+                await _context.SaveChangesAsync();
+                TempData["ReseniaEliminada"] = "True";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar reseña");
+                TempData["Error"] = "Ocurrió un error al eliminar la reseña.";
             }
 
             return RedirectToAction("Detalle", new { id = ser_id });

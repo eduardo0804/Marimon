@@ -23,8 +23,12 @@ namespace Marimon.Models
         public Usuario? Usuario { get; set; }
 
         [ForeignKey("Servicio")]
-        public int ser_id { get; set; }
-        public virtual Servicio Servicio { get; set; }
+        public int? ser_id { get; set; }
+        public virtual Servicio? Servicio { get; set; }
+
+        [ForeignKey("Autoparte")]
+        public int? aut_id { get; set; }
+        public virtual Autoparte? Autoparte { get; set; }
     }
 
 }
