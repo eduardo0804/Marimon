@@ -1,0 +1,559 @@
+﻿<style>
+    /* Widget Container */
+    .contact-widget {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+    }
+
+    /* Botón Flotante */
+    .contact-float {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #E42229 0%, #D42025 100%);
+        color: #FFFFFF;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 20px rgba(228, 34, 41, 0.4);
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        animation: pulse 3s infinite;
+    }
+
+        .contact-float:hover {
+            background: linear-gradient(135deg, #D42025 0%, #E42229 100%);
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(228, 34, 41, 0.6);
+        }
+
+    /* Ventana de chat que se despliega */
+    .chat-window {
+        position: absolute;
+        bottom: 70px;
+        right: 0;
+        width: 320px;
+        background: #FFFFFF;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        transform: scale(0.8) translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        border: 1px solid #626C66;
+    }
+
+        .chat-window.show {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+    .chat-header {
+        background: linear-gradient(135deg, #E42229 0%, #D42025 100%);
+        color: #FFFFFF;
+        padding: 1rem;
+        text-align: center;
+        position: relative;
+    }
+
+        .chat-header h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+    .close-chat {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #FFFFFF;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .close-chat:hover {
+            transform: translateY(-50%) rotate(90deg);
+            opacity: 0.7;
+        }
+
+    .chat-body {
+        padding: 1.5rem;
+        max-height: 400px;
+        overflow-y: auto;
+        background-color: #FFFFFF;
+    }
+
+    .step {
+        display: none;
+        animation: fadeInUp 0.4s ease-in-out;
+    }
+
+        .step.active {
+            display: block;
+        }
+
+    /* Indicador de pasos */
+    .step-indicator {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .step-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #626C66;
+        margin: 0 5px;
+        transition: all 0.3s ease;
+    }
+
+        .step-dot.active {
+            background: #E42229;
+            transform: scale(1.2);
+        }
+
+        .step-dot.completed {
+            background: #D42025;
+        }
+
+    /* Botones de opción personalizados */
+    .option-btn {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.75rem;
+        border: 2px solid #626C66;
+        border-radius: 8px;
+        background: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #000000;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .option-btn:hover {
+            border-color: #E42229;
+            background: #FFFFFF;
+            color: #E42229;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(228, 34, 41, 0.1);
+            text-decoration: none;
+        }
+
+        .option-btn.selected {
+            border-color: #E42229;
+            background: #E42229;
+            color: #FFFFFF;
+        }
+
+        .option-btn i {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+    /* Estilos específicos para WhatsApp */
+    .whatsapp-btn {
+        border-color: #25d366;
+    }
+
+        .whatsapp-btn:hover {
+            border-color: #25d366;
+            background: #f0fdf4;
+            color: #25d366;
+        }
+
+        .whatsapp-btn.selected {
+            background: #25d366;
+            border-color: #25d366;
+            color: white;
+        }
+
+        .whatsapp-btn i {
+            color: #25d366;
+        }
+
+        .whatsapp-btn.selected i {
+            color: white;
+        }
+
+    /* Estilos específicos para SMS */
+    .sms-btn {
+        border-color: #626C66;
+    }
+
+        .sms-btn:hover {
+            border-color: #626C66;
+            background: #f8f9fa;
+            color: #626C66;
+        }
+
+        .sms-btn.selected {
+            background: #626C66;
+            border-color: #626C66;
+            color: white;
+        }
+
+        .sms-btn i {
+            color: #626C66;
+        }
+
+        .sms-btn.selected i {
+            color: white;
+        }
+
+    /* Botones de acción */
+    .btn-primary {
+        background-color: #E42229;
+        border-color: #E42229;
+    }
+
+        .btn-primary:hover {
+            background-color: #D42025;
+            border-color: #D42025;
+        }
+
+</style>
+
+
+<!-- Widget de Contacto -->
+<div class="contact-widget">
+    <!-- Botón Flotante -->
+    <button class="contact-float" id="contactBtn" aria-label="Abrir chat">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <!-- Ventana de Chat -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <h6 id="chatTitle">Selecciona el medio</h6>
+            <button class="close-chat" id="closeChat">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-body">
+            <!-- Indicador de pasos -->
+            <div class="step-indicator">
+                <span class="step-dot active" id="dot1"></span>
+                <span class="step-dot" id="dot2"></span>
+                <span class="step-dot" id="dot3"></span>
+            </div>
+
+            <!-- Paso 1: Selección de medio -->
+            <div class="step active" id="step1">
+                <button class="option-btn whatsapp-btn" id="whatsappBtn">
+                    <i class="fab fa-whatsapp"></i>
+                    WhatsApp
+                </button>
+                <button class="option-btn sms-btn" id="smsBtn">
+                    <i class="fas fa-sms"></i>
+                    SMS
+                </button>
+            </div>
+
+            <!-- Paso 2: Selección de asesor -->
+            <div class="step" id="step2">
+                <button class="option-btn" data-advisor="1">
+                    <i class="fas fa-user-tie"></i>
+                    Asesor 1
+                </button>
+                <button class="option-btn" data-advisor="2">
+                    <i class="fas fa-user-tie"></i>
+                    Asesor 2
+                </button>
+                <button class="option-btn" data-advisor="3">
+                    <i class="fas fa-user-tie"></i>
+                    Asesor 3
+                </button>
+                <button class="btn btn-primary w-100 mt-3" id="continueBtn" disabled>
+                    <i class="fas fa-arrow-right me-2"></i>
+                    Continuar
+                </button>
+            </div>
+
+            <!-- Paso 3: Redacción del mensaje -->
+            <div class="step" id="step3">
+                <div class="mb-3">
+                    <textarea class="form-control"
+                              id="messageTextarea"
+                              rows="4"
+                              placeholder="Escribe tu mensaje aquí...">Hola, necesito asistencia. ¿Podrías ayudarme?</textarea>
+                </div>
+                <button class="btn btn-dark w-100" id="sendBtn">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    Enviar Mensaje
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS y Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    class ContactWidget {
+        constructor() {
+            this.currentStep = 1;
+            this.selectedMedium = null;
+            this.selectedAdvisor = null;
+            this.advisorPhones = {
+                '1': '+51946775614',
+                '2': '+51955025436',
+                '3': '+51946289666'
+            };
+
+            this.initEventListeners();
+        }
+
+        initEventListeners() {
+            // Abrir/cerrar chat
+            document.getElementById('contactBtn').addEventListener('click', () => {
+                this.toggleChat();
+            });
+
+            document.getElementById('closeChat').addEventListener('click', () => {
+                this.closeChat();
+            });
+
+            // Cerrar chat al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                const widget = document.querySelector('.contact-widget');
+                const chatWindow = document.getElementById('chatWindow');
+                if (!widget.contains(e.target)) {
+                    this.closeChat();
+                }
+            });
+
+
+            // Selección de medio
+            document.getElementById('whatsappBtn').addEventListener('click', () => {
+                this.selectMedium('whatsapp');
+            });
+
+            document.getElementById('smsBtn').addEventListener('click', () => {
+                this.selectMedium('sms');
+            });
+
+            // Selección de asesor
+            document.querySelectorAll('[data-advisor]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    this.selectAdvisor(btn.dataset.advisor, btn);
+                });
+            });
+
+            // Continuar al paso 3
+            document.getElementById('continueBtn').addEventListener('click', () => {
+                this.goToStep(3);
+            });
+
+            // Enviar mensaje
+            document.getElementById('sendBtn').addEventListener('click', () => {
+                this.sendMessage();
+            });
+
+            // Cerrar chat con tecla Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    this.closeChat();
+                }
+            });
+        }
+
+        toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            if (chatWindow.classList.contains('show')) {
+                this.closeChat();
+            } else {
+                this.openChat();
+            }
+        }
+
+        openChat() {
+            document.getElementById('chatWindow').classList.add('show');
+        }
+
+        closeChat() {
+            document.getElementById('chatWindow').classList.remove('show');
+
+            // Reset después de un delay para la animación
+            setTimeout(() => {
+                this.resetWidget();
+            }, 300);
+        }
+
+        resetWidget() {
+            this.currentStep = 1;
+            this.selectedMedium = null;
+            this.selectedAdvisor = null;
+
+            // Resetear UI
+            this.updateStepIndicator();
+            this.updateChatTitle();
+            this.showStep(1);
+
+            // Limpiar selecciones
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            document.getElementById('continueBtn').disabled = true;
+            document.getElementById('messageTextarea').value = 'Hola, necesito asistencia. ¿Podrías ayudarme?';
+        }
+
+        selectMedium(medium) {
+            this.selectedMedium = medium;
+
+            // Actualizar UI
+            document.querySelectorAll('#step1 .option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            if (medium === 'whatsapp') {
+                document.getElementById('whatsappBtn').classList.add('selected');
+            } else {
+                document.getElementById('smsBtn').classList.add('selected');
+            }
+
+            // Avanzar al siguiente paso después de una pequeña pausa
+            setTimeout(() => {
+                this.goToStep(2);
+            }, 300);
+        }
+
+        selectAdvisor(advisor, btn) {
+            this.selectedAdvisor = advisor;
+
+            // Actualizar UI
+            document.querySelectorAll('[data-advisor]').forEach(button => {
+                button.classList.remove('selected');
+            });
+            btn.classList.add('selected');
+
+            document.getElementById('continueBtn').disabled = false;
+        }
+
+        goToStep(step) {
+            this.currentStep = step;
+            this.updateStepIndicator();
+            this.updateChatTitle();
+            this.showStep(step);
+        }
+
+        updateStepIndicator() {
+            document.querySelectorAll('.step-dot').forEach((dot, index) => {
+                const stepNumber = index + 1;
+                dot.classList.remove('active', 'completed');
+
+                if (stepNumber < this.currentStep) {
+                    dot.classList.add('completed');
+                } else if (stepNumber === this.currentStep) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        updateChatTitle() {
+            const titles = {
+                1: 'Selecciona el medio',
+                2: 'Elige un asesor',
+                3: 'Escribe tu mensaje'
+            };
+
+            document.getElementById('chatTitle').textContent = titles[this.currentStep];
+        }
+
+        showStep(step) {
+            document.querySelectorAll('.step').forEach(stepEl => {
+                stepEl.classList.remove('active');
+            });
+
+            document.getElementById(`step${step}`).classList.add('active');
+        }
+
+        sendMessage() {
+            const message = document.getElementById('messageTextarea').value.trim();
+            const phone = this.advisorPhones[this.selectedAdvisor];
+
+            if (!message) {
+                this.showToast('Por favor, escribe un mensaje', 'error');
+                return;
+            }
+
+            if (this.selectedMedium === 'whatsapp') {
+                // Limpiar el número de teléfono (remover + y espacios)
+                const cleanPhone = phone.replace(/\D/g, '');
+
+                // Codificar el mensaje correctamente
+                const encodedMessage = encodeURIComponent(message);
+
+                // Crear la URL de WhatsApp con el formato correcto
+                const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+
+                // Abrir en una nueva pestaña
+                window.open(whatsappUrl, '_blank');
+
+            } else {
+                // Para SMS
+                const smsUrl = `sms:${phone}?body=${encodeURIComponent(message)}`;
+                window.location.href = smsUrl;
+            }
+
+            this.showToast('Redirigiendo...', 'success');
+            setTimeout(() => {
+                this.closeChat();
+            }, 1000);
+        }
+
+        showToast(message, type) {
+            // Crear toast dinámico con Bootstrap
+            const toastHtml = `
+                <div class="toast align-items-center text-bg-${type === 'error' ? 'danger' : 'success'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+            // Crear container de toasts si no existe
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                toastContainer.style.zIndex = '11000';
+                document.body.appendChild(toastContainer);
+            }
+
+            // Agregar toast
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+
+            // Limpiar después de que se oculte
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+    }
+
+    // Inicializar widget cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+        new ContactWidget();
+    });
+</script>
