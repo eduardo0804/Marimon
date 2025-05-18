@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marimon.ViewModel;
 
 namespace Marimon.Models.ViewModels
 {
@@ -12,10 +13,10 @@ namespace Marimon.Models.ViewModels
         public string aut_descripcion { get; set; }
         public string aut_especificacion { get; set; }
         public decimal aut_precio { get; set; }
-        public int aut_cantidad {get;set;}
+        public int aut_cantidad { get; set; }
         public string aut_imagen { get; set; }
-        public string CategoriaNombre { get; set; } 
-        public List<AutoparteViewModel> ProductosSimilares { get; set; } = new List<AutoparteViewModel>();
-
+        public string CategoriaNombre { get; set; }
+        public List<AutoparteViewModel> ProductosSimilares { get; set; }
+        public List<ReseniaViewModel> Resenias { get; set; } // Cambiado a ReseniaViewModel
     }
 }

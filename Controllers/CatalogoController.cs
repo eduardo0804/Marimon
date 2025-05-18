@@ -10,17 +10,21 @@ using System.Text.Json;
 using Marimon.Models.ViewModels;
 using System.Globalization;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Marimon.ViewModel;
 namespace Marimon.Controllers
 {
     public class CatalogoController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<CatalogoController> _logger;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public CatalogoController(ApplicationDbContext context, ILogger<CatalogoController> logger)
+        public CatalogoController(ApplicationDbContext context, ILogger<CatalogoController> logger, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _logger = logger;
+            _userManager = userManager;
         }
 
         // GET: Catalogo/Index
@@ -97,6 +101,24 @@ namespace Marimon.Controllers
                 })
                 .ToListAsync();
 
+            // Obtener las reseñas relacionadas con la autoparte
+            var resenias = await _context.Resenias
+                .Where(r => r.aut_id == id)
+                .Select(r => new ReseniaViewModel
+                {
+                    res_id = r.res_id,
+                    res_comentario = r.res_comentario,
+                    res_puntuacion = r.res_puntuacion,
+                    res_fecha = r.res_fecha,
+                    res_gusto = r.res_gusto,
+                    usuario_id = r.UsuarioId,
+                    usuario_nombre = _context.Usuario
+                        .Where(u => u.usu_id == r.UsuarioId)
+                        .Select(u => u.usu_nombre)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
             var modelo = new AutoparteViewModel
             {
                 aut_id = autoparte.aut_id,
@@ -107,10 +129,136 @@ namespace Marimon.Controllers
                 aut_cantidad = autoparte.aut_cantidad,
                 aut_imagen = autoparte.aut_imagen,
                 CategoriaNombre = autoparte.Categoria.cat_nombre,
-                ProductosSimilares = productosSimilares
+                ProductosSimilares = productosSimilares,
+                Resenias = resenias
             };
 
             return PartialView("_DetalleAutoparteModal", modelo);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgregarReseniaAutoparte(int aut_id, int res_puntuacion, string res_gusto, string res_comentario)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["Error"] = "Debes iniciar sesión para agregar una reseña.";
+                return RedirectToAction("Index");
+            }
+
+            var identityUser = await _userManager.GetUserAsync(User);
+            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.usu_id == identityUser.Id);
+
+            if (usuario == null)
+            {
+                TempData["Error"] = "Usuario no encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            var nuevaResenia = new Resenia
+            {
+                res_puntuacion = res_puntuacion,
+                res_gusto = res_gusto,
+                res_comentario = res_comentario,
+                res_fecha = DateTime.UtcNow,
+                UsuarioId = usuario.usu_id,
+                aut_id = aut_id,
+                ser_id = null
+            };
+
+            try
+            {
+                _context.Resenias.Add(nuevaResenia);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al agregar reseña");
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return BadRequest("Ocurrió un error al agregar la reseña.");
+                }
+                return BadRequest("Ocurrió un error al agregar la reseña.");
+            }
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return await ObtenerReseniasAutoparte(aut_id);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerReseniasAutoparte(int aut_id)
+        {
+            var resenias = await _context.Resenias
+                .Where(r => r.aut_id == aut_id)
+                .Select(r => new ReseniaViewModel
+                {
+                    res_id = r.res_id,
+                    res_comentario = r.res_comentario,
+                    res_puntuacion = r.res_puntuacion,
+                    res_fecha = r.res_fecha,
+                    res_gusto = r.res_gusto,
+                    usuario_id = r.UsuarioId,
+                    usuario_nombre = _context.Usuario
+                        .Where(u => u.usu_id == r.UsuarioId)
+                        .Select(u => u.usu_nombre)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            ViewBag.AutoparteId = aut_id;
+
+            return PartialView("_ReseniasAutoparte", resenias);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> EliminarResenia(int id, int aut_id)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized(new { success = false, message = "Usuario no autorizado" });
+            }
+
+            var identityUser = await _userManager.GetUserAsync(User);
+            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.usu_id == identityUser.Id);
+
+            if (usuario == null)
+            {
+                return BadRequest(new { success = false, message = "Usuario no encontrado" });
+            }
+
+            var resenia = await _context.Resenias.FindAsync(id);
+
+            if (resenia == null)
+            {
+                return NotFound(new { success = false, message = "Reseña no encontrada" });
+            }
+
+            if (resenia.UsuarioId != usuario.usu_id)
+            {
+                return Unauthorized(new { success = false, message = "No puedes eliminar reseñas de otros usuarios" });
+            }
+
+            try
+            {
+                _context.Resenias.Remove(resenia);
+                await _context.SaveChangesAsync();
+
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = true, message = "Reseña eliminada correctamente" });
+                }
+
+                return RedirectToAction("DetalleAutoparte", new { id = aut_id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar reseña");
+                return BadRequest(new { success = false, message = "Error al eliminar la reseña" });
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
