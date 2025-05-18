@@ -13,14 +13,14 @@
     .contact-float {
         width: 60px;
         height: 60px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #fff;
+        background: linear-gradient(135deg, #E42229 0%, #D42025 100%);
+        color: #FFFFFF;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5rem;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 20px rgba(228, 34, 41, 0.4);
         cursor: pointer;
         border: none;
         transition: all 0.3s ease;
@@ -28,12 +28,10 @@
     }
 
         .contact-float:hover {
-            background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
+            background: linear-gradient(135deg, #D42025 0%, #E42229 100%);
             transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 6px 25px rgba(228, 34, 41, 0.6);
         }
-
-
 
     /* Ventana de chat que se despliega */
     .chat-window {
@@ -41,7 +39,7 @@
         bottom: 70px;
         right: 0;
         width: 320px;
-        background: white;
+        background: #FFFFFF;
         border-radius: 15px;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         transform: scale(0.8) translateY(20px);
@@ -49,6 +47,7 @@
         visibility: hidden;
         transition: all 0.3s ease;
         overflow: hidden;
+        border: 1px solid #626C66;
     }
 
         .chat-window.show {
@@ -58,8 +57,8 @@
         }
 
     .chat-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #E42229 0%, #D42025 100%);
+        color: #FFFFFF;
         padding: 1rem;
         text-align: center;
         position: relative;
@@ -77,7 +76,7 @@
         transform: translateY(-50%);
         background: none;
         border: none;
-        color: white;
+        color: #FFFFFF;
         font-size: 1.2rem;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -92,6 +91,7 @@
         padding: 1.5rem;
         max-height: 400px;
         overflow-y: auto;
+        background-color: #FFFFFF;
     }
 
     .step {
@@ -103,8 +103,7 @@
             display: block;
         }
 
-
-    /* Indicador de pasos usando Bootstrap */
+    /* Indicador de pasos */
     .step-indicator {
         display: flex;
         justify-content: center;
@@ -115,51 +114,51 @@
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        background: #e9ecef;
+        background: #626C66;
         margin: 0 5px;
         transition: all 0.3s ease;
     }
 
         .step-dot.active {
-            background: #667eea;
+            background: #E42229;
             transform: scale(1.2);
         }
 
         .step-dot.completed {
-            background: #28a745;
+            background: #D42025;
         }
 
-    /* Botones de opción personalizados con Bootstrap */
+    /* Botones de opción personalizados */
     .option-btn {
         width: 100%;
         padding: 0.75rem 1rem;
         margin-bottom: 0.75rem;
-        border: 2px solid #e9ecef;
+        border: 2px solid #626C66;
         border-radius: 8px;
-        background: white;
+        background: #FFFFFF;
         display: flex;
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        color: #495057;
+        color: #000000;
         font-weight: 500;
         transition: all 0.3s ease;
         cursor: pointer;
     }
 
         .option-btn:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-            color: #667eea;
+            border-color: #E42229;
+            background: #FFFFFF;
+            color: #E42229;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 15px rgba(228, 34, 41, 0.1);
             text-decoration: none;
         }
 
         .option-btn.selected {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
+            border-color: #E42229;
+            background: #E42229;
+            color: #FFFFFF;
         }
 
         .option-btn i {
@@ -194,32 +193,41 @@
 
     /* Estilos específicos para SMS */
     .sms-btn {
-        border-color: #007bff;
+        border-color: #626C66;
     }
 
         .sms-btn:hover {
-            border-color: #007bff;
-            background: #f8f9ff;
-            color: #007bff;
+            border-color: #626C66;
+            background: #f8f9fa;
+            color: #626C66;
         }
 
         .sms-btn.selected {
-            background: #007bff;
-            border-color: #007bff;
+            background: #626C66;
+            border-color: #626C66;
             color: white;
         }
 
         .sms-btn i {
-            color: #007bff;
+            color: #626C66;
         }
 
         .sms-btn.selected i {
             color: white;
         }
 
-
-
+    /* Botones de acción */
+    .btn-primary {
+        background-color: #E42229;
+        border-color: #E42229;
     }
+
+        .btn-primary:hover {
+            background-color: #D42025;
+            border-color: #D42025;
+        }
+
+
 </style>
 <!-- Bootstrap Container para el contenido demo -->
 <div class="container my-5">
@@ -250,7 +258,7 @@
     <!-- Ventana de Chat -->
     <div class="chat-window" id="chatWindow">
         <div class="chat-header">
-            <h6 id="chatTitle">Selecciona el medio de comunicación</h6>
+            <h6 id="chatTitle">Selecciona el medio</h6>
             <button class="close-chat" id="closeChat">
                 <i class="fas fa-times"></i>
             </button>
@@ -303,7 +311,7 @@
                               rows="4"
                               placeholder="Escribe tu mensaje aquí...">Hola, necesito asistencia. ¿Podrías ayudarme?</textarea>
                 </div>
-                <button class="btn btn-success w-100" id="sendBtn">
+                <button class="btn btn-dark w-100" id="sendBtn">
                     <i class="fas fa-paper-plane me-2"></i>
                     Enviar Mensaje
                 </button>
@@ -495,27 +503,33 @@
 
         sendMessage() {
             const message = document.getElementById('messageTextarea').value.trim();
+            const phone = this.advisorPhones[this.selectedAdvisor];
 
             if (!message) {
-                // Usar Bootstrap toast para mostrar error
                 this.showToast('Por favor, escribe un mensaje', 'error');
                 return;
             }
 
-            const phone = this.advisorPhones[this.selectedAdvisor];
-            let url;
-
             if (this.selectedMedium === 'whatsapp') {
-                url = `https://wa.me/${phone.replace('+', '')}?text=${encodeURIComponent(message)}`;
+                // Limpiar el número de teléfono (remover + y espacios)
+                const cleanPhone = phone.replace(/\D/g, '');
+
+                // Codificar el mensaje correctamente
+                const encodedMessage = encodeURIComponent(message);
+
+                // Crear la URL de WhatsApp con el formato correcto
+                const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+
+                // Usar window.open directamente
+                window.open(whatsappUrl, '_blank');
+
             } else {
-                url = `sms:${phone}?body=${encodeURIComponent(message)}`;
+                // Para SMS
+                const smsUrl = `sms:${phone}?body=${encodeURIComponent(message)}`;
+                window.open(smsUrl);
             }
 
-            // Abrir enlace
-            window.open(url, '_blank');
-
-            // Mostrar confirmación y cerrar chat
-            this.showToast('Mensaje enviado correctamente', 'success');
+            this.showToast('Redirigiendo...', 'success');
             setTimeout(() => {
                 this.closeChat();
             }, 1000);
