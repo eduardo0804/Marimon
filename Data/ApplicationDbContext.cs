@@ -28,12 +28,12 @@ public class ApplicationDbContext : IdentityDbContext
             .WithOne()
             .HasForeignKey<Usuario>(u => u.usu_id)
             .OnDelete(DeleteBehavior.Cascade); // Esta línea hace que se elimine en cascada
-        
+
         builder.Entity<Reserva>()
             .HasOne(r => r.Usuario)
             .WithMany(u => u.Reservas)
             .HasForeignKey(r => r.UsuarioId)
-            .HasPrincipalKey(u => u.usu_id); 
+            .HasPrincipalKey(u => u.usu_id);
 
         builder.Entity<Reserva>()
             .Property(r => r.Estado)
@@ -57,4 +57,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Reserva> Reserva { get; set; }
     public DbSet<Carrito> Carritos { get; set; }
     public DbSet<CarritoAutoparte> CarritoAutopartes { get; set; } = null!;
+    public DbSet<Resenia> Resenias { get; set; }
+
 }
