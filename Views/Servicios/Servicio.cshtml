@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
 <link rel="stylesheet" href="~/css/home.css">
+<link rel="stylesheet" href="~/css/reseñaservicio.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
@@ -254,17 +255,21 @@
 <!-- Sección de Reseñas -->
 <div class="container-fluid mt-5 px-4">
     <div class="row my-5">
-        <div class="col-12 text-center mb-4" data-aos="fade-up">
-            <h3 class="fw-bold">Reseñas</h3>
-            <div style="width:60px;height:4px;background:#D42025;margin:auto;border-radius:2px;"></div>
+        <div class="col-12 text-center mb-5" data-aos="fade-up">
+            <h2 class="fw-bold" style="color: #000000; letter-spacing: 1px; text-transform: uppercase;">Reseñas de Clientes</h2>
+            <div style="width:80px; height:5px; background:#E42229; margin:auto; border-radius:3px;"></div>
+            <p class="mt-3 text-muted" style="color: #626C66;">Tu opinión nos ayuda a mejorar nuestros servicios</p>
         </div>
 
-        <!-- Contenedor principal dividido en dos columnas lado a lado -->
-        <div class="row">
+        <!-- Contenedor principal con efecto de sombra y bordes redondeados -->
+        <div class="row g-4">
             <!-- Columna izquierda para formulario -->
             <div class="col-md-6 mb-5">
-                <div class="bg-white rounded-4 shadow-lg p-4">
-                    <h5 class="mb-4">Se el Primero en Valorar "@Model.ser_nombre"</h5>
+                <div class="bg-white rounded-4 shadow-lg p-5" style="border-top: 5px solid #E42229; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: rgba(228, 34, 41, 0.1); border-radius: 0 0 0 120px;"></div>
+                    
+                    <h4 class="mb-4" style="color: #000000; font-weight: 700;">Compartenos tu Experiencia</h4>
+                    <p class="mb-4" style="color: #626C66;">Se el primero en valorar "<span style="color: #D42025; font-weight: 600;">@Model.ser_nombre</span>"</p>
 
                     <form id="formularioResenia" method="post" asp-action="AgregarResenia" asp-controller="Servicios" class="row">
                         @Html.AntiForgeryToken()
@@ -272,26 +277,26 @@
                         <input type="hidden" name="usuario_id" value="@ViewBag.UsuarioId" />
 
                         <div class="col-12 mb-3">
-                            <label class="form-label">Nombre:</label>
+                            <label class="form-label" style="font-weight: 600; color: #000000;">Nombre:</label>
                             <input type="text" class="form-control" id="nombreUsuario"
-                                value="@ViewBag.Nombre" readonly />
+                                value="@ViewBag.Nombre" readonly style="border-radius: 8px; border: 1px solid #e0e0e0; padding: 12px; background-color: #f9f9f9;" />
                         </div>
 
                         <div class="col-12 mb-3">
-                            <label class="form-label">Correo Electrónico:</label>
+                            <label class="form-label" style="font-weight: 600; color: #000000;">Correo Electrónico:</label>
                             <input type="email" class="form-control" id="emailUsuario" value="@ViewBag.Correo"
-                                readonly />
+                                readonly style="border-radius: 8px; border: 1px solid #e0e0e0; padding: 12px; background-color: #f9f9f9;" />
                         </div>
 
                         <div class="col-12 mb-4">
-                            <label class="form-label">Tu Puntuación:</label>
+                            <label class="form-label" style="font-weight: 600; color: #000000;">Tu Puntuación:</label>
                             <div class="d-flex">
                                 <input type="hidden" name="res_puntuacion" id="valoracionInput" value="0" required>
                                 <div class="stars d-flex">
                                     @for (int i = 1; i <= 5; i++)
                                     {
                                         <span class="star" data-value="@i"
-                                            style="font-size: 2rem; margin-right: 10px; cursor: pointer; color: #dddddd; transition: color 0.2s ease;">
+                                            style="font-size: 2.2rem; margin-right: 10px; cursor: pointer; color: #dddddd; transition: color 0.3s ease;">
                                             <i class="far fa-star"></i>
                                         </span>
                                     }
@@ -302,161 +307,340 @@
                             </div>
                         </div>
 
-                        <div class="col-12 mb-3">
-                            <label class="form-label">¿Te gustó este servicio?</label>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="res_gusto" id="gustoSi" value="Si" checked>
-                                <label class="form-check-label" for="gustoSi">Sí</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="res_gusto" id="gustoNo" value="No">
-                                <label class="form-check-label" for="gustoNo">No</label>
+                        <div class="col-12 mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #000000;">¿Te Gustó este Servicio?</label>
+                            <div class="d-flex gap-4 mt-2">
+                                <div class="form-check form-check-inline custom-radio">
+                                    <input class="form-check-input" type="radio" name="res_gusto" id="gustoSi" value="Si" checked
+                                        style="width: 20px; height: 20px; border: 2px solid #E42229;">
+                                    <label class="form-check-label ms-2" for="gustoSi" style="font-size: 1rem;">
+                                        <i class="fas fa-thumbs-up me-1" style="color: #E42229;"></i> Sí me gustó
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline custom-radio">
+                                    <input class="form-check-input" type="radio" name="res_gusto" id="gustoNo" value="No"
+                                        style="width: 20px; height: 20px; border: 2px solid #626C66;">
+                                    <label class="form-check-label ms-2" for="gustoNo" style="font-size: 1rem;">
+                                        <i class="fas fa-thumbs-down me-1" style="color: #626C66;"></i> No me gustó
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-12 mb-3">
-                            <label for="res_comentario" class="form-label">Tu Comentario</label>
+                        <div class="col-12 mb-4">
+                            <label for="res_comentario" class="form-label" style="font-weight: 600; color: #000000;">Tu Comentario</label>
                             <textarea class="form-control" id="res_comentario" name="res_comentario" rows="4" required
-                                placeholder="Escribe tu comentario aquí..."></textarea>
+                                placeholder="Comparte tu experiencia con este servicio..." 
+                                style="border-radius: 12px; border: 1px solid #e0e0e0; padding: 15px; resize: none;"></textarea>
                             <div class="invalid-feedback" id="comentarioError">
                                 Por favor, escribe un comentario para continuar.
                             </div>
                         </div>
 
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary" id="submitResenia"
-                                style="background-color: #2E4BDB; border: none;">
-                                Enviar
+                            <button type="submit" class="btn btn-lg w-100 py-3" id="submitResenia"
+                                style="background-color: #E42229; border: none; border-radius: 10px; font-weight: 600; transition: all 0.3s ease;">
+                                <i class="fas fa-paper-plane me-2"></i> Enviar Reseña
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-           <!-- Columna derecha para comentarios existentes -->
-<div class="col-md-6">
-    <div class="bg-white rounded-4 shadow-lg p-4">
-        <h5 class="mb-4">Comentarios</h5>
+            <!-- Columna derecha para comentarios existentes -->
+            <div class="col-md-6">
+                <div class="bg-white rounded-4 shadow-lg p-5" style="border-top: 5px solid #626C66; position: relative;">
+                    <div style="position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: rgba(98, 108, 102, 0.1); border-radius: 0 0 0 120px;"></div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 style="color: #000000; font-weight: 700;">Opiniones de Clientes</h4>
+                        <span class="badge rounded-pill" style="background-color: #626C66; padding: 8px 15px; font-size: 0.9rem;">
+                            <i class="fas fa-comments me-1"></i> 
+                            @if (ViewBag.Resenias != null)
+                            {
+                                <span>@(((IEnumerable<dynamic>)ViewBag.Resenias).Count()) reseñas</span>
+                            }
+                            else
+                            {
+                                <span>0 reseñas</span>
+                            }
+                        </span>
+                    </div>
 
-        <div id="reseniasList" class="resenias-list" style="max-height: 500px; overflow-y: auto;">
-            @if (resenias != null && resenias.Count > 0)
-            {
-                foreach (var resenia in resenias)
-                {
-                    <div class="resenia-item mb-4 pb-3 border-bottom" id="resenia-@resenia.res_id">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="me-3">
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
-                                    style="width: 40px; height: 40px;">
-                                    <i class="fas fa-user text-secondary"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">@resenia.usuario_nombre</h6>
-                                <div class="d-flex align-items-center">
-                                    <!-- Mostrar estrellas según valoración -->
-                                    <div class="rating-stars me-2">
-                                        @for (int i = 1; i <= 5; i++)
-                                        {
-                                            <i class="@(i <= resenia.valoracion ? "fas" : "far") fa-star text-warning"></i>
-                                        }
-                                    </div>
-                                    <small class="text-muted">@resenia.res_fecha.ToString("dd/MM/yyyy")</small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-2">
-                            <p class="mb-1">@resenia.res_comentario</p>
-                            <span class="badge @(resenia.gusto == "Si" ? "bg-success" : "bg-danger")">
-                                @(resenia.gusto == "Si" ? "Me gustó" : "No me gustó")
-                            </span>
-                        </div>
-
-                        @if (resenia.usuario_id == usuarioId)
+                    <div id="reseniasList" class="resenias-list" style="max-height: 550px; overflow-y: auto; scrollbar-width: thin; padding-right: 10px;">
+                        @if (ViewBag.Resenias != null && ((IEnumerable<dynamic>)ViewBag.Resenias).Any())
                         {
-                            <div class="text-end">
-                                <button class="btn btn-sm btn-outline-danger eliminar-resenia"
-                                    data-id="@resenia.res_id" data-bs-toggle="modal"
-                                    data-bs-target="#confirmarEliminarModal">
-                                    <i class="fas fa-trash-alt"></i> Eliminar
-                                </button>
+                            foreach (var resenia in (IEnumerable<dynamic>)ViewBag.Resenias)
+                            {
+                                <div class="resenia-item mb-4 p-4 border-bottom" id="resenia-@resenia.res_id" 
+                                    style="border-radius: 12px; background-color: #f9f9f9; border: none !important; transition: transform 0.2s ease-in-out;">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                                style="width: 50px; height: 50px; background: linear-gradient(135deg, #E42229, #D42025); color: white;">
+                                                <i class="fas fa-user-circle fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold" style="color: #000000; font-size: 1.1rem;">@resenia.usuario_nombre</h6>
+                                            <div class="d-flex align-items-center">
+                                                <div class="rating-stars me-2">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="@(i <= resenia.res_puntuacion ? "fas" : "far") fa-star" 
+                                                            style="color: @(i <= resenia.res_puntuacion ? "#E42229" : "#dddddd");"></i>
+                                                    }
+                                                </div>
+                                                <small style="color: #626C66;">@((resenia.res_fecha as DateTime?).Value.ToString("dd/MM/yyyy"))</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 ps-2" style="border-left: 3px solid #E42229; padding-left: 15px;">
+                                        <p class="mb-3" style="color: #000000; line-height: 1.6;">@resenia.res_comentario</p>
+                                        <span class="badge" 
+                                            style="background-color: @(resenia.res_gusto == "Si" ? "#E42229" : "#626C66"); 
+                                                   padding: 6px 12px; font-size: 0.85rem; border-radius: 30px;">
+                                            @if (resenia.res_gusto == "Si") 
+                                            {
+                                                <i class="fas fa-thumbs-up me-1"></i>
+                                                <span>Me gustó</span>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-thumbs-down me-1"></i>
+                                                <span>No me gustó</span>
+                                            }
+                                        </span>
+                                    </div>
+                                    @if (resenia.usuario_id == ViewBag.UsuarioId)
+                                    {
+                                        <div class="text-end">
+                                            <button class="btn btn-sm eliminar-resenia"
+                                                data-id="@resenia.res_id" data-bs-toggle="modal"
+                                                data-bs-target="#confirmarEliminarModal"
+                                                style="background-color: transparent; color: #626C66; border: 1px solid #626C66; border-radius: 30px; padding: 5px 15px; transition: all 0.3s ease;">
+                                                <i class="fas fa-trash-alt me-1"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5" id="noComments" style="background-color: #f9f9f9; border-radius: 12px; padding: 40px 20px;">
+                                <i class="far fa-comment-dots fa-4x mb-3" style="color: #E42229;"></i>
+                                <h5 style="color: #000000; font-weight: 600;">No hay comentarios todavía</h5>
+                                <p class="text-muted mt-2" style="color: #626C66;">¡Sé el primero en compartir tu experiencia!</p>
                             </div>
                         }
                     </div>
-                }
-            }
-            else
-            {
-                <div class="text-center py-5" id="noComments">
-                    <p class="mb-0">No hay comentarios para este servicio.</p>
-                    <p class="text-muted">¡Sé el primero en comentar!</p>
                 </div>
-            }
-        </div>
-    </div>
-</div>
-
-<!-- Modal de Confirmación para Eliminar Reseña -->
-<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmar eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body text-center">
-                <p>¿Estás seguro de que deseas eliminar este comentario?</p>
-                <p class="text-muted">Esta acción no se puede deshacer.</p>
-            </div>
-            <div class="modal-footer">
-                <form asp-action="EliminarResenia" asp-controller="Servicios" method="post" id="eliminarReseniaForm">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="res_id" id="reseniaIdEliminar" value="">
-                    <input type="hidden" name="ser_id" value="@Model.ser_id">
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Modal de Éxito para Reseña Registrada -->
-<div class="modal fade" id="reseniaExitoModal" tabindex="-1" aria-labelledby="reseniaExitoModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="reseniaExitoModalLabel">¡Reseña registrada!</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body text-center">
-                <p>Tu reseña ha sido publicada correctamente.</p>
-                <p class="text-muted">Gracias por compartir tu experiencia.</p>
+        <!-- Modal de Confirmación para Eliminar Reseña -->
+        <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 15px; overflow: hidden; border: none;">
+                    <div class="modal-header" style="background-color: #E42229; color: #FFFFFF; border: none;">
+                        <h5 class="modal-title" id="confirmarEliminarModalLabel">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Confirmar Eliminación
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-trash-alt fa-3x" style="color: #E42229;"></i>
+                        </div>
+                        <h5 style="color: #000000;">¿Estás seguro de que deseas eliminar este comentario?</h5>
+                        <p class="text-muted mt-2" style="color: #626C66;">Esta acción no se puede deshacer.</p>
+                    </div>
+                    <div class="modal-footer" style="border: none; padding: 0 20px 20px;">
+                        <form asp-action="EliminarResenia" asp-controller="Servicios" method="post" class="d-flex gap-2 w-100">
+                            <input type="hidden" id="reseniaIdEliminar" name="res_id" value="" />
+                            <input type="hidden" name="ser_id" value="@Model.ser_id" />
+                            <button type="button" class="btn flex-grow-1" data-bs-dismiss="modal"
+                                style="border-radius: 10px; background-color: #f0f0f0; color: #626C66; font-weight: 600; padding: 10px;">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn flex-grow-1" 
+                                style="border-radius: 10px; background-color: #E42229; color: #FFFFFF; font-weight: 600; padding: 10px;">
+                                <i class="fas fa-trash-alt me-2"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Modal de Éxito para Reseña Eliminada -->
-<div class="modal fade" id="reseniaEliminadaModal" tabindex="-1" aria-labelledby="reseniaEliminadaModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="reseniaEliminadaModalLabel">Comentario eliminado</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <!-- Modal de Éxito para Reseña Registrada -->
+        <div class="modal fade" id="reseniaExitoModal" tabindex="-1" aria-labelledby="reseniaExitoModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 15px; overflow: hidden; border: none;">
+                    <div class="modal-header" style="background-color: #E42229; color: #FFFFFF; border: none;">
+                        <h5 class="modal-title" id="reseniaExitoModalLabel">
+                            <i class="fas fa-check-circle me-2"></i>
+                            ¡Reseña registrada!
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-thumbs-up fa-3x" style="color: #E42229;"></i>
+                        </div>
+                        <h5 style="color: #000000;">¡Tu reseña ha sido publicada correctamente!</h5>
+                        <p class="text-muted mt-2" style="color: #626C66;">Gracias por compartir tu experiencia con nosotros.</p>
+                        <button type="button" class="btn mt-3" data-bs-dismiss="modal"
+                            style="background-color: #E42229; color: #FFFFFF; font-weight: 600; padding: 10px 20px; border-radius: 10px;">
+                            <i class="fas fa-times me-2"></i> Cerrar
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body text-center">
-                <p>Tu comentario ha sido eliminado correctamente.</p>
+        </div>
+
+        <!-- Modal de Éxito para Reseña Eliminada -->
+        <div class="modal fade" id="reseniaEliminadaModal" tabindex="-1" aria-labelledby="reseniaEliminadaModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 15px; overflow: hidden; border: none;">
+                    <div class="modal-header" style="background-color: #626C66; color: #FFFFFF; border: none;">
+                        <h5 class="modal-title" id="reseniaEliminadaModalLabel">
+                            <i class="fas fa-trash-alt me-2"></i>
+                            Comentario eliminado
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle fa-3x" style="color: #626C66;"></i>
+                        </div>
+                        <h5 style="color: #000000;">Tu comentario ha sido eliminado correctamente.</h5>
+                        <button type="button" class="btn mt-3" data-bs-dismiss="modal"
+                            style="background-color: #626C66; color: #FFFFFF; font-weight: 600; padding: 10px 20px; border-radius: 10px;">
+                            <i class="fas fa-times me-2"></i> Cerrar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animación para elementos al cargar la página
+        const reseniaItems = document.querySelectorAll('.resenia-item');
+        reseniaItems.forEach((item, index) => {
+            setTimeout(() => {
+                item.style.opacity = '1';
+            }, 100 * index);
+        });
+
+        // Sistema de valoración por estrellas
+        const stars = document.querySelectorAll('.star');
+        const valoracionInput = document.getElementById('valoracionInput');
+        
+        stars.forEach(star => {
+            // Evento hover
+            star.addEventListener('mouseover', () => {
+                const value = star.getAttribute('data-value');
+                highlightStars(value);
+            });
+            
+            // Evento click
+            star.addEventListener('click', () => {
+                const value = star.getAttribute('data-value');
+                valoracionInput.value = value;
+                highlightStars(value, true);
+            });
+        });
+        
+        // Resetear estrellas cuando el mouse sale del contenedor
+        const starsContainer = document.querySelector('.stars');
+        starsContainer.addEventListener('mouseleave', () => {
+            const selectedValue = valoracionInput.value;
+            highlightStars(selectedValue, true);
+        });
+        
+        // Función para iluminar las estrellas
+        function highlightStars(count, permanent = false) {
+            stars.forEach(star => {
+                const starValue = star.getAttribute('data-value');
+                const icon = star.querySelector('i');
+                
+                if (starValue <= count) {
+                    icon.className = 'fas fa-star';
+                    star.style.color = '#E42229';
+                } else {
+                    if (!permanent || valoracionInput.value < starValue) {
+                        icon.className = 'far fa-star';
+                        star.style.color = '#dddddd';
+                    }
+                }
+            });
+        }
+        
+        // Validación del formulario
+        const formularioResenia = document.getElementById('formularioResenia');
+        const comentarioInput = document.getElementById('res_comentario');
+        const comentarioError = document.getElementById('comentarioError');
+        const valoracionError = document.getElementById('valoracionError');
+        
+        formularioResenia.addEventListener('submit', function(event) {
+            let valid = true;
+            
+            // Validar valoración
+            if (valoracionInput.value == '0') {
+                valoracionError.style.display = 'block';
+                valid = false;
+            } else {
+                valoracionError.style.display = 'none';
+            }
+            
+            // Validar comentario
+            if (comentarioInput.value.trim() === '') {
+                comentarioInput.classList.add('is-invalid');
+                comentarioError.style.display = 'block';
+                valid = false;
+            } else {
+                comentarioInput.classList.remove('is-invalid');
+                comentarioError.style.display = 'none';
+            }
+            
+            if (!valid) {
+                event.preventDefault();
+            }
+        });
+        
+        // Modal para eliminación
+        const eliminarButtons = document.querySelectorAll('.eliminar-resenia');
+        const reseniaIdEliminar = document.getElementById('reseniaIdEliminar');
+        
+        eliminarButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const reseniaId = this.getAttribute('data-id');
+                reseniaIdEliminar.value = reseniaId;
+            });
+        });
+        
+        // Mostrar modal de éxito si viene del controlador
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        
+        if (status === 'success') {
+            const reseniaExitoModal = new bootstrap.Modal(document.getElementById('reseniaExitoModal'));
+            reseniaExitoModal.show();
+        } else if (status === 'deleted') {
+            const reseniaEliminadaModal = new bootstrap.Modal(document.getElementById('reseniaEliminadaModal'));
+            reseniaEliminadaModal.show();
+        }
+    });
+
 document.addEventListener('DOMContentLoaded', function () {
     const stars = document.querySelectorAll('.star');
     const valoracionInput = document.getElementById('valoracionInput');
@@ -464,7 +648,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const formularioResenia = document.getElementById('formularioResenia');
     const comentario = document.getElementById('comentario');
     const comentarioError = document.getElementById('comentarioError');
+    const botonesEliminar = document.querySelectorAll('.eliminar-resenia');
+    const reseniaIdInput = document.getElementById('reseniaIdEliminar');
 
+    botonesEliminar.forEach(boton => {
+        boton.addEventListener('click', function () {
+            const reseniaId = this.getAttribute('data-id');
+            reseniaIdInput.value = reseniaId;
+        });
+    });
+    
     // Función para actualizar las estrellas visualmente
     function updateStars(value) {
         stars.forEach((s, index) => {
@@ -533,10 +726,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
-</script>
 
-<script>
-    AOS.init({ once: true });
+AOS.init({ once: true });
     function mostrarModalLogin() {
         var modal = new bootstrap.Modal(document.getElementById('loginRequeridoModal'));
         modal.show();
