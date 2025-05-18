@@ -8,29 +8,30 @@ body {
         pointer-events: none;
     }
 }
+
 .search-container {
     max-width: 600px;
     margin: 0 auto 30px;
     position: relative;
-  }
-  
-  /* Input group styling */
-  .input-group {
+}
+
+/* Input group styling */
+.input-group {
     border-radius: 50px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     border: 2px solid #f1f1f1;
-  }
-  
-  .input-group:hover,
-  .input-group:focus-within {
+}
+
+.input-group:hover,
+.input-group:focus-within {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     border-color: #e63946;
-  }
-  
-  /* Search input styling */
-  .form-control {
+}
+
+/* Search input styling */
+.form-control {
     height: 54px;
     border: none !important;
     padding-left: 25px;
@@ -39,25 +40,25 @@ body {
     color: #333;
     letter-spacing: 0.3px;
     transition: all 0.3s ease;
-  }
-  
-  .form-control:focus {
+}
+
+.form-control:focus {
     box-shadow: none;
     background-color: #fff;
-  }
-  
-  .form-control::placeholder {
+}
+
+.form-control::placeholder {
     color: #aaa;
     font-weight: 400;
     transition: opacity 0.3s;
-  }
-  
-  .form-control:focus::placeholder {
+}
+
+.form-control:focus::placeholder {
     opacity: 0.6;
-  }
-  
-  /* Search button styling */
-  .btn-dark {
+}
+
+/* Search button styling */
+.btn-dark {
     background-color: #000 !important;
     border-color: #000 !important;
     color: #fff;
@@ -70,20 +71,20 @@ body {
     position: relative;
     overflow: hidden;
     text-transform: uppercase;
-  }
-  
-  .btn-dark:hover {
+}
+
+.btn-dark:hover {
     background-color: #e63946 !important;
     border-color: #e63946 !important;
     box-shadow: 0 0 15px rgba(230, 57, 70, 0.3);
-  }
-  
-  .btn-dark:active {
+}
+
+.btn-dark:active {
     transform: scale(0.98);
-  }
-  
-  /* Button ripple effect */
-  .btn-dark::after {
+}
+
+/* Button ripple effect */
+.btn-dark::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -94,41 +95,41 @@ body {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0);
     transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-  }
-  
-  .btn-dark:active::after {
+}
+
+.btn-dark:active::after {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
     transition: 0s;
-  }
-  
-  /* Autocomplete results styling */
-  .autocomplete-container {
+}
+
+/* Autocomplete results styling */
+.autocomplete-container {
     border-radius: 15px;
     margin-top: 5px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     border: 1px solid #f0f0f0 !important;
     overflow: hidden;
-  }
-  
-  .autocomplete-item {
+}
+
+.autocomplete-item {
     padding: 12px 20px;
     transition: all 0.2s ease;
     border-bottom: 1px solid #f5f5f5;
-  }
-  
-  .autocomplete-item:hover {
+}
+
+.autocomplete-item:hover {
     background-color: #f8f9fa;
     padding-left: 25px;
     color: #e63946;
-  }
-  
-  /* Add search icon */
-  .search-with-icon {
+}
+
+/* Add search icon */
+.search-with-icon {
     position: relative;
-  }
-  
-  .search-with-icon::before {
+}
+
+.search-with-icon::before {
     content: "\f002";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
@@ -140,15 +141,16 @@ body {
     z-index: 10;
     font-size: 16px;
     transition: all 0.3s ease;
-  }
-  
-  .search-with-icon input {
+}
+
+.search-with-icon input {
     padding-left: 50px !important;
-  }
-  
-  .search-with-icon:focus-within::before {
+}
+
+.search-with-icon:focus-within::before {
     color: #e63946;
-  }
+}
+
 .pagination .page-item .page-link {
     color: #333;
     background-color: #fff;
@@ -208,6 +210,7 @@ body {
 .page-link:hover:after {
     left: 100%;
 }
+
 .modal-custom {
     display: block;
     position: fixed;
@@ -265,9 +268,17 @@ body {
 }
 
 @keyframes heartBeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .toast {
@@ -393,7 +404,7 @@ h4 {
     top: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
     justify-content: center;
     align-items: center;
     display: flex;
@@ -409,7 +420,7 @@ h4 {
     align-items: center;
     max-width: 90vw;
     max-height: 90vh;
-    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
 }
 
 .zoom-content img {
@@ -442,6 +453,7 @@ h4 {
 .cerrar-zoom:hover {
     color: #d9534f;
 }
+
 .modal {
     display: none;
     position: fixed;
@@ -479,6 +491,7 @@ h4 {
 .cerrar-modal:hover {
     color: #d9534f;
 }
+
 .catalogo-container {
     font-family: 'Nunito', sans-serif;
     padding: 30px 0;
@@ -639,7 +652,8 @@ h4 {
 /* Campo de búsqueda con transición suave */
 .search-box {
     flex: 1;
-    padding: 12px 20px 12px 50px; /* Espacio para el ícono */
+    padding: 12px 20px 12px 50px;
+    /* Espacio para el ícono */
     border: none !important;
     outline: none;
     font-size: 0.95rem;
@@ -739,7 +753,7 @@ h4 {
     transform: translateY(0);
 }
 
-.search-input-group:focus-within + .search-suggestion {
+.search-input-group:focus-within+.search-suggestion {
     opacity: 1;
     transform: translateY(3px);
     color: #000;
@@ -757,6 +771,7 @@ h4 {
     padding: 6px 15px;
     font-size: 0.85rem;
 }
+
 .producto-card.oculto {
     display: none;
 }
@@ -775,14 +790,16 @@ h4 {
 .producto-card.resultado-busqueda {
     animation: destacarResultado 1s ease-in-out;
 }
+
 .resultados-contador {
     margin-bottom: 20px;
     font-size: 0.9rem;
     color: #666;
     display: none;
 }
- /* Estilos modernos para el catálogo */
- .catalogo-container {
+
+/* Estilos modernos para el catálogo */
+.catalogo-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
@@ -912,7 +929,8 @@ h2:after {
 
 
 .btn-primary:hover {
-    background-color: #666 !important; /* Cambia a gris */
+    background-color: #666 !important;
+    /* Cambia a gris */
     color: white !important;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -947,4 +965,66 @@ h2:after {
     font-size: 16px;
     transition: all 0.3s ease;
     font-weight: 600;
+}
+
+#reseniasList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#reseniasList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#reseniasList::-webkit-scrollbar-thumb {
+    background: #E42229;
+    border-radius: 10px;
+}
+
+#reseniasList::-webkit-scrollbar-thumb:hover {
+    background: #D42025;
+}
+
+/* Efecto hover para las reseñas */
+.resenia-item {
+    opacity: 0.9;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.resenia-item:hover {
+    opacity: 1;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Efecto hover para el botón de enviar */
+#submitResenia:hover {
+    background-color: #D42025 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(228, 34, 41, 0.3);
+}
+
+/* Efecto para los inputs al enfocar */
+.form-control:focus {
+    border-color: #E42229;
+    box-shadow: 0 0 0 0.25rem rgba(228, 34, 41, 0.25);
+}
+
+/* Estilo para los radio buttons */
+.form-check-input:checked {
+    background-color: #E42229;
+    border-color: #E42229;
+}
+
+/* Animación para las estrellas */
+.star:hover {
+    transform: scale(1.2);
+}
+
+/* Estilo para el botón de iniciar sesión */
+a[href="/Identity/Account/Login"]:hover {
+    background-color: #D42025 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(228, 34, 41, 0.3);
 }

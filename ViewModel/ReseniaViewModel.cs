@@ -14,5 +14,7 @@ namespace Marimon.ViewModel
         public string res_gusto { get; set; }
         public string usuario_id { get; set; }
         public string usuario_nombre { get; set; }
+        public int aut_id { get; set; }
+
     }
 }

@@ -209,7 +209,56 @@ namespace Marimon.Controllers
                 })
                 .ToListAsync();
 
+            ViewBag.AutoparteId = aut_id;
+
             return PartialView("_ReseniasAutoparte", resenias);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> EliminarResenia(int id, int aut_id)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized(new { success = false, message = "Usuario no autorizado" });
+            }
+
+            var identityUser = await _userManager.GetUserAsync(User);
+            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.usu_id == identityUser.Id);
+
+            if (usuario == null)
+            {
+                return BadRequest(new { success = false, message = "Usuario no encontrado" });
+            }
+
+            var resenia = await _context.Resenias.FindAsync(id);
+
+            if (resenia == null)
+            {
+                return NotFound(new { success = false, message = "Reseña no encontrada" });
+            }
+
+            if (resenia.UsuarioId != usuario.usu_id)
+            {
+                return Unauthorized(new { success = false, message = "No puedes eliminar reseñas de otros usuarios" });
+            }
+
+            try
+            {
+                _context.Resenias.Remove(resenia);
+                await _context.SaveChangesAsync();
+
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = true, message = "Reseña eliminada correctamente" });
+                }
+
+                return RedirectToAction("DetalleAutoparte", new { id = aut_id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar reseña");
+                return BadRequest(new { success = false, message = "Error al eliminar la reseña" });
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
