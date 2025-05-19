@@ -28,42 +28,87 @@ namespace Marimon.Controllers
         }
 
         // GET: Catalogo/Index
-        public IActionResult Index(string buscar, int pagina = 1)
+        public IActionResult Index(string buscar, int pagina = 1, string orden = null, List<int> categorias = null)
         {
-            const int PaginasPorPagina = 12;  // Número de autopartes por página
+            const int PaginasPorPagina = 12;
 
-            // Consulta base para las autopartes
-            var autopartesQuery = _context.Autopartes.AsQueryable();
+            var ventasOnline = _context.DetalleVentas
+                .GroupBy(d => d.AutoParteId)
+                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(d => d.det_cantidad) });
 
-            // Filtro por búsqueda
+            var ventasPresenciales = _context.Salida
+                .GroupBy(s => s.AutoparteId)
+                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(s => s.sal_cantidad) });
+
+            var ventasTotales = ventasOnline
+                .Concat(ventasPresenciales)
+                .GroupBy(v => v.AutoparteId)
+                .Select(g => new { AutoparteId = g.Key, Total = g.Sum(x => x.Cantidad) })
+                .ToList();
+
+            var autopartesQuery = _context.Autopartes.Include(a => a.Categoria).AsQueryable();
+
             if (!string.IsNullOrEmpty(buscar))
             {
                 autopartesQuery = autopartesQuery
                     .Where(a => EF.Functions.ILike(ApplicationDbContext.Unaccent(a.aut_nombre), $"%{buscar}%"));
             }
 
-            // Obtener el total de registros
+            if (categorias != null && categorias.Any())
+            {
+                autopartesQuery = autopartesQuery.Where(a => categorias.Contains(a.CategoriaId));
+            }
+
+            // Filtro de novedades (mostrar solo los 3 últimos por ID)
+            bool esNovedades = orden == "novedades";
+            if (esNovedades)
+            {
+                autopartesQuery = autopartesQuery
+                    .OrderByDescending(a => a.aut_id)
+                    .Take(3);
+            }
+
+            else if (orden == "asc")
+            {
+                autopartesQuery = autopartesQuery.OrderBy(a => a.aut_precio);
+            }
+            else if (orden == "desc")
+            {
+                autopartesQuery = autopartesQuery.OrderByDescending(a => a.aut_precio);
+            }
+            else if (orden == "mas_vendidas")
+            {
+                autopartesQuery = autopartesQuery
+                    .AsEnumerable()
+                    .OrderByDescending(a =>
+                        ventasTotales.FirstOrDefault(v => v.AutoparteId == a.aut_id)?.Total ?? 0)
+                    .AsQueryable();
+            }
+            else
+            {
+                autopartesQuery = autopartesQuery.OrderBy(a => a.aut_id);
+            }
+
             var totalAutopartes = autopartesQuery.Count();
 
-            // Si no hay resultados, establecer un mensaje
             if (totalAutopartes == 0)
             {
                 ViewBag.Mensaje = "No se encontraron productos que coincidan con tu búsqueda.";
             }
 
-            // Obtener las autopartes para la página actual
-            var autopartes = autopartesQuery
-                .Skip((pagina - 1) * PaginasPorPagina)
-                .Take(PaginasPorPagina)
-                .ToList();
+            // Paginación (solo si no es novedades)
+            if (!esNovedades)
+            {
+                autopartesQuery = autopartesQuery
+                    .Skip((pagina - 1) * PaginasPorPagina)
+                    .Take(PaginasPorPagina);
+            }
 
-            // Calcular cuántas páginas hay
-            var totalPaginas = (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
+            var autopartes = autopartesQuery.ToList();
+            var totalPaginas = esNovedades ? 1 : (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
 
-            // Obtener el carrito (esto puede depender de tu implementación, por ejemplo, desde la sesión o la base de datos)
-            var carrito = _context.Carritos.FirstOrDefault(c => c.UsuarioId == User.Identity.Name); // Ejemplo de cómo obtener el carrito
+            var carrito = _context.Carritos.FirstOrDefault(c => c.UsuarioId == User.Identity.Name);
 
-            // Crear el modelo para la vista
             var viewModel = new CatalogoViewModel
             {
                 Autopartes = autopartes,
@@ -73,6 +118,7 @@ namespace Marimon.Controllers
                 Buscar = buscar
             };
 
+            ViewBag.Categorias = _context.Categorias.ToList();
             return View(viewModel);
         }
 
