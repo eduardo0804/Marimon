@@ -90,27 +90,33 @@ namespace Marimon.Controllers
                 else // Ambos campos están presentes
                 {
                     prompt = @"
-                        Analiza la siguiente combinación de imagen y comentario sobre un problema automotriz siguiendo estas instrucciones:
+                    Analiza la combinación de imagen y comentario sobre un problema automotriz siguiendo estas reglas:
 
-                        1. EXAMINA ambos inputs (imagen y texto) para identificar:
-                        - Componentes afectados
-                        - Síntomas descritos
-                        - Posibles causas del problema
+                    1. EXAMINA ambos inputs identificando:
+                    - Componentes/sistemas afectados
+                    - Síntomas o problemas mencionados
+                    - Severidad del problema
 
-                        2. DETERMINA el servicio de reparación más adecuado basado en:
-                        - La gravedad del problema
-                        - Los sistemas afectados
-                        - La urgencia de la reparación
+                    2. DETERMINA el servicio adecuado usando ESTA LISTA EXCLUSIVA:
+                    [Sistema de Refrigeración, Aire Acondicionado, Mecatrónica y Electrónica, Mantenimientos y Frenos, Diagnóstico y Scanner, Planchado y Pintura Automotriz, Conversión a GLP, Conversión a GNV]
 
-                        3. RESPONDE en este formato exacto:
-                        'Analizando su contenido:
-                        - [Breve descripción técnica del problema en 1-2 frases]
-                        - [Recomendación específica basada en el análisis]
+                    3. RESPUESTA OBLIGATORIA en este formato:
+                    'Analizando su contenido:
+                    - Problema detectado: [descripción técnica concisa]
+                    - Recomendación: [sugerencia específica]
 
-                        El servicio más adecuado es: [Nombre exacto del servicio según la lista]'
+                    El servicio más adecuado es: [EXACTAMENTE un servicio de la lista o ""Ninguno""]'
 
-                        Sé técnico pero conciso (máximo 3 frases en total), usa lenguaje automotriz profesional y prioriza la precisión sobre la longitud del texto.
-                        ";
+                    4. REGLAS ESPECIALES:
+                    - Si es mantenimiento básico (inflado de llantas, lavado, etc.):
+                        'Recomendación: Servicio básico, puede acercarse a cualquier establecimiento'
+                    - Si no coincide con tus servicios especializados:
+                        'El servicio más adecuado es: Ninguno'
+                    - Usa SOLO los nombres exactos de la lista proporcionada
+                    - Máximo 3 frases en total
+                    - Lenguaje técnico pero entendible
+                    - Prioriza diagnóstico preciso sobre velocidad
+                    ";
                     parts.Add(new { text = prompt });
                     
                     // Agregar la imagen
