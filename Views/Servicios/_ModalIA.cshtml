@@ -1,13 +1,13 @@
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background-color: #E42229; color: #FFFFFF;">
-        <h5 class="modal-title" id="exampleModalLabel">Análisis de Imagen con Google AI Studio</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Análisis con Google AI Studio</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #FFFFFF;"></button>
       </div>
       <div class="modal-body">
         <div class="container py-4">
-          <p class="mb-4">Selecciona una imagen para analizarla con el modelo de visión de Google AI.</p>
+          <p class="mb-4">Sube una imagen o escribe un comentario para analizar con IA.</p>
 
           <div class="row">
             <div class="col-md-6 mb-3 text-center">
@@ -16,20 +16,25 @@
             </div>
 
             <div class="col-md-6">
-              <form id="imageForm" enctype="multipart/form-data">
+              <form id="analysisForm" enctype="multipart/form-data">
                 <div class="mb-3">
                   <label for="imageUpload" class="form-label">Seleccionar imagen:</label>
                   <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*">
                 </div>
+                
+                <div class="mb-3">
+                  <label for="commentInput" class="form-label">Comentario (opcional):</label>
+                  <textarea class="form-control" id="commentInput" name="comment" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
+                </div>
 
-                <button type="button" class="btn w-100 mb-3" id="btnIntegration" style="background-color: #D42025; color: #FFFFFF;">Analizar Imagen</button>
+                <button type="button" class="btn w-100 mb-3" id="btnIntegration" style="background-color: #D42025; color: #FFFFFF;">Analizar</button>
               </form>
 
               <div id="loadingIndicator" class="text-center" style="display:none;">
                 <div class="spinner-border" role="status" style="color: #E42229;">
                   <span class="visually-hidden">Cargando...</span>
                 </div>
-                <p class="mt-2">Analizando imagen con IA...</p>
+                <p class="mt-2">Analizando con IA...</p>
               </div>
 
               <div id="resultIntegration" class="card mt-3" style="display:none;">
@@ -65,19 +70,30 @@
 
         document.getElementById("btnIntegration").addEventListener("click", function() {
           const fileInput = document.getElementById("imageUpload");
-
-          if (!fileInput.files || fileInput.files.length === 0) {
-            alert("Por favor, selecciona una imagen primero.");
+          const commentInput = document.getElementById("commentInput").value.trim();
+          
+          // Validación: al menos un campo debe estar completo
+          if ((!fileInput.files || fileInput.files.length === 0) && commentInput === "") {
+            alert("Por favor, completa al menos un campo (imagen o comentario) para realizar el análisis.");
             return;
           }
 
           const formData = new FormData();
-          formData.append("image", fileInput.files[0]);
+          
+          // Solo agregamos la imagen si fue subida
+          if (fileInput.files && fileInput.files[0]) {
+            formData.append("image", fileInput.files[0]);
+          }
+          
+          // Solo agregamos el comentario si fue escrito
+          if (commentInput !== "") {
+            formData.append("comment", commentInput);
+          }
 
           document.getElementById("loadingIndicator").style.display = "block";
           document.getElementById("resultIntegration").style.display = "none";
 
-          fetch("/Servicios/AnalyzeImage", {
+          fetch("/Servicios/AnalyzeContent", {
             method: "POST",
             body: formData
           })
