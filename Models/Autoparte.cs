@@ -24,5 +24,8 @@ namespace Marimon.Models
         [NotMapped]
         public int CantidadVendida { get; set; }
 
+        // Relaciones
+        public virtual ICollection<Oferta>? Ofertas { get; set; }
+        public virtual ICollection<CodigoDescuento>? CodigosDescuento { get; set; }
     }
 }

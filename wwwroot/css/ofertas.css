@@ -1,0 +1,63 @@
+.sidebar {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-right: 1px solid #dee2e6;
+}
+.content {
+    padding: 20px;
+}
+.filter-section {
+    margin-bottom: 20px;
+}
+.table-container {
+    overflow-x: auto;
+}
+.search-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+.pagination {
+    margin-top: 20px;
+    justify-content: center;
+}
+.oferta-badge {
+    background-color: #ff6b6b;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+.stock-low {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+.stock-ok {
+    color: #28a745;
+}
+.checkbox-container {
+    margin-bottom: 5px;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#tablaContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+#tablaContainer::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#tablaContainer::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#tablaContainer::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

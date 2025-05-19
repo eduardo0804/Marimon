@@ -18,5 +18,14 @@ namespace Marimon.Models.ViewModels
         public string CategoriaNombre { get; set; }
         public List<AutoparteViewModel> ProductosSimilares { get; set; }
         public List<ReseniaViewModel> Resenias { get; set; } // Cambiado a ReseniaViewModel
+
+        // Campos de oferta
+        public decimal? PorcentajeOferta { get; set; }
+        public decimal? PrecioOferta { get; set; }
+        public string? DescripcionOferta { get; set; }
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
+        public bool? OfertaActiva { get; set; }
+        public int? OfertaId { get; set; }
     }
 }
