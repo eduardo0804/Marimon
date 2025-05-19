@@ -20,160 +20,164 @@
 
   <div class="row">
     <!-- Panel de filtros (Lado izquierdo) -->
-    <div class="col-lg-3">
-      <div class="filter-panel">
-        <h5 class="border-bottom pb-2 mb-3">Filtros de Búsqueda</h5>
+    @* <div class="col-lg-3"> *@
+    @*   <div class="filter-panel"> *@
+    @*     <h5 class="border-bottom pb-2 mb-3">Filtros de Búsqueda</h5> *@
 
-        <!-- Filtro por precio -->
-        <div class="price-filter mt-4">
-          <p class="fw-bold mb-2">Ordenar por precio:</p>
-          <select class="form-select filter-select" id="filtroOrden" name="orden">
-            <option value="">-- Seleccionar --</option>
-            <option value="asc">Menor a mayor</option>
-            <option value="desc">Mayor a menor</option>
-            <option value="mas_vendidas">Más vendidas</option>
-          </select>
-        </div>
+        @* <!-- Filtro por precio --> *@
+        @* <div class="price-filter mt-4"> *@
+        @*   <p class="fw-bold mb-2">Ordenar por precio:</p> *@
+        @*   <select class="form-select filter-select" id="filtroOrden" name="orden"> *@
+        @*     <option value="">-- Seleccionar --</option> *@
+        @*     <option value="asc">Menor a mayor</option> *@
+        @*     <option value="desc">Mayor a menor</option> *@
+        @*     <option value="mas_vendidas">Más vendidas</option> *@
+        @*   </select> *@
+        @* </div> *@
 
-        <!-- Filtro por categoría -->
-        <div class="category-section mt-4">
-          <p class="fw-bold mb-2">Filtrar por categoría:</p>
-          <div class="categories-container" id="categoriesContainer">
-            @{
-              var displayedCategories = (ViewBag.Categorias as List<Categoria>).Take(3).ToList();
-              var remainingCategories = (ViewBag.Categorias as List<Categoria>).Skip(3).ToList();
-            }
+        @* <!-- Filtro por categoría --> *@
+        @* <div class="category-section mt-4"> *@
+        @*   <p class="fw-bold mb-2">Filtrar por categoría:</p> *@
+        @*   <div class="categories-container" id="categoriesContainer"> *@
+        @*     @{ *@
+        @*       var displayedCategories = (ViewBag.Categorias as List<Categoria>).Take(3).ToList(); *@
+        @*       var remainingCategories = (ViewBag.Categorias as List<Categoria>).Skip(3).ToList(); *@
+        @*     } *@
 
-            @foreach (var categoria in displayedCategories)
-            {
-              <div class="category-checkbox">
-                <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id"
-                  id="cat_@categoria.cat_id">
-                <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label>
-              </div>
-            }
+        @*     @foreach (var categoria in displayedCategories) *@
+        @*     { *@
+        @*       <div class="category-checkbox"> *@
+        @*         <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id" *@
+        @*           id="cat_@categoria.cat_id"> *@
+        @*         <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label> *@
+        @*       </div> *@
+        @*     } *@
 
-            <div class="hidden-categories" style="display: none;">
-              @foreach (var categoria in remainingCategories)
-              {
-                <div class="category-checkbox">
-                  <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id"
-                    id="cat_@categoria.cat_id">
-                  <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label>
-                </div>
-              }
-            </div>
-          </div>
+        @*     <div class="hidden-categories" style="display: none;"> *@
+        @*       @foreach (var categoria in remainingCategories) *@
+        @*       { *@
+        @*         <div class="category-checkbox"> *@
+        @*           <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id" *@
+        @*             id="cat_@categoria.cat_id"> *@
+        @*           <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label> *@
+        @*         </div> *@
+        @*       } *@
+        @*     </div> *@
+        @*   </div> *@
 
-          @if ((ViewBag.Categorias as List<Categoria>).Count > 3)
-          {
-            <button type="button" class="show-more-btn" id="showMoreBtn">
-              Ver más categorías <i class="fas fa-chevron-down"></i>
-            </button>
-          }
-        </div>
+        @*   @if ((ViewBag.Categorias as List<Categoria>).Count > 3) *@
+        @*   { *@
+        @*     <button type="button" class="show-more-btn" id="showMoreBtn"> *@
+        @*       Ver más categorías <i class="fas fa-chevron-down"></i> *@
+        @*     </button> *@
+        @*   } *@
+        @* </div> *@
 
-        <div class="mt-4">
-          <button class="filter-btn" id="btnAplicarFiltros">
-            <i class="fas fa-filter"></i> Aplicar Filtros
-          </button>
-        </div>
+        @* <div class="mt-4"> *@
+        @*   <button class="filter-btn" id="btnAplicarFiltros"> *@
+        @*     <i class="fas fa-filter"></i> Aplicar Filtros *@
+        @*   </button> *@
+        @* </div> *@
 
-        <div class="mt-4">
-          <button class="btn-registrar w-100" data-bs-toggle="modal" data-bs-target="#registerModal">
-            <i class="fas fa-plus-circle me-2"></i>Registrar nueva autoparte
-          </button>
-        </div>
-      </div>
-    </div>
+        @* <div class="mt-4"> *@
+        @*   <button class="btn-registrar w-100" data-bs-toggle="modal" data-bs-target="#registerModal"> *@
+        @*     <i class="fas fa-plus-circle me-2"></i>Registrar nueva autoparte *@
+        @*   </button> *@
+        @* </div> *@
+    @*   </div> *@
+    @* </div> *@
 
     <!-- Sección de tabla (Lado derecho) -->
-    <div class="col-lg-9">
+    <div class="col-lg-12">
       <div class="table-container fade-in">
         <div class="table-header">
-          <div class="row align-items-center">
-            <div class="col">
-              <h5 class="mb-0">Listado de Autopartes</h5>
-            </div>
-            <div class="col-auto">
-              <div class="input-group search-container">
-                <input type="text" class="form-control" id="searchTable" placeholder="Buscar en tabla...">
-                <button class="btn btn-outline-secondary" type="button">
-                  <i class="fas fa-search"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <div class="mt-4">
+                                <button class="btn w-100" style="background-color: #E42229; color: #FFFFFF; border-color: #E42229;" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                    <i class="fas fa-plus-circle me-2"></i>Registrar nueva autoparte
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 ms-auto">
+                            <div class="input-group mt-4">
+                                <input type="text" class="form-control" id="searchTable" placeholder="Buscar en tabla..." style="border-color: #626C66;">
+                                <button class="btn" type="button" style="background-color: #E42229; color: #FFFFFF; border-color: #E42229;">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
         </div>
         <div class="table-scroll-container">
-          <table class="modern-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Especificaciones</th>
-                <th>Precio (S/)</th>
-                <th>Cantidad</th>
-                <th>Cantidad vendidas Totales</th>
-                <th>Categoría</th>
-                <th>Imagen</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach (var item in Model)
-              {
-                <tr class="table-row" data-id="@item.aut_id">
-                  <td data-label="ID">@item.aut_id</td>
-                  <td data-label="Nombre">@item.aut_nombre</td>
-                  <td data-label="Descripción" class="td-description">
-                    <div class="description-content">@item.aut_descripcion</div>
-                    <div class="description-tooltip">@item.aut_descripcion</div>
-                  </td>
-                  <td data-label="Especificaciones" class="td-description">
-                    <div class="description-content">@item.aut_especificacion</div>
-                    <div class="description-tooltip">@item.aut_especificacion</div>
-                  </td>
-                  <td data-label="Precio">S/ @item.aut_precio.ToString("F2")</td>
-                  <td data-label="Cantidad">@item.aut_cantidad.ToString()</td>
-                  <td data-label="Cantidad vendidas Totales">@item.CantidadVendida.ToString()</td>
-                  <td data-label="Categoría">@item.Categoria?.cat_nombre</td>
-                  <td data-label="Imagen">
-                    @if (!string.IsNullOrEmpty(item.aut_imagen))
-                    {
-                      <div class="image-container">
-                        <img src="@item.aut_imagen" alt="Imagen" class="table-image" />
-                        <div class="image-overlay">
-                          <a style="text-decoration: none;" href="@item.aut_imagen" target="_blank" class="image-zoom">
-                            <i style="color:white;" class="fas fa-search-plus"></i>
-                          </a>
-                        </div>
-                      </div>
-                    }
-                    else
-                    {
-                      <span class="no-image"><i class="fas fa-image"></i> Sin imagen</span>
-                    }
-                  </td>
-                  <td data-label="Acciones" class="actions-cell">
-                    <div class="action-buttons">
-                      <button class="btn-action btn-edit" onclick="loadEditModal('@item.aut_id');" title="Modificar">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <form asp-action="Eliminar" asp-controller="Personal_Ventas" asp-route-id="@item.aut_id"
-                        method="post" class="delete-form">
-                        <button type="button" class="btn-action btn-delete" onclick="confirmDelete(this)"
-                          title="Eliminar">
-                          <i class="fas fa-trash-alt"></i>
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+                    <table class="modern-table">
+                        <thead>
+                            <tr style="background-color: #E42229; color: #FFFFFF;">
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Especificaciones</th>
+                                <th>Precio (S/)</th>
+                                <th>Cantidad</th>
+                                <th>Categoría</th>
+                                <th>Imagen</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr class="table-row" data-id="@item.aut_id" style="border-bottom: 1px solid #626C66;">
+                                    <td data-label="ID">@item.aut_id</td>
+                                    <td data-label="Nombre">@item.aut_nombre</td>
+                                    <td data-label="Descripción" class="td-description">
+                                        <div class="description-content">@item.aut_descripcion</div>
+                                        <div class="description-tooltip" style="background-color: #FFFFFF; color: #000000; border: 1px solid #626C66;">@item.aut_descripcion</div>
+                                    </td>
+                                    <td data-label="Especificaciones" class="td-description">
+                                        <div class="description-content">@item.aut_especificacion</div>
+                                        <div class="description-tooltip" style="background-color: #FFFFFF; color: #000000; border: 1px solid #626C66;">@item.aut_especificacion</div>
+                                    </td>
+                                    <td data-label="Precio">S/ @item.aut_precio.ToString("F2")</td>
+                                    <td data-label="Cantidad">@item.aut_cantidad.ToString()</td>
+                                    <td data-label="Categoría">@item.Categoria?.cat_nombre</td>
+                                    <td data-label="Imagen">
+                                        @if (!string.IsNullOrEmpty(item.aut_imagen))
+                                        {
+                                            <div class="image-container">
+                                                <img src="@item.aut_imagen" alt="Imagen" class="table-image" />
+                                                <div class="image-overlay" style="background-color: rgba(0, 0, 0, 0.5);">
+                                                    <a style="text-decoration: none;" href="@item.aut_imagen" target="_blank" class="image-zoom">
+                                                        <i style="color: #FFFFFF;" class="fas fa-search-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="no-image" style="color: #626C66;"><i class="fas fa-image"></i> Sin imagen</span>
+                                        }
+                                    </td>
+                                    <td data-label="Acciones" class="actions-cell">
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-edit" style="background-color: #D42025; color: #FFFFFF; border: none;" onclick="loadEditModal('@item.aut_id');" title="Modificar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <form asp-action="Eliminar" asp-controller="Personal_Ventas" asp-route-id="@item.aut_id"
+                                                  method="post" class="delete-form">
+                                                <button type="button" class="btn-action btn-delete" style="background-color: #E42229; color: #FFFFFF; border: none;" onclick="confirmDelete(this)"
+                                                        title="Eliminar">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
         </div>
       </div>
     </div>

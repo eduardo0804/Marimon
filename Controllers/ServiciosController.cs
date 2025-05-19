@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Marimon.Services;
+using System.Text.Json;
+using System.Text;
 
 namespace Marimon.Controllers
 {
@@ -14,13 +16,26 @@ namespace Marimon.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IEmailSenderWithAttachments _emailSender;
-
-        public ServiciosController(ILogger<ServiciosController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager, IEmailSenderWithAttachments emailSender)
+        private readonly HttpClient _httpClient;
+        private readonly string _apiKey;
+        private readonly string _modelId;
+        public ServiciosController(
+            ILogger<ServiciosController> logger,
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager,
+            IEmailSenderWithAttachments emailSender,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
+
+            // Configuración de Google AI
+            _httpClient = httpClientFactory.CreateClient("GoogleAI");
+            _apiKey = configuration["GoogleAI:ApiKey"];
+            _modelId = configuration["GoogleAI:ModelId"] ?? "gemini-1.5-flash";
         }
 
         public IActionResult Index()
@@ -29,6 +44,239 @@ namespace Marimon.Controllers
             return View(servicios);
         }
 
+        public async Task<IActionResult> AnalyzeContent(IFormFile image, string comment)
+        {
+            // Validación: al menos un campo debe estar completo
+            if ((image == null || image.Length == 0) && string.IsNullOrWhiteSpace(comment))
+            {
+                return Json(new { success = false, result = "Por favor, sube una imagen o escribe un comentario para analizar." });
+            }
+
+            try
+            {
+                var parts = new List<object>();
+                var prompt = "";
+
+                // Configurar el prompt según lo que se está analizando
+                if (!string.IsNullOrWhiteSpace(comment) && (image == null || image.Length == 0))
+                {
+                    prompt = "Analiza brevemente este comentario sobre un problema automotriz (máximo 3 frases cortas) y determina qué tipo de servicio de reparación sería el más adecuado. Sé conciso y directo.";
+                    parts.Add(new { text = prompt });
+                    parts.Add(new { text = comment });
+                }
+                else if (string.IsNullOrWhiteSpace(comment) && (image != null && image.Length > 0))
+                {
+                    prompt = "Analiza brevemente esta imagen de un vehículo o componente automotriz (máximo 3 frases cortas) y determina qué tipo de servicio de reparación sería el más adecuado. Sé conciso y directo.";
+                    parts.Add(new { text = prompt });
+                    
+                    // Convertir la imagen a base64
+                    string base64Image;
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await image.CopyToAsync(memoryStream);
+                        byte[] imageBytes = memoryStream.ToArray();
+                        base64Image = Convert.ToBase64String(imageBytes);
+                    }
+                    
+                    parts.Add(new
+                    {
+                        inline_data = new
+                        {
+                            mime_type = image.ContentType,
+                            data = base64Image
+                        }
+                    });
+                }
+                else // Ambos campos están presentes
+                {
+                    prompt = @"
+                    Analiza la combinación de imagen y comentario sobre un problema automotriz siguiendo estas reglas:
+
+                    1. EXAMINA ambos inputs identificando:
+                    - Componentes/sistemas afectados
+                    - Síntomas o problemas mencionados
+                    - Severidad del problema
+
+                    2. DETERMINA el servicio adecuado usando ESTA LISTA EXCLUSIVA:
+                    [Sistema de Refrigeración, Aire Acondicionado, Mecatrónica y Electrónica, Mantenimientos y Frenos, Diagnóstico y Scanner, Planchado y Pintura Automotriz, Conversión a GLP, Conversión a GNV]
+
+                    3. RESPUESTA OBLIGATORIA en este formato:
+                    'Analizando su contenido:
+                    - Problema detectado: [descripción técnica concisa]
+                    - Recomendación: [sugerencia específica]
+
+                    El servicio más adecuado es: [EXACTAMENTE un servicio de la lista o ""Ninguno""]'
+
+                    4. REGLAS ESPECIALES:
+                    - Si es mantenimiento básico (inflado de llantas, lavado, etc.):
+                        'Recomendación: Servicio básico, puede acercarse a cualquier establecimiento'
+                    - Si no coincide con tus servicios especializados:
+                        'El servicio más adecuado es: Ninguno'
+                    - Usa SOLO los nombres exactos de la lista proporcionada
+                    - Máximo 3 frases en total
+                    - Lenguaje técnico pero entendible
+                    - Prioriza diagnóstico preciso sobre velocidad
+                    ";
+                    parts.Add(new { text = prompt });
+                    
+                    // Agregar la imagen
+                    string base64Image;
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await image.CopyToAsync(memoryStream);
+                        byte[] imageBytes = memoryStream.ToArray();
+                        base64Image = Convert.ToBase64String(imageBytes);
+                    }
+                    
+                    parts.Add(new
+                    {
+                        inline_data = new
+                        {
+                            mime_type = image.ContentType,
+                            data = base64Image
+                        }
+                    });
+                    
+                    // Agregar el comentario
+                    parts.Add(new { text = comment });
+                }
+
+                var payload = new
+                {
+                    contents = new[]
+                    {
+                        new
+                        {
+                            parts = parts
+                        }
+                    },
+                    generation_config = new
+                    {
+                        temperature = 0.1,
+                        topK = 32,
+                        topP = 1,
+                        maxOutputTokens = 256
+                    }
+                };
+
+                var jsonContent = JsonSerializer.Serialize(payload);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var endpoint = $"v1beta/models/gemini-1.5-flash:generateContent?key={_apiKey}";
+                var response = await _httpClient.PostAsync(endpoint, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"Error al llamar a Google AI API: {errorContent}");
+                    return Json(new { success = false, result = $"Error en la API de Google AI: {response.StatusCode}" });
+                }
+
+                var responseContent = await response.Content.ReadFromJsonAsync<JsonElement>();
+                string resultText = "";
+
+                if (responseContent.TryGetProperty("candidates", out var candidates) &&
+                    candidates.GetArrayLength() > 0 &&
+                    candidates[0].TryGetProperty("content", out var content1) &&
+                    content1.TryGetProperty("parts", out var responseParts) &&
+                    responseParts.GetArrayLength() > 0 &&
+                    responseParts[0].TryGetProperty("text", out var text))
+                {
+                    resultText = text.GetString();
+                }
+                else
+                {
+                    resultText = "No se pudo extraer el texto de la respuesta.";
+                }
+
+                // Determinar el servicio adecuado
+                var service = DetermineService(resultText);
+                if (service != null)
+                {
+                    var typedService = (dynamic)service;
+                    // Formatear el resultado con colores de la paleta
+                    string formattedResult = $@"
+                        <div class='card mb-3'>
+                            <div class='card-body'>
+                                <h5 class='card-title' style='color: #E42229;'>Análisis</h5>
+                                <p class='card-text'>{FormatResultText(resultText)}</p>
+                                <h5 class='mt-3' style='color: #E42229;'>Servicio recomendado:</h5>
+                                <div class='mt-2'>
+                                    <strong style='font-style: italic;'>{typedService.name}</strong>
+                                </div>
+                            </div>
+                        </div>";
+
+                    return Json(new { success = true, result = formattedResult, url = typedService.url });
+                }
+
+                return Json(new { success = true, result = $"<div class='alert alert-info'>Análisis realizado: {resultText}</div><p>No se encontró un servicio adecuado.</p>" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al analizar el contenido");
+                return Json(new { success = false, result = $"<div class='alert alert-danger'>Error al analizar: {ex.Message}</div>" });
+            }
+        }
+
+        // Métodos auxiliares (se mantienen igual que en tu versión original)
+        private string FormatResultText(string text)
+        {
+            return text.Replace("\n", "<br>");
+        }
+
+        private object DetermineService(string resultText)
+        {
+            resultText = resultText.ToLower();
+            
+            var services = new[]
+            {
+                new { id = 4, name = "Sistema de Refrigeración", url = "/Servicios/Detalle/4", keywords = new[] { "refrigeración", "radiador", "mangueras", "enfriamiento", "termostato", "refrigerante", "sobrecalentamiento", "temperatura" } },
+                new { id = 5, name = "Aire Acondicionado", url = "/Servicios/Detalle/5", keywords = new[] { "aire acondicionado", "a/c", "clima", "climatización", "compresor", "frío", "temperatura cabina", "ventilación" } },
+                new { id = 3, name = "Mecatrónica y Electrónica", url = "/Servicios/Detalle/3", keywords = new[] { "mecatrónica", "electrónica", "componentes", "computadora", "sensores", "ecu", "cableado", "fusibles", "batería", "alternador", "sistema eléctrico" } },
+                new { id = 6, name = "Mantenimientos y Frenos", url = "/Servicios/Detalle/6", keywords = new[] { "frenos", "mantenimiento", "pastillas", "discos", "preventivo", "filtros", "aceite", "bujías", "correa", "faja", "balatas", "zapatas" } },
+                new { id = 7, name = "Diagnóstico y Scanner", url = "/Servicios/Detalle/7", keywords = new[] { "diagnóstico", "scanner", "fallos", "codes", "códigos", "error", "check engine", "obd", "diagnóstico computarizado", "escaneo" } },
+                new { id = 8, name = "Planchado y Pintura Automotriz", url = "/Servicios/Detalle/8", keywords = new[] { "planchado", "pintura", "carrocería", "chapa", "golpe", "abolladura", "rayón", "pulido", "latonería", "acabado" } },
+                new { id = 9, name = "Conversión a GLP", url = "/Servicios/Detalle/9", keywords = new[] { "glp", "gas licuado", "gas licuado de petróleo", "conversión gas", "kit gas" } },
+                new { id = 10, name = "Conversión a GNV", url = "/Servicios/Detalle/10", keywords = new[] { "gnv", "gas natural", "gas natural vehicular", "conversión gas natural" } },
+            };
+
+            var matchCounts = new Dictionary<int, int>();
+            foreach (var service in services)
+            {
+                int count = 0;
+                foreach (var keyword in service.keywords)
+                {
+                    int keywordCount = CountOccurrences(resultText, keyword.ToLower());
+                    count += keywordCount;
+                }
+                
+                if (count > 0)
+                {
+                    matchCounts.Add(service.id, count);
+                }
+            }
+
+            if (matchCounts.Count > 0)
+            {
+                int bestServiceId = matchCounts.OrderByDescending(x => x.Value).First().Key;
+                return services.FirstOrDefault(s => s.id == bestServiceId);
+            }
+
+            return services.FirstOrDefault(s => s.id == 1);
+        }
+
+        private int CountOccurrences(string text, string keyword)
+        {
+            int count = 0;
+            int i = 0;
+            while ((i = text.IndexOf(keyword, i)) != -1)
+            {
+                i += keyword.Length;
+                count++;
+            }
+            return count;
+        }        
         public async Task<IActionResult> Detalle(int id)
         {
             var servicio = await _context.Servicio

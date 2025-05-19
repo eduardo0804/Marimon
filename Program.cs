@@ -14,7 +14,9 @@ using System.Reflection;
 using Marimon.Helpers; // Necesario para SameSiteMode
 using Stripe;
 using Stripe.Checkout;
-using Marimon.Models;  // <-- Aquí está el using para StripeSettings
+using Marimon.Models;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Http.Features;  // <-- Aquí está el using para StripeSettings
 
 var builder = WebApplication.CreateBuilder(args);
 // Configuración de PostgreSQL
@@ -92,6 +94,22 @@ builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
     .SetApplicationName("Marimon");
+
+// Agregar cliente HTTP configurado para Google AI Studio
+builder.Services.AddHttpClient("GoogleAI", client =>
+{
+    client.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
+    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+});
+
+// Configurar límites de carga de archivos
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
+});
+
+
+
 var app = builder.Build();
 //asignación roles
 using (var scope = app.Services.CreateScope())
