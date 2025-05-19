@@ -15,5 +15,6 @@ namespace Marimon.Models
 
         // Propiedad para manejar el término de búsqueda (si lo hay)
         public string Buscar { get; set; }
+        
     }
 }

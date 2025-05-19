@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Catálogo";
+
 }
 
 <!-- Font Awesome -->
@@ -93,49 +94,108 @@
 
     }
 
-    <!-- Productos -->
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="row justify-content-center">
-                @foreach (var autoparte in Model.Autopartes)
+    <!-- Filtro por precio -->
+    <div class="price-filter mt-4">
+        <p class="fw-bold mb-2">Ordenar:</p>
+        <select class="form-select filter-select" id="filtroOrden" name="orden">
+            <option value="">-- Seleccionar --</option>
+            <option value="asc">Menor a mayor</option>
+            <option value="desc">Mayor a menor</option>
+            <option value="mas_vendidas">Más vendidas</option>
+            <option value="novedades">Novedades</option>
+        </select>
+    </div>
+
+    <!-- Filtro por categoría -->
+    <div class="category-section mt-4">
+        <p class="fw-bold mb-2">Filtrar por categoría:</p>
+        <div class="categories-container" id="categoriesContainer">
+            @{
+                var displayedCategories = (ViewBag.Categorias as List<Categoria>).Take(3).ToList();
+                var remainingCategories = (ViewBag.Categorias as List<Categoria>).Skip(3).ToList();
+            }
+
+            @foreach (var categoria in displayedCategories)
+            {
+                <div class="category-checkbox">
+                    <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id"
+                        id="cat_@categoria.cat_id">
+                    <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label>
+                </div>
+            }
+
+            <div class="hidden-categories" style="display: none;">
+                @foreach (var categoria in remainingCategories)
                 {
-                    <div class="col-md-4 col-sm-6 mb-4">
-                        <div class="card producto-card h-100 shadow-sm">
-                            <div class="p-3 text-center">
-                                <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="producto-imagen"
-                                    style="cursor:pointer;" onclick="cargarDetalleAutoparte(@autoparte.aut_id)" />
-                            </div>
-                            <div class="card-body text-center">
-                                <h5 class="card-title">@autoparte.aut_nombre</h5>
-                                <p class="card-text precio">Precio:
-                                    <strong>S/@autoparte.aut_precio.ToString("0.00")</strong>
-                                </p>
-                                @if (User.Identity.IsAuthenticated)
-                                {
-                                    @if (autoparte.aut_cantidad > 0)
+                    <div class="category-checkbox">
+                        <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id"
+                            id="cat_@categoria.cat_id">
+                        <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if ((ViewBag.Categorias as List<Categoria>).Count > 3)
+        {
+            <button type="button" class="show-more-btn" id="showMoreBtn">
+                Ver más categorías <i class="fas fa-chevron-down"></i>
+            </button>
+        }
+    </div>
+
+    <div class="mt-4">
+        <button class="filter-btn" id="btnAplicarFiltros">
+            <i class="fas fa-filter"></i> Aplicar Filtros
+        </button>
+    </div>
+
+    <!-- Productos -->
+    <div id="productosContainer">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="row justify-content-center">
+                    @foreach (var autoparte in Model.Autopartes)
+                    {
+                        <div class="col-md-4 col-sm-6 mb-4">
+                            <div class="card producto-card h-100 shadow-sm">
+                                <div class="p-3 text-center">
+                                    <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="producto-imagen"
+                                        style="cursor:pointer;" onclick="cargarDetalleAutoparte(@autoparte.aut_id)" />
+                                </div>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">@autoparte.aut_nombre</h5>
+                                    <p class="card-text precio">Precio:
+                                        <strong>S/@autoparte.aut_precio.ToString("0.00")</strong>
+                                    </p>
+                                    @if (User.Identity.IsAuthenticated)
                                     {
-                                        <button class="btn btn-dark btn-search" type="button"
-                                            onclick="añadirAlCarritoAsync(@autoparte.aut_id, 1)">
-                                            Añadir al Carrito
-                                        </button>
+                                        @if (autoparte.aut_cantidad > 0)
+                                        {
+                                            <button class="btn btn-dark btn-search" type="button"
+                                                onclick="añadirAlCarritoAsync(@autoparte.aut_id, 1)">
+                                                Añadir al Carrito
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary" disabled>AGOTADO</button>
+                                        }
                                     }
                                     else
                                     {
-                                        <button class="btn btn-secondary" disabled>AGOTADO</button>
+                                        <div class="alert alert-warning">
+                                            Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir productos a
+                                            la
+                                            cesta.
+                                        </div>
                                     }
-                                }
-                                else
-                                {
-                                    <div class="alert alert-warning">
-                                        Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir productos a la
-                                        cesta.
-                                    </div>
-                                }
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
+                    }
 
+                </div>
             </div>
         </div>
     </div>
@@ -146,27 +206,30 @@
         <nav aria-label="Navegación de páginas">
             <ul class="pagination">
                 <li class="page-item @(Model.PaginaActual > 1 ? "" : "disabled")">
-                    <a class="page-link"
-                        href="@Url.Action("Index", "Catalogo", new { pagina = Model.PaginaActual > 1 ? Model.PaginaActual - 1 : 1, buscar = Model.Buscar })"
-                        aria-label="Anterior">
+                    <a class="page-link paginacion" href="#"
+                        data-pagina="@(Model.PaginaActual > 1 ? Model.PaginaActual - 1 : 1)" aria-label="Anterior">
                         <span aria-hidden="true">&laquo; Anterior</span>
                         <span class="sr-only">Anterior</span>
                     </a>
                 </li>
 
-                @* @for (var i = 1; i <= Model.TotalPaginas; i++)
+                @* Si quieres mostrar los números de página, descomenta esto *@
+                @* 
+                @for (var i = 1; i <= Model.TotalPaginas; i++)
                 {
                     <li class="page-item @(i == Model.PaginaActual ? "active" : "")">
                         <a class="page-link"
-                           href="@Url.Action("Index", "Catalogo", new { pagina = i, buscar = Model.Buscar })">
+                           href="#"
+                           data-pagina="@i">
                             @i
                         </a>
                     </li>
-                } *@
+                }
+                *@
 
                 <li class="page-item @(Model.PaginaActual < Model.TotalPaginas ? "" : "disabled")">
-                    <a class="page-link"
-                        href="@Url.Action("Index", "Catalogo", new { pagina = Model.PaginaActual < Model.TotalPaginas ? Model.PaginaActual + 1 : Model.PaginaActual, buscar = Model.Buscar })"
+                    <a class="page-link paginacion" href="#"
+                        data-pagina="@(Model.PaginaActual<Model.TotalPaginas? Model.PaginaActual + 1 : Model.PaginaActual)"
                         aria-label="Siguiente">
                         <span aria-hidden="true">&raquo; Siguiente</span>
                         <span class="sr-only">Siguiente</span>
@@ -176,6 +239,7 @@
         </nav>
     </div>
 </div>
+
 
 <!-- Alerta Carrito-->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
@@ -214,6 +278,93 @@
         <!-- Aquí se carga el contenido desde el controlador -->
     </div>
 </div>
+
+<script>
+    function aplicarFiltros(orden, categorias = []) {
+        const url = new URL('/Catalogo', window.location.origin);
+
+        if (orden) {
+            url.searchParams.append('orden', orden);
+        }
+        categorias.forEach(cat => url.searchParams.append('categorias', cat));
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                // Parsear el HTML completo recibido
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Extraer solo el contenido de productos
+                const nuevoContenido = doc.querySelector('#productosContainer');
+                if (nuevoContenido) {
+                    // Reemplazar el contenido actual sin recargar la página completa
+                    document.querySelector('#productosContainer').innerHTML = nuevoContenido.innerHTML;
+                } else {
+                    console.error('No se encontró el contenedor #productosContainer en la respuesta.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al aplicar filtros:', error);
+            });
+    }
+
+    // Eventos
+    document.getElementById('filtroOrden').addEventListener('change', () => {
+        const orden = document.getElementById('filtroOrden').value;
+        const categoriasSeleccionadas = Array.from(document.querySelectorAll('.filtro-categoria:checked'))
+            .map(cb => cb.value);
+        aplicarFiltros(orden, categoriasSeleccionadas);
+    });
+
+    document.getElementById('btnAplicarFiltros').addEventListener('click', () => {
+        const orden = document.getElementById('filtroOrden').value;
+        const categoriasSeleccionadas = Array.from(document.querySelectorAll('.filtro-categoria:checked'))
+            .map(cb => cb.value);
+        aplicarFiltros(orden, categoriasSeleccionadas);
+    });
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.paginacion')) {
+            e.preventDefault();
+
+            const pagina = e.target.closest('.paginacion').getAttribute('data-pagina');
+            const orden = document.getElementById('filtroOrden').value;
+            const categoriasSeleccionadas = Array.from(document.querySelectorAll('.filtro-categoria:checked'))
+                .map(cb => cb.value);
+
+            const url = new URL('/Catalogo', window.location.origin);
+            if (orden) {
+                url.searchParams.append('orden', orden);
+            }
+            categoriasSeleccionadas.forEach(cat => url.searchParams.append('categorias', cat));
+            url.searchParams.append('pagina', pagina);
+
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Reemplazar productos
+                    const nuevoContenido = doc.querySelector('#productosContainer');
+                    if (nuevoContenido) {
+                        document.querySelector('#productosContainer').innerHTML = nuevoContenido.innerHTML;
+                    }
+
+                    // Reemplazar paginación
+                    const nuevaPaginacion = doc.querySelector('.pagination');
+                    if (nuevaPaginacion) {
+                        document.querySelector('.pagination').innerHTML = nuevaPaginacion.innerHTML;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar la nueva página:', error);
+                });
+        }
+    });
+</script>
+
+
 
 <script>
     // Unificar todos los eventos DOMContentLoaded en uno solo
@@ -265,7 +416,23 @@
                     });
             }, 300);
         });
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const hiddenCategories = document.querySelector('.hidden-categories');
+        const categoriesContainer = document.getElementById('categoriesContainer');
 
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', function () {
+                if (hiddenCategories.style.display === 'none') {
+                    hiddenCategories.style.display = 'block';
+                    showMoreBtn.innerHTML = 'Ver menos categorías <i class="fas fa-chevron-up"></i>';
+                    categoriesContainer.classList.add('expanded');
+                } else {
+                    hiddenCategories.style.display = 'none';
+                    showMoreBtn.innerHTML = 'Ver más categorías <i class="fas fa-chevron-down"></i>';
+                    categoriesContainer.classList.remove('expanded');
+                }
+            });
+        }
         // Ocultar resultados al hacer clic fuera
         document.addEventListener('click', function (e) {
             if (e.target !== searchInput && e.target !== resultsContainer) {
@@ -350,6 +517,7 @@
                 historialElement.appendChild(limpiarLi);
             }
         }
+
     });
     function cargarDetalleAutoparte(id) {
         fetch(`/Catalogo/DetalleAutoparte/${id}`)
