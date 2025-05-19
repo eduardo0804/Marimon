@@ -233,7 +233,6 @@ namespace Marimon.Controllers
                 new { id = 8, name = "Planchado y Pintura Automotriz", url = "/Servicios/Detalle/8", keywords = new[] { "planchado", "pintura", "carrocería", "chapa", "golpe", "abolladura", "rayón", "pulido", "latonería", "acabado" } },
                 new { id = 9, name = "Conversión a GLP", url = "/Servicios/Detalle/9", keywords = new[] { "glp", "gas licuado", "gas licuado de petróleo", "conversión gas", "kit gas" } },
                 new { id = 10, name = "Conversión a GNV", url = "/Servicios/Detalle/10", keywords = new[] { "gnv", "gas natural", "gas natural vehicular", "conversión gas natural" } },
-                new { id = 1, name = "Servicio Automotriz General", url = "/Servicios/Detalle/1", keywords = new[] { "motor", "transmisión", "suspensión", "dirección", "embrague", "caja de cambios" } }
             };
 
             var matchCounts = new Dictionary<int, int>();
