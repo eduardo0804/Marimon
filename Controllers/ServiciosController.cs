@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Marimon.Services;
+using System.Text.Json;
+using System.Text;
 
 namespace Marimon.Controllers
 {
@@ -14,13 +16,26 @@ namespace Marimon.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IEmailSenderWithAttachments _emailSender;
-
-        public ServiciosController(ILogger<ServiciosController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager, IEmailSenderWithAttachments emailSender)
+        private readonly HttpClient _httpClient;
+        private readonly string _apiKey;
+        private readonly string _modelId;
+        public ServiciosController(
+            ILogger<ServiciosController> logger,
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager,
+            IEmailSenderWithAttachments emailSender,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
+
+            // Configuración de Google AI
+            _httpClient = httpClientFactory.CreateClient("GoogleAI");
+            _apiKey = configuration["GoogleAI:ApiKey"];
+            _modelId = configuration["GoogleAI:ModelId"] ?? "gemini-1.5-flash";
         }
 
         public IActionResult Index()
@@ -28,7 +43,183 @@ namespace Marimon.Controllers
             var servicios = _context.Servicio.ToList();
             return View(servicios);
         }
+        
+        public async Task<IActionResult> AnalyzeImage(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return Json(new { success = false, result = "No se ha seleccionado ninguna imagen." });
+            }
 
+            try
+            {
+                // Convertir la imagen a base64
+                string base64Image;
+                using (var memoryStream = new MemoryStream())
+                {
+                    await image.CopyToAsync(memoryStream);
+                    byte[] imageBytes = memoryStream.ToArray();
+                    base64Image = Convert.ToBase64String(imageBytes);
+                }
+
+                string mimeType = image.ContentType;
+
+                var payload = new
+                {
+                    contents = new[]
+                    {
+                        new
+                        {
+                            parts = new object[]
+                            {
+                                new { text = "Analiza brevemente esta imagen de un vehículo o componente automotriz (máximo 3 frases cortas) y determina qué tipo de servicio de reparación sería el más adecuado. Sé conciso y directo." },
+                                new
+                                {
+                                    inline_data = new
+                                    {
+                                        mime_type = mimeType,
+                                        data = base64Image
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    generation_config = new
+                    {
+                        temperature = 0.1,
+                        topK = 32,
+                        topP = 1,
+                        maxOutputTokens = 256
+                    }
+                };
+
+                var jsonContent = JsonSerializer.Serialize(payload);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var endpoint = $"v1/models/{_modelId}:generateContent?key={_apiKey}";
+                var response = await _httpClient.PostAsync(endpoint, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"Error al llamar a Google AI API: {errorContent}");
+                    return Json(new { success = false, result = $"Error en la API de Google AI: {response.StatusCode}" });
+                }
+
+                var responseContent = await response.Content.ReadFromJsonAsync<JsonElement>();
+                string resultText = "";
+
+                if (responseContent.TryGetProperty("candidates", out var candidates) &&
+                    candidates.GetArrayLength() > 0 &&
+                    candidates[0].TryGetProperty("content", out var content1) &&
+                    content1.TryGetProperty("parts", out var parts) &&
+                    parts.GetArrayLength() > 0 &&
+                    parts[0].TryGetProperty("text", out var text))
+                {
+                    resultText = text.GetString();
+                }
+                else
+                {
+                    resultText = "No se pudo extraer el texto de la respuesta.";
+                }
+
+                // Determinar el servicio adecuado
+                var service = DetermineService(resultText);
+                if (service != null)
+                {
+                    var typedService = (dynamic)service;
+                    // Formatear el resultado con colores de la paleta
+                    string formattedResult = $@"
+                        <div class='card mb-3'>
+                            <div class='card-body'>
+                                <h5 class='card-title' style='color: #E42229;'>Análisis</h5>
+                                <p class='card-text'>{FormatResultText(resultText)}</p>
+                                <h5 class='mt-3' style='color: #E42229;'>Servicio recomendado:</h5>
+                                <div class='mt-2'>
+                                    <strong style='font-style: italic;'>{typedService.name}</strong>
+                                </div>
+                            </div>
+                        </div>";
+
+                    
+                    return Json(new { success = true, result = formattedResult, url = typedService.url });
+                }
+
+                return Json(new { success = true, result = $"<div class='alert alert-info'>Análisis realizado: {resultText}</div><p>No se encontró un servicio adecuado para esta imagen.</p>" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al analizar la imagen");
+                return Json(new { success = false, result = $"<div class='alert alert-danger'>Error al analizar la imagen: {ex.Message}</div>" });
+            }
+        }
+
+        // Método para formatear el texto del resultado
+        private string FormatResultText(string text)
+        {
+            // Reemplazar saltos de línea con etiquetas <br> para mantener el formato
+            return text.Replace("\n", "<br>");
+        }
+
+        // Método para determinar el servicio adecuado
+        private object DetermineService(string resultText)
+        {
+            resultText = resultText.ToLower();
+            
+            var services = new[]
+            {
+                new { id = 4, name = "Sistema de Refrigeración", url = "/Servicios/Detalle/4", keywords = new[] { "refrigeración", "radiador", "mangueras", "enfriamiento", "termostato", "refrigerante", "sobrecalentamiento", "temperatura" } },
+                new { id = 5, name = "Aire Acondicionado", url = "/Servicios/Detalle/5", keywords = new[] { "aire acondicionado", "a/c", "clima", "climatización", "compresor", "frío", "temperatura cabina", "ventilación" } },
+                new { id = 3, name = "Mecatrónica y Electrónica", url = "/Servicios/Detalle/3", keywords = new[] { "mecatrónica", "electrónica", "componentes", "computadora", "sensores", "ecu", "cableado", "fusibles", "batería", "alternador", "sistema eléctrico" } },
+                new { id = 6, name = "Mantenimientos y Frenos", url = "/Servicios/Detalle/6", keywords = new[] { "frenos", "mantenimiento", "pastillas", "discos", "preventivo", "filtros", "aceite", "bujías", "correa", "faja", "balatas", "zapatas" } },
+                new { id = 7, name = "Diagnóstico y Scanner", url = "/Servicios/Detalle/7", keywords = new[] { "diagnóstico", "scanner", "fallos", "codes", "códigos", "error", "check engine", "obd", "diagnóstico computarizado", "escaneo" } },
+                new { id = 8, name = "Planchado y Pintura Automotriz", url = "/Servicios/Detalle/8", keywords = new[] { "planchado", "pintura", "carrocería", "chapa", "golpe", "abolladura", "rayón", "pulido", "latonería", "acabado" } },
+                new { id = 9, name = "Conversión a GLP", url = "/Servicios/Detalle/9", keywords = new[] { "glp", "gas licuado", "gas licuado de petróleo", "conversión gas", "kit gas" } },
+                new { id = 10, name = "Conversión a GNV", url = "/Servicios/Detalle/10", keywords = new[] { "gnv", "gas natural", "gas natural vehicular", "conversión gas natural" } },
+                new { id = 1, name = "Servicio Automotriz General", url = "/Servicios/Detalle/1", keywords = new[] { "motor", "transmisión", "suspensión", "dirección", "embrague", "caja de cambios" } }
+            };
+
+            // Contar cuántas palabras clave de cada servicio aparecen en el texto
+            var matchCounts = new Dictionary<int, int>();
+            foreach (var service in services)
+            {
+                int count = 0;
+                foreach (var keyword in service.keywords)
+                {
+                    // Contar cuántas veces aparece cada palabra clave
+                    int keywordCount = CountOccurrences(resultText, keyword.ToLower());
+                    count += keywordCount;
+                }
+                
+                if (count > 0)
+                {
+                    matchCounts.Add(service.id, count);
+                }
+            }
+
+            // Si hay coincidencias, devolver el servicio con más palabras clave encontradas
+            if (matchCounts.Count > 0)
+            {
+                int bestServiceId = matchCounts.OrderByDescending(x => x.Value).First().Key;
+                return services.FirstOrDefault(s => s.id == bestServiceId);
+            }
+
+            // Si no hay coincidencias específicas, devolver servicio general
+            return services.FirstOrDefault(s => s.id == 1);
+        }
+
+        // Método auxiliar para contar ocurrencias de una subcadena en un texto
+        private int CountOccurrences(string text, string keyword)
+        {
+            int count = 0;
+            int i = 0;
+            while ((i = text.IndexOf(keyword, i)) != -1)
+            {
+                i += keyword.Length;
+                count++;
+            }
+            return count;
+        }
         public async Task<IActionResult> Detalle(int id)
         {
             var servicio = await _context.Servicio
