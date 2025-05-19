@@ -8,6 +8,7 @@ body {
     pointer-events: none;
   }
 }
+
 /* Estructura para el layout con filtros a la izquierda */
 .catalogo-layout {
   display: flex;
@@ -169,6 +170,7 @@ body {
   font-size: 11px;
   transition: transform 0.3s ease;
 }
+
 .categories-container .hidden-categories.visible {
   display: block !important;
 }
@@ -178,6 +180,7 @@ body {
   color: #e63946;
   border-color: #e63946;
 }
+
 /* Corrección de estilos para asegurar que las categorías ocultas se muestren */
 .expanded .hidden-categories {
   display: block !important;
@@ -188,18 +191,21 @@ body {
   opacity: 1;
   visibility: visible;
 }
+
 /* Fijar el problema de categorías que no se muestran */
 .hidden-categories {
-  display: none; /* Esto es el estado inicial */
+  display: none;
+  /* Esto es el estado inicial */
 }
 
 /* Esta clase es importante para el toggle */
 .categories-container.expanded .hidden-categories {
-  display: block !important; /* Fuerza la visualización cuando se expande */
+  display: block !important;
+  /* Fuerza la visualización cuando se expande */
 }
 
 /* Ajustamos el ícono cuando está expandido */
-.categories-container.expanded + .show-more-btn i {
+.categories-container.expanded+.show-more-btn i {
   transform: rotate(180deg);
 }
 
@@ -282,11 +288,62 @@ body {
     width: 100%;
     margin-bottom: 20px;
   }
+
+  .search-bar-container {
+    max-width: 600px;
+  }
+
+  .search-input-wrapper {
+    flex: 0 1 400px;
+  }
+
+  .busquedas-recientes-btn {
+    font-size: 12px;
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-bar-container {
+    flex-direction: column;
+    margin: 0 auto 20px;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .search-input-wrapper {
+    flex: 1 !important;
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .search-input-wrapper form {
+    display: flex;
+    width: 100%;
+  }
+
+  .search-input-wrapper .btn-dark {
+    padding: 0 15px !important;
+    min-width: 80px;
+    font-size: 14px;
+  }
+
+  .search-dropdown {
+    width: 100%;
+  }
+
+  .busquedas-recientes-btn {
+    width: 100%;
+    justify-content: center;
+    height: 45px;
+  }
 }
 
 /* Corrigiendo el script para el botón Ver más */
 .js-fix-categories {
-  display: none; /* Estilos para ayudar con JavaScript */
+  display: none;
+  /* Estilos para ayudar con JavaScript */
 }
 
 .search-container {
@@ -415,6 +472,7 @@ body {
 .search-with-icon {
   position: relative;
 }
+
 .search-with-dropdown {
   display: flex;
   align-items: center;
@@ -424,6 +482,7 @@ body {
   margin: 0 auto;
   position: relative;
 }
+
 .dropdown-menu {
   border-radius: 15px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
@@ -440,6 +499,7 @@ body {
   background-color: #f8f9fa;
   color: #e63946;
 }
+
 .search-with-icon::before {
   content: "\f002";
   font-family: "Font Awesome 6 Free";
@@ -530,11 +590,9 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 0, 0, 0.8) 0%,
-    rgba(0, 0, 0, 0.6) 100%
-  );
+  background: radial-gradient(circle at center,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.6) 100%);
   overflow: auto;
   padding: 60px 20px;
 }
@@ -938,11 +996,14 @@ h4 {
   margin: 0 auto 25px;
   position: relative;
   flex: 1;
-  margin: 0 !important; /* Anular margin del search-container */
+  margin: 0 !important;
+  /* Anular margin del search-container */
 }
+
 .search-dropdown {
-    margin-left: 10px;
+  margin-left: 0;
 }
+
 /* Contenedor principal con efecto de brillo en el borde */
 .search-input-group {
   display: flex;
@@ -955,10 +1016,13 @@ h4 {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(5px);
 }
+
 .search-input-wrapper {
-  flex: 1;
+  flex: 0 1 600px;
   position: relative;
+  margin-right: 10px;
 }
+
 .search-input-wrapper .form-control {
   height: 54px;
   border-radius: 50px;
@@ -968,11 +1032,13 @@ h4 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
+
 .search-input-wrapper .form-control:focus,
 .search-input-wrapper .form-control:hover {
   border-color: #e63946;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
+
 .search-input-wrapper .btn-dark {
   position: absolute;
   right: 0;
@@ -1003,6 +1069,7 @@ h4 {
   font-size: 16px;
   pointer-events: none;
 }
+
 .search-input-group:hover {
   box-shadow: 0 8px 20px #000;
   border-color: #000;
@@ -1030,13 +1097,15 @@ h4 {
   letter-spacing: 0.3px;
   color: #444;
 }
+
 .search-bar-container {
   display: flex;
   align-items: center;
   width: 100%;
   max-width: 800px;
-  margin: 0 auto 20px;
+  margin: 0 0 20px auto;
   position: relative;
+  justify-content: flex-end;
 }
 
 .search-box:focus {
@@ -1127,7 +1196,7 @@ h4 {
   transform: translateY(0);
 }
 
-.search-input-group:focus-within + .search-suggestion {
+.search-input-group:focus-within+.search-suggestion {
   opacity: 1;
   transform: translateY(3px);
   color: #000;
@@ -1171,6 +1240,7 @@ h4 {
   color: #666;
   display: none;
 }
+
 .busquedas-recientes-btn {
   height: 54px;
   padding: 0 20px;
@@ -1191,6 +1261,7 @@ h4 {
   border-color: #e63946;
   box-shadow: 0 4px 10px rgba(230, 57, 70, 0.15);
 }
+
 /* Estilos modernos para el catálogo */
 .catalogo-container {
   max-width: 1200px;
