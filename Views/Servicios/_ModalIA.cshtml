@@ -2,8 +2,7 @@
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background-color: #E42229; color: #FFFFFF;">
-        <h5 class="modal-title" id="exampleModalLabel">Análisis con Google AI Studio</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #FFFFFF;"></button>
+        <h5 class="modal-title" id="exampleModalLabel">Análisis con Inteligencia Artificial</h5>
       </div>
       <div class="modal-body">
         <div class="container py-4">
@@ -49,7 +48,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #626C66; color: #FFFFFF;">Cerrar</button>
+        <button type="button" class="btn btn-dark" data-bs-dismiss="modal" >Cerrar</button>
       </div>
       <script>
         // Previsualización de la imagen
@@ -68,6 +67,28 @@
           }
         });
 
+        // Limpiar al cerrar el modal
+        function resetModal() {
+          // Restablece la imagen de vista previa
+          document.getElementById('imagePreview').src = '/img/placeholder-image.png';
+          
+          // Limpia el input de archivo
+          document.getElementById('imageUpload').value = '';
+          
+          // Limpia el área de comentarios
+          document.getElementById('commentInput').value = '';
+          
+          // Oculta resultados y loading indicator
+          document.getElementById('loadingIndicator').style.display = 'none';
+          document.getElementById('resultIntegration').style.display = 'none';
+        }
+
+        // Eventos para cerrar el modal
+        document.getElementById('closeModalButton').addEventListener('click', resetModal);
+        document.getElementById('exampleModal').addEventListener('hidden.bs.modal', resetModal);
+        document.querySelector('.modal-footer .btn').addEventListener('click', resetModal);
+
+        // Envío del formulario
         document.getElementById("btnIntegration").addEventListener("click", function() {
           const fileInput = document.getElementById("imageUpload");
           const commentInput = document.getElementById("commentInput").value.trim();
@@ -80,12 +101,12 @@
 
           const formData = new FormData();
           
-          // Solo agregamos la imagen si fue subida
+          // Agregar imagen si existe
           if (fileInput.files && fileInput.files[0]) {
             formData.append("image", fileInput.files[0]);
           }
           
-          // Solo agregamos el comentario si fue escrito
+          // Agregar comentario si existe (ahora funciona independientemente de la imagen)
           if (commentInput !== "") {
             formData.append("comment", commentInput);
           }
@@ -97,18 +118,27 @@
             method: "POST",
             body: formData
           })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
           .then(data => {
             document.getElementById("loadingIndicator").style.display = "none";
             document.getElementById("resultIntegration").style.display = "block";
-            document.getElementById("resultContent").innerHTML = data.result;
             
-            if (data.url) {
-              document.getElementById("resultContent").innerHTML += `
-                <div class="mt-3 text-center">
-                  <a href="${data.url}" class="btn mt-2" style="background-color: #E42229; color: #FFFFFF;">Ir al servicio recomendado</a>
-                </div>
-              `;
+            if (data.success === false) {
+              document.getElementById("resultContent").innerHTML = `<div class="alert alert-danger">${data.result}</div>`;
+            } else {
+              document.getElementById("resultContent").innerHTML = data.result;
+              if (data.url) {
+                document.getElementById("resultContent").innerHTML += `
+                  <div class="mt-3 text-center">
+                    <a href="${data.url}" class="btn mt-2" style="background-color: #E42229; color: #FFFFFF;">Ir al servicio recomendado</a>
+                  </div>
+                `;
+              }
             }
           })
           .catch(error => {
