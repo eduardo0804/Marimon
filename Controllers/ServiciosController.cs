@@ -43,26 +43,97 @@ namespace Marimon.Controllers
             var servicios = _context.Servicio.ToList();
             return View(servicios);
         }
-        
-        public async Task<IActionResult> AnalyzeImage(IFormFile image)
+
+        public async Task<IActionResult> AnalyzeContent(IFormFile image, string comment)
         {
-            if (image == null || image.Length == 0)
+            // Validación: al menos un campo debe estar completo
+            if ((image == null || image.Length == 0) && string.IsNullOrWhiteSpace(comment))
             {
-                return Json(new { success = false, result = "No se ha seleccionado ninguna imagen." });
+                return Json(new { success = false, result = "Por favor, sube una imagen o escribe un comentario para analizar." });
             }
 
             try
             {
-                // Convertir la imagen a base64
-                string base64Image;
-                using (var memoryStream = new MemoryStream())
-                {
-                    await image.CopyToAsync(memoryStream);
-                    byte[] imageBytes = memoryStream.ToArray();
-                    base64Image = Convert.ToBase64String(imageBytes);
-                }
+                var parts = new List<object>();
+                var prompt = "";
 
-                string mimeType = image.ContentType;
+                // Configurar el prompt según lo que se está analizando
+                if (!string.IsNullOrWhiteSpace(comment) && (image == null || image.Length == 0))
+                {
+                    prompt = "Analiza brevemente este comentario sobre un problema automotriz (máximo 3 frases cortas) y determina qué tipo de servicio de reparación sería el más adecuado. Sé conciso y directo.";
+                    parts.Add(new { text = prompt });
+                    parts.Add(new { text = comment });
+                }
+                else if (string.IsNullOrWhiteSpace(comment) && (image != null && image.Length > 0))
+                {
+                    prompt = "Analiza brevemente esta imagen de un vehículo o componente automotriz (máximo 3 frases cortas) y determina qué tipo de servicio de reparación sería el más adecuado. Sé conciso y directo.";
+                    parts.Add(new { text = prompt });
+                    
+                    // Convertir la imagen a base64
+                    string base64Image;
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await image.CopyToAsync(memoryStream);
+                        byte[] imageBytes = memoryStream.ToArray();
+                        base64Image = Convert.ToBase64String(imageBytes);
+                    }
+                    
+                    parts.Add(new
+                    {
+                        inline_data = new
+                        {
+                            mime_type = image.ContentType,
+                            data = base64Image
+                        }
+                    });
+                }
+                else // Ambos campos están presentes
+                {
+                    prompt = @"
+                        Analiza la siguiente combinación de imagen y comentario sobre un problema automotriz siguiendo estas instrucciones:
+
+                        1. EXAMINA ambos inputs (imagen y texto) para identificar:
+                        - Componentes afectados
+                        - Síntomas descritos
+                        - Posibles causas del problema
+
+                        2. DETERMINA el servicio de reparación más adecuado basado en:
+                        - La gravedad del problema
+                        - Los sistemas afectados
+                        - La urgencia de la reparación
+
+                        3. RESPONDE en este formato exacto:
+                        'Analizando su contenido:
+                        - [Breve descripción técnica del problema en 1-2 frases]
+                        - [Recomendación específica basada en el análisis]
+
+                        El servicio más adecuado es: [Nombre exacto del servicio según la lista]'
+
+                        Sé técnico pero conciso (máximo 3 frases en total), usa lenguaje automotriz profesional y prioriza la precisión sobre la longitud del texto.
+                        ";
+                    parts.Add(new { text = prompt });
+                    
+                    // Agregar la imagen
+                    string base64Image;
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await image.CopyToAsync(memoryStream);
+                        byte[] imageBytes = memoryStream.ToArray();
+                        base64Image = Convert.ToBase64String(imageBytes);
+                    }
+                    
+                    parts.Add(new
+                    {
+                        inline_data = new
+                        {
+                            mime_type = image.ContentType,
+                            data = base64Image
+                        }
+                    });
+                    
+                    // Agregar el comentario
+                    parts.Add(new { text = comment });
+                }
 
                 var payload = new
                 {
@@ -70,18 +141,7 @@ namespace Marimon.Controllers
                     {
                         new
                         {
-                            parts = new object[]
-                            {
-                                new { text = "Analiza brevemente esta imagen de un vehículo o componente automotriz (máximo 3 frases cortas) y determina qué tipo de servicio de reparación sería el más adecuado. Sé conciso y directo." },
-                                new
-                                {
-                                    inline_data = new
-                                    {
-                                        mime_type = mimeType,
-                                        data = base64Image
-                                    }
-                                }
-                            }
+                            parts = parts
                         }
                     },
                     generation_config = new
@@ -96,7 +156,7 @@ namespace Marimon.Controllers
                 var jsonContent = JsonSerializer.Serialize(payload);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                var endpoint = $"v1/models/{_modelId}:generateContent?key={_apiKey}";
+                var endpoint = $"v1beta/models/gemini-1.5-flash:generateContent?key={_apiKey}";
                 var response = await _httpClient.PostAsync(endpoint, content);
 
                 if (!response.IsSuccessStatusCode)
@@ -112,9 +172,9 @@ namespace Marimon.Controllers
                 if (responseContent.TryGetProperty("candidates", out var candidates) &&
                     candidates.GetArrayLength() > 0 &&
                     candidates[0].TryGetProperty("content", out var content1) &&
-                    content1.TryGetProperty("parts", out var parts) &&
-                    parts.GetArrayLength() > 0 &&
-                    parts[0].TryGetProperty("text", out var text))
+                    content1.TryGetProperty("parts", out var responseParts) &&
+                    responseParts.GetArrayLength() > 0 &&
+                    responseParts[0].TryGetProperty("text", out var text))
                 {
                     resultText = text.GetString();
                 }
@@ -141,27 +201,24 @@ namespace Marimon.Controllers
                             </div>
                         </div>";
 
-                    
                     return Json(new { success = true, result = formattedResult, url = typedService.url });
                 }
 
-                return Json(new { success = true, result = $"<div class='alert alert-info'>Análisis realizado: {resultText}</div><p>No se encontró un servicio adecuado para esta imagen.</p>" });
+                return Json(new { success = true, result = $"<div class='alert alert-info'>Análisis realizado: {resultText}</div><p>No se encontró un servicio adecuado.</p>" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al analizar la imagen");
-                return Json(new { success = false, result = $"<div class='alert alert-danger'>Error al analizar la imagen: {ex.Message}</div>" });
+                _logger.LogError(ex, "Error al analizar el contenido");
+                return Json(new { success = false, result = $"<div class='alert alert-danger'>Error al analizar: {ex.Message}</div>" });
             }
         }
 
-        // Método para formatear el texto del resultado
+        // Métodos auxiliares (se mantienen igual que en tu versión original)
         private string FormatResultText(string text)
         {
-            // Reemplazar saltos de línea con etiquetas <br> para mantener el formato
             return text.Replace("\n", "<br>");
         }
 
-        // Método para determinar el servicio adecuado
         private object DetermineService(string resultText)
         {
             resultText = resultText.ToLower();
@@ -179,14 +236,12 @@ namespace Marimon.Controllers
                 new { id = 1, name = "Servicio Automotriz General", url = "/Servicios/Detalle/1", keywords = new[] { "motor", "transmisión", "suspensión", "dirección", "embrague", "caja de cambios" } }
             };
 
-            // Contar cuántas palabras clave de cada servicio aparecen en el texto
             var matchCounts = new Dictionary<int, int>();
             foreach (var service in services)
             {
                 int count = 0;
                 foreach (var keyword in service.keywords)
                 {
-                    // Contar cuántas veces aparece cada palabra clave
                     int keywordCount = CountOccurrences(resultText, keyword.ToLower());
                     count += keywordCount;
                 }
@@ -197,18 +252,15 @@ namespace Marimon.Controllers
                 }
             }
 
-            // Si hay coincidencias, devolver el servicio con más palabras clave encontradas
             if (matchCounts.Count > 0)
             {
                 int bestServiceId = matchCounts.OrderByDescending(x => x.Value).First().Key;
                 return services.FirstOrDefault(s => s.id == bestServiceId);
             }
 
-            // Si no hay coincidencias específicas, devolver servicio general
             return services.FirstOrDefault(s => s.id == 1);
         }
 
-        // Método auxiliar para contar ocurrencias de una subcadena en un texto
         private int CountOccurrences(string text, string keyword)
         {
             int count = 0;
@@ -219,7 +271,7 @@ namespace Marimon.Controllers
                 count++;
             }
             return count;
-        }
+        }        
         public async Task<IActionResult> Detalle(int id)
         {
             var servicio = await _context.Servicio
