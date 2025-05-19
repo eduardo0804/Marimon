@@ -1,0 +1,107 @@
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #E42229; color: #FFFFFF;">
+        <h5 class="modal-title" id="exampleModalLabel">Análisis de Imagen con Google AI Studio</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: #FFFFFF;"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container py-4">
+          <p class="mb-4">Selecciona una imagen para analizarla con el modelo de visión de Google AI.</p>
+
+          <div class="row">
+            <div class="col-md-6 mb-3 text-center">
+              <img src="/img/placeholder-image.png" alt="Imagen a analizar" id="imagePreview" class="img-fluid rounded shadow-sm border" style="max-height: 380px; width: 100%; object-fit: contain; background-color: #f8f9fa;">
+              <p class="text-muted small mt-2">Vista previa de la imagen</p>
+            </div>
+
+            <div class="col-md-6">
+              <form id="imageForm" enctype="multipart/form-data">
+                <div class="mb-3">
+                  <label for="imageUpload" class="form-label">Seleccionar imagen:</label>
+                  <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*">
+                </div>
+
+                <button type="button" class="btn w-100 mb-3" id="btnIntegration" style="background-color: #D42025; color: #FFFFFF;">Analizar Imagen</button>
+              </form>
+
+              <div id="loadingIndicator" class="text-center" style="display:none;">
+                <div class="spinner-border" role="status" style="color: #E42229;">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-2">Analizando imagen con IA...</p>
+              </div>
+
+              <div id="resultIntegration" class="card mt-3" style="display:none;">
+                <div class="card-header" style="background-color: #626C66; color: #FFFFFF;">
+                  <h5 class="mb-0">Resultados del análisis</h5>
+                </div>
+                <div class="card-body" id="resultContent">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #626C66; color: #FFFFFF;">Cerrar</button>
+      </div>
+      <script>
+        // Previsualización de la imagen
+        document.getElementById("imageUpload").addEventListener("change", function() {
+          const fileInput = this;
+          const imagePreview = document.getElementById("imagePreview");
+          
+          if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+              imagePreview.src = e.target.result;
+            };
+            
+            reader.readAsDataURL(fileInput.files[0]);
+          }
+        });
+
+        document.getElementById("btnIntegration").addEventListener("click", function() {
+          const fileInput = document.getElementById("imageUpload");
+
+          if (!fileInput.files || fileInput.files.length === 0) {
+            alert("Por favor, selecciona una imagen primero.");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("image", fileInput.files[0]);
+
+          document.getElementById("loadingIndicator").style.display = "block";
+          document.getElementById("resultIntegration").style.display = "none";
+
+          fetch("/Servicios/AnalyzeImage", {
+            method: "POST",
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById("loadingIndicator").style.display = "none";
+            document.getElementById("resultIntegration").style.display = "block";
+            document.getElementById("resultContent").innerHTML = data.result;
+            
+            if (data.url) {
+              document.getElementById("resultContent").innerHTML += `
+                <div class="mt-3 text-center">
+                  <a href="${data.url}" class="btn mt-2" style="background-color: #E42229; color: #FFFFFF;">Ir al servicio recomendado</a>
+                </div>
+              `;
+            }
+          })
+          .catch(error => {
+            document.getElementById("loadingIndicator").style.display = "none";
+            document.getElementById("resultIntegration").style.display = "block";
+            document.getElementById("resultContent").innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+          });
+        });
+      </script>
+    </div>
+  </div>
+</div>

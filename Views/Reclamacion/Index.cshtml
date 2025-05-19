@@ -10,7 +10,7 @@
 }
 <link rel="stylesheet" href="~/css/reclamacion.css" />
 <h2>Libro de Reclamaciones</h2>
-
+<p>Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, esta institución cuenta con un Libro de Reclamaciones a su disposición.</p>
 <form asp-action="CrearReclamacion" asp-controller="Reclamacion" method="post" id="reclamacionForm">
     <input type="hidden" asp-for="UsuarioId" value="@usuario?.usu_id" />
 

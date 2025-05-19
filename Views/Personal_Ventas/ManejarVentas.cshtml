@@ -1,0 +1,326 @@
+﻿@model List<Marimon.Models.Venta>
+@{
+    ViewData["Title"] = "Consultar Ventas de Autopartes";
+    Layout = "_LayoutVentas";
+    var estados = ViewBag.Estados as List<string>;
+    var estadoSeleccionado = ViewBag.EstadoSeleccionado as string;
+}
+
+<link rel="stylesheet" href="~/css/consultarServicio.css" />
+
+<div class="container-fluid mt-1 my-4">
+    <ol class="breadcrumb m-0 ">
+        <li class="breadcrumb-item">
+            <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Módulo de Autopartes</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Consultar Ventas de Autopartes</li>
+    </ol>
+
+    <div class="page-header text-center m-0 p-0 pb-2">
+        <h2>Consultar Ventas de Autopartes</h2>
+    </div>
+
+    <div class="row">
+        <!-- Filtros (Left side) -->
+        <div class="col-lg-3">
+            <div class="filter-panel shadow-sm rounded-3">
+                <form id="filtrosForm" method="get" action="">
+                    <div class="filter-header bg-light p-3 rounded-top">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <i class="fas fa-filter me-2 text-primary"></i>
+                            <span>Filtrar resultados</span>
+                        </h5>
+                    </div>
+                    <div class="filter-body p-3">
+                        <h6 class="mb-3">Filtrar por estado</h6>
+                        <div class="status-filters">
+                            <!-- Opción Todos -->
+                            <a href="javascript:void(0)" onclick="setEstado('')"
+                               class="status-filter @(string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) ? "active" : "")">
+                                <div class="status-icon bg-secondary">
+                                    <i class="fas fa-list text-white"></i>
+                                </div>
+                                <span class="status-label">Todos los estados</span>
+                                <span class="status-badge">@Model?.Count</span>
+                            </a>
+                            @if (ViewBag.Estados != null)
+                            {
+                                foreach (var est in ViewBag.Estados)
+                                {
+                                    var count = Model?.Count(v => v.Estado == est) ?? 0;
+                                    var iconClass = "";
+                                    var bgClass = "";
+                                    switch (est)
+                                    {
+                                        case "Pendiente":
+                                            iconClass = "fa-clock";
+                                            bgClass = "bg-warning";
+                                            break;
+                                        case "Completado":
+                                            iconClass = "fa-check-circle";
+                                            bgClass = "bg-success";
+                                            break;
+                                        case "Cancelado":
+                                            iconClass = "fa-times-circle";
+                                            bgClass = "bg-danger";
+                                            break;
+                                        default:
+                                            iconClass = "fa-circle";
+                                            bgClass = "bg-info";
+                                            break;
+                                    }
+                                    <a href="javascript:void(0)" onclick="setEstado('@est')"
+                                       class="status-filter @(ViewBag.EstadoSeleccionado == est ? "active" : "")">
+                                        <div class="status-icon @bgClass">
+                                            <i class="fas @iconClass text-white"></i>
+                                        </div>
+                                        <span class="status-label">@est</span>
+                                        <span class="status-badge">@count</span>
+                                    </a>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <!-- Filtro por monto -->
+                        <label for="customRangeMonto" class="form-label">Filtrar por monto máximo ($)</label>
+                        <input type="range" class="form-range" min="0" max="5000" step="100" id="customRangeMonto"
+                               value="@ViewBag.MontoMaximo"
+                               oninput="updateMontoValor(this.value)">
+                        <div class="range-value" id="montoValor">$@ViewBag.MontoMaximo</div>
+                        <input type="hidden" name="estado" id="estadoHidden" value="@ViewBag.EstadoSeleccionado">
+                        <input type="hidden" name="montoMaximo" id="montoMaximoHidden" value="@ViewBag.MontoMaximo">
+                    </div>
+                    <div class="filter-footer p-3 bg-light rounded-bottom d-flex justify-content-between">
+                        <small class="text-muted">@(Model?.Count ?? 0) ventas encontradas</small>
+                        <button type="submit" class="btn btn-primary btn-sm">Aplicar filtros</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .filter-panel {
+                background: white;
+                border: 1px solid #e9ecef;
+                margin-bottom: 20px;
+            }
+
+            .status-filters {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .status-filter {
+                display: flex;
+                align-items: center;
+                padding: 10px 12px;
+                border-radius: 6px;
+                text-decoration: none;
+                color: #495057;
+                transition: all 0.2s;
+                border: 1px solid transparent;
+            }
+
+                .status-filter:hover {
+                    background-color: #f8f9fa;
+                    border-color: #e9ecef;
+                }
+
+                .status-filter.active {
+                    background-color: #f0f7ff;
+                    border-color: #cfe2ff;
+                    color: #084298;
+                    font-weight: 500;
+                }
+
+            .status-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 12px;
+                flex-shrink: 0;
+            }
+
+            .status-label {
+                flex-grow: 1;
+            }
+
+            .status-badge {
+                background-color: #e9ecef;
+                color: #495057;
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-size: 0.8rem;
+            }
+
+            .status-filter.active .status-badge {
+                background-color: #cfe2ff;
+                color: #084298;
+            }
+
+            .filter-header {
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .filter-footer {
+                border-top: 1px solid #e9ecef;
+            }
+        </style>
+
+        <!-- Tabla (Right side) -->
+        <div class="col-lg-9">
+            <div class="table-container fade-in">
+                <div class="table-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-0">Listado de Ventas</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group search-container">
+                                <input type="text" class="form-control" id="searchTable"
+                                       placeholder="Buscar en tabla...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-scroll-container">
+                    <table class="services-table">
+                        <thead>
+                            <tr>
+                                <th>ID Venta</th>
+                                <th>Autopartes</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                @foreach (var venta in Model)
+                                {
+                                    <tr class="table-row" data-id="@venta.ven_id">
+                                        <td>@venta.ven_id</td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                                @foreach (var detalle in venta.Detalles)
+                                                {
+                                                    <li>@detalle.Autoparte?.aut_nombre <small>(@detalle.det_cantidad)</small></li>
+                                                }
+                                            </ul>
+                                        </td>
+                                        <td>@venta.Total.ToString("C")</td>
+                                        <td>
+                                            <a href="#"
+                                               class="status-badge status-@venta.Estado.ToLower() text-white px-2 py-1 rounded"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#cambiarEstadoModal"
+                                               data-estado-actual="@venta.Estado"
+                                               style="display: inline-flex; align-items: center; gap: 4px;
+              background-color:
+              @(venta.Estado == "Pendiente" ? "#ffc107" :
+                venta.Estado == "Completado" ? "#28a745" :
+                venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
+                                                @switch (venta.Estado)
+                                                {
+                                                    case "Pendiente":
+                                                        <i class="fas fa-clock"></i>
+                                                        break;
+                                                    case "Completado":
+                                                        <i class="fas fa-check-circle"></i>
+                                                        break;
+                                                    case "Cancelado":
+                                                        <i class="fas fa-times-circle"></i>
+                                                        break;
+                                                }
+                                                <span>@venta.Estado</span>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        <div class="empty-state">
+                                            <i class="fas fa-search"></i>
+                                            <p>No hay ventas que coincidan con los filtros seleccionados.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Search functionality
+        const searchInput = document.getElementById('searchTable');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.services-table tbody tr');
+
+                rows.forEach(row => {
+                    if (row.querySelector('td[colspan]')) {
+                        // Skip empty state row
+                        return;
+                    }
+
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show empty state if no results
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none' && !row.querySelector('td[colspan]'));
+                const emptyStateRow = document.querySelector('.services-table tbody tr td[colspan]')?.parentNode;
+
+                if (visibleRows.length === 0 && emptyStateRow) {
+                    emptyStateRow.style.display = '';
+                } else if (emptyStateRow) {
+                    emptyStateRow.style.display = 'none';
+                }
+            });
+        }
+    });
+
+    window.onload = function() {
+        const montoInicial = document.getElementById('customRangeMonto').value;
+        document.getElementById('montoValor').innerText = '$' + montoInicial;
+    }
+
+    function updateMontoValor(valor) {
+        document.getElementById('montoValor').innerText = '$' + valor;
+        document.getElementById('montoMaximoHidden').value = valor;
+    }
+
+
+    function setEstado(estado) {
+        document.getElementById('estadoHidden').value = estado;
+        // Actualizar clase active en los filtros de estado
+        document.querySelectorAll('.status-filter').forEach(el => {
+            el.classList.remove('active');
+        });
+        event.currentTarget.classList.add('active');
+    }
+</script>
+

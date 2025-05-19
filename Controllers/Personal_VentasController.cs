@@ -551,6 +551,39 @@ namespace Marimon.Controllers
             }
         }
 
+        public IActionResult ManejarVentas(string estado = null, decimal montoMaximo = 0)
+        {
+            var ventasQuery = _context.Venta
+                .Include(v => v.Detalles)
+                    .ThenInclude(d => d.Autoparte)
+                .AsQueryable();
+
+            // Filtro por estado
+            if (!string.IsNullOrEmpty(estado))
+            {
+                ventasQuery = ventasQuery.Where(v => v.Estado == estado);
+            }
+
+            // Filtro por monto máximo (si es mayor a 0)
+            if (montoMaximo > 0)
+            {
+                ventasQuery = ventasQuery.Where(v => v.Total <= montoMaximo);
+            }
+
+            // Para el dropdown de estados únicos
+            var estados = _context.Venta.Select(v => v.Estado).Distinct().ToList();
+
+            // Configurar ViewBag para la vista
+            ViewBag.Estados = estados;
+            ViewBag.EstadoSeleccionado = string.IsNullOrEmpty(estado) ? "" : estado;
+            ViewBag.MontoMaximo = montoMaximo == 0 ? 5000 : montoMaximo; // Valor predeterminado
+
+            return View(ventasQuery.ToList());
+        }
+
+
+
+
 
 
 
