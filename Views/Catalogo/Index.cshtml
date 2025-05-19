@@ -11,6 +11,18 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
 <style>
+    .hidden-categories {
+        display: none;
+    }
+
+    .hidden-categories.visible {
+        display: block !important;
+    }
+
+    .categories-container.expanded .hidden-categories {
+        display: block !important;
+    }
+
     .autocomplete-container {
         position: absolute;
         z-index: 1000;
@@ -44,202 +56,188 @@
 
 <div class="container catalogo-container">
     <div class="row mb-4 align-items-center">
-        <!-- Columna para centrar el título -->
         <div class="col-12 text-center mb-2">
             <h2>Catálogo de Autopartes</h2>
         </div>
+    </div>
 
-        <!-- Columna para alinear el dropdown a la derecha -->
-        <div class="col-12 text-end">
+    <!-- Nueva estructura del buscador -->
+    <div class="search-bar-container">
+        <!-- Buscador principal -->
+        <div class="search-input-wrapper">
+            <form asp-controller="Catalogo" asp-action="Index" method="get">
+                <input type="text" name="buscar" id="autocomplete-search" class="form-control"
+                    placeholder="¿Qué repuesto estás buscando hoy?" autocomplete="off">
+                <button class="btn btn-dark" type="submit">BUSCAR</button>
+            </form>
+            <div id="autocomplete-results" class="autocomplete-container"></div>
+        </div>
+
+        <!-- Búsquedas recientes (a la derecha) -->
+        <div class="search-dropdown">
             <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="historialBusqueda"
+                <button class="busquedas-recientes-btn dropdown-toggle" type="button" id="historialBusqueda"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     Búsquedas recientes
                 </button>
-                <ul class="dropdown-menu" id="historial-busquedas" aria-labelledby="historialBusqueda">
+                <ul class="dropdown-menu dropdown-menu-end" id="historial-busquedas"
+                    aria-labelledby="historialBusqueda">
                     <li><a class="dropdown-item text-center" href="#">No hay búsquedas recientes</a></li>
                 </ul>
             </div>
         </div>
     </div>
 
-
-    <!-- Buscador -->
-    <!-- Reemplazar el buscador actual con este -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="search-container">
-                <form asp-controller="Catalogo" asp-action="Index" method="get" class="d-flex justify-content-center">
-                    <div class="input-group search-with-icon">
-                        <input type="text" name="buscar" id="autocomplete-search" class="form-control"
-                            placeholder="¿Qué repuesto estás buscando hoy?" autocomplete="off">
-                        <button class="btn btn-dark" type="submit">Buscar</button>
-                    </div>
-                </form>
-                <div id="autocomplete-results" class="autocomplete-container"></div>
+    <!-- Layout con filtros a la izquierda y productos a la derecha -->
+    <div class="catalogo-layout">
+        <!-- Filtros (columna izquierda) -->
+        <div class="filtros-sidebar">
+            <!-- Filtro de ordenamiento -->
+            <div class="price-filter">
+                <p class="fw-bold mb-2">Ordenar:</p>
+                <select class="form-select filter-select" id="filtroOrden" name="orden">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="asc">Menor a mayor</option>
+                    <option value="desc">Mayor a menor</option>
+                    <option value="mas_vendidas">Más vendidas</option>
+                    <option value="novedades">Novedades</option>
+                </select>
             </div>
-        </div>
-    </div>
-    @if (ViewBag.Mensaje != null)
-    {
-        <div class="d-flex flex-column align-items-center justify-content-center mb-4">
-            <div class="text-center">
-                <h4 class="text-muted">@ViewBag.Mensaje</h4>
-            </div>
-            <div class="mt-3">
-                <img src="https://cdn-icons-png.flaticon.com/512/5622/5622660.png" alt="No se encontraron productos"
-                    width="80" height="80" class="img-fluid" />
-            </div>
-        </div>
 
-    }
+            <!-- Filtro por categoría -->
+            <div class="category-section">
+                <p class="fw-bold mb-2">Filtrar por categoría:</p>
+                <div class="categories-container" id="categoriesContainer">
+                    @{
+                        var displayedCategories = (ViewBag.Categorias as List<Categoria>).Take(3).ToList();
+                        var remainingCategories = (ViewBag.Categorias as List<Categoria>).Skip(3).ToList();
+                    }
 
-    <!-- Filtro por precio -->
-    <div class="price-filter mt-4">
-        <p class="fw-bold mb-2">Ordenar:</p>
-        <select class="form-select filter-select" id="filtroOrden" name="orden">
-            <option value="">-- Seleccionar --</option>
-            <option value="asc">Menor a mayor</option>
-            <option value="desc">Mayor a menor</option>
-            <option value="mas_vendidas">Más vendidas</option>
-            <option value="novedades">Novedades</option>
-        </select>
-    </div>
-
-    <!-- Filtro por categoría -->
-    <div class="category-section mt-4">
-        <p class="fw-bold mb-2">Filtrar por categoría:</p>
-        <div class="categories-container" id="categoriesContainer">
-            @{
-                var displayedCategories = (ViewBag.Categorias as List<Categoria>).Take(3).ToList();
-                var remainingCategories = (ViewBag.Categorias as List<Categoria>).Skip(3).ToList();
-            }
-
-            @foreach (var categoria in displayedCategories)
-            {
-                <div class="category-checkbox">
-                    <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id"
-                        id="cat_@categoria.cat_id">
-                    <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label>
-                </div>
-            }
-
-            <div class="hidden-categories" style="display: none;">
-                @foreach (var categoria in remainingCategories)
-                {
-                    <div class="category-checkbox">
-                        <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id"
-                            id="cat_@categoria.cat_id">
-                        <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label>
-                    </div>
-                }
-            </div>
-        </div>
-
-        @if ((ViewBag.Categorias as List<Categoria>).Count > 3)
-        {
-            <button type="button" class="show-more-btn" id="showMoreBtn">
-                Ver más categorías <i class="fas fa-chevron-down"></i>
-            </button>
-        }
-    </div>
-
-    <div class="mt-4">
-        <button class="filter-btn" id="btnAplicarFiltros">
-            <i class="fas fa-filter"></i> Aplicar Filtros
-        </button>
-    </div>
-
-    <!-- Productos -->
-    <div id="productosContainer">
-        <div class="row justify-content-center">
-            <div class="col-md-12">
-                <div class="row justify-content-center">
-                    @foreach (var autoparte in Model.Autopartes)
+                    @foreach (var categoria in displayedCategories)
                     {
-                        <div class="col-md-4 col-sm-6 mb-4">
-                            <div class="card producto-card h-100 shadow-sm">
-                                <div class="p-3 text-center">
-                                    <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="producto-imagen"
-                                        style="cursor:pointer;" onclick="cargarDetalleAutoparte(@autoparte.aut_id)" />
-                                </div>
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">@autoparte.aut_nombre</h5>
-                                    <p class="card-text precio">Precio:
-                                        <strong>S/@autoparte.aut_precio.ToString("0.00")</strong>
-                                    </p>
-                                    @if (User.Identity.IsAuthenticated)
-                                    {
-                                        @if (autoparte.aut_cantidad > 0)
-                                        {
-                                            <button class="btn btn-dark btn-search" type="button"
-                                                onclick="añadirAlCarritoAsync(@autoparte.aut_id, 1)">
-                                                Añadir al Carrito
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button class="btn btn-secondary" disabled>AGOTADO</button>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <div class="alert alert-warning">
-                                            Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir productos a
-                                            la
-                                            cesta.
-                                        </div>
-                                    }
-                                </div>
-                            </div>
+                        <div class="category-checkbox">
+                            <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id"
+                                id="cat_@categoria.cat_id">
+                            <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label>
                         </div>
                     }
 
+                    <div class="hidden-categories" style="display: none;">
+                        @foreach (var categoria in remainingCategories)
+                        {
+                            <div class="category-checkbox">
+                                <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id"
+                                    id="cat_@categoria.cat_id">
+                                <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <button type="button" class="show-more-btn" id="showMoreBtn">
+                    Ver más categorías <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+
+            <!-- Botón aplicar filtros -->
+            <button class="filter-btn" id="btnAplicarFiltros">
+                <i class="fas fa-filter"></i> Aplicar Filtros
+            </button>
+        </div>
+        <!-- Contenido principal -->
+        <div class="contenido-principal">
+
+            @if (ViewBag.Mensaje != null)
+            {
+                <div class="d-flex flex-column align-items-center justify-content-center mb-4">
+                    <div class="text-center">
+                        <h4 class="text-muted">@ViewBag.Mensaje</h4>
+                    </div>
+                    <div class="mt-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5622/5622660.png" alt="No se encontraron productos"
+                            width="80" height="80" class="img-fluid" />
+                    </div>
+                </div>
+            }
+
+            <!-- Productos -->
+            <div id="productosContainer">
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        <div class="row justify-content-center">
+                            @foreach (var autoparte in Model.Autopartes)
+                            {
+                                <div class="col-md-4 col-sm-6 mb-4">
+                                    <div class="card producto-card h-100 shadow-sm">
+                                        <div class="p-3 text-center">
+                                            <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre"
+                                                class="producto-imagen" style="cursor:pointer;"
+                                                onclick="cargarDetalleAutoparte(@autoparte.aut_id)" />
+                                        </div>
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">@autoparte.aut_nombre</h5>
+                                            <p class="card-text precio">Precio:
+                                                <strong>S/@autoparte.aut_precio.ToString("0.00")</strong>
+                                            </p>
+                                            @if (User.Identity.IsAuthenticated)
+                                            {
+                                                @if (autoparte.aut_cantidad > 0)
+                                                {
+                                                    <button class="btn btn-dark btn-search" type="button"
+                                                        onclick="añadirAlCarritoAsync(@autoparte.aut_id, 1)">
+                                                        Añadir al Carrito
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-secondary" disabled>AGOTADO</button>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="alert alert-warning">
+                                                    Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir
+                                                    productos a
+                                                    la cesta.
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Navegación -->
+            <div class="row mt-4 mb-4">
+                <div class="col-12 d-flex justify-content-center">
+                    <nav aria-label="Navegación de páginas">
+                        <ul class="pagination">
+                            <li class="page-item @(Model.PaginaActual > 1 ? "" : "disabled")">
+                                <a class="page-link paginacion" href="#"
+                                    data-pagina="@(Model.PaginaActual > 1 ? Model.PaginaActual - 1 : 1)"
+                                    aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo; Anterior</span>
+                                    <span class="sr-only">Anterior</span>
+                                </a>
+                            </li>
+                            <li class="page-item @(Model.PaginaActual < Model.TotalPaginas ? "" : "disabled")">
+                                <a class="page-link paginacion" href="#"
+                                    data-pagina="@(Model.PaginaActual<Model.TotalPaginas? Model.PaginaActual + 1 : Model.PaginaActual)"
+                                    aria-label="Siguiente">
+                                    <span aria-hidden="true">Siguiente &raquo; </span>
+                                    <span class="sr-only">Siguiente</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Botones de Navegación -->
-<div class="row mt-4 mb-4">
-    <div class="col-12 d-flex justify-content-center">
-        <nav aria-label="Navegación de páginas">
-            <ul class="pagination">
-                <li class="page-item @(Model.PaginaActual > 1 ? "" : "disabled")">
-                    <a class="page-link paginacion" href="#"
-                        data-pagina="@(Model.PaginaActual > 1 ? Model.PaginaActual - 1 : 1)" aria-label="Anterior">
-                        <span aria-hidden="true">&laquo; Anterior</span>
-                        <span class="sr-only">Anterior</span>
-                    </a>
-                </li>
-
-                @* Si quieres mostrar los números de página, descomenta esto *@
-                @* 
-                @for (var i = 1; i <= Model.TotalPaginas; i++)
-                {
-                    <li class="page-item @(i == Model.PaginaActual ? "active" : "")">
-                        <a class="page-link"
-                           href="#"
-                           data-pagina="@i">
-                            @i
-                        </a>
-                    </li>
-                }
-                *@
-
-                <li class="page-item @(Model.PaginaActual < Model.TotalPaginas ? "" : "disabled")">
-                    <a class="page-link paginacion" href="#"
-                        data-pagina="@(Model.PaginaActual<Model.TotalPaginas? Model.PaginaActual + 1 : Model.PaginaActual)"
-                        aria-label="Siguiente">
-                        <span aria-hidden="true">Siguiente &raquo; </span>
-                        <span class="sr-only">Siguiente</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
 
 <!-- Alerta Carrito-->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
@@ -364,7 +362,30 @@
     });
 </script>
 
+<script>
+    // Script simple y directo para el botón "Ver más categorías"
+    document.addEventListener('DOMContentLoaded', function () {
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const hiddenCategoriesDiv = document.querySelector('.hidden-categories');
 
+        if (showMoreBtn && hiddenCategoriesDiv) {
+            // Asegurar que comienza oculto (aunque ya tenga style="display: none;")
+            hiddenCategoriesDiv.style.display = 'none';
+
+            // Añadir event listener simplificado
+            showMoreBtn.addEventListener('click', function () {
+                // Toggle simple basado en el estado actual
+                if (hiddenCategoriesDiv.style.display === 'none') {
+                    hiddenCategoriesDiv.style.display = 'block';
+                    showMoreBtn.innerHTML = 'Ver menos categorías <i class="fas fa-chevron-up"></i>';
+                } else {
+                    hiddenCategoriesDiv.style.display = 'none';
+                    showMoreBtn.innerHTML = 'Ver más categorías <i class="fas fa-chevron-down"></i>';
+                }
+            });
+        }
+    });
+</script>
 
 <script>
     // Unificar todos los eventos DOMContentLoaded en uno solo
@@ -374,84 +395,111 @@
         const resultsContainer = document.getElementById('autocomplete-results');
         let timeoutId;
 
-        searchInput.addEventListener('input', function () {
-            clearTimeout(timeoutId);
-            const query = this.value.trim();
+        if (searchInput && resultsContainer) {
+            searchInput.addEventListener('input', function () {
+                clearTimeout(timeoutId);
+                const query = this.value.trim();
 
-            if (query.length < 2) {
-                resultsContainer.innerHTML = '';
-                resultsContainer.style.display = 'none';
-                return;
-            }
-
-            timeoutId = setTimeout(() => {
-                fetch(`/Catalogo/Autocomplete?query=${encodeURIComponent(query)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        resultsContainer.innerHTML = '';
-
-                        if (data.length === 0) {
-                            resultsContainer.style.display = 'none';
-                            return;
-                        }
-
-                        data.forEach(item => {
-                            const div = document.createElement('div');
-                            div.className = 'autocomplete-item';
-                            div.textContent = item.nombre;
-                            div.addEventListener('click', () => {
-                                searchInput.value = item.nombre;
-                                resultsContainer.style.display = 'none';
-
-                                // Guardar en historial cuando se selecciona
-                                guardarEnHistorial(item.nombre);
-
-                                // Opcional: enviar formulario automáticamente
-                                searchInput.closest('form').submit();
-                            });
-                            resultsContainer.appendChild(div);
-                        });
-
-                        resultsContainer.style.display = 'block';
-                    });
-            }, 300);
-        });
-        const showMoreBtn = document.getElementById('showMoreBtn');
-        const hiddenCategories = document.querySelector('.hidden-categories');
-        const categoriesContainer = document.getElementById('categoriesContainer');
-
-        if (showMoreBtn) {
-            showMoreBtn.addEventListener('click', function () {
-                if (hiddenCategories.style.display === 'none') {
-                    hiddenCategories.style.display = 'block';
-                    showMoreBtn.innerHTML = 'Ver menos categorías <i class="fas fa-chevron-up"></i>';
-                    categoriesContainer.classList.add('expanded');
-                } else {
-                    hiddenCategories.style.display = 'none';
-                    showMoreBtn.innerHTML = 'Ver más categorías <i class="fas fa-chevron-down"></i>';
-                    categoriesContainer.classList.remove('expanded');
+                if (query.length < 2) {
+                    resultsContainer.innerHTML = '';
+                    resultsContainer.style.display = 'none';
+                    return;
                 }
+
+                timeoutId = setTimeout(() => {
+                    fetch(`/Catalogo/Autocomplete?query=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            resultsContainer.innerHTML = '';
+
+                            if (data.length === 0) {
+                                resultsContainer.style.display = 'none';
+                                return;
+                            }
+
+                            data.forEach(item => {
+                                const div = document.createElement('div');
+                                div.className = 'autocomplete-item';
+                                div.textContent = item.nombre;
+                                div.addEventListener('click', () => {
+                                    searchInput.value = item.nombre;
+                                    resultsContainer.style.display = 'none';
+
+                                    // Guardar en historial cuando se selecciona
+                                    if (typeof guardarEnHistorial === 'function') {
+                                        guardarEnHistorial(item.nombre);
+                                    }
+
+                                    // Opcional: enviar formulario automáticamente
+                                    searchInput.closest('form').submit();
+                                });
+                                resultsContainer.appendChild(div);
+                            });
+
+                            resultsContainer.style.display = 'block';
+                        });
+                }, 300);
             });
         }
-        // Ocultar resultados al hacer clic fuera
-        document.addEventListener('click', function (e) {
-            if (e.target !== searchInput && e.target !== resultsContainer) {
-                resultsContainer.style.display = 'none';
+
+        function solucionarVerMasCategorias() {
+            // Método 1: Utilizando un enfoque directo para mostrar/ocultar
+            const showMoreBtn = document.getElementById('showMoreBtn');
+            const hiddenCategoriesDiv = document.querySelector('.hidden-categories');
+
+            if (showMoreBtn && hiddenCategoriesDiv) {
+                console.log("Aplicando solución para el botón Ver más categorías");
+
+                // Remover todos los event listeners anteriores (técnica un poco drástica pero efectiva)
+                const nuevoBoton = showMoreBtn.cloneNode(true);
+                showMoreBtn.parentNode.replaceChild(nuevoBoton, showMoreBtn);
+
+                // Añadir el nuevo event listener
+                nuevoBoton.addEventListener('click', function () {
+                    console.log("Clic en botón Ver más detectado");
+
+                    // Cambiar la visibilidad directamente
+                    if (hiddenCategoriesDiv.style.display === 'none') {
+                        console.log("Mostrando categorías ocultas");
+                        hiddenCategoriesDiv.style.display = 'block';
+                        nuevoBoton.innerHTML = 'Ver menos categorías <i class="fas fa-chevron-up"></i>';
+                    } else {
+                        console.log("Ocultando categorías");
+                        hiddenCategoriesDiv.style.display = 'none';
+                        nuevoBoton.innerHTML = 'Ver más categorías <i class="fas fa-chevron-down"></i>';
+                    }
+                });
+
+                console.log("Solución aplicada. El botón debería funcionar ahora.");
+            } else {
+                console.error("No se encontraron los elementos necesarios para la solución");
             }
+        }
+
+        // Ejecutar cuando el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("DOM completamente cargado, aplicando solución...");
+            // Aplicar solución después de un breve retraso para asegurar que todo esté cargado
+            setTimeout(solucionarVerMasCategorias, 100);
         });
 
         // Resetear estrellas cuando el mouse sale del contenedor
         const starsContainer = document.querySelector('.stars');
         if (starsContainer) {
             starsContainer.addEventListener('mouseleave', () => {
-                const selectedValue = valoracionInput.value;
-                highlightStars(selectedValue, true);
+                const valoracionInput = document.getElementById('valoracionInput');
+                if (valoracionInput) {
+                    const selectedValue = valoracionInput.value;
+                    highlightStars(selectedValue, true);
+                }
             });
         }
 
         // Inicializar estrellas con valor 0
-        highlightStars(0, true);
-    }
+        if (typeof highlightStars === 'function') {
+            highlightStars(0, true);
+        }
+    });
 
     // Función para iluminar las estrellas (fuera del DOMContentLoaded)
     function highlightStars(count, permanent = false) {
@@ -459,6 +507,7 @@
         if (!stars.length) return;
 
         const valoracionInput = document.getElementById('valoracionInput');
+        if (!valoracionInput) return;
 
         stars.forEach(star => {
             const starValue = parseInt(star.getAttribute('data-value'));
@@ -473,195 +522,194 @@
                     star.style.color = '#dddddd';
                 }
             }
+        });
+        function cargarDetalleAutoparte(id) {
+            fetch(`/Catalogo/DetalleAutoparte/${id}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("contenidoModal").innerHTML = '<button class="cerrar-modal" onclick="cerrarModal()">×</button>' + html;
+                    document.getElementById("modalAutoparte").style.display = "block";
+
+                    // Inicializar el zoom
+                    const zoomModal = document.getElementById("zoomModal");
+                    if (zoomModal) zoomModal.style.display = "none";
+
+                    // Inicializar el formulario de reseñas después de cargar el contenido
+                    setTimeout(function () {
+                        inicializarFormularioResenia();
+                        inicializarSistemaEstrellas(); // ¡Importante! Inicializar estrellas aquí también
+
+                        // Animar las reseñas
+                        const reseniaItems = document.querySelectorAll('.resenia-item');
+                        reseniaItems.forEach((item, index) => {
+                            setTimeout(() => {
+                                item.style.opacity = '1';
+                            }, 100 * index);
+                        });
+                    }, 300);
+                })
+                .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
         }
 
-    });
-    function cargarDetalleAutoparte(id) {
-        fetch(`/Catalogo/DetalleAutoparte/${id}`)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById("contenidoModal").innerHTML = '<button class="cerrar-modal" onclick="cerrarModal()">×</button>' + html;
-                document.getElementById("modalAutoparte").style.display = "block";
+        //Mejorar la función inicializarFormularioResenia
+        function inicializarFormularioResenia() {
+            const form = document.getElementById('formReseniaAutoparte');
 
-                // Inicializar el zoom
-                const zoomModal = document.getElementById("zoomModal");
-                if (zoomModal) zoomModal.style.display = "none";
+            if (form && !form.hasAttribute('data-initialized')) {
+                form.setAttribute('data-initialized', 'true');
+                console.log("Inicializando formulario de reseña");
 
-                // Inicializar el formulario de reseñas después de cargar el contenido
-                setTimeout(function () {
-                    inicializarFormularioResenia();
-                    inicializarSistemaEstrellas(); // ¡Importante! Inicializar estrellas aquí también
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault(); // Evitar el envío tradicional del formulario
+                    console.log("Formulario enviado via AJAX");
 
-                    // Animar las reseñas
-                    const reseniaItems = document.querySelectorAll('.resenia-item');
-                    reseniaItems.forEach((item, index) => {
-                        setTimeout(() => {
-                            item.style.opacity = '1';
-                        }, 100 * index);
-                    });
-                }, 300);
-            })
-            .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
-    }
+                    // Validaciones básicas del formulario
+                    const comentarioInput = document.getElementById('res_comentario');
+                    const valoracionInput = document.getElementById('valoracionInput');
+                    let isValid = true;
 
-    //Mejorar la función inicializarFormularioResenia
-    function inicializarFormularioResenia() {
-        const form = document.getElementById('formReseniaAutoparte');
+                    // Validar comentario
+                    if (!comentarioInput || comentarioInput.value.trim() === '') {
+                        if (comentarioInput) comentarioInput.classList.add('is-invalid');
+                        const comentarioError = document.getElementById('comentarioError');
+                        if (comentarioError) comentarioError.style.display = 'block';
+                        isValid = false;
+                    }
 
-        if (form && !form.hasAttribute('data-initialized')) {
-            form.setAttribute('data-initialized', 'true');
-            console.log("Inicializando formulario de reseña");
+                    // Validar valoración
+                    if (!valoracionInput || valoracionInput.value === '0') {
+                        const valoracionError = document.getElementById('valoracionError');
+                        if (valoracionError) valoracionError.style.display = 'block';
+                        isValid = false;
+                    }
 
-            form.addEventListener('submit', function (e) {
-                e.preventDefault(); // Evitar el envío tradicional del formulario
-                console.log("Formulario enviado via AJAX");
+                    if (!isValid) {
+                        console.log("Formulario inválido");
+                        return;
+                    }
 
-                // Validaciones básicas del formulario
-                const comentarioInput = document.getElementById('res_comentario');
-                const valoracionInput = document.getElementById('valoracionInput');
-                let isValid = true;
+                    const formData = new FormData(form);
+                    const aut_id = formData.get('aut_id'); // Obtener el ID de la autoparte
 
-                // Validar comentario
-                if (!comentarioInput || comentarioInput.value.trim() === '') {
-                    if (comentarioInput) comentarioInput.classList.add('is-invalid');
-                    const comentarioError = document.getElementById('comentarioError');
-                    if (comentarioError) comentarioError.style.display = 'block';
-                    isValid = false;
-                }
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'text/html'
+                        },
+                        redirect: 'manual'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.text();
+                            } else if (response.type === 'opaqueredirect') {
+                                // Si se intenta redireccionar, mantenerse en la página actual
+                                console.log("Detectada redirección, permaneciendo en modal");
+                                return fetch(`/Catalogo/ObtenerReseniasAutoparte?aut_id=${aut_id}`, {
+                                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                }).then(r => r.text());
+                            } else {
+                                throw new Error('Error al enviar la reseña.');
+                            }
+                        })
+                        .then(html => {
+                            console.log("Respuesta recibida, actualizando reseñas");
+                            // Actualizar solo la sección de reseñas
+                            const reseniasContainer = document.querySelector('.resenias-list');
+                            if (reseniasContainer) {
+                                reseniasContainer.innerHTML = html;
+                                form.reset();
+                                // Reinicializar las estrellas a 0
+                                if (valoracionInput) valoracionInput.value = '0';
+                                highlightStars(0, true);
 
-                // Validar valoración
-                if (!valoracionInput || valoracionInput.value === '0') {
-                    const valoracionError = document.getElementById('valoracionError');
-                    if (valoracionError) valoracionError.style.display = 'block';
-                    isValid = false;
-                }
+                                // Animar las nuevas reseñas
+                                const reseniaItems = document.querySelectorAll('.resenia-item');
+                                reseniaItems.forEach((item, index) => {
+                                    setTimeout(() => {
+                                        item.style.opacity = '1';
+                                    }, 100 * index);
+                                });
 
-                if (!isValid) {
-                    console.log("Formulario inválido");
-                    return;
-                }
+                                const modal = document.getElementById("modalAutoparte");
+                                if (modal) {
+                                    modal.style.display = "block";
 
-                const formData = new FormData(form);
-                const aut_id = formData.get('aut_id'); // Obtener el ID de la autoparte
+                                    const cerrarBtn = document.querySelector('.cerrar-modal');
+                                    if (cerrarBtn) {
+                                        cerrarBtn.onclick = cerrarModal;
+                                    } else {
+                                        const nuevoBotonCerrar = document.createElement('button');
+                                        nuevoBotonCerrar.className = 'cerrar-modal';
+                                        nuevoBotonCerrar.textContent = '×';
+                                        nuevoBotonCerrar.onclick = cerrarModal;
 
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
+                                        const contenidoModal = document.getElementById('contenidoModal');
+                                        if (contenidoModal) {
+                                            contenidoModal.prepend(nuevoBotonCerrar);
+                                        }
+                                    }
+
+                                    console.log("Modal mantenido visible");
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error en la solicitud AJAX:", error);
+                            alert('Ocurrió un error al enviar la reseña.');
+                        });
+                });
+            }
+        }
+        function eliminarResenia(reseniaId, autoparteId) {
+            if (confirm('¿Estás seguro de eliminar esta reseña?')) {
+                console.log(`Eliminando reseña: ${reseniaId} de autoparte: ${autoparteId}`); // Para depuración
+
+                fetch(`/Catalogo/EliminarResenia?id=${reseniaId}&aut_id=${autoparteId}`, {
+                    method: 'DELETE',
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'text/html'
-                    },
-                    redirect: 'manual'
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 })
                     .then(response => {
-                        if (response.ok) {
-                            return response.text();
-                        } else if (response.type === 'opaqueredirect') {
-                            // Si se intenta redireccionar, mantenerse en la página actual
-                            console.log("Detectada redirección, permaneciendo en modal");
-                            return fetch(`/Catalogo/ObtenerReseniasAutoparte?aut_id=${aut_id}`, {
-                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                            }).then(r => r.text());
-                        } else {
-                            throw new Error('Error al enviar la reseña.');
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor');
                         }
+                        return response.json();
                     })
-                    .then(html => {
-                        console.log("Respuesta recibida, actualizando reseñas");
-                        // Actualizar solo la sección de reseñas
-                        const reseniasContainer = document.querySelector('.resenias-list');
-                        if (reseniasContainer) {
-                            reseniasContainer.innerHTML = html;
-                            form.reset();
-                            // Reinicializar las estrellas a 0
-                            if (valoracionInput) valoracionInput.value = '0';
-                            highlightStars(0, true);
-
-                            // Animar las nuevas reseñas
-                            const reseniaItems = document.querySelectorAll('.resenia-item');
-                            reseniaItems.forEach((item, index) => {
-                                setTimeout(() => {
-                                    item.style.opacity = '1';
-                                }, 100 * index);
-                            });
-
-                            const modal = document.getElementById("modalAutoparte");
-                            if (modal) {
-                                modal.style.display = "block";
-
-                                const cerrarBtn = document.querySelector('.cerrar-modal');
-                                if (cerrarBtn) {
-                                    cerrarBtn.onclick = cerrarModal;
-                                } else {
-                                    const nuevoBotonCerrar = document.createElement('button');
-                                    nuevoBotonCerrar.className = 'cerrar-modal';
-                                    nuevoBotonCerrar.textContent = '×';
-                                    nuevoBotonCerrar.onclick = cerrarModal;
-
-                                    const contenidoModal = document.getElementById('contenidoModal');
-                                    if (contenidoModal) {
-                                        contenidoModal.prepend(nuevoBotonCerrar);
-                                    }
-                                }
-
-                                console.log("Modal mantenido visible");
+                    .then(data => {
+                        if (data.success) {
+                            const reseniaElement = document.getElementById(`resenia-${reseniaId}`);
+                            if (reseniaElement) {
+                                reseniaElement.remove();
+                                alert('Reseña eliminada correctamente');
                             }
+
+                            // Verificar si no quedan reseñas
+                            const reseniasContainer = document.querySelector('.resenias-list');
+                            if (reseniasContainer && reseniasContainer.children.length === 0) {
+                                reseniasContainer.innerHTML = '<p class="text-muted">No hay reseñas para esta autoparte.</p>';
+                            }
+
+                        } else {
+                            alert(data.message || 'Error al eliminar la reseña');
                         }
                     })
                     .catch(error => {
-                        console.error("Error en la solicitud AJAX:", error);
-                        alert('Ocurrió un error al enviar la reseña.');
+                        console.error('Error:', error);
+                        alert('Ocurrió un error al eliminar la reseña');
                     });
-            });
+            }
         }
-    }
-    function eliminarResenia(reseniaId, autoparteId) {
-        if (confirm('¿Estás seguro de eliminar esta reseña?')) {
-            console.log(`Eliminando reseña: ${reseniaId} de autoparte: ${autoparteId}`); // Para depuración
+        function cerrarModal() {
+            console.log("Cerrando modal...");
+            const modal = document.getElementById("modalAutoparte");
+            if (modal) modal.style.display = "none";
 
-            fetch(`/Catalogo/EliminarResenia?id=${reseniaId}&aut_id=${autoparteId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error en la respuesta del servidor');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        const reseniaElement = document.getElementById(`resenia-${reseniaId}`);
-                        if (reseniaElement) {
-                            reseniaElement.remove();
-                            alert('Reseña eliminada correctamente');
-                        }
-
-                        // Verificar si no quedan reseñas
-                        const reseniasContainer = document.querySelector('.resenias-list');
-                        if (reseniasContainer && reseniasContainer.children.length === 0) {
-                            reseniasContainer.innerHTML = '<p class="text-muted">No hay reseñas para esta autoparte.</p>';
-                        }
-
-                    } else {
-                        alert(data.message || 'Error al eliminar la reseña');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Ocurrió un error al eliminar la reseña');
-                });
+            // También cerrar el modal de zoom si está abierto
+            const zoomModal = document.getElementById("zoomModal");
+            if (zoomModal) zoomModal.style.display = "none";
         }
-    }
-    function cerrarModal() {
-        console.log("Cerrando modal...");
-        const modal = document.getElementById("modalAutoparte");
-        if (modal) modal.style.display = "none";
 
-        // También cerrar el modal de zoom si está abierto
-        const zoomModal = document.getElementById("zoomModal");
-        if (zoomModal) zoomModal.style.display = "none";
-    }     
 </script>
