@@ -30,5 +30,6 @@ namespace Marimon.Models
         public int? aut_id { get; set; }
         public virtual Autoparte? Autoparte { get; set; }
     }
+    //JP ES EL MEJOR
 
 }
