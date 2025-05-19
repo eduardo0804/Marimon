@@ -584,43 +584,6 @@ body {
     width: 100%;
 }
 
-/* Modo oscuro (opcional para futuras implementaciones) */
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #121212;
-    }
-    
-    .filter-panel, .table-container {
-        background-color: #1e1e1e;
-        border: 1px solid #333;
-    }
-    
-    .services-table {
-        background-color: #1e1e1e;
-    }
-    
-    .services-table td {
-        border-bottom: 1px solid #333;
-        color: #e0e0e0;
-    }
-    
-    .status-filter {
-        background-color: #2a2a2a;
-        color: #e0e0e0;
-    }
-    
-    .form-range {
-        background: #333;
-    }
-    
-    .toast {
-        background-color: #1e1e1e;
-    }
-    
-    .toast-body {
-        color: #e0e0e0;
-    }
-}
 
 /* Media queries para responsive */
 @media (max-width: 992px) {
