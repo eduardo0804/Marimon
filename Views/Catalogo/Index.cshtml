@@ -219,138 +219,76 @@
     // Unificar todos los eventos DOMContentLoaded en uno solo
     document.addEventListener('DOMContentLoaded', function () {
         // === Código del autocompletado ===
-        const searchInput = document.getElementById('autocomplete-search');
-        const resultsContainer = document.getElementById('autocomplete-results');
-        let timeoutId;
-
-        searchInput.addEventListener('input', function () {
-            clearTimeout(timeoutId);
-            const query = this.value.trim();
-
-            if (query.length < 2) {
-                resultsContainer.innerHTML = '';
-                resultsContainer.style.display = 'none';
-                return;
-            }
-
-            timeoutId = setTimeout(() => {
-                fetch(`/Catalogo/Autocomplete?query=${encodeURIComponent(query)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        resultsContainer.innerHTML = '';
-
-                        if (data.length === 0) {
-                            resultsContainer.style.display = 'none';
-                            return;
-                        }
-
-                        data.forEach(item => {
-                            const div = document.createElement('div');
-                            div.className = 'autocomplete-item';
-                            div.textContent = item.nombre;
-                            div.addEventListener('click', () => {
-                                searchInput.value = item.nombre;
-                                resultsContainer.style.display = 'none';
-
-                                // Guardar en historial cuando se selecciona
-                                guardarEnHistorial(item.nombre);
-
-                                // Opcional: enviar formulario automáticamente
-                                searchInput.closest('form').submit();
-                            });
-                            resultsContainer.appendChild(div);
-                        });
-
-                        resultsContainer.style.display = 'block';
-                    });
-            }, 300);
+        const reseniaItems = document.querySelectorAll('.resenia-item');
+        reseniaItems.forEach((item, index) => {
+            setTimeout(() => {
+                item.style.opacity = '1';
+            }, 100 * index);
         });
 
-        // Ocultar resultados al hacer clic fuera
-        document.addEventListener('click', function (e) {
-            if (e.target !== searchInput && e.target !== resultsContainer) {
-                resultsContainer.style.display = 'none';
-            }
-        });
+        // Sistema de valoración por estrellas
+        inicializarSistemaEstrellas();
+        //});
+    });
 
-        // === Código del historial de búsquedas ===
-        // Obtener historial almacenado o inicializar vacío
-        let historialBusquedas = JSON.parse(localStorage.getItem('historialBusquedas')) || [];
-        actualizarHistorialUI();
+    // Función para inicializar el sistema de estrellas
+    function inicializarSistemaEstrellas() {
+        const stars = document.querySelectorAll('.star');
+        const valoracionInput = document.getElementById('valoracionInput');
 
-        // Función para guardar en historial (para reutilizar)
-        function guardarEnHistorial(searchTerm) {
-            if (searchTerm) {
-                console.log("Guardando búsqueda:", searchTerm); // Depuración
+        if (!stars.length || !valoracionInput) return;
 
-                // Evitar duplicados
-                historialBusquedas = historialBusquedas.filter(item => item !== searchTerm);
-
-                // Añadir al principio
-                historialBusquedas.unshift(searchTerm);
-
-                // Mantener solo las 10 búsquedas más recientes
-                if (historialBusquedas.length > 10) {
-                    historialBusquedas.pop();
-                }
-
-                // Guardar en localStorage
-                localStorage.setItem('historialBusquedas', JSON.stringify(historialBusquedas));
-
-                // Actualizar la UI inmediatamente
-                actualizarHistorialUI();
-            }
-        }
-
-        // Cuando se envía el formulario de búsqueda, guardar la búsqueda
-        document.querySelector('form[asp-controller="Catalogo"]').addEventListener('submit', function (e) {
-            const searchTerm = document.getElementById('autocomplete-search').value.trim();
-            guardarEnHistorial(searchTerm);
-        });
-
-        // Función para actualizar la UI del historial
-        function actualizarHistorialUI() {
-            const historialElement = document.getElementById('historial-busquedas');
-
-            if (!historialBusquedas || historialBusquedas.length === 0) {
-                historialElement.innerHTML = '<li><a class="dropdown-item text-center" href="#">No hay búsquedas recientes</a></li>';
-                return;
-            }
-
-            historialElement.innerHTML = '';
-            historialBusquedas.forEach(termino => {
-                const li = document.createElement('li');
-                const a = document.createElement('a');
-                a.classList.add('dropdown-item');
-                a.href = '/Catalogo/Index?buscar=' + encodeURIComponent(termino);
-                a.textContent = termino;
-
-                li.appendChild(a);
-                historialElement.appendChild(li);
+        stars.forEach(star => {
+            // Evento hover
+            star.addEventListener('mouseover', () => {
+                const value = star.getAttribute('data-value');
+                highlightStars(value);
             });
 
-            if (historialBusquedas.length > 0) {
-                const separador = document.createElement('li');
-                separador.innerHTML = '<hr class="dropdown-divider">';
-                historialElement.appendChild(separador);
+            // Evento click
+            star.addEventListener('click', () => {
+                const value = star.getAttribute('data-value');
+                valoracionInput.value = value;
+                highlightStars(value, true);
+            });
+        });
 
-                const limpiarLi = document.createElement('li');
-                const limpiarA = document.createElement('a');
-                limpiarA.classList.add('dropdown-item', 'text-danger');
-                limpiarA.href = '#';
-                limpiarA.textContent = 'Limpiar historial';
-                limpiarA.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    localStorage.removeItem('historialBusquedas');
-                    historialBusquedas = [];
-                    actualizarHistorialUI();
-                });
-
-                limpiarLi.appendChild(limpiarA);
-                historialElement.appendChild(limpiarLi);
-            }
+        // Resetear estrellas cuando el mouse sale del contenedor
+        const starsContainer = document.querySelector('.stars');
+        if (starsContainer) {
+            starsContainer.addEventListener('mouseleave', () => {
+                const selectedValue = valoracionInput.value;
+                highlightStars(selectedValue, true);
+            });
         }
-    });
+
+        // Inicializar estrellas con valor 0
+        highlightStars(0, true);
+    }
+
+    // Función para iluminar las estrellas (fuera del DOMContentLoaded)
+    function highlightStars(count, permanent = false) {
+        const stars = document.querySelectorAll('.star');
+        if (!stars.length) return;
+
+        const valoracionInput = document.getElementById('valoracionInput');
+
+        stars.forEach(star => {
+            const starValue = parseInt(star.getAttribute('data-value'));
+            const icon = star.querySelector('i');
+
+            if (starValue <= count) {
+                icon.className = 'fas fa-star';
+                star.style.color = '#E42229';
+            } else {
+                if (!permanent || parseInt(valoracionInput.value) < starValue) {
+                    icon.className = 'far fa-star';
+                    star.style.color = '#dddddd';
+                }
+            }
+        });
+    }
+
     function cargarDetalleAutoparte(id) {
         fetch(`/Catalogo/DetalleAutoparte/${id}`)
             .then(response => response.text())
@@ -363,130 +301,58 @@
                 if (zoomModal) zoomModal.style.display = "none";
 
                 // Inicializar el formulario de reseñas después de cargar el contenido
-                setTimeout(inicializarFormularioResenia, 100);
+                setTimeout(function () {
+                    inicializarFormularioResenia();
+                    inicializarSistemaEstrellas(); // ¡Importante! Inicializar estrellas aquí también
+
+                    // Animar las reseñas
+                    const reseniaItems = document.querySelectorAll('.resenia-item');
+                    reseniaItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                        }, 100 * index);
+                    });
+                }, 300);
             })
             .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
     }
-    document.getElementById("zoomModal").style.display = "flex";
-    document.getElementById("zoomModal").style.display = "none";
 
-    function abrirZoomModal(imagenSrc) {
-        const zoomModal = document.getElementById("zoomModal");
-        const zoomedImage = document.getElementById("zoomedImage");
-        if (!zoomModal || !zoomedImage) return;
-
-        zoomModal.style.display = "flex";
-        zoomedImage.src = imagenSrc;
-        zoomedImage.style.transform = "scale(1)";
-        let zoomActivo = false;
-
-        zoomedImage.onmousemove = null;
-        zoomedImage.onmousedown = null;
-        zoomedImage.onmouseleave = null;
-
-        zoomedImage.onmousemove = function (e) {
-            if (!zoomActivo) return;
-            const rect = zoomedImage.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            zoomedImage.style.transformOrigin = `${x}% ${y}%`;
-        };
-
-        zoomedImage.onmousedown = function () {
-            if (!zoomActivo) {
-                zoomedImage.style.transform = "scale(2)";
-                zoomActivo = true;
-            } else {
-                zoomedImage.style.transform = "scale(1)";
-                zoomActivo = false;
-            }
-        };
-
-        zoomedImage.onmouseleave = function () {
-            zoomedImage.style.transform = "scale(1)";
-            zoomActivo = false;
-        };
-    }
-
-    function cerrarModal() {
-        document.getElementById("modalAutoparte").style.display = "none";
-        const zoomModal = document.getElementById("zoomModal");
-        if (zoomModal) zoomModal.style.display = "none";
-    }
-
-    function mostrarToast() {
-        var toast = new bootstrap.Toast(document.getElementById("toastCarrito"));
-        toast.show();
-    }
-
-    function agregarFavorito(icon) {
-        if (icon.classList.contains('fa-regular')) {
-            icon.classList.remove('fa-regular');
-            icon.classList.add('fa-solid');
-        } else {
-            icon.classList.remove('fa-solid');
-            icon.classList.add('fa-regular');
-        }
-        var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
-        toast.show();
-    }
-
-    function cerrarZoom() {
-        const zoomModal = document.getElementById("zoomModal");
-        const zoomedImage = document.getElementById("zoomedImage");
-        if (zoomModal && zoomedImage) {
-            zoomModal.style.display = "none";
-            zoomedImage.style.transform = "scale(1)";
-        }
-    }
-    function añadirAlCarritoAsync(autoparteId, cantidad) {
-        const formData = new FormData();
-        formData.append('autoparteId', autoparteId);
-        formData.append('cantidad', cantidad);
-
-        fetch('/Carrito/AñadirAlCarrito', {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    mostrarToast();
-
-                    // Actualizar y mostrar el sidebar del carrito
-                    actualizarSidebarCarrito();
-
-                    // Mostrar el sidebar del carrito (descomenta para que se abra automáticamente)
-                    // mostrarSidebarCarrito();
-                } else {
-                    console.error('Error:', data.message);
-                    alert('No se pudo añadir al carrito: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Ocurrió un error al añadir el producto al carrito');
-            });
-    }
-
-    //Reseñas Miau
+    //Mejorar la función inicializarFormularioResenia
     function inicializarFormularioResenia() {
         const form = document.getElementById('formReseniaAutoparte');
 
         if (form && !form.hasAttribute('data-initialized')) {
             form.setAttribute('data-initialized', 'true');
+            console.log("Inicializando formulario de reseña");
 
             form.addEventListener('submit', function (e) {
                 e.preventDefault(); // Evitar el envío tradicional del formulario
                 console.log("Formulario enviado via AJAX");
+
+                // Validaciones básicas del formulario
+                const comentarioInput = document.getElementById('res_comentario');
+                const valoracionInput = document.getElementById('valoracionInput');
+                let isValid = true;
+
+                // Validar comentario
+                if (!comentarioInput || comentarioInput.value.trim() === '') {
+                    if (comentarioInput) comentarioInput.classList.add('is-invalid');
+                    const comentarioError = document.getElementById('comentarioError');
+                    if (comentarioError) comentarioError.style.display = 'block';
+                    isValid = false;
+                }
+
+                // Validar valoración
+                if (!valoracionInput || valoracionInput.value === '0') {
+                    const valoracionError = document.getElementById('valoracionError');
+                    if (valoracionError) valoracionError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    console.log("Formulario inválido");
+                    return;
+                }
 
                 const formData = new FormData(form);
                 const aut_id = formData.get('aut_id'); // Obtener el ID de la autoparte
@@ -520,11 +386,37 @@
                         if (reseniasContainer) {
                             reseniasContainer.innerHTML = html;
                             form.reset();
+                            // Reinicializar las estrellas a 0
+                            if (valoracionInput) valoracionInput.value = '0';
+                            highlightStars(0, true);
 
-                            // Mantener el modal visible
+                            // Animar las nuevas reseñas
+                            const reseniaItems = document.querySelectorAll('.resenia-item');
+                            reseniaItems.forEach((item, index) => {
+                                setTimeout(() => {
+                                    item.style.opacity = '1';
+                                }, 100 * index);
+                            });
+
                             const modal = document.getElementById("modalAutoparte");
                             if (modal) {
                                 modal.style.display = "block";
+
+                                const cerrarBtn = document.querySelector('.cerrar-modal');
+                                if (cerrarBtn) {
+                                    cerrarBtn.onclick = cerrarModal;
+                                } else {
+                                    const nuevoBotonCerrar = document.createElement('button');
+                                    nuevoBotonCerrar.className = 'cerrar-modal';
+                                    nuevoBotonCerrar.textContent = '×';
+                                    nuevoBotonCerrar.onclick = cerrarModal;
+
+                                    const contenidoModal = document.getElementById('contenidoModal');
+                                    if (contenidoModal) {
+                                        contenidoModal.prepend(nuevoBotonCerrar);
+                                    }
+                                }
+
                                 console.log("Modal mantenido visible");
                             }
                         }
@@ -576,4 +468,13 @@
                 });
         }
     }
+    function cerrarModal() {
+        console.log("Cerrando modal...");
+        const modal = document.getElementById("modalAutoparte");
+        if (modal) modal.style.display = "none";
+
+        // También cerrar el modal de zoom si está abierto
+        const zoomModal = document.getElementById("zoomModal");
+        if (zoomModal) zoomModal.style.display = "none";
+    }     
 </script>
