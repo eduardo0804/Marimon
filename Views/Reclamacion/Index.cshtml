@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="~/css/reclamacion.css" />
 <h2>Libro de Reclamaciones</h2>
 <p>Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, esta institución cuenta con un Libro de Reclamaciones a su disposición.</p>
-<form asp-action="CrearReclamacion" asp-controller="Reclamacion" method="post" id="reclamacionForm">
+<form asp-action="CrearReclamacion" asp-controller="Reclamacion" method="post" id="reclamacionForm" novalidate>
     <input type="hidden" asp-for="UsuarioId" value="@usuario?.usu_id" />
 
     <div class="form-group">
@@ -31,62 +31,68 @@
 
     <div class="form-group">
         <label asp-for="TipoReclamacion">Tipo de Reclamación</label>
-        <select asp-for="TipoReclamacion" class="form-control">
+        <select asp-for="TipoReclamacion" class="form-control" id="tipoReclamacion" required>
             <option value="">-- Seleccione --</option>
             <option value="@((int)TipoReclamacion.Reclamo)">Reclamo</option>
             <option value="@((int)TipoReclamacion.Queja)">Queja</option>
         </select>
+        <div class="invalid-feedback">Por favor, selecciona un tipo de reclamación.</div>
     </div>
 
     <div class="form-group">
         <label asp-for="TipoEntidad">Tipo de Entidad</label>
-        <select asp-for="TipoEntidad" class="form-control" id="tipoEntidad">
+        <select asp-for="TipoEntidad" class="form-control" id="tipoEntidad" required>
             <option value="">-- Seleccione --</option>
             <option value="@((int)TipoEntidad.Producto)">Producto</option>
             <option value="@((int)TipoEntidad.Servicio)">Servicio</option>
         </select>
+        <div class="invalid-feedback">Por favor, selecciona un tipo de entidad.</div>
     </div>
 
     <div id="productoSection" style="display:none;">
         <div class="form-group">
             <label>Categoría</label>
-            <select class="form-control" id="categoriaSelect">
+            <select class="form-control" id="categoriaSelect" required>
                 <option value="">-- Seleccione Categoría --</option>
                 @foreach (var cat in categorias)
                 {
                     <option value="@cat.cat_id">@cat.cat_nombre</option>
                 }
             </select>
+            <div class="invalid-feedback">Por favor, selecciona una categoría.</div>
         </div>
 
         <div class="form-group">
             <label>Producto</label>
-            <select class="form-control" id="productoSelect">
+            <select class="form-control" id="productoSelect" required>
                 <option value="">-- Seleccione Producto --</option>
             </select>
+            <div class="invalid-feedback">Por favor, selecciona un producto.</div>
         </div>
     </div>
 
     <div id="servicioSection" style="display:none;">
         <div class="form-group">
             <label>Servicio</label>
-            <select id="servicioSelect" class="form-control">
+            <select id="servicioSelect" class="form-control" required>
                 <option value="">-- Seleccione Servicio --</option>
                 @foreach (var ser in servicios)
                 {
                     <option value="@ser.ser_id">@ser.ser_nombre</option>
                 }
             </select>
+            <div class="invalid-feedback">Por favor, selecciona un servicio.</div>
         </div>
     </div>
 
-    <!-- Añadimos name para que se envíen al servidor -->
+    <!-- Campos ocultos para enviar al servidor -->
     <input type="hidden" asp-for="EntidadId" id="hiddenEntidadId" name="EntidadId" />
     <input type="hidden" asp-for="NombreEntidad" id="hiddenNombreEntidad" name="NombreEntidad" />
 
     <div class="form-group">
         <label asp-for="Descripcion">Descripción</label>
-        <textarea asp-for="Descripcion" class="form-control"></textarea>
+        <textarea asp-for="Descripcion" class="form-control" id="descripcion" required></textarea>
+        <div class="invalid-feedback">Por favor, ingresa una descripción.</div>
     </div>
 
     <button type="submit" class="btn btn-primary">Enviar Reclamación</button>
@@ -106,17 +112,38 @@
 
             const productos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(productos));
 
+            let submitted = false; // Flag para controlar si el usuario ya intentó enviar
+
             tipoEntidad.addEventListener("change", function () {
                 const tipo = tipoEntidad.value;
                 if (tipo === "1") {
                     productoSection.style.display = "block";
                     servicioSection.style.display = "none";
+
+                    // activar required en productoSection
+                    categoriaSelect.setAttribute("required", "required");
+                    productoSelect.setAttribute("required", "required");
+
+                    // quitar required en servicioSection
+                    servicioSelect.removeAttribute("required");
                 } else if (tipo === "2") {
                     servicioSection.style.display = "block";
                     productoSection.style.display = "none";
+
+                    // activar required en servicioSection
+                    servicioSelect.setAttribute("required", "required");
+
+                    // quitar required en productoSection
+                    categoriaSelect.removeAttribute("required");
+                    productoSelect.removeAttribute("required");
                 } else {
                     productoSection.style.display = "none";
                     servicioSection.style.display = "none";
+
+                    // quitar required ambos
+                    categoriaSelect.removeAttribute("required");
+                    productoSelect.removeAttribute("required");
+                    servicioSelect.removeAttribute("required");
                 }
 
                 categoriaSelect.value = "";
@@ -124,6 +151,8 @@
                 servicioSelect.value = "";
                 hiddenEntidadId.value = "";
                 hiddenNombreEntidad.value = "";
+
+                limpiarValidaciones();
             });
 
             categoriaSelect.addEventListener("change", function () {
@@ -143,7 +172,59 @@
 
             const form = document.getElementById('reclamacionForm');
 
+            function limpiarValidaciones() {
+                [tipoEntidad, categoriaSelect, productoSelect, servicioSelect, form.querySelector('#tipoReclamacion'), form.querySelector('#descripcion')].forEach(el => {
+                    if (el) {
+                        el.classList.remove("is-invalid");
+                        el.classList.remove("is-valid");
+                    }
+                });
+            }
+
+            // Función para validar individualmente un campo (select o textarea/input)
+            function validarCampo(campo) {
+                if (!campo) return true; // si no existe, pasa
+                if (!campo.value || campo.value.trim() === "") {
+                    campo.classList.add("is-invalid");
+                    campo.classList.remove("is-valid");
+                    return false;
+                } else {
+                    campo.classList.remove("is-invalid");
+                    campo.classList.add("is-valid");
+                    return true;
+                }
+            }
+
+            // Validar campos visibles segun tipoEntidad
+            function validarCamposVisibles() {
+                let valido = true;
+
+                if (!validarCampo(form.querySelector('#tipoReclamacion'))) valido = false;
+                if (!validarCampo(tipoEntidad)) valido = false;
+
+                if (productoSection.style.display === 'block') {
+                    if (!validarCampo(categoriaSelect)) valido = false;
+                    if (!validarCampo(productoSelect)) valido = false;
+                } else if (servicioSection.style.display === 'block') {
+                    if (!validarCampo(servicioSelect)) valido = false;
+                }
+
+                if (!validarCampo(form.querySelector('#descripcion'))) valido = false;
+
+                return valido;
+            }
+
+            // Validar en submit
             form.addEventListener('submit', function (event) {
+                submitted = true;
+                limpiarValidaciones();
+
+                if (!validarCamposVisibles()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
+
                 // Asignar valores ocultos justo antes de enviar
                 let entidadId = "";
                 let nombreEntidad = "";
@@ -162,13 +243,21 @@
 
                 hiddenEntidadId.value = entidadId;
                 hiddenNombreEntidad.value = nombreEntidad;
-
-                // Aquí puedes descomentar el siguiente console.log para depurar
-                // console.log("EntidadId:", entidadId, "NombreEntidad:", nombreEntidad);
-
-                // No hacer preventDefault para que el formulario se envíe normalmente
             });
 
+            // Validar individualmente al salir del campo (blur) si ya intentó enviar o el usuario modificó el campo
+            [tipoEntidad, categoriaSelect, productoSelect, servicioSelect, form.querySelector('#tipoReclamacion'), form.querySelector('#descripcion')]
+                .forEach(el => {
+                    if (!el) return;
+                    el.addEventListener('blur', function () {
+                        if (!submitted) return; // no validar aún si no se intentó enviar
+                        validarCampo(el);
+                    });
+                    el.addEventListener('input', function () {
+                        if (!submitted) return;
+                        validarCampo(el);
+                    });
+                });
         });
     </script>
 }
