@@ -10,7 +10,9 @@
 }
 <link rel="stylesheet" href="~/css/reclamacion.css" />
 <h2>Libro de Reclamaciones</h2>
-<p>Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, esta institución cuenta con un Libro de Reclamaciones a su disposición.</p>
+<p>Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, esta institución cuenta con un Libro
+    de Reclamaciones a su disposición.</p>
+
 <form asp-action="CrearReclamacion" asp-controller="Reclamacion" method="post" id="reclamacionForm" novalidate>
     <input type="hidden" asp-for="UsuarioId" value="@usuario?.usu_id" />
 
@@ -40,7 +42,7 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="TipoEntidad">Tipo de Entidad</label>
+        <label asp-for="TipoEntidad">Estimacion del bien contratado</label>
         <select asp-for="TipoEntidad" class="form-control" id="tipoEntidad" required>
             <option value="">-- Seleccione --</option>
             <option value="@((int)TipoEntidad.Producto)">Producto</option>
@@ -69,6 +71,18 @@
             </select>
             <div class="invalid-feedback">Por favor, selecciona un producto.</div>
         </div>
+
+        <div class="form-group">
+            <label>Número de Pedido</label>
+            <input type="text" asp-for="NumeroReferencia" class="form-control" name="NumeroPedido" id="numeroPedido" />
+            <div class="invalid-feedback">Por favor, ingresa el número de pedido.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Monto</label>
+            <input type="number" asp-for="Monto" class="form-control" name="Monto" id="montoProducto" step="0.01" min="0" />
+            <div class="invalid-feedback">Por favor, ingresa el monto del producto.</div>
+        </div>
     </div>
 
     <div id="servicioSection" style="display:none;">
@@ -83,9 +97,21 @@
             </select>
             <div class="invalid-feedback">Por favor, selecciona un servicio.</div>
         </div>
+
+        <div class="form-group">
+            <label>Número de Servicio</label>
+            <input type="text" asp-for="NumeroReferencia" class="form-control" name="NumeroServicio" id="numeroServicio" />
+            <div class="invalid-feedback">Por favor, ingresa el número de servicio.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Monto</label>
+            <input type="number" asp-for="Monto" class="form-control" name="Monto" id="montoServicio" step="0.01" min="0" />
+            <div class="invalid-feedback">Por favor, ingresa el monto del servicio.</div>
+        </div>
     </div>
 
-    <!-- Campos ocultos para enviar al servidor -->
+    <!-- Campos ocultos -->
     <input type="hidden" asp-for="EntidadId" id="hiddenEntidadId" name="EntidadId" />
     <input type="hidden" asp-for="NombreEntidad" id="hiddenNombreEntidad" name="NombreEntidad" />
 
@@ -109,38 +135,32 @@
             const servicioSelect = document.getElementById("servicioSelect");
             const hiddenEntidadId = document.getElementById("hiddenEntidadId");
             const hiddenNombreEntidad = document.getElementById("hiddenNombreEntidad");
+            const montoProducto = document.getElementById("montoProducto");
+            const numeroPedido = document.getElementById("numeroPedido");
+            const montoServicio = document.getElementById("montoServicio");
+            const numeroServicio = document.getElementById("numeroServicio");
+
 
             const productos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(productos));
-
-            let submitted = false; // Flag para controlar si el usuario ya intentó enviar
+            let submitted = false;
 
             tipoEntidad.addEventListener("change", function () {
                 const tipo = tipoEntidad.value;
                 if (tipo === "1") {
                     productoSection.style.display = "block";
                     servicioSection.style.display = "none";
-
-                    // activar required en productoSection
                     categoriaSelect.setAttribute("required", "required");
                     productoSelect.setAttribute("required", "required");
-
-                    // quitar required en servicioSection
                     servicioSelect.removeAttribute("required");
                 } else if (tipo === "2") {
                     servicioSection.style.display = "block";
                     productoSection.style.display = "none";
-
-                    // activar required en servicioSection
                     servicioSelect.setAttribute("required", "required");
-
-                    // quitar required en productoSection
                     categoriaSelect.removeAttribute("required");
                     productoSelect.removeAttribute("required");
                 } else {
                     productoSection.style.display = "none";
                     servicioSection.style.display = "none";
-
-                    // quitar required ambos
                     categoriaSelect.removeAttribute("required");
                     productoSelect.removeAttribute("required");
                     servicioSelect.removeAttribute("required");
@@ -158,7 +178,6 @@
             categoriaSelect.addEventListener("change", function () {
                 const categoriaId = parseInt(this.value);
                 productoSelect.innerHTML = '<option value="">-- Seleccione Producto --</option>';
-
                 if (!isNaN(categoriaId)) {
                     const productosFiltrados = productos.filter(p => p.categoriaId === categoriaId || p.CategoriaId === categoriaId);
                     productosFiltrados.forEach(p => {
@@ -181,9 +200,8 @@
                 });
             }
 
-            // Función para validar individualmente un campo (select o textarea/input)
             function validarCampo(campo) {
-                if (!campo) return true; // si no existe, pasa
+                if (!campo) return true;
                 if (!campo.value || campo.value.trim() === "") {
                     campo.classList.add("is-invalid");
                     campo.classList.remove("is-valid");
@@ -195,7 +213,6 @@
                 }
             }
 
-            // Validar campos visibles segun tipoEntidad
             function validarCamposVisibles() {
                 let valido = true;
 
@@ -205,8 +222,12 @@
                 if (productoSection.style.display === 'block') {
                     if (!validarCampo(categoriaSelect)) valido = false;
                     if (!validarCampo(productoSelect)) valido = false;
+                    if (!validarCampo(numeroPedido)) valido = false;
+                    if (!validarCampo(montoProducto)) valido = false;
                 } else if (servicioSection.style.display === 'block') {
                     if (!validarCampo(servicioSelect)) valido = false;
+                    if (!validarCampo(numeroServicio)) valido = false;
+                    if (!validarCampo(montoServicio)) valido = false;
                 }
 
                 if (!validarCampo(form.querySelector('#descripcion'))) valido = false;
@@ -214,7 +235,7 @@
                 return valido;
             }
 
-            // Validar en submit
+
             form.addEventListener('submit', function (event) {
                 submitted = true;
                 limpiarValidaciones();
@@ -225,17 +246,16 @@
                     return false;
                 }
 
-                // Asignar valores ocultos justo antes de enviar
                 let entidadId = "";
                 let nombreEntidad = "";
 
                 if (productoSection.style.display === 'block') {
-                    if (productoSelect.value && productoSelect.value !== "") {
+                    if (productoSelect.value) {
                         entidadId = productoSelect.value;
                         nombreEntidad = productoSelect.options[productoSelect.selectedIndex]?.text || "";
                     }
                 } else if (servicioSection.style.display === 'block') {
-                    if (servicioSelect.value && servicioSelect.value !== "") {
+                    if (servicioSelect.value) {
                         entidadId = servicioSelect.value;
                         nombreEntidad = servicioSelect.options[servicioSelect.selectedIndex]?.text || "";
                     }
@@ -245,12 +265,11 @@
                 hiddenNombreEntidad.value = nombreEntidad;
             });
 
-            // Validar individualmente al salir del campo (blur) si ya intentó enviar o el usuario modificó el campo
             [tipoEntidad, categoriaSelect, productoSelect, servicioSelect, form.querySelector('#tipoReclamacion'), form.querySelector('#descripcion')]
                 .forEach(el => {
                     if (!el) return;
                     el.addEventListener('blur', function () {
-                        if (!submitted) return; // no validar aún si no se intentó enviar
+                        if (!submitted) return;
                         validarCampo(el);
                     });
                     el.addEventListener('input', function () {

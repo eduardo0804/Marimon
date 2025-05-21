@@ -43,6 +43,10 @@ namespace Marimon.Models
 
         public DateTime? FechaRespuesta { get; set; }
 
+        public string NumeroReferencia { get; set; } // Número de pedido o servicio
+
+        public decimal Monto { get; set; }
+
         // Propiedad auxiliar solo para enviar/recibir nombre, no va a BD
         [NotMapped]
         public string NombreEntidad { get; set; }
