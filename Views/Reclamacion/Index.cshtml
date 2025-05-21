@@ -15,6 +15,14 @@
 
 <form asp-action="CrearReclamacion" asp-controller="Reclamacion" method="post" id="reclamacionForm" novalidate>
     <input type="hidden" asp-for="UsuarioId" value="@usuario?.usu_id" />
+    <div class="form-group mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+        <h5 class="mb-3" style="font-weight: 600; color: #D42025;">Datos de la Empresa</h5>
+        <ul style="padding-left: 20px; margin: 0; color: #212529; font-size: 15px;">
+            <li><strong>Razón Social:</strong> MARIMON S.A.C</li>
+            <li><strong>RUC:</strong> 20601635152</li>
+            <li><strong>Dirección Fiscal:</strong>AV. ANGAMOS ESTE NRO. 1686 A.H. CASA HUERTAS LIMA - LIMA - SURQUILLO</li>
+        </ul>
+    </div>
 
     <div class="form-group">
         <label>Nombre</label>
@@ -80,7 +88,8 @@
 
         <div class="form-group">
             <label>Monto</label>
-            <input type="number" asp-for="Monto" class="form-control" name="Monto" id="montoProducto" step="0.01" min="0" />
+            <input type="number" asp-for="Monto" class="form-control" name="Monto" id="montoProducto" step="0.01"
+                min="0" />
             <div class="invalid-feedback">Por favor, ingresa el monto del producto.</div>
         </div>
     </div>
@@ -100,13 +109,15 @@
 
         <div class="form-group">
             <label>Número de Servicio</label>
-            <input type="text" asp-for="NumeroReferencia" class="form-control" name="NumeroServicio" id="numeroServicio" />
+            <input type="text" asp-for="NumeroReferencia" class="form-control" name="NumeroServicio"
+                id="numeroServicio" />
             <div class="invalid-feedback">Por favor, ingresa el número de servicio.</div>
         </div>
 
         <div class="form-group">
             <label>Monto</label>
-            <input type="number" asp-for="Monto" class="form-control" name="Monto" id="montoServicio" step="0.01" min="0" />
+            <input type="number" asp-for="Monto" class="form-control" name="Monto" id="montoServicio" step="0.01"
+                min="0" />
             <div class="invalid-feedback">Por favor, ingresa el monto del servicio.</div>
         </div>
     </div>
