@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Marimon.Enums;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Marimon.Controllers
 {
@@ -14,12 +15,14 @@ namespace Marimon.Controllers
         private readonly ILogger<ReclamacionController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public ReclamacionController(ILogger<ReclamacionController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public ReclamacionController(ILogger<ReclamacionController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager, IEmailSender emailSender)
         {
+            _logger = logger;
             _context = context;
             _userManager = userManager;
-            _logger = logger;
+            _emailSender = emailSender;
         }
 
         // GET: Mostrar formulario
@@ -57,6 +60,14 @@ namespace Marimon.Controllers
             {
                 _context.Reclamacion.Add(model);
                 await _context.SaveChangesAsync();
+
+                // Preparar contenido del correo (solo descripción)
+                string subject = "Nueva reclamación recibida";
+                string body = $"Descripción de la reclamación:\n\n{model.Descripcion}";
+
+                // Enviar correo (sin adjuntos)
+                await _emailSender.SendEmailAsync("castroadrian1228@gmail.com", subject, body);
+
                 return RedirectToAction("Confirmacion");
             }
             catch (Exception ex)
@@ -64,7 +75,6 @@ namespace Marimon.Controllers
                 var innerMessage = ex.InnerException != null ? ex.InnerException.Message : "No inner exception";
                 return Content("Error al guardar: " + ex.Message + " | Detalle interno: " + innerMessage);
             }
-
         }
 
         // Método privado para cargar datos comunes para la vista
