@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        text-align: center;
+      }
+
+      .email-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #ddd; /* línea nueva */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* más sombra */
+      }
+
+      .email-header {
+        background-color: black;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .email-header img {
+        max-width: 150px;
+      }
+
+      .email-body {
+        padding: 20px;
+        color: #333333;
+        text-align: center;
+      }
+
+      .email-body h1 {
+        color: black;
+      }
+
+      .status-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 20px auto;
+        text-align: center;
+      }
+
+      .status-step {
+        display: flex;
+        flex-direction: column;
+        /* Apilar imagen y texto */
+        align-items: center;
+        /* Centrar horizontalmente */
+        font-size: 14px;
+        color: #888;
+        margin: 0 15px;
+        opacity: 0.4;
+        /* Elementos no activos aparecerán con menor opacidad */
+      }
+
+      .status-step img {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+      }
+
+      /* Clases para el H2 del estado principal */
+      .estado-texto {
+        font-weight: bold;
+        font-size: 22px;
+        margin-bottom: 20px;
+      }
+      .email-footer {
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 10px;
+        font-size: 12px;
+        color: #888888;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <img src="{{LogoUrl}}" alt="Marimon Logo" />
+      </div>
+      <div class="email-body">
+        <h1>Nueva Reclamación Recibida</h1>
+        <div class="content">
+          <p><strong>Descripción:</strong></p>
+          <p>{{DESCRIPCION}}</p>
+        </div>
+      </div>
+      <div class="email-footer">
+        <p>Marimon © 2025. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </body>
+</html>

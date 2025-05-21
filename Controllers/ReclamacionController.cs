@@ -61,12 +61,16 @@ namespace Marimon.Controllers
                 _context.Reclamacion.Add(model);
                 await _context.SaveChangesAsync();
 
-                // Preparar contenido del correo (solo descripción)
-                string subject = "Nueva reclamación recibida";
-                string body = $"Descripción de la reclamación:\n\n{model.Descripcion}";
+                // Ruta del archivo HTML
+                var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "emailRecla.html");
+                string emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+                var logoUrl = "https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Flogo-web-marimon.png?alt=media&token=e7fd3cab-30b0-4a6f-a675-30b3b69f836b";
+                emailBody = emailBody.Replace("{{LogoUrl}}", logoUrl);
+                // Reemplazar el marcador con la descripción real
+                emailBody = emailBody.Replace("{{DESCRIPCION}}", model.Descripcion);
 
-                // Enviar correo (sin adjuntos)
-                await _emailSender.SendEmailAsync("castroadrian1228@gmail.com", subject, body);
+                // Enviar correo con contenido HTML
+                await _emailSender.SendEmailAsync("cetoce64@gmail.com", "Nueva reclamación recibida", emailBody);
 
                 return RedirectToAction("Confirmacion");
             }
