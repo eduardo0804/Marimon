@@ -31,7 +31,7 @@ namespace Marimon.Controllers
             var identityUserId = _userManager.GetUserId(User);
 
             if (identityUserId == null)
-                return RedirectToAction("Login", "Account");
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
 
             var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(u => u.usu_id == identityUserId);
