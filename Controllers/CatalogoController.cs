@@ -51,7 +51,7 @@ namespace Marimon.Controllers
             if (!string.IsNullOrEmpty(buscar))
             {
                 autopartesQuery = autopartesQuery
-                    .Where(a => EF.Functions.ILike(ApplicationDbContext.Unaccent(a.aut_nombre), $"%{buscar}%"));
+                    .Where(a => EF.Functions.ILike(a.aut_nombre.ToLower(), $"%{buscar.ToLower()}%"));
             }
 
             if (categorias != null && categorias.Any())
@@ -322,19 +322,28 @@ namespace Marimon.Controllers
                 return Json(new List<object>());
             }
 
-            var autopartes = await _context.Autopartes
-                .Where(a => EF.Functions.ILike(ApplicationDbContext.Unaccent(a.aut_nombre), $"%{query}%"))
-                .Select(a => new
-                {
-                    id = a.aut_id,
-                    nombre = a.aut_nombre,
-                    imagen = a.aut_imagen,
-                    precio = a.aut_precio
-                })
-                .Take(10)
-                .ToListAsync();
+            try
+            {
+                // Buscar autopartes que coincidan con la búsqueda
+                var resultados = await _context.Autopartes
+                    .Where(a => EF.Functions.ILike(a.aut_nombre.ToLower(), $"%{query.ToLower()}%"))
+                    .Select(a => new
+                    {
+                        id = a.aut_id,
+                        nombre = a.aut_nombre,
+                        precio = a.aut_precio,
+                        imagen = a.aut_imagen
+                    })
+                    .Take(8)
+                    .ToListAsync();
 
-            return Json(autopartes);
+                return Json(resultados);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en autocompletado");
+                return Json(new List<object>());
+            }
         }
 
 
