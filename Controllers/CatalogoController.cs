@@ -229,17 +229,20 @@ namespace Marimon.Controllers
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-                return await ObtenerReseniasAutoparte(aut_id);
+                // Devolver toda la sección de reseñas con el diseño completo
+                return await ObtenerSeccionResenias(aut_id);
             }
 
             return RedirectToAction("Index");
         }
 
+        // Nuevo método para obtener toda la sección de reseñas
         [HttpGet]
-        public async Task<IActionResult> ObtenerReseniasAutoparte(int aut_id)
+        public async Task<IActionResult> ObtenerSeccionResenias(int aut_id)
         {
             var resenias = await _context.Resenias
                 .Where(r => r.aut_id == aut_id)
+                .OrderByDescending(r => r.res_fecha) // Ordenar por fecha descendente
                 .Select(r => new ReseniaViewModel
                 {
                     res_id = r.res_id,
@@ -257,7 +260,8 @@ namespace Marimon.Controllers
 
             ViewBag.AutoparteId = aut_id;
 
-            return PartialView("_ReseniasAutoparte", resenias);
+            // Devolver la vista parcial que incluye todo el contenedor de reseñas con estilos
+            return PartialView("_SeccionResenias", resenias);
         }
 
         [HttpDelete]
