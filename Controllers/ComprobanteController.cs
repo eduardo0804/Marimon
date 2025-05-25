@@ -1187,12 +1187,19 @@ namespace Marimon.Controllers
                 return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
             }
 
+            var metodoPagoId = 1;
+            var metodoPago = await _context.MetodoPago.FindAsync(metodoPagoId);
+            if (metodoPago == null)
+            {
+                return BadRequest("El método de pago especificado no es válido.");
+            }
+            
             // Crear venta
             var venta = new Venta
             {
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
-                MetodoPagoId = 10, // ID para Yape
+                MetodoPagoId = metodoPagoId, // ID para Yape
                 Total = carrito.car_total,
                 Estado = "Pendiente"
             };
