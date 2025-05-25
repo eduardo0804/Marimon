@@ -491,16 +491,12 @@ namespace Marimon.Controllers
                 }
 
                 var comprobante = await _context.Comprobante
-                    .Include(c => c.Boletas)
-                    .Include(c => c.Facturas)
                     .FirstOrDefaultAsync(c => c.VentaId == ventaId);
 
                 string cliente = venta.Usuario?.usu_nombre + " " + venta.Usuario?.usu_apellido;
                 string documento = "";
                 string evidenciaUrl = "";
-                bool esStripe = false;
-
-                esStripe = !string.IsNullOrEmpty(venta.StripeSessionId);
+                bool esStripe = !string.IsNullOrEmpty(venta.StripeSessionId);
 
                 if (comprobante != null)
                 {
@@ -515,32 +511,40 @@ namespace Marimon.Controllers
                         var boleta = comprobante.Boletas.First();
                         documento = "DNI: " + boleta.num_identificacion;
                     }
-
-                    // Obtener la URL de la evidencia solo para pagos que no son por Stripe
-                    if (!esStripe && !string.IsNullOrEmpty(comprobante.com_evidencia))
+                    if (!string.IsNullOrEmpty(comprobante.com_evidencia))
                     {
                         evidenciaUrl = comprobante.com_evidencia;
-                        if (!evidenciaUrl.StartsWith("http") && !evidenciaUrl.StartsWith("/"))
+                        if (!evidenciaUrl.StartsWith("/") && !evidenciaUrl.StartsWith("http"))
                         {
                             evidenciaUrl = "/" + evidenciaUrl;
                         }
+                        
+                        _logger.LogInformation($"Evidencia URL para venta {ventaId}: {evidenciaUrl}");
                     }
                 }
 
-                // Obtener el nombre del método de pago
+                // Obtener el nombre del método de pago y especificar si es Stripe
+                bool esYape = venta.MetodoPago?.pag_metodo?.ToLower() == "yape";
+                if (esYape)
+                {
+                    esStripe = false;
+                }
+
                 string metodoPago = venta.MetodoPago?.pag_metodo ?? "No especificado";
-                if (esStripe)
+
+                if (esStripe && !esYape)
                 {
                     metodoPago += " (Stripe)";
                 }
 
                 return Json(new
                 {
-                    cliente = cliente,
-                    documento = documento,
+                    cliente = cliente ?? "Cliente no registrado",
+                    documento = documento ?? "Sin documento",
                     total = venta.Total.ToString("0.00"),
                     evidenciaUrl = evidenciaUrl,
                     esStripe = esStripe,
+                    esYape = esYape,
                     metodoPago = metodoPago
                 });
             }
