@@ -1,293 +1,259 @@
 @model IEnumerable<Marimon.Models.Autoparte>
 
 @{
-  ViewData["Title"] = "Repuestos y Llantas";
-  Layout = "_LayoutVentas";
+    ViewData["Title"] = "Repuestos y Llantas";
+    Layout = "_LayoutVentas";
+
 }
 
 <link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
 
-<div class="container-fluid mt-4 my-4">
-  <ol class="breadcrumb m-0">
-    <li class="breadcrumb-item">
-      <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
-    </li>
-    <li class="breadcrumb-item active" aria-current="page">Autopartes</li>
-  </ol>
-  <div class="page-header text-center m-0 p-0 pb-2">
-    <h2>Repuestos y Llantas</h2>
-  </div>
-
-  <div class="row">
-    <!-- Panel de filtros (Lado izquierdo) -->
-    @* <div class="col-lg-3"> *@
-    @*   <div class="filter-panel"> *@
-    @*     <h5 class="border-bottom pb-2 mb-3">Filtros de Búsqueda</h5> *@
-
-        @* <!-- Filtro por precio --> *@
-        @* <div class="price-filter mt-4"> *@
-        @*   <p class="fw-bold mb-2">Ordenar por precio:</p> *@
-        @*   <select class="form-select filter-select" id="filtroOrden" name="orden"> *@
-        @*     <option value="">-- Seleccionar --</option> *@
-        @*     <option value="asc">Menor a mayor</option> *@
-        @*     <option value="desc">Mayor a menor</option> *@
-        @*     <option value="mas_vendidas">Más vendidas</option> *@
-        @*   </select> *@
-        @* </div> *@
-
-        @* <!-- Filtro por categoría --> *@
-        @* <div class="category-section mt-4"> *@
-        @*   <p class="fw-bold mb-2">Filtrar por categoría:</p> *@
-        @*   <div class="categories-container" id="categoriesContainer"> *@
-        @*     @{ *@
-        @*       var displayedCategories = (ViewBag.Categorias as List<Categoria>).Take(3).ToList(); *@
-        @*       var remainingCategories = (ViewBag.Categorias as List<Categoria>).Skip(3).ToList(); *@
-        @*     } *@
-
-        @*     @foreach (var categoria in displayedCategories) *@
-        @*     { *@
-        @*       <div class="category-checkbox"> *@
-        @*         <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id" *@
-        @*           id="cat_@categoria.cat_id"> *@
-        @*         <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label> *@
-        @*       </div> *@
-        @*     } *@
-
-        @*     <div class="hidden-categories" style="display: none;"> *@
-        @*       @foreach (var categoria in remainingCategories) *@
-        @*       { *@
-        @*         <div class="category-checkbox"> *@
-        @*           <input class="form-check-input filtro-categoria" type="checkbox" value="@categoria.cat_id" *@
-        @*             id="cat_@categoria.cat_id"> *@
-        @*           <label class="form-check-label" for="cat_@categoria.cat_id">@categoria.cat_nombre</label> *@
-        @*         </div> *@
-        @*       } *@
-        @*     </div> *@
-        @*   </div> *@
-
-        @*   @if ((ViewBag.Categorias as List<Categoria>).Count > 3) *@
-        @*   { *@
-        @*     <button type="button" class="show-more-btn" id="showMoreBtn"> *@
-        @*       Ver más categorías <i class="fas fa-chevron-down"></i> *@
-        @*     </button> *@
-        @*   } *@
-        @* </div> *@
-
-        @* <div class="mt-4"> *@
-        @*   <button class="filter-btn" id="btnAplicarFiltros"> *@
-        @*     <i class="fas fa-filter"></i> Aplicar Filtros *@
-        @*   </button> *@
-        @* </div> *@
-
-        @* <div class="mt-4"> *@
-        @*   <button class="btn-registrar w-100" data-bs-toggle="modal" data-bs-target="#registerModal"> *@
-        @*     <i class="fas fa-plus-circle me-2"></i>Registrar nueva autoparte *@
-        @*   </button> *@
-        @* </div> *@
-    @*   </div> *@
-    @* </div> *@
-
-    <!-- Sección de tabla (Lado derecho) -->
-    <div class="col-lg-12">
-      <div class="table-container fade-in">
-        <div class="table-header">
-
-                    <div class="row align-items-center">
-                        <div class="col-md-4">
-                            <div class="mt-4">
-                                <button class="btn w-100" style="background-color: #E42229; color: #FFFFFF; border-color: #E42229;" data-bs-toggle="modal" data-bs-target="#registerModal">
-                                    <i class="fas fa-plus-circle me-2"></i>Registrar nueva autoparte
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-4 ms-auto">
-                            <div class="input-group mt-4">
-                                <input type="text" class="form-control" id="searchTable" placeholder="Buscar en tabla..." style="border-color: #626C66;">
-                                <button class="btn" type="button" style="background-color: #E42229; color: #FFFFFF; border-color: #E42229;">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
+<div class="container">
+    <div class="toast-container bottom-0 end-0 p-3">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Éxito</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                La autoparte se registró correctamente.
+            </div>
         </div>
-        <div class="table-scroll-container">
-                    <table class="modern-table">
-                        <thead>
-                            <tr style="background-color: #E42229; color: #FFFFFF;">
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th>Especificaciones</th>
-                                <th>Precio (S/)</th>
-                                <th>Cantidad</th>
-                                <th>Categoría</th>
-                                <th>Imagen</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model)
+        <div id="editToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-warning text-white">
+                <strong class="me-auto">Edición Exitosa</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                La autoparte se actualizo correctamente.
+            </div>
+        </div>
+        <div id="deleteToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">Eliminación</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                La autoparte se eliminó correctamente.
+            </div>
+        </div>
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">Error</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="errorToastMessage">
+                Ha ocurrido un error.
+            </div>
+        </div>
+    </div>
+    <!-- Encabezado con imagen y texto -->
+    <div class="row align-items-center">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Autopartes</li>
+        </ol>
+        <div class="col-md-6 text-center">
+            <img src="~/images/auto.png" alt="Auto" class="img-fluid" />
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold">Autopartes</h2>
+            <p>
+                Contamos con una amplia variedad de autopartes y llantas para tu vehículo.
+                Consulta la lista y encuentra lo que necesitas.
+            </p>
+        </div>
+    </div>
+
+    <!-- Botón para abrir el modal de registro -->
+    <div class="mb-3">
+        <button class="btn-registrar" data-bs-toggle="modal" data-bs-target="#registerModal">
+            <i class="fas fa-plus-circle me-2"></i>Registrar nueva autoparte
+        </button>
+    </div>
+
+
+
+    <!-- Modal de Registro (Carga el formulario de la otra vista) -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Registrar nueva autoparte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    <!-- Aquí se cargará el formulario de la vista separada -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal para editar autoparte -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar autoparte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="modalContentEdit">
+                    <!-- Aquí se cargará el formulario de edición -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Tabla de autopartes -->
+    <div class="table-container" style="max-height: 30vh; overflow-y: auto;overflow-x: auto; border-radius: 8px; border: 1px solid #eee; background: #fff;">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Especificaciones</th>
+                    <th>Precio (S/)</th>
+                    <th>Cantidad</th>
+                    <th>Categoría</th>
+                    <th>Imagen</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="table-row">
+                        <td data-label="ID">@item.aut_id</td>
+                        <td data-label="Nombre">@item.aut_nombre</td>
+                        <td data-label="Descripción" class="td-description">
+                            <div class="description-content">@item.aut_descripcion</div>
+                            <div class="description-tooltip">@item.aut_descripcion</div>
+                        </td>
+                        <td data-label="Especificaciones" class="td-description">
+                            <div class="description-content">@item.aut_especificacion</div>
+                            <div class="description-tooltip">@item.aut_especificacion</div>
+                        </td>
+                        <td data-label="Precio">S/ @item.aut_precio.ToString("F2")</td>
+                        <td data-label="Cantidad">@item.aut_cantidad.ToString()</td>
+                        <td data-label="Categoría">@item.Categoria?.cat_nombre</td>
+                        <td data-label="Imagen">
+                            @if (!string.IsNullOrEmpty(item.aut_imagen))
                             {
-                                <tr class="table-row" data-id="@item.aut_id" style="border-bottom: 1px solid #626C66;">
-                                    <td data-label="ID">@item.aut_id</td>
-                                    <td data-label="Nombre">@item.aut_nombre</td>
-                                    <td data-label="Descripción" class="td-description">
-                                        <div class="description-content">@item.aut_descripcion</div>
-                                        <div class="description-tooltip" style="background-color: #FFFFFF; color: #000000; border: 1px solid #626C66;">@item.aut_descripcion</div>
-                                    </td>
-                                    <td data-label="Especificaciones" class="td-description">
-                                        <div class="description-content">@item.aut_especificacion</div>
-                                        <div class="description-tooltip" style="background-color: #FFFFFF; color: #000000; border: 1px solid #626C66;">@item.aut_especificacion</div>
-                                    </td>
-                                    <td data-label="Precio">S/ @item.aut_precio.ToString("F2")</td>
-                                    <td data-label="Cantidad">@item.aut_cantidad.ToString()</td>
-                                    <td data-label="Categoría">@item.Categoria?.cat_nombre</td>
-                                    <td data-label="Imagen">
-                                        @if (!string.IsNullOrEmpty(item.aut_imagen))
-                                        {
-                                            <div class="image-container">
-                                                <img src="@item.aut_imagen" alt="Imagen" class="table-image" />
-                                                <div class="image-overlay" style="background-color: rgba(0, 0, 0, 0.5);">
-                                                    <a style="text-decoration: none;" href="@item.aut_imagen" target="_blank" class="image-zoom">
-                                                        <i style="color: #FFFFFF;" class="fas fa-search-plus"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <span class="no-image" style="color: #626C66;"><i class="fas fa-image"></i> Sin imagen</span>
-                                        }
-                                    </td>
-                                    <td data-label="Acciones" class="actions-cell">
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-edit" style="background-color: #D42025; color: #FFFFFF; border: none;" onclick="loadEditModal('@item.aut_id');" title="Modificar">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <form asp-action="Eliminar" asp-controller="Personal_Ventas" asp-route-id="@item.aut_id"
-                                                  method="post" class="delete-form">
-                                                <button type="button" class="btn-action btn-delete" style="background-color: #E42229; color: #FFFFFF; border: none;" onclick="confirmDelete(this)"
-                                                        title="Eliminar">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <div class="image-container">
+                                    <img src="@item.aut_imagen" alt="Imagen" class="table-image" />
+                                    <div class="image-overlay">
+                                        <a style="text-decoration: none;" href="@item.aut_imagen" target="_blank" class="image-zoom">
+                                            <i style="color:white;" class="fas fa-search-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
                             }
-                        </tbody>
-                    </table>
-        </div>
-      </div>
+                            else
+                            {
+                                <span class="no-image"><i class="fas fa-image"></i> Sin imagen</span>
+                            }
+                        </td>
+                        <td data-label="Acciones" class="actions-cell">
+                            <div class="action-buttons">
+                                <button class="btn-action btn-edit" onclick="loadEditModal('@item.aut_id');" title="Modificar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form asp-action="Eliminar" asp-controller="Personal_Ventas" asp-route-id="@item.aut_id" method="post"
+                                      class="delete-form">
+                                    <button type="button" class="btn-action btn-delete" onclick="confirmDelete(this)" title="Eliminar">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-  </div>
-</div>
-
-<!-- Modal de Registro (Carga el formulario de la otra vista) -->
-<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="registerModalLabel">Registrar nueva autoparte</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalContent">
-        <!-- Aquí se cargará el formulario de la vista separada -->
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para editar autoparte -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Editar autoparte</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body" id="modalContentEdit">
-        <!-- Aquí se cargará el formulario de edición -->
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- Modal de confirmación para eliminar -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirmar eliminación</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>¿Estás seguro que deseas eliminar esta autoparte? Esta acción no se puede deshacer.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn-confirm-delete">Eliminar</button>
-      </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que deseas eliminar esta autoparte? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn-confirm-delete">Eliminar</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- Contenedor de notificaciones toast -->
-<div class="toast-container" id="toastContainer"></div>
 
 @section Scripts {
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      // Este script carga el formulario desde otra página al abrir el modal de registro
-      $('#registerModal').on('show.bs.modal', function (e) {
-        $.get('@Url.Action("Create", "Personal_Ventas")', function (data) {
-          $('#modalContent').html(data); // Inserta el contenido en el modal
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Este script carga el formulario desde otra página al abrir el modal de registro
+        $('#registerModal').on('show.bs.modal', function (e) {
+          $.get('@Url.Action("Create", "Personal_Ventas")', function (data) {
+            $('#modalContent').html(data); // Inserta el contenido en el modal
+          });
         });
-      });
 
-      // Este script carga el formulario desde otra página al abrir el modal de edición
-      function loadEditModal(aut_id) {
-        $.get('/Personal_Ventas/Editar/' + aut_id, function (data) {
-          $('#modalContentEdit').html(data);
-          $('#editModal').modal('show');
-        });
-      }
-      window.loadEditModal = loadEditModal;
-
-      // Notificaciones Toast
-      // Se mantiene el código original de toasts pero reemplazamos con nuestro nuevo sistema
-      @if (TempData["SuccessMessage"] != null)
+        // Este script carga el formulario desde otra página al abrir el modal de edición
+        function loadEditModal(aut_id) {
+          $.get('/Personal_Ventas/Editar/' + aut_id, function (data) {
+            $('#modalContentEdit').html(data);
+            $('#editModal').modal('show');
+          });
+        }
+        $(document).ready(function () {
+        @if (TempData["SuccessMessage"] != null)
         {
-          <text>
-            showToast('@TempData["SuccessMessage"]', 'success');
-          </text>
-      }
+            <text>
+                    const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+                    successToast.show();
+            </text>
+        }
 
-        @if (TempData["EditMessage"] != null)
+        @if (TempData["EditMessage"] != null) // Agregar la condición para el toast de edición
         {
-          <text>
-            showToast('@TempData["EditMessage"]', 'warning');
-          </text>
-      }
+            <text>
+                    const editToast = new bootstrap.Toast(document.getElementById('editToast'));
+                    editToast.show();
+            </text>
+        }
 
         @if (TempData["DeleteMessage"] != null)
         {
-          <text>
-            showToast('@TempData["DeleteMessage"]', 'error');
-          </text>
-      }
+            <text>
+                    const deleteToast = new bootstrap.Toast(document.getElementById('deleteToast'));
+                    deleteToast.show();
+            </text>
+        }
 
         @if (TempData["Error"] != null)
         {
-          <text>
-            showToast('@TempData["Error"]', 'error');
-          </text>
-      }
+            <text>
+                    document.getElementById('errorToastMessage').innerText = '@TempData["Error"]';
+                    const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                    errorToast.show();
+            </text>
+        }
+            });
 
-        // Confirmar eliminación
-        window.confirmDelete = function(button) {
+
+        function confirmDelete(button) {
           const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
           const deleteForm = button.closest('form');
 
@@ -301,201 +267,36 @@
           };
         }
 
-      // Añadir efectos de ripple a los botones de acción
-      document.querySelectorAll('.btn-action').forEach(button => {
-        button.addEventListener('mousedown', function (e) {
-          const x = e.clientX - e.target.getBoundingClientRect().left;
-          const y = e.clientY - e.target.getBoundingClientRect().top;
+        // Añadir efectos de ripple a los botones de acción
+        document.querySelectorAll('.btn-action').forEach(button => {
+          button.addEventListener('mousedown', function (e) {
+            const x = e.clientX - e.target.getBoundingClientRect().left;
+            const y = e.clientY - e.target.getBoundingClientRect().top;
 
-          const ripple = document.createElement('span');
-          ripple.className = 'ripple';
-          ripple.style.left = `${x}px`;
-          ripple.style.top = `${y}px`;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
 
-          this.appendChild(ripple);
+            this.appendChild(ripple);
 
-          setTimeout(() => {
-            ripple.remove();
-          }, 600);
+            setTimeout(() => {
+              ripple.remove();
+            }, 600);
+          });
         });
-      });
-      const showMoreBtn = document.getElementById('showMoreBtn');
-      const hiddenCategories = document.querySelector('.hidden-categories');
-      const categoriesContainer = document.getElementById('categoriesContainer');
 
-      if (showMoreBtn) {
-        showMoreBtn.addEventListener('click', function () {
-          if (hiddenCategories.style.display === 'none') {
-            hiddenCategories.style.display = 'block';
-            showMoreBtn.innerHTML = 'Ver menos categorías <i class="fas fa-chevron-up"></i>';
-            categoriesContainer.classList.add('expanded');
+        // Añadir tooltip para las imágenes que están recortadas
+        document.querySelectorAll('.td-description').forEach(cell => {
+          const content = cell.querySelector('.description-content');
+          const tooltip = cell.querySelector('.description-tooltip');
+
+          if (content.offsetWidth < content.scrollWidth) {
+            tooltip.style.display = 'block';
           } else {
-            hiddenCategories.style.display = 'none';
-            showMoreBtn.innerHTML = 'Ver más categorías <i class="fas fa-chevron-down"></i>';
-            categoriesContainer.classList.remove('expanded');
+            tooltip.style.display = 'none';
           }
         });
-      }
-      // Añadir tooltip para las descripciones que están recortadas
-      document.querySelectorAll('.td-description').forEach(cell => {
-        const content = cell.querySelector('.description-content');
-        const tooltip = cell.querySelector('.description-tooltip');
+    </script>
 
-        if (content.offsetWidth < content.scrollWidth) {
-          tooltip.style.display = 'block';
-        } else {
-          tooltip.style.display = 'none';
-        }
-      });
-
-      // Buscar en la tabla
-      const searchInput = document.getElementById('searchTable');
-      if (searchInput) {
-        searchInput.addEventListener('keyup', function () {
-          const searchTerm = this.value.toLowerCase();
-          const rows = document.querySelectorAll('.modern-table tbody tr');
-
-          rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-              row.style.display = '';
-            } else {
-              row.style.display = 'none';
-            }
-          });
-        });
-      }
-
-      // Filtrar autopartes
-      document.getElementById('btnAplicarFiltros').addEventListener('click', function () {
-        const orden = document.getElementById('filtroOrden').value;
-        const categoriasSeleccionadas = Array.from(document.querySelectorAll('.filtro-categoria:checked'))
-          .map(cb => cb.value);
-
-        aplicarFiltros(orden, categoriasSeleccionadas);
-      });
-
-      function aplicarFiltros(orden, categorias = []) {
-        const url = new URL('@Url.Action("ListaAutopartes", "Personal_Ventas")', window.location.origin);
-
-        if (orden) {
-          url.searchParams.append('orden', orden);
-        }
-
-        categorias.forEach(cat => url.searchParams.append('categorias', cat));
-
-        fetch(url)
-          .then(response => response.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const tablaNueva = doc.querySelector('.table-scroll-container').innerHTML;
-            document.querySelector('.table-scroll-container').innerHTML = tablaNueva;
-
-            // Re-inicializar los tooltips después de actualizar la tabla
-            document.querySelectorAll('.td-description').forEach(cell => {
-              const content = cell.querySelector('.description-content');
-              const tooltip = cell.querySelector('.description-tooltip');
-
-              if (content.offsetWidth < content.scrollWidth) {
-                tooltip.style.display = 'block';
-              } else {
-                tooltip.style.display = 'none';
-              }
-            });
-
-            showToast('Filtros aplicados correctamente', 'success');
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            showToast('Error al aplicar los filtros', 'error');
-          });
-      }
-    });
-
-    // Función para mostrar notificación toast
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-
-      // Crear elemento toast
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-
-      // Configurar color de fondo según el tipo
-      let headerBgColor = 'var(--primary-color)';
-      let headerIcon = 'fas fa-check-circle';
-
-      if (type === 'error') {
-        headerBgColor = 'var(--cancelada-color)';
-        headerIcon = 'fas fa-exclamation-circle';
-      } else if (type === 'warning') {
-        headerBgColor = 'var(--pendiente-color)';
-        headerIcon = 'fas fa-exclamation-triangle';
-      }
-
-      toast.innerHTML = `
-                    <div class="toast-header" style="background-color: ${headerBgColor}">
-                        <h6><i class="${headerIcon} me-2"></i> Notificación</h6>
-                        <button type="button" class="toast-close">&times;</button>
-                    </div>
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                `;
-
-      // Añadir al contenedor
-      container.appendChild(toast);
-
-      // Funcionalidad del botón cerrar
-      const closeBtn = toast.querySelector('.toast-close');
-      closeBtn.addEventListener('click', function () {
-        container.removeChild(toast);
-      });
-
-      // Eliminar automáticamente después de 4 segundos
-      setTimeout(() => {
-        if (container.contains(toast)) {
-          container.removeChild(toast);
-        }
-      }, 4000);
-    }
-    function initializeTooltips() {
-    document.querySelectorAll('.td-description').forEach(cell => {
-        const content = cell.querySelector('.description-content');
-        const tooltip = cell.querySelector('.description-tooltip');
-        
-        if (content && tooltip) {
-            // Asegurar que el tooltip esté oculto por defecto
-            tooltip.style.visibility = 'hidden';
-            tooltip.style.opacity = '0';
-            
-            // Solo configurar tooltips visibles para contenido que realmente lo necesita
-            if (content.offsetWidth < content.scrollWidth) {
-                content.addEventListener('mouseenter', function() {
-                    tooltip.style.visibility = 'visible';
-                    tooltip.style.opacity = '1';
-                });
-                
-                content.addEventListener('mouseleave', function() {
-                    tooltip.style.visibility = 'hidden';
-                    tooltip.style.opacity = '0';
-                });
-            }
-        }
-    });
-}
-
-// Llamar a la función cuando se carga el documento
-document.addEventListener('DOMContentLoaded', function() {
-    initializeTooltips();
-    
-    // También llamar a la función después de aplicar filtros o actualizar la tabla
-    document.getElementById('btnAplicarFiltros').addEventListener('click', function() {
-        // Código existente...
-        
-        // Volver a inicializar los tooltips después de actualizar el contenido
-        setTimeout(initializeTooltips, 300);
-    });
-});
-  </script>
 }
