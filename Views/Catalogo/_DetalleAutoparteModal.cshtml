@@ -331,7 +331,7 @@
                                                 @resenia.res_comentario</p>
                                             <span class="badge"
                                                 style="background-color: @(resenia.res_gusto == "Si" ? "#E42229" : "#626C66"); 
-                                                                                                           padding: 6px 12px; font-size: 0.85rem; border-radius: 30px;">
+                                                                                                                   padding: 6px 12px; font-size: 0.85rem; border-radius: 30px;">
                                                 @if (resenia.res_gusto == "Si")
                                                 {
                                                     <i class="fas fa-thumbs-up me-1"></i>
@@ -376,6 +376,40 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Animación de aparición secuencial
+            const reseniaItems = document.querySelectorAll('.resenia-item');
+            reseniaItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transition = 'opacity 0.5s ease';
+                }, 100 * index);
+            });
+
+            // Asignar ID al modal para eliminar
+            const botonesEliminar = document.querySelectorAll('.eliminar-resenia');
+            const reseniaIdInput = document.getElementById('reseniaIdEliminar');
+
+            botonesEliminar.forEach(boton => {
+                boton.addEventListener('click', function () {
+                    const reseniaId = this.getAttribute('data-id');
+                    reseniaIdInput.value = reseniaId;
+                });
+            });
+
+            // Mostrar modal si viene con parámetro en URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+
+            if (status === 'success') {
+                const reseniaExitoModal = new bootstrap.Modal(document.getElementById('reseniaExitoModal'));
+                reseniaExitoModal.show();
+            } else if (status === 'deleted') {
+                const reseniaEliminadaModal = new bootstrap.Modal(document.getElementById('reseniaEliminadaModal'));
+                reseniaEliminadaModal.show();
+            }
+        });
+
         function cerrarModal() {
             document.getElementById("modalAutoparte").style.display = "none";
             const zoomModal = document.getElementById("zoomModal");
