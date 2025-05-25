@@ -10,6 +10,7 @@
 #reseniasList::-webkit-scrollbar-thumb {
     background: #E42229;
     border-radius: 10px;
+    color: white;
 }
 
 #reseniasList::-webkit-scrollbar-thumb:hover {
