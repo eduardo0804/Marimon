@@ -57,18 +57,57 @@ namespace Marimon.Controllers
                 var parts = new List<object>();
                 var prompt = "";
 
+                // Lista de servicios disponibles para incluir en el prompt
+                var availableServices = new[]
+                {
+            "Sistema de Refrigeración",
+            "Aire Acondicionado",
+            "Mecatrónica y Electrónica",
+            "Mantenimientos y Frenos",
+            "Diagnóstico y Scanner",
+            "Planchado y Pintura Automotriz",
+            "Conversión a GLP",
+            "Conversión a GNV"
+        };
+
+                var servicesListText = string.Join(", ", availableServices);
+
                 // Configurar el prompt según lo que se está analizando
                 if (!string.IsNullOrWhiteSpace(comment) && (image == null || image.Length == 0))
                 {
-                    prompt = "Analiza brevemente este comentario sobre un problema automotriz (máximo 3 frases cortas) y determina qué tipo de servicio de reparación sería el más adecuado. Sé conciso y directo.";
+                    prompt = $@"Analiza este comentario sobre un problema automotriz y determina qué servicio es el más adecuado.
+
+SERVICIOS DISPONIBLES: {servicesListText}
+
+FORMATO DE RESPUESTA OBLIGATORIO:
+- Problema detectado: [descripción breve]
+- Recomendación: [sugerencia específica]
+
+El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
+
+Si no corresponde a ningún servicio especializado, responde ""Ninguno"".
+Sé conciso y directo (máximo 3 frases).";
+
                     parts.Add(new { text = prompt });
                     parts.Add(new { text = comment });
                 }
                 else if (string.IsNullOrWhiteSpace(comment) && (image != null && image.Length > 0))
                 {
-                    prompt = "Analiza brevemente esta imagen de un vehículo o componente automotriz (máximo 3 frases cortas) y determina qué tipo de servicio de reparación sería el más adecuado. Sé conciso y directo.";
+                    prompt = $@"Analiza esta imagen de un vehículo o componente automotriz y determina qué servicio es el más adecuado.
+
+SERVICIOS DISPONIBLES: {servicesListText}
+
+FORMATO DE RESPUESTA OBLIGATORIO:
+- Problema detectado: [descripción breve]
+- Recomendación: [sugerencia específica]
+
+El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
+
+Si no corresponde a ningún servicio especializado, responde ""Ninguno"".
+Sé conciso y directo (máximo 3 frases).";
+
                     parts.Add(new { text = prompt });
-                    
+
                     // Convertir la imagen a base64
                     string base64Image;
                     using (var memoryStream = new MemoryStream())
@@ -77,7 +116,7 @@ namespace Marimon.Controllers
                         byte[] imageBytes = memoryStream.ToArray();
                         base64Image = Convert.ToBase64String(imageBytes);
                     }
-                    
+
                     parts.Add(new
                     {
                         inline_data = new
@@ -89,36 +128,29 @@ namespace Marimon.Controllers
                 }
                 else // Ambos campos están presentes
                 {
-                    prompt = @"
-                    Analiza la combinación de imagen y comentario sobre un problema automotriz siguiendo estas reglas:
+                    prompt = $@"Analiza la combinación de imagen y comentario sobre un problema automotriz.
 
-                    1. EXAMINA ambos inputs identificando:
-                    - Componentes/sistemas afectados
-                    - Síntomas o problemas mencionados
-                    - Severidad del problema
+SERVICIOS DISPONIBLES: {servicesListText}
 
-                    2. DETERMINA el servicio adecuado usando ESTA LISTA EXCLUSIVA:
-                    [Sistema de Refrigeración, Aire Acondicionado, Mecatrónica y Electrónica, Mantenimientos y Frenos, Diagnóstico y Scanner, Planchado y Pintura Automotriz, Conversión a GLP, Conversión a GNV]
+INSTRUCCIONES:
+1. Examina ambos inputs identificando componentes/sistemas afectados y síntomas
+2. Determina el servicio más adecuado de la lista proporcionada
 
-                    3. RESPUESTA OBLIGATORIA en este formato:
-                    'Analizando su contenido:
-                    - Problema detectado: [descripción técnica concisa]
-                    - Recomendación: [sugerencia específica]
+FORMATO DE RESPUESTA OBLIGATORIO:
+- Problema detectado: [descripción técnica concisa]
+- Recomendación: [sugerencia específica]
 
-                    El servicio más adecuado es: [EXACTAMENTE un servicio de la lista o ""Ninguno""]'
+El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
 
-                    4. REGLAS ESPECIALES:
-                    - Si es mantenimiento básico (inflado de llantas, lavado, etc.):
-                        'Recomendación: Servicio básico, puede acercarse a cualquier establecimiento'
-                    - Si no coincide con tus servicios especializados:
-                        'El servicio más adecuado es: Ninguno'
-                    - Usa SOLO los nombres exactos de la lista proporcionada
-                    - Máximo 3 frases en total
-                    - Lenguaje técnico pero entendible
-                    - Prioriza diagnóstico preciso sobre velocidad
-                    ";
+REGLAS ESPECIALES:
+- Si es mantenimiento básico (inflado de llantas, lavado): responde ""Ninguno""
+- Si no coincide con servicios especializados: responde ""Ninguno""
+- Usa SOLO los nombres exactos de la lista
+- Máximo 3 frases en total
+- Prioriza diagnóstico preciso";
+
                     parts.Add(new { text = prompt });
-                    
+
                     // Agregar la imagen
                     string base64Image;
                     using (var memoryStream = new MemoryStream())
@@ -127,7 +159,7 @@ namespace Marimon.Controllers
                         byte[] imageBytes = memoryStream.ToArray();
                         base64Image = Convert.ToBase64String(imageBytes);
                     }
-                    
+
                     parts.Add(new
                     {
                         inline_data = new
@@ -136,7 +168,7 @@ namespace Marimon.Controllers
                             data = base64Image
                         }
                     });
-                    
+
                     // Agregar el comentario
                     parts.Add(new { text = comment });
                 }
@@ -145,11 +177,11 @@ namespace Marimon.Controllers
                 {
                     contents = new[]
                     {
-                        new
-                        {
-                            parts = parts
-                        }
-                    },
+                new
+                {
+                    parts = parts
+                }
+            },
                     generation_config = new
                     {
                         temperature = 0.1,
@@ -189,23 +221,23 @@ namespace Marimon.Controllers
                     resultText = "No se pudo extraer el texto de la respuesta.";
                 }
 
-                // Determinar el servicio adecuado
-                var service = DetermineService(resultText);
+                // Determinar el servicio adecuado usando la nueva lógica
+                var service = DetermineServiceFromAIResponse(resultText);
                 if (service != null)
                 {
                     var typedService = (dynamic)service;
                     // Formatear el resultado con colores de la paleta
                     string formattedResult = $@"
-                        <div class='card mb-3'>
-                            <div class='card-body'>
-                                <h5 class='card-title' style='color: #E42229;'>Análisis</h5>
-                                <p class='card-text'>{FormatResultText(resultText)}</p>
-                                <h5 class='mt-3' style='color: #E42229;'>Servicio recomendado:</h5>
-                                <div class='mt-2'>
-                                    <strong style='font-style: italic;'>{typedService.name}</strong>
-                                </div>
-                            </div>
-                        </div>";
+                <div class='card mb-3'>
+                    <div class='card-body'>
+                        <h5 class='card-title' style='color: #E42229;'>Análisis</h5>
+                        <p class='card-text'>{FormatResultText(resultText)}</p>
+                        <h5 class='mt-3' style='color: #E42229;'>Servicio recomendado:</h5>
+                        <div class='mt-2'>
+                            <strong style='font-style: italic;'>{typedService.name}</strong>
+                        </div>
+                    </div>
+                </div>";
 
                     return Json(new { success = true, result = formattedResult, url = typedService.url });
                 }
@@ -219,27 +251,83 @@ namespace Marimon.Controllers
             }
         }
 
-        // Métodos auxiliares (se mantienen igual que en tu versión original)
-        private string FormatResultText(string text)
+        // Nuevo método que extrae el servicio directamente de la respuesta de la IA
+        private object DetermineServiceFromAIResponse(string aiResponse)
         {
-            return text.Replace("\n", "<br>");
-        }
-
-        private object DetermineService(string resultText)
-        {
-            resultText = resultText.ToLower();
-            
             var services = new[]
             {
-                new { id = 4, name = "Sistema de Refrigeración", url = "/Servicios/Detalle/4", keywords = new[] { "refrigeración", "radiador", "mangueras", "enfriamiento", "termostato", "refrigerante", "sobrecalentamiento", "temperatura" } },
-                new { id = 5, name = "Aire Acondicionado", url = "/Servicios/Detalle/5", keywords = new[] { "aire acondicionado", "a/c", "clima", "climatización", "compresor", "frío", "temperatura cabina", "ventilación" } },
-                new { id = 3, name = "Mecatrónica y Electrónica", url = "/Servicios/Detalle/3", keywords = new[] { "mecatrónica", "electrónica", "componentes", "computadora", "sensores", "ecu", "cableado", "fusibles", "batería", "alternador", "sistema eléctrico" } },
-                new { id = 6, name = "Mantenimientos y Frenos", url = "/Servicios/Detalle/6", keywords = new[] { "frenos", "mantenimiento", "pastillas", "discos", "preventivo", "filtros", "aceite", "bujías", "correa", "faja", "balatas", "zapatas" } },
-                new { id = 7, name = "Diagnóstico y Scanner", url = "/Servicios/Detalle/7", keywords = new[] { "diagnóstico", "scanner", "fallos", "codes", "códigos", "error", "check engine", "obd", "diagnóstico computarizado", "escaneo" } },
-                new { id = 8, name = "Planchado y Pintura Automotriz", url = "/Servicios/Detalle/8", keywords = new[] { "planchado", "pintura", "carrocería", "chapa", "golpe", "abolladura", "rayón", "pulido", "latonería", "acabado" } },
-                new { id = 9, name = "Conversión a GLP", url = "/Servicios/Detalle/9", keywords = new[] { "glp", "gas licuado", "gas licuado de petróleo", "conversión gas", "kit gas" } },
-                new { id = 10, name = "Conversión a GNV", url = "/Servicios/Detalle/10", keywords = new[] { "gnv", "gas natural", "gas natural vehicular", "conversión gas natural" } },
-            };
+        new { id = 4, name = "Sistema de Refrigeración", url = "/Servicios/Detalle/4" },
+        new { id = 5, name = "Aire Acondicionado", url = "/Servicios/Detalle/5" },
+        new { id = 3, name = "Mecatrónica y Electrónica", url = "/Servicios/Detalle/3" },
+        new { id = 6, name = "Mantenimientos y Frenos", url = "/Servicios/Detalle/6" },
+        new { id = 7, name = "Diagnóstico y Scanner", url = "/Servicios/Detalle/7" },
+        new { id = 8, name = "Planchado y Pintura Automotriz", url = "/Servicios/Detalle/8" },
+        new { id = 9, name = "Conversión a GLP", url = "/Servicios/Detalle/9" },
+        new { id = 10, name = "Conversión a GNV", url = "/Servicios/Detalle/10" }
+    };
+
+            // Buscar la línea que contiene "El servicio más adecuado es:"
+            var lines = aiResponse.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            string serviceLine = null;
+
+            foreach (var line in lines)
+            {
+                if (line.Contains("El servicio más adecuado es:", StringComparison.OrdinalIgnoreCase))
+                {
+                    serviceLine = line;
+                    break;
+                }
+            }
+
+            if (serviceLine != null)
+            {
+                // Extraer el nombre del servicio después de los dos puntos
+                var colonIndex = serviceLine.LastIndexOf(':');
+                if (colonIndex >= 0 && colonIndex < serviceLine.Length - 1)
+                {
+                    var serviceName = serviceLine.Substring(colonIndex + 1).Trim();
+
+                    // Buscar coincidencia exacta primero
+                    var exactMatch = services.FirstOrDefault(s =>
+                        string.Equals(s.name, serviceName, StringComparison.OrdinalIgnoreCase));
+
+                    if (exactMatch != null)
+                    {
+                        return exactMatch;
+                    }
+
+                    // Si no hay coincidencia exacta, buscar coincidencia parcial
+                    var partialMatch = services.FirstOrDefault(s =>
+                        serviceName.Contains(s.name, StringComparison.OrdinalIgnoreCase) ||
+                        s.name.Contains(serviceName, StringComparison.OrdinalIgnoreCase));
+
+                    if (partialMatch != null)
+                    {
+                        return partialMatch;
+                    }
+                }
+            }
+
+            // Si no encuentra nada específico en la respuesta, usar el método de keywords como fallback
+            return DetermineServiceByKeywords(aiResponse);
+        }
+
+        // Método auxiliar de keywords como fallback (tu método original simplificado)
+        private object DetermineServiceByKeywords(string resultText)
+        {
+            resultText = resultText.ToLower();
+
+            var services = new[]
+            {
+        new { id = 4, name = "Sistema de Refrigeración", url = "/Servicios/Detalle/4", keywords = new[] { "refrigeración", "radiador", "mangueras", "enfriamiento", "termostato", "refrigerante", "sobrecalentamiento", "temperatura" } },
+        new { id = 5, name = "Aire Acondicionado", url = "/Servicios/Detalle/5", keywords = new[] { "aire acondicionado", "a/c", "clima", "climatización", "compresor", "frío", "temperatura cabina", "ventilación" } },
+        new { id = 3, name = "Mecatrónica y Electrónica", url = "/Servicios/Detalle/3", keywords = new[] { "mecatrónica", "electrónica", "componentes", "computadora", "sensores", "ecu", "cableado", "fusibles", "batería", "alternador", "sistema eléctrico" } },
+        new { id = 6, name = "Mantenimientos y Frenos", url = "/Servicios/Detalle/6", keywords = new[] { "frenos", "mantenimiento", "pastillas", "discos", "preventivo", "filtros", "aceite", "bujías", "correa", "faja", "balatas", "zapatas" } },
+        new { id = 7, name = "Diagnóstico y Scanner", url = "/Servicios/Detalle/7", keywords = new[] { "diagnóstico", "scanner", "fallos", "codes", "códigos", "error", "check engine", "obd", "diagnóstico computarizado", "escaneo" } },
+        new { id = 8, name = "Planchado y Pintura Automotriz", url = "/Servicios/Detalle/8", keywords = new[] { "planchado", "pintura", "carrocería", "chapa", "golpe", "abolladura", "rayón", "pulido", "latonería", "acabado" } },
+        new { id = 9, name = "Conversión a GLP", url = "/Servicios/Detalle/9", keywords = new[] { "glp", "gas licuado", "gas licuado de petróleo", "conversión gas", "kit gas" } },
+        new { id = 10, name = "Conversión a GNV", url = "/Servicios/Detalle/10", keywords = new[] { "gnv", "gas natural", "gas natural vehicular", "conversión gas natural" } },
+    };
 
             var matchCounts = new Dictionary<int, int>();
             foreach (var service in services)
@@ -250,7 +338,7 @@ namespace Marimon.Controllers
                     int keywordCount = CountOccurrences(resultText, keyword.ToLower());
                     count += keywordCount;
                 }
-                
+
                 if (count > 0)
                 {
                     matchCounts.Add(service.id, count);
@@ -263,20 +351,28 @@ namespace Marimon.Controllers
                 return services.FirstOrDefault(s => s.id == bestServiceId);
             }
 
-            return services.FirstOrDefault(s => s.id == 1);
+            return null;
         }
 
-        private int CountOccurrences(string text, string keyword)
+        // Método auxiliar para contar ocurrencias (mantén tu método original)
+        private int CountOccurrences(string text, string pattern)
         {
             int count = 0;
-            int i = 0;
-            while ((i = text.IndexOf(keyword, i)) != -1)
+            int index = 0;
+            while ((index = text.IndexOf(pattern, index, StringComparison.OrdinalIgnoreCase)) != -1)
             {
-                i += keyword.Length;
                 count++;
+                index += pattern.Length;
             }
             return count;
-        }        
+        }
+
+        // Método para formatear el texto (mantén tu método original)
+        private string FormatResultText(string text)
+        {
+            return text.Replace("\n", "<br>");
+        }
+
         public async Task<IActionResult> Detalle(int id)
         {
             var servicio = await _context.Servicio

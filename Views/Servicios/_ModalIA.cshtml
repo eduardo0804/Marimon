@@ -408,7 +408,7 @@
             </div>
             <div class="modal-body">
                 <div class="container py-2">
-                    <p class="mb-4" style="font-weight: 500; color: #333; text-align: center; font-size: 1.1rem;">Sube una imagen o escribe un comentario para analizar con IA.</p>
+                    <p class="mb-2" style="font-weight: 500; color: #333; text-align: center; font-size: 1.1rem;">Sube una imagen o escribe un comentario para analizar con IA.</p>
 
                     <!-- Alerta de validación -->
                     <div id="validationAlert" class="alert alert-danger mb-3" style="display: none;">
@@ -479,14 +479,45 @@
             </div>
         </div>
     </div>
+    <!-- Solo muestro la parte del JavaScript que necesitas modificar -->
     <script>
-        // Manejo de drag and drop
+        // Función para hacer scroll suave hacia los resultados
+        function scrollToResults() {
+            const resultSection = document.getElementById('resultIntegration');
+            const loadingSection = document.getElementById('loadingIndicator');
+
+            // Scroll hacia el loading primero, luego hacia resultados cuando aparezcan
+            if (loadingSection.style.display !== 'none') {
+                loadingSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                    inline: 'nearest'
+                });
+            }
+        }
+
+        // Función para scroll hacia resultados finales
+        function scrollToFinalResults() {
+            const resultSection = document.getElementById('resultIntegration');
+            if (resultSection.style.display !== 'none') {
+                // Pequeño delay para asegurar que el contenido se haya renderizado
+                setTimeout(() => {
+                    resultSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }, 100);
+            }
+        }
+
+        // Manejo de drag and drop (mantén tu código original)
         const uploadDropZone = document.getElementById('uploadDropZone');
         const uploadPlaceholder = document.getElementById('uploadPlaceholder');
         const imagePreview = document.getElementById('imagePreview');
         const removeImageBtn = document.getElementById('removeImageBtn');
 
-        // Eventos de drag and drop
+        // Eventos de drag and drop (mantén tu código original)
         uploadDropZone.addEventListener('dragover', function(e) {
             e.preventDefault();
             uploadDropZone.classList.add('dragover');
@@ -510,7 +541,7 @@
             }
         });
 
-        // Previsualización de la imagen
+        // Previsualización de la imagen (mantén tu código original)
         document.getElementById("imageUpload").addEventListener("change", function() {
           const fileInput = this;
           if (fileInput.files && fileInput.files[0]) {
@@ -537,28 +568,21 @@
             removeImageBtn.style.display = 'none';
         }
 
-        // Limpiar al cerrar el modal
+        // Limpiar al cerrar el modal (mantén tu código original)
         function resetModal() {
-            // Restablece la zona de subida
             removeSelectedImage();
-
-            // Limpia el área de comentarios
             document.getElementById('commentInput').value = '';
-
-            // Oculta resultados y loading indicator
             document.getElementById('loadingIndicator').style.display = 'none';
             document.getElementById('resultIntegration').style.display = 'none';
-
-            // Oculta la alerta de validación si está visible
             document.getElementById('validationAlert').style.display = 'none';
         }
 
-        // Eventos para cerrar el modal
+        // Eventos para cerrar el modal (mantén tu código original)
         document.getElementById('closeModalButton').addEventListener('click', resetModal);
         document.getElementById('exampleModal').addEventListener('hidden.bs.modal', resetModal);
         document.querySelector('.modal-footer .btn').addEventListener('click', resetModal);
 
-        // Envío del formulario
+        // *** CÓDIGO MODIFICADO: Envío del formulario con scroll automático ***
         document.getElementById("btnIntegration").addEventListener("click", function() {
             const fileInput = document.getElementById("imageUpload");
             const commentInput = document.getElementById("commentInput").value.trim();
@@ -567,6 +591,13 @@
             if ((!fileInput.files || fileInput.files.length === 0) && commentInput === "") {
                 const validationAlert = document.getElementById("validationAlert");
                 validationAlert.style.display = "block";
+
+                // Scroll hacia la alerta de validación
+                validationAlert.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
 
                 // Ocultar la alerta después de 5 segundos
                 setTimeout(() => {
@@ -587,9 +618,13 @@
                 formData.append("comment", commentInput);
             }
 
+            // Mostrar loading y hacer scroll hacia él
             document.getElementById("loadingIndicator").style.display = "block";
             document.getElementById("resultIntegration").style.display = "none";
             document.getElementById("validationAlert").style.display = "none";
+
+            // *** NUEVO: Scroll automático hacia la sección de loading ***
+            scrollToResults();
 
             fetch("/Servicios/AnalyzeContent", {
                 method: "POST",
@@ -617,11 +652,17 @@
                         `;
                     }
                 }
+
+                // *** NUEVO: Scroll automático hacia los resultados finales ***
+                scrollToFinalResults();
             })
             .catch(error => {
                 document.getElementById("loadingIndicator").style.display = "none";
                 document.getElementById("resultIntegration").style.display = "block";
                 document.getElementById("resultContent").innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+
+                // *** NUEVO: Scroll hacia error también ***
+                scrollToFinalResults();
             });
         });
     </script>
