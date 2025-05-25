@@ -78,7 +78,7 @@ namespace Marimon.Controllers
             }
             else if (action == "editar")
             {
-                return await EditarOferta(productosSeleccionados);
+                return await EditarOferta(productosSeleccionados, ofe_descripcion, ofe_porcentaje, ofe_fecha_inicio, ofe_fecha_fin);
             }
             else if (action == "eliminar")
             {
@@ -162,8 +162,9 @@ namespace Marimon.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Reemplaza el método EditarOferta actual con este:
-        private async Task<IActionResult> EditarOferta(int[] productosSeleccionados)
+        // REEMPLAZAR este método en tu Controller:
+        private async Task<IActionResult> EditarOferta(int[] productosSeleccionados, 
+            string descripcion, decimal porcentaje, DateTime fechaInicio, DateTime fechaFin)
         {
             if (productosSeleccionados == null || productosSeleccionados.Length == 0)
             {
@@ -171,97 +172,64 @@ namespace Marimon.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            if (productosSeleccionados.Length > 1)
-            {
-                TempData["Error"] = "Solo puede editar una oferta a la vez. Seleccione un solo producto.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var autoparteId = productosSeleccionados[0];
-            var oferta = await _context.Ofertas
-                .Include(o => o.Autoparte)
-                .Where(o => o.AutoparteId == autoparteId)
-                .FirstOrDefaultAsync();
-
-            if (oferta == null)
-            {
-                TempData["Error"] = "El producto seleccionado no tiene ninguna oferta para editar.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Redirigir a una vista de edición específica con el ID de la oferta
-            return RedirectToAction(nameof(EditarOfertaForm), new { id = oferta.ofe_id });
-        }
-
-        // Agregar estos nuevos métodos:
-        public async Task<IActionResult> EditarOfertaForm(int id)
-        {
-            var oferta = await _context.Ofertas
-                .Include(o => o.Autoparte)
-                .FirstOrDefaultAsync(o => o.ofe_id == id);
-
-            if (oferta == null)
-            {
-                return NotFound();
-            }
-
-            return View(oferta);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditarOfertaForm(int id, string ofe_descripcion, decimal ofe_porcentaje, 
-            DateTime ofe_fecha_inicio, DateTime ofe_fecha_fin)
-        {
-            var oferta = await _context.Ofertas.FindAsync(id);
-
-            if (oferta == null)
-            {
-                return NotFound();
-            }
-
             // Validaciones
-            if (string.IsNullOrWhiteSpace(ofe_descripcion))
+            if (string.IsNullOrWhiteSpace(descripcion))
             {
-                ModelState.AddModelError("ofe_descripcion", "La descripción de la oferta es obligatoria.");
-                return View(oferta);
+                TempData["Error"] = "La descripción de la oferta es obligatoria.";
+                return RedirectToAction(nameof(Index));
             }
 
-            if (ofe_porcentaje <= 0 || ofe_porcentaje >= 100)
+            if (porcentaje <= 0 || porcentaje >= 100)
             {
-                ModelState.AddModelError("ofe_porcentaje", "El porcentaje debe ser entre 1 y 99.");
-                return View(oferta);
+                TempData["Error"] = "El porcentaje debe ser entre 1 y 99.";
+                return RedirectToAction(nameof(Index));
             }
 
-            if (ofe_fecha_inicio >= ofe_fecha_fin)
+            if (fechaInicio >= fechaFin)
             {
-                ModelState.AddModelError("ofe_fecha_inicio", "La fecha de inicio debe ser anterior a la fecha de fin.");
-                return View(oferta);
+                TempData["Error"] = "La fecha de inicio debe ser anterior a la fecha de fin.";
+                return RedirectToAction(nameof(Index));
             }
 
             try
             {
-                // Actualizar los campos de la oferta
-                oferta.ofe_descripcion = ofe_descripcion;
-                oferta.ofe_porcentaje = ofe_porcentaje;
-                oferta.ofe_fecha_inicio = ofe_fecha_inicio;
-                oferta.ofe_fecha_fin = ofe_fecha_fin;
-                
+                // Buscar ofertas existentes para los productos seleccionados
+                var ofertasExistentes = await _context.Ofertas
+                    .Where(o => productosSeleccionados.Contains(o.AutoparteId))
+                    .ToListAsync();
+
+                if (ofertasExistentes.Count == 0)
+                {
+                    TempData["Error"] = "Los productos seleccionados no tienen ofertas para editar.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 // Determinar si la oferta está activa basada en la fecha actual
                 var hoy = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Unspecified);
-                oferta.ofe_activa = (hoy >= ofe_fecha_inicio && hoy <= ofe_fecha_fin);
+                bool ofertaActiva = (hoy >= fechaInicio && hoy <= fechaFin);
 
-                _context.Update(oferta);
+                // Actualizar cada oferta existente
+                foreach (var oferta in ofertasExistentes)
+                {
+                    oferta.ofe_descripcion = descripcion;
+                    oferta.ofe_porcentaje = porcentaje;
+                    oferta.ofe_fecha_inicio = fechaInicio;
+                    oferta.ofe_fecha_fin = fechaFin;
+                    oferta.ofe_activa = ofertaActiva;
+                }
+
+                _context.UpdateRange(ofertasExistentes);
                 await _context.SaveChangesAsync();
-                
-                TempData["Success"] = "La oferta ha sido actualizada correctamente.";
-                return RedirectToAction(nameof(Index));
+
+                TempData["Success"] = $"Se actualizaron {ofertasExistentes.Count} oferta(s) correctamente.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al actualizar la oferta");
-                ModelState.AddModelError("", "Ocurrió un error al actualizar la oferta. Intente nuevamente.");
-                return View(oferta);
+                _logger.LogError(ex, "Error al editar ofertas");
+                TempData["Error"] = "Ocurrió un error al editar las ofertas. Intente nuevamente.";
             }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // Reemplaza el método EliminarOferta actual con este:
