@@ -25,6 +25,7 @@
         <!-- Paso 2 -->
         <div class="chat-step d-none" id="step-2">
             <p>¿Con quién deseas hablar?</p>
+            <div id="asesor-error" class="text-danger mb-2" style="display: none; font-size: 0.8rem;"></div>
             <div class="form-check mb-2">
                 <input class="form-check-input" type="radio" name="asesor" id="asesor1" value="1">
                 <label class="form-check-label" for="asesor1">
@@ -52,7 +53,8 @@
         <!-- Paso 3 -->
         <div class="chat-step d-none" id="step-3">
             <p>Escribe tu mensaje:</p>
-            <textarea class="form-control mb-3" rows="3" id="mensaje-texto">Hola, necesito asistencia. ¿Podrías ayudarme?</textarea>
+            <textarea class="form-control mb-2" rows="3" id="mensaje-texto">Hola, necesito asistencia. ¿Podrías ayudarme?</textarea>
+            <div id="mensaje-error" class="text-danger mb-3" style="display: none; font-size: 0.8rem;"></div>
             <div class="d-flex justify-content-between">
                 <button class="btn" onclick="backStep(2)" style="border: 1px solid #626C66; color: #626C66;">Atrás</button>
                 <button class="btn" onclick="enviarMensaje()" style="background-color: #E42229; color: #FFFFFF;">Enviar</button>
@@ -80,7 +82,7 @@
     };
 
     const numerosSMS = {
-      1: '51946289666', // Reemplaza con números reales para SMS
+      1: '51946289666',
       2: '51955025436',
       3: '51946775614'
     };
@@ -94,20 +96,33 @@
       reiniciarChat();
     };
 
+    function mostrarError(elementId, mensaje) {
+        const element = document.getElementById(elementId);
+        element.textContent = mensaje;
+        element.style.display = 'block';
+    }
+
+    function ocultarError(elementId) {
+        document.getElementById(elementId).style.display = 'none';
+    }
+
     function nextStep(step, medio = null) {
       if (medio) medioSeleccionado = medio;
       if (step === 3) {
         const selectedAsesor = document.querySelector('input[name="asesor"]:checked');
         if (!selectedAsesor) {
-          alert('Por favor, selecciona un asesor.');
+          mostrarError('asesor-error', 'Por favor, selecciona un asesor');
           return;
         }
         asesorId = selectedAsesor.value;
+        ocultarError('asesor-error');
       }
       cambiarPaso(step);
     }
 
     function backStep(step) {
+      ocultarError('asesor-error');
+      ocultarError('mensaje-error');
       cambiarPaso(step);
     }
 
@@ -119,9 +134,10 @@
     function enviarMensaje() {
       const mensaje = document.getElementById('mensaje-texto').value.trim();
       if (!mensaje) {
-        alert('Por favor, escribe un mensaje.');
+        mostrarError('mensaje-error', 'Por favor, escribe un mensaje');
         return;
       }
+      ocultarError('mensaje-error');
 
       if (medioSeleccionado === 'WhatsApp' && asesorId) {
         const numero = numerosAsesores[asesorId];
@@ -146,6 +162,8 @@
       document.querySelectorAll('input[name="asesor"]').forEach(radio => {
         radio.checked = false;
       });
+      ocultarError('asesor-error');
+      ocultarError('mensaje-error');
       cambiarPaso(1);
     }
 </script>
