@@ -1,0 +1,170 @@
+/* Contenedor principal */
+.promociones-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+/* Contenido principal */
+.promociones-content {
+    padding: 40px;
+}
+
+/* Grid de las cards */
+.cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    justify-items: center;
+}
+
+/* Link de las cards */
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Card principal */
+.promotion-card {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    /* Aquí puedes ajustar la altura total de la card */
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.promotion-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.promotion-card:hover .card-title-section {
+    background-color: #e22122;
+}
+
+/* Sección de la imagen */
+.card-image-section {
+    background-color: #f8f9fa;
+    /* Aquí puedes ajustar la altura de la sección de imagen */
+    height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    flex: 1;
+}
+
+.card-image {
+    max-width: 85%;
+    max-height: 85%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.promotion-card:hover .card-image {
+    transform: scale(1.08);
+}
+
+/* Sección del título */
+.card-title-section {
+    background-color: #1c1c1c;
+    color: white;
+    padding: 18px 20px;
+    text-align: center;
+    /* Altura fija para mantener consistencia */
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .promociones-content {
+        padding: 20px;
+    }
+    
+    .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .card-link {
+        max-width: 350px;
+    }
+    
+    /* Ajuste de altura para móviles */
+    .promotion-card {
+        min-height: 280px;
+    }
+    
+    .card-image-section {
+        height: 240px;
+        padding: 15px;
+    }
+    
+    .card-title {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .promociones-container {
+        margin-top: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+    
+    .promociones-content {
+        padding: 15px;
+    }
+    
+    .cards-grid {
+        gap: 25px;
+    }
+    
+    /* Ajuste de altura para móviles pequeños */
+    .promotion-card {
+        min-height: 260px;
+    }
+    
+    .card-image-section {
+        height: 200px;
+        padding: 12px;
+    }
+    
+    .card-title-section {
+        padding: 15px;
+        min-height: 55px;
+    }
+    
+    .card-title {
+        font-size: 14px;
+        letter-spacing: 0.6px;
+    }
+}
