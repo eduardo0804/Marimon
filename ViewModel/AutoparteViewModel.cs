@@ -27,5 +27,16 @@ namespace Marimon.Models.ViewModels
         public DateTime? FechaFin { get; set; }
         public bool? OfertaActiva { get; set; }
         public int? OfertaId { get; set; }
+
+        // Campos de código de descuento
+        public decimal? PorcentajeDescuento { get; set; }
+        public decimal? PrecioDescuento { get; set; }
+        public string? CodigoDescuento { get; set; }
+        public string? DescripcionDescuento { get; set; }
+        public DateTime? FechaInicioDescuento { get; set; }
+        public DateTime? FechaFinDescuento { get; set; }
+        public bool? DescuentoActivo { get; set; }
+        public int? CodigoDescuentoId { get; set; }
+        public bool? TieneDescuento { get; set; }
     }
 }

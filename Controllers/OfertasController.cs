@@ -162,7 +162,7 @@ namespace Marimon.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // REEMPLAZAR este método en tu Controller:
+        // Metido Edita la oferta de los productos seleccionados
         private async Task<IActionResult> EditarOferta(int[] productosSeleccionados, 
             string descripcion, decimal porcentaje, DateTime fechaInicio, DateTime fechaFin)
         {
@@ -232,7 +232,7 @@ namespace Marimon.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Reemplaza el método EliminarOferta actual con este:
+        //método EliminarOferta actual con este:
         private async Task<IActionResult> EliminarOferta(int[] productosSeleccionados)
         {
             if (productosSeleccionados == null || productosSeleccionados.Length == 0)
@@ -266,9 +266,6 @@ namespace Marimon.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
