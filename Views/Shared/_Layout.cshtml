@@ -187,7 +187,7 @@
                 <div>Copyright &#169; 2025 <a asp-controller="Home" asp-action="Index"
                         style="color: white; text-decoration: none;">Marimon</a></div>
                 <div><a href="@Url.Action("Terminos", "Home")">Términos y Condiciones</a></div>
-                <div><a href="@Url.Action("Index", "Reclamacion")">Libro de Reclamaciones</a></div>
+                <div><a href="#" id="linkReclamacion">Libro de Reclamaciones</a></div>
                 <div><a href="@Url.Action("Privacy", "Home")">Política y Privacidad</a></div>
                 <div>Developed by <strong>G03 - ISW2</strong></div>
             </div>
@@ -369,10 +369,49 @@
             document.querySelector('.qr-box').classList.remove('pulse');
         }, 10000);
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const link = document.getElementById("linkReclamacion");
+            if (link) {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    fetch("/api/esta-logueado")
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.logueado) {
+                                window.location.href = "/Reclamacion";
+                            } else {
+                                const modal = new bootstrap.Modal(document.getElementById("modalLoginRequired"));
+                                modal.show();
+                            }
+                        });
+                });
+            }
+        });
+    </script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!--<script src="~/js/site.js" asp-append-version="true"></script> -->
     @await RenderSectionAsync("Scripts", required: false)
+    <!-- Modal para login requerido -->
+    <div class="modal fade" id="modalLoginRequired" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Acceso restringido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    Para acceder al libro de reclamaciones necesitas iniciar sesión.
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" href="/Identity/Account/Login">Iniciar sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
