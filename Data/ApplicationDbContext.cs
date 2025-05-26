@@ -69,7 +69,7 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany(a => a.CodigosDescuento)
             .HasForeignKey(c => c.AutoparteId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.Entity<Oferta>()
             .Property(o => o.ofe_fecha_inicio)
             .HasColumnType("date");
@@ -78,6 +78,13 @@ public class ApplicationDbContext : IdentityDbContext
             .Property(o => o.ofe_fecha_fin)
             .HasColumnType("date");
 
+        builder.Entity<CodigoDescuento>()
+            .Property(c => c.cod_fecha_creacion)
+            .HasColumnType("date");
+
+        builder.Entity<CodigoDescuento>()
+            .Property(c => c.cod_fecha_expiracion)
+            .HasColumnType("date");
     }
 
     public DbSet<Autoparte> Autopartes { get; set; }
