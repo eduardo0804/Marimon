@@ -1,0 +1,18 @@
+@model Marimon.Models.ViewModels.OfertasViewModel
+
+@{
+    Layout = "_LayoutVentas";
+    ViewData["Title"] = "Gestión de Cupones de Descuentos";
+}
+
+<link rel="stylesheet" href="~/css/descuentos.css" asp-append-version="true" />
+
+<ol class="breadcrumb m-0 py-2">
+    <li class="breadcrumb-item">
+        <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a asp-area="" asp-controller="GestionPromociones" asp-action="Index">Gestión de Promociones</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Cupones de Descuentos</li>
+</ol>
