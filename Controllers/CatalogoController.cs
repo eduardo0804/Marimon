@@ -194,6 +194,18 @@ namespace Marimon.Controllers
                 })
                 .ToListAsync();
 
+            // Obtener la oferta más reciente
+            var oferta = await _context.Ofertas
+            .Where(o => o.Autoparte.aut_id == autoparte.aut_id)
+                .OrderByDescending(o => o.ofe_id)
+                .FirstOrDefaultAsync();
+
+            var hoy = DateTime.Today;
+            bool? ofertaActiva = oferta != null && hoy >= oferta.ofe_fecha_inicio && hoy <= oferta.ofe_fecha_fin;
+            decimal? precioOferta = (ofertaActiva == true)
+                ? autoparte.aut_precio - (autoparte.aut_precio * (oferta.ofe_porcentaje / 100m))
+                : (decimal?)null;
+
             var modelo = new AutoparteViewModel
             {
                 aut_id = autoparte.aut_id,
@@ -205,9 +217,17 @@ namespace Marimon.Controllers
                 aut_imagen = autoparte.aut_imagen,
                 CategoriaNombre = autoparte.Categoria.cat_nombre,
                 ProductosSimilares = productosSimilares,
-                Resenias = resenias
-            };
+                Resenias = resenias,
 
+                // Oferta
+                OfertaId = oferta?.ofe_id,
+                PorcentajeOferta = oferta?.ofe_porcentaje,
+                DescripcionOferta = oferta?.ofe_descripcion,
+                FechaInicio = oferta?.ofe_fecha_inicio,
+                FechaFin = oferta?.ofe_fecha_fin,
+                PrecioOferta = precioOferta,
+                OfertaActiva = ofertaActiva
+            };
             return PartialView("_DetalleAutoparteModal", modelo);
         }
 

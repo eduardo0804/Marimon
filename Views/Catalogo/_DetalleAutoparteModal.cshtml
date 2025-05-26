@@ -93,9 +93,22 @@
                                 <li><i class="fa-solid fa-circle-check text-danger me-2"></i><strong>Categoría:</strong>
                                     @Model.CategoriaNombre</li>
                             </ul>
+
                             <div class="precio2 mb-4">
-                                <span class="fs-3 fw-bold text-danger">S/ @Model.aut_precio.ToString("0.00")</span>
+
+                                @if (Model.OfertaActiva == true && Model.PrecioOferta.HasValue)
+                                {
+                                    <span><del>@Model.aut_precio.ToString("C")</del> <strong class="text-danger">@Model.PrecioOferta.Value.ToString("C")</strong></span>
+                                    <br/>
+                                    <span class="text-success">Oferta: @Model.DescripcionOferta</span>
+                                }
+                                else
+                                {
+                                    <span class="fs-3 fw-bold text-danger">S/ @Model.aut_precio.ToString("0.00")</span>
+                                }
                             </div>
+
+                            
                         </div>
 
                         <div class="tab-pane fade" id="similares" role="tabpanel" aria-labelledby="similares-tab">
