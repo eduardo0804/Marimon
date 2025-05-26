@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Marimon.ViewModel;
+
 namespace Marimon.Controllers
 {
     public class CatalogoController : Controller
@@ -46,7 +47,12 @@ namespace Marimon.Controllers
                 .Select(g => new { AutoparteId = g.Key, Total = g.Sum(x => x.Cantidad) })
                 .ToList();
 
-            var autopartesQuery = _context.Autopartes.Include(a => a.Categoria).AsQueryable();
+            // MODIFICACIÓN: Incluir las ofertas en la consulta
+            var hoy = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Unspecified);
+            var autopartesQuery = _context.Autopartes
+                .Include(a => a.Categoria)
+                .Include(a => a.Ofertas) // Incluir ofertas
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(buscar))
             {
@@ -67,7 +73,6 @@ namespace Marimon.Controllers
                     .OrderByDescending(a => a.aut_id)
                     .Take(3);
             }
-
             else if (orden == "asc")
             {
                 autopartesQuery = autopartesQuery.OrderBy(a => a.aut_precio);
@@ -104,12 +109,37 @@ namespace Marimon.Controllers
                     .Take(PaginasPorPagina);
             }
 
-            var autopartes = autopartesQuery.ToList();
+            // MODIFICACIÓN: Convertir a AutoparteViewModel con información de ofertas
+            var autopartes = autopartesQuery.Select(a => new AutoparteViewModel
+            {
+                aut_id = a.aut_id,
+                aut_nombre = a.aut_nombre,
+                aut_descripcion = a.aut_descripcion,
+                aut_precio = a.aut_precio,
+                aut_cantidad = a.aut_cantidad,
+                aut_imagen = a.aut_imagen,
+                CategoriaNombre = a.Categoria.cat_nombre,
+                // Información de ofertas
+                OfertaId = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_id,
+                PorcentajeOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje,
+                DescripcionOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_descripcion,
+                FechaInicio = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio,
+                FechaFin = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin,
+                PrecioOferta = a.Ofertas.Any() 
+                    ? a.aut_precio - (a.aut_precio * (a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje / 100m))
+                    : (decimal?)null,
+                OfertaActiva = a.Ofertas.Any() 
+                    ? (hoy >= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio 
+                    && hoy <= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin)
+                    : (bool?)null
+            }).ToList();
+
             var totalPaginas = esNovedades ? 1 : (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
 
             var carrito = _context.Carritos.FirstOrDefault(c => c.UsuarioId == User.Identity.Name);
 
-            var viewModel = new CatalogoViewModel
+            // MODIFICACIÓN: Usar CatalogoViewModelModificado en lugar del original
+            var viewModel = new CatalogoViewModelModificado
             {
                 Autopartes = autopartes,
                 Carrito = carrito,
@@ -121,7 +151,6 @@ namespace Marimon.Controllers
             ViewBag.Categorias = _context.Categorias.ToList();
             return View(viewModel);
         }
-
 
         // GET: Catalogo/DetalleAutoparte/5
         public async Task<IActionResult> DetalleAutoparte(int id)
@@ -349,7 +378,15 @@ namespace Marimon.Controllers
                 return Json(new List<object>());
             }
         }
+    }
 
-
+    // NUEVA CLASE: ViewModel modificado para usar AutoparteViewModel
+    public class CatalogoViewModelModificado
+    {
+        public List<AutoparteViewModel> Autopartes { get; set; } = new List<AutoparteViewModel>();
+        public Carrito Carrito { get; set; }
+        public int PaginaActual { get; set; }
+        public int TotalPaginas { get; set; }
+        public string Buscar { get; set; }
     }
 }

@@ -1,8 +1,7 @@
-@model Marimon.Models.CatalogoViewModel
+@model Marimon.Controllers.CatalogoViewModelModificado
 
 @{
     ViewData["Title"] = "Catálogo";
-
 }
 
 <!-- Font Awesome -->
@@ -168,24 +167,80 @@
                             @foreach (var autoparte in Model.Autopartes)
                             {
                                 <div class="col-md-4 col-sm-6 mb-4">
-                                    <div class="card producto-card h-100 shadow-sm">
+                                    <div class="card producto-card h-100 shadow-sm @(autoparte.OfertaActiva == true ? "oferta" : "")">
+                                        
+                                        @if (autoparte.OfertaActiva == true)
+                                        {
+                                            <!-- Badge de descuento -->
+                                            <div class="oferta-badge">
+                                                <i class="fas fa-fire"></i> -@autoparte.PorcentajeOferta.Value.ToString("0")%
+                                            </div>
+                                            <!-- Ribbon de oferta -->
+                                            <div class="oferta-ribbon">
+                                                ¡OFERTA!
+                                            </div>
+                                        }
+
                                         <div class="p-3 text-center">
                                             <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre"
                                                 class="producto-imagen" style="cursor:pointer;"
                                                 onclick="cargarDetalleAutoparte(@autoparte.aut_id)" />
                                         </div>
+                                        
                                         <div class="card-body text-center">
                                             <h5 class="card-title">@autoparte.aut_nombre</h5>
-                                            <p class="card-text precio">Precio:
-                                                <strong>S/@autoparte.aut_precio.ToString("0.00")</strong>
-                                            </p>
+                                            
+                                            @if (autoparte.OfertaActiva == true && !string.IsNullOrEmpty(autoparte.DescripcionOferta))
+                                            {
+                                                <div class="oferta-descripcion">
+                                                    <i class="fas fa-tag"></i> @autoparte.DescripcionOferta
+                                                </div>
+                                            }
+
+                                            @if (autoparte.OfertaActiva == true)
+                                            {
+                                                <div class="precio-oferta">
+                                                    <span class="precio-original">S/@autoparte.aut_precio.ToString("0.00")</span>
+                                                    <span class="precio-descuento">
+                                                        <strong>S/@autoparte.PrecioOferta.Value.ToString("0.00")</strong>
+                                                        <small class="text-success ms-1">
+                                                            <i class="fas fa-arrow-down"></i> 
+                                                            Ahorras S/@((autoparte.aut_precio - autoparte.PrecioOferta.Value).ToString("0.00"))
+                                                        </small>
+                                                    </span>
+                                                </div>
+                                                
+                                                @if (autoparte.FechaFin.HasValue)
+                                                {
+                                                    <div class="tiempo-oferta">
+                                                        <i class="fas fa-clock"></i> 
+                                                        Válida hasta: @autoparte.FechaFin.Value.ToString("dd/MM/yyyy")
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <p class="card-text precio">Precio:
+                                                    <strong>S/@autoparte.aut_precio.ToString("0.00")</strong>
+                                                </p>
+                                            }
+
                                             @if (User.Identity.IsAuthenticated)
                                             {
                                                 @if (autoparte.aut_cantidad > 0)
                                                 {
-                                                    <button class="btn btn-dark btn-search" type="button"
-                                                        onclick="añadirAlCarritoAsync(@autoparte.aut_id, 1)">
-                                                        Añadir al Carrito
+                                                    <button class="btn @(autoparte.OfertaActiva == true ? "btn-oferta" : "btn-dark") btn-search" 
+                                                            type="button"
+                                                            onclick="añadirAlCarritoAsync(@autoparte.aut_id, 1)">
+                                                        @if (autoparte.OfertaActiva == true)
+                                                        {
+                                                            <i class="fas fa-fire"></i>
+                                                            <text> ¡Aprovechar Oferta!</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>Añadir al Carrito</text>
+                                                        }
                                                     </button>
                                                 }
                                                 else
@@ -197,8 +252,7 @@
                                             {
                                                 <div class="alert alert-warning">
                                                     Debes <a href="/Identity/Account/Login">iniciar sesión</a> para añadir
-                                                    productos a
-                                                    la cesta.
+                                                    productos a la cesta.
                                                 </div>
                                             }
                                         </div>
