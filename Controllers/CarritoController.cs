@@ -36,11 +36,10 @@ namespace Marimon.Controllers
 
             if (identityUserId == null)
             {
-                return RedirectToAction("Login", "Account"); // o muestra un mensaje
+                return RedirectToAction("Login", "Account");
             }
 
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
-
             if (usuario == null)
             {
                 return RedirectToAction("Login", "Account");
@@ -49,10 +48,17 @@ namespace Marimon.Controllers
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
                     .ThenInclude(ca => ca.Autoparte)
+                        .ThenInclude(a => a.Ofertas)
                 .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
 
-            return View(carrito ?? new Carrito { CarritoAutopartes = new List<CarritoAutoparte>() });
+            if (carrito == null)
+            {
+                carrito = new Carrito { CarritoAutopartes = new List<CarritoAutoparte>() };
+            }
+
+            return View(carrito);
         }
+
 
         // M�todo para mostrar el sidebar del carrito
         public async Task<IActionResult> Side()
@@ -86,7 +92,22 @@ namespace Marimon.Controllers
             try
             {
                 // Buscar el autoparte
-                var autoparte = await _context.Autopartes.FindAsync(autoparteId);
+                var autoparte = await _context.Autopartes
+                    .Include(a => a.Ofertas)
+                    .FirstOrDefaultAsync(a => a.aut_id == autoparteId);
+
+                decimal precioFinal = autoparte.aut_precio;
+                var hoy = DateTime.Now;
+
+                var ofertaActiva = autoparte.Ofertas?
+                    .FirstOrDefault(o => o.ofe_activa && o.ofe_fecha_inicio <= hoy && o.ofe_fecha_fin >= hoy);
+
+                if (ofertaActiva != null)
+                {
+                    precioFinal = autoparte.aut_precio - (autoparte.aut_precio * ofertaActiva.ofe_porcentaje / 100);
+                }
+
+
                 if (autoparte == null)
                 {
                     return Request.Headers["X-Requested-With"] == "XMLHttpRequest"
@@ -122,7 +143,7 @@ namespace Marimon.Controllers
                 if (carritoProducto != null)
                 {
                     carritoProducto.car_cantidad += cantidad;
-                    carritoProducto.car_subtotal = carritoProducto.car_cantidad * autoparte.aut_precio;
+                    carritoProducto.car_subtotal = carritoProducto.car_cantidad * precioFinal;
                 }
                 else
                 {
@@ -130,7 +151,7 @@ namespace Marimon.Controllers
                     {
                         AutoparteId = autoparteId,
                         car_cantidad = cantidad,
-                        car_subtotal = cantidad * autoparte.aut_precio,
+                        car_subtotal = cantidad * precioFinal,
                         Autoparte = autoparte,
                     });
                 }
@@ -185,7 +206,9 @@ namespace Marimon.Controllers
         public async Task<IActionResult> ActualizarCantidad([FromBody] ActualizarCantidadRequest request)
         {
             var carrito = await _context.Carritos
-                .Include(c => c.CarritoAutopartes).ThenInclude(ca => ca.Autoparte)
+                .Include(c => c.CarritoAutopartes)
+                    .ThenInclude(ca => ca.Autoparte)
+                        .ThenInclude(a => a.Ofertas)
                 .FirstOrDefaultAsync(c => c.car_id == request.CarritoId);
 
             if (carrito == null)
@@ -195,13 +218,33 @@ namespace Marimon.Controllers
             if (carritoAutoparte == null)
                 return NotFound(new { Message = "CarritoAutoparte no encontrado", request.ProductoId });
 
+            var autoparte = carritoAutoparte.Autoparte;
+
+            decimal precioBase = autoparte.aut_precio;
+
+            // Buscar oferta activa si existe
+            var ofertaActiva = autoparte.Ofertas?.FirstOrDefault(o => o.ofe_activa) ?? null;
+
+            if (ofertaActiva != null)
+            {
+                // Aplica descuento
+                precioBase = precioBase * (1 - (ofertaActiva.ofe_porcentaje / 100));
+            }
+
             carritoAutoparte.car_cantidad = request.NuevaCantidad;
-            carritoAutoparte.car_subtotal = carritoAutoparte.Autoparte.aut_precio * request.NuevaCantidad;
+
+            // Actualiza subtotal según precio con o sin oferta
+            carritoAutoparte.car_subtotal = precioBase * request.NuevaCantidad;
 
             await _context.SaveChangesAsync();
 
-            return Json(new { subtotal = carritoAutoparte.car_subtotal, total = carrito.car_total });
+            // Calcula total usando la propiedad calculada car_total (no se asigna, solo se lee)
+            decimal total = carrito.car_total;
+
+            return Json(new { subtotal = carritoAutoparte.car_subtotal, total = total });
         }
+
+
 
 
         [HttpPost]

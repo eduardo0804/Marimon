@@ -40,38 +40,57 @@
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody id="productos-carrito">
-                        @foreach (var item in Model.CarritoAutopartes)
-                        {
-                            var autoparte = item.Autoparte;
-                            <tr id="producto-@item.carAut_id" data-stock="@autoparte.aut_cantidad" class="cart-item">
-                                <td class="text-start">
-                                    <div class="d-flex align-items-center">
-                                        <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="product-img me-3">
-                                        <div>
-                                            <div class="product-name">@autoparte.aut_nombre</div>
-                                            <small class="text-muted">Código: @autoparte.aut_id</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="price">S/ @autoparte.aut_precio.ToString("0.00")</td>
-                                <td>
-                                    <div class="quantity-control">
-                                        <button class="quantity-btn decrease-btn" data-producto-id="@item.carAut_id">-</button>
-                                        <span id="cantidad-@item.carAut_id" class="quantity-input">@item.car_cantidad</span>
-                                        <button class="quantity-btn increase-btn" data-producto-id="@item.carAut_id">+</button>
-                                    </div>
-                                </td>
-                                <td class="subtotal price" id="subtotal-@item.carAut_id">S/ @item.car_subtotal.ToString("0.00")
-                                </td>
-                                <td>
-                                    <button class="remove-btn" data-producto-id="@item.carAut_id" title="Eliminar">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
+<tbody id="productos-carrito">
+    @foreach (var item in Model.CarritoAutopartes)
+    {
+        var autoparte = item.Autoparte;
+
+        decimal precioMostrar = autoparte.aut_precio;
+
+        if (autoparte.Ofertas != null && autoparte.Ofertas.Any(o => o.ofe_activa))
+        {
+            var ofertaActiva = autoparte.Ofertas.First(o => o.ofe_activa);
+            precioMostrar = autoparte.aut_precio * (1 - ofertaActiva.ofe_porcentaje / 100);
+        }
+        <tr id="producto-@item.carAut_id" data-stock="@autoparte.aut_cantidad" class="cart-item">
+            <td class="text-start">
+                <div class="d-flex align-items-center">
+                    <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="product-img me-3">
+                    <div>
+                        <div class="product-name">@autoparte.aut_nombre</div>
+                        <small class="text-muted">Código: @autoparte.aut_id</small>
+                    </div>
+                </div>
+            </td>
+            <td class="price">
+                @if (precioMostrar < autoparte.aut_precio)
+                {
+                    <span class="precio-oferta text-danger fw-bold">S/ @precioMostrar.ToString("0.00")</span>
+                    <br />
+                    <small class="text-muted text-decoration-line-through">S/ @autoparte.aut_precio.ToString("0.00")</small>
+                }
+                else
+                {
+                    <span>S/ @precioMostrar.ToString("0.00")</span>
+                }
+            </td>
+            <td>
+                <div class="quantity-control">
+                    <button class="quantity-btn decrease-btn" data-producto-id="@item.carAut_id">-</button>
+                    <span id="cantidad-@item.carAut_id" class="quantity-input">@item.car_cantidad</span>
+                    <button class="quantity-btn increase-btn" data-producto-id="@item.carAut_id">+</button>
+                </div>
+            </td>
+            <td class="subtotal price" id="subtotal-@item.carAut_id">S/ @item.car_subtotal.ToString("0.00")</td>
+            <td>
+                <button class="remove-btn" data-producto-id="@item.carAut_id" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>
+    }
+</tbody>
+
                 </table>
             </div>
 
