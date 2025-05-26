@@ -52,7 +52,6 @@ namespace Marimon.Controllers
             _stripeSettings = stripeSettings.Value;
         }
 
-
         public async Task<IActionResult> Index()
         {
             var identityUserId = _userManager.GetUserId(User);
@@ -65,7 +64,8 @@ namespace Marimon.Controllers
 
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
-                    .ThenInclude(cp => cp.Autoparte)
+                    .ThenInclude(ca => ca.Autoparte)
+                        .ThenInclude(a => a.Ofertas) // Incluye las ofertas
                 .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
 
             if (carrito == null || !carrito.CarritoAutopartes.Any())
@@ -73,13 +73,19 @@ namespace Marimon.Controllers
                 return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
             }
 
-            // Convertir los elementos del carrito a CarritoItem
-            var carritoItems = carrito.CarritoAutopartes.Select(item => new Carrito.CarritoItem
+            // Convertir los elementos del carrito a CarritoItem con precios actualizados
+            var carritoItems = carrito.CarritoAutopartes.Select(item =>
             {
-                Nombre = item.Autoparte.aut_nombre,
-                PrecioUnitario = item.Autoparte.aut_precio,
-                Cantidad = item.car_cantidad,
-                ImagenUrl = item.Autoparte.aut_imagen
+                var autoparte = item.Autoparte;
+                decimal precioUnitario = CalcularPrecioConOferta(autoparte);
+
+                return new Carrito.CarritoItem
+                {
+                    Nombre = autoparte.aut_nombre,
+                    PrecioUnitario = precioUnitario,
+                    Cantidad = item.car_cantidad,
+                    ImagenUrl = autoparte.aut_imagen
+                };
             }).ToList();
 
             ViewBag.TipoComprobante = TempData["tipoComprobante"]?.ToString();
@@ -89,11 +95,42 @@ namespace Marimon.Controllers
             ViewBag.FacRuc = TempData["fac_ruc"]?.ToString();
             ViewBag.FacDireccion = TempData["fac_direccion"]?.ToString();
 
-            // Crear el tuple 
             var modelo = new Tuple<Usuario, List<Carrito.CarritoItem>>(usuario, carritoItems);
 
             return View(modelo);
         }
+
+
+        // MÉTODO PARA CALCULAR PRECIO CON OFERTAS
+        private decimal CalcularPrecioConOferta(Autoparte autoparte)
+        {
+            decimal precio = autoparte.aut_precio;
+            
+            var ofertaActiva = autoparte.Ofertas?.FirstOrDefault(o => 
+                o.ofe_activa && 
+                o.ofe_fecha_inicio <= DateTime.Now && 
+                o.ofe_fecha_fin >= DateTime.Now);
+                
+            if (ofertaActiva != null)
+            {
+                precio = autoparte.aut_precio * (1 - ofertaActiva.ofe_porcentaje / 100);
+            }
+            
+            return precio;
+        }
+
+        // MÉTODO PARA CALCULAR TOTAL DEL CARRITO CON OFERTAS
+        private decimal CalcularTotalCarritoConOfertas(List<CarritoAutoparte> items)
+        {
+            decimal total = 0;
+            foreach (var item in items)
+            {
+                decimal precioConOferta = CalcularPrecioConOferta(item.Autoparte);
+                total += precioConOferta * item.car_cantidad;
+            }
+            return total;
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> RegistrarComprobante(string tipoComprobante, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion)
@@ -294,7 +331,6 @@ namespace Marimon.Controllers
             TempData["fac_ruc"] = fac_ruc;
             TempData["fac_direccion"] = fac_direccion;
 
-            // Si es tarjeta, crea una sesión de Stripe
             var identityUserId = _userManager.GetUserId(User);
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
 
@@ -303,9 +339,11 @@ namespace Marimon.Controllers
                 return Unauthorized("Usuario no encontrado.");
             }
 
+            // IMPORTANTE: Incluir las ofertas en la consulta
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
                     .ThenInclude(cp => cp.Autoparte)
+                        .ThenInclude(a => a.Ofertas) // AGREGAR ESTA LÍNEA
                 .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
 
             if (carrito == null || !carrito.CarritoAutopartes.Any())
@@ -313,32 +351,34 @@ namespace Marimon.Controllers
                 return BadRequest("El carrito está vacío.");
             }
 
-
-            // Si el método de pago es Yape, procesa directamente
+            // Si el método de pago es Yape
             if (metodoPago == "yape")
             {
-                // Almacenar datos en TempData para recuperarlos en PagoYape
+                // Calcular total con ofertas para Yape
+                decimal totalYapeConOfertas = CalcularTotalCarritoConOfertas(carrito.CarritoAutopartes.ToList());
+                
                 TempData["tipoComprobante"] = tipoComprobante;
                 TempData["tipoDocumento"] = tipoDocumento;
                 TempData["num_identificacion"] = num_identificacion;
                 TempData["fac_razon"] = fac_razon;
                 TempData["fac_ruc"] = fac_ruc;
                 TempData["fac_direccion"] = fac_direccion;
-
-                // Guardar el total en TempData
-                TempData["totalPago"] = carrito.car_total.ToString(CultureInfo.InvariantCulture);
+                TempData["totalPago"] = totalYapeConOfertas.ToString(CultureInfo.InvariantCulture);
 
                 return RedirectToAction("PagoYape");
             }
 
-            // Crear venta temporal (pendiente de pago)
+            // Para pagos con tarjeta - Calcular total con ofertas
+            decimal totalConOfertas = CalcularTotalCarritoConOfertas(carrito.CarritoAutopartes.ToList());
+
+            // Crear venta temporal con total correcto
             var venta = new Venta
             {
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
-                MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1, // Ajusta según tus IDs de métodos de pago
+                MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1,
                 Estado = "Completado",
-                Total = carrito.car_total
+                Total = totalConOfertas // Usar total calculado con ofertas
             };
 
             _context.Venta.Add(venta);
@@ -352,41 +392,48 @@ namespace Marimon.Controllers
             TempData["fac_direccion"] = fac_direccion;
             TempData["ventaId"] = venta.ven_id;
 
-            // Crear sesión de Stripe
+            // Crear sesión de Stripe con precios correctos
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
-                LineItems = carrito.CarritoAutopartes.Select(item => new SessionLineItemOptions
+                LineItems = carrito.CarritoAutopartes.Select(item =>
                 {
-                    PriceData = new SessionLineItemPriceDataOptions
+                    var autoparte = item.Autoparte;
+                    decimal precioConOferta = CalcularPrecioConOferta(autoparte);
+                    
+                    return new SessionLineItemOptions
                     {
-                        Currency = "pen", // Moneda peruana (soles)
-                        UnitAmount = (long)(item.Autoparte.aut_precio * 100), // Stripe trabaja en centavos
-                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        PriceData = new SessionLineItemPriceDataOptions
                         {
-                            Name = item.Autoparte.aut_nombre,
-                            Description = item.Autoparte.aut_descripcion,
-                            Images = new List<string> { item.Autoparte.aut_imagen }
+                            Currency = "pen",
+                            UnitAmount = (long)(precioConOferta * 100), // Usar precio con oferta
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = autoparte.aut_nombre,
+                                Description = autoparte.aut_descripcion,
+                                Images = new List<string> { autoparte.aut_imagen }
+                            },
                         },
-                    },
-                    Quantity = item.car_cantidad, // Cantidad del producto
+                        Quantity = item.car_cantidad,
+                    };
                 }).ToList(),
                 Mode = "payment",
                 SuccessUrl = $"{Request.Scheme}://{Request.Host}/Comprobante/PagoExitoso?session_id={{CHECKOUT_SESSION_ID}}",
-
-                //SuccessUrl = Url.Action("PagoExitoso", "Comprobante", new { session_id = "{CHECKOUT_SESSION_ID}" }, Request.Scheme),
                 CancelUrl = Url.Action("Index", "Comprobante", null, Request.Scheme)
             };
 
             var service = new SessionService();
             var session = service.Create(options);
 
-            // Guardar el ID de sesión en la venta
             venta.StripeSessionId = session.Id;
             await _context.SaveChangesAsync();
 
             return Redirect(session.Url);
         }
+
+
+
+
 
         private async Task EnviarCorreoEstadoAsync(int ventaId, string estado, string correoUsuario, string nombreUsuario, [FromServices] IEmailSenderWithAttachments emailSender)
         {
@@ -1114,7 +1161,6 @@ namespace Marimon.Controllers
 
         public IActionResult PagoYape()
         {
-            // Crea un ViewModel con los datos almacenados en TempData
             var viewModel = new PagoYapeViewModel
             {
                 TipoComprobante = TempData["tipoComprobante"]?.ToString(),
@@ -1131,27 +1177,26 @@ namespace Marimon.Controllers
             TempData.Keep("fac_razon");
             TempData.Keep("fac_ruc");
             TempData.Keep("fac_direccion");
-            TempData.Keep("totalPago"); // Mantener el total
+            TempData.Keep("totalPago");
+            
             return View(viewModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> ConfirmarPagoYape(IFormFile comprobanteFile)
         {
-            // Verificar si se ha subido un archivo
             if (comprobanteFile == null || comprobanteFile.Length == 0)
             {
                 return BadRequest("No se ha seleccionado ningún archivo.");
             }
 
-            // Recuperar los datos del TempData
             string tipoComprobante = TempData["tipoComprobante"]?.ToString();
             string num_identificacion = TempData["num_identificacion"]?.ToString();
             string fac_razon = TempData["fac_razon"]?.ToString();
             string fac_ruc = TempData["fac_ruc"]?.ToString();
             string fac_direccion = TempData["fac_direccion"]?.ToString();
 
-            // Validar tipo de archivo (solo imágenes)
+            // Validar tipo de archivo
             string[] permitidos = { ".jpg", ".jpeg", ".png" };
             var extension = Path.GetExtension(comprobanteFile.FileName).ToLowerInvariant();
 
@@ -1160,13 +1205,11 @@ namespace Marimon.Controllers
                 return BadRequest("El archivo debe ser una imagen (JPG, JPEG o PNG).");
             }
 
-            // Verificar tamaño (máximo 5MB)
             if (comprobanteFile.Length > 5 * 1024 * 1024)
             {
                 return BadRequest("El archivo no debe exceder los 5MB.");
             }
 
-            // Obtener el usuario actual
             var identityUserId = _userManager.GetUserId(User);
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
 
@@ -1175,15 +1218,15 @@ namespace Marimon.Controllers
                 return Unauthorized("Usuario no encontrado.");
             }
 
-            // Obtener el carrito
+            // IMPORTANTE: Incluir ofertas en la consulta
             var carrito = await _context.Carritos
                 .Include(c => c.CarritoAutopartes)
                     .ThenInclude(cp => cp.Autoparte)
+                        .ThenInclude(a => a.Ofertas) // AGREGAR ESTA LÍNEA
                 .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
 
             if (carrito == null || !carrito.CarritoAutopartes.Any())
             {
-                // Si el carrito está vacío, redirige a una página amigable
                 return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
             }
 
@@ -1193,14 +1236,17 @@ namespace Marimon.Controllers
             {
                 return BadRequest("El método de pago especificado no es válido.");
             }
+
+            // Calcular total con ofertas para Yape
+            decimal totalConOfertasYape = CalcularTotalCarritoConOfertas(carrito.CarritoAutopartes.ToList());
             
-            // Crear venta
+            // Crear venta con total correcto
             var venta = new Venta
             {
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
-                MetodoPagoId = metodoPagoId, // ID para Yape
-                Total = carrito.car_total,
+                MetodoPagoId = metodoPagoId,
+                Total = totalConOfertasYape, // Usar total calculado con ofertas
                 Estado = "Pendiente"
             };
 
@@ -1295,9 +1341,11 @@ namespace Marimon.Controllers
             _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
             await _context.SaveChangesAsync();
 
-            // Redirigir usando el patrón POST-Redirect-GET para evitar reenvíos
             return RedirectToAction("PagoYapeExitoso", new { id = comprobante.com_id });
         }
+
+
+
 
         // Nueva acción para mostrar la vista de éxito
         public async Task<IActionResult> PagoYapeExitoso(int id)
