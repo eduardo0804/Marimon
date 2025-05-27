@@ -82,7 +82,7 @@
 
         <div class="form-group">
             <label>Número de Pedido</label>
-            <input type="text" asp-for="NumeroReferencia" class="form-control" name="NumeroPedido" id="numeroPedido" />
+            <input type="text"  class="form-control" name="NumeroPedido" id="numeroPedido" />
             <div class="invalid-feedback">Por favor, ingresa el número de pedido.</div>
         </div>
 
@@ -109,7 +109,7 @@
 
         <div class="form-group">
             <label>Número de Servicio</label>
-            <input type="text" asp-for="NumeroReferencia" class="form-control" name="NumeroServicio"
+            <input type="text"  class="form-control" name="NumeroServicio"
                 id="numeroServicio" />
             <div class="invalid-feedback">Por favor, ingresa el número de servicio.</div>
         </div>
@@ -125,6 +125,8 @@
     <!-- Campos ocultos -->
     <input type="hidden" asp-for="EntidadId" id="hiddenEntidadId" name="EntidadId" />
     <input type="hidden" asp-for="NombreEntidad" id="hiddenNombreEntidad" name="NombreEntidad" />
+    <input type="hidden" id="numeroReferencia" name="NumeroReferencia" />
+
 
     <div class="form-group">
         <label asp-for="Descripcion">Descripción</label>
@@ -152,6 +154,8 @@
             const montoServicio = document.getElementById("montoServicio");
             const numeroServicio = document.getElementById("numeroServicio");
 
+            // 👇 NUEVO: Referencia al campo oculto que el backend espera
+            const numeroReferencia = document.getElementById("numeroReferencia");
 
             const productos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(productos));
             let submitted = false;
@@ -247,7 +251,6 @@
                 return valido;
             }
 
-
             form.addEventListener('submit', function (event) {
                 submitted = true;
                 limpiarValidaciones();
@@ -266,11 +269,15 @@
                         entidadId = productoSelect.value;
                         nombreEntidad = productoSelect.options[productoSelect.selectedIndex]?.text || "";
                     }
+                    // 👇 Copiar el valor de numeroPedido a numeroReferencia
+                    numeroReferencia.value = numeroPedido.value;
                 } else if (servicioSection.style.display === 'block') {
                     if (servicioSelect.value) {
                         entidadId = servicioSelect.value;
                         nombreEntidad = servicioSelect.options[servicioSelect.selectedIndex]?.text || "";
                     }
+                    // 👇 Copiar el valor de numeroServicio a numeroReferencia
+                    numeroReferencia.value = numeroServicio.value;
                 }
 
                 hiddenEntidadId.value = entidadId;
