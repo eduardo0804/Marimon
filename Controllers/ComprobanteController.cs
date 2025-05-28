@@ -52,84 +52,120 @@ namespace Marimon.Controllers
             _stripeSettings = stripeSettings.Value;
         }
 
-        public async Task<IActionResult> Index()
+// MODIFICACIONES EN EL MÉTODO Index (agregar parámetro para código de descuento)
+public async Task<IActionResult> Index(string codigoDescuento = null)
+{
+    var identityUserId = _userManager.GetUserId(User);
+    var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
+
+    if (usuario == null)
+    {
+        return RedirectToAction("Login", "Account");
+    }
+
+    var carrito = await _context.Carritos
+        .Include(c => c.CarritoAutopartes)
+            .ThenInclude(ca => ca.Autoparte)
+                .ThenInclude(a => a.Ofertas) // Incluye las ofertas
+        .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
+
+    if (carrito == null || !carrito.CarritoAutopartes.Any())
+    {
+        return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
+    }
+
+    // Convertir los elementos del carrito a CarritoItem con precios actualizados
+    var carritoItems = carrito.CarritoAutopartes.Select(item =>
+    {
+        var autoparte = item.Autoparte;
+        decimal precioUnitario = CalcularPrecioAutopartes(autoparte, codigoDescuento);
+
+        return new Carrito.CarritoItem
         {
-            var identityUserId = _userManager.GetUserId(User);
-            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
+            Nombre = autoparte.aut_nombre,
+            PrecioUnitario = precioUnitario,
+            Cantidad = item.car_cantidad,
+            ImagenUrl = autoparte.aut_imagen
+        };
+    }).ToList();
 
-            if (usuario == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
+    ViewBag.TipoComprobante = TempData["tipoComprobante"]?.ToString();
+    ViewBag.TipoDocumento = TempData["tipoDocumento"]?.ToString();
+    ViewBag.NumIdentificacion = TempData["num_identificacion"]?.ToString();
+    ViewBag.FacRazon = TempData["fac_razon"]?.ToString();
+    ViewBag.FacRuc = TempData["fac_ruc"]?.ToString();
+    ViewBag.FacDireccion = TempData["fac_direccion"]?.ToString();
+    ViewBag.CodigoDescuento = codigoDescuento; // Pasar el código a la vista
 
-            var carrito = await _context.Carritos
-                .Include(c => c.CarritoAutopartes)
-                    .ThenInclude(ca => ca.Autoparte)
-                        .ThenInclude(a => a.Ofertas) // Incluye las ofertas
-                .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
+    var modelo = new Tuple<Usuario, List<Carrito.CarritoItem>>(usuario, carritoItems);
 
-            if (carrito == null || !carrito.CarritoAutopartes.Any())
-            {
-                return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
-            }
-
-            // Convertir los elementos del carrito a CarritoItem con precios actualizados
-            var carritoItems = carrito.CarritoAutopartes.Select(item =>
-            {
-                var autoparte = item.Autoparte;
-                decimal precioUnitario = CalcularPrecioConOferta(autoparte);
-
-                return new Carrito.CarritoItem
-                {
-                    Nombre = autoparte.aut_nombre,
-                    PrecioUnitario = precioUnitario,
-                    Cantidad = item.car_cantidad,
-                    ImagenUrl = autoparte.aut_imagen
-                };
-            }).ToList();
-
-            ViewBag.TipoComprobante = TempData["tipoComprobante"]?.ToString();
-            ViewBag.TipoDocumento = TempData["tipoDocumento"]?.ToString();
-            ViewBag.NumIdentificacion = TempData["num_identificacion"]?.ToString();
-            ViewBag.FacRazon = TempData["fac_razon"]?.ToString();
-            ViewBag.FacRuc = TempData["fac_ruc"]?.ToString();
-            ViewBag.FacDireccion = TempData["fac_direccion"]?.ToString();
-
-            var modelo = new Tuple<Usuario, List<Carrito.CarritoItem>>(usuario, carritoItems);
-
-            return View(modelo);
-        }
+    return View(modelo);
+}
 
 
-        // MÉTODO PARA CALCULAR PRECIO CON OFERTAS
-        private decimal CalcularPrecioConOferta(Autoparte autoparte)
-        {
-            decimal precio = autoparte.aut_precio;
+// MÉTODO PARA CALCULAR PRECIO CON OFERTAS Y DESCUENTOS
+private decimal CalcularPrecioAutopartes(Autoparte autoparte, string codigoDescuento = null)
+{
+    decimal precio = autoparte.aut_precio;
+    
+    // Primero verificar si hay oferta activa
+    var ofertaActiva = autoparte.Ofertas?.FirstOrDefault(o => 
+        o.ofe_activa && 
+        o.ofe_fecha_inicio <= DateTime.Now && 
+        o.ofe_fecha_fin >= DateTime.Now);
+        
+    if (ofertaActiva != null)
+    {
+        precio = autoparte.aut_precio * (1 - ofertaActiva.ofe_porcentaje / 100);
+    }
+    
+    // Si hay código de descuento, verificar si aplica
+    if (!string.IsNullOrEmpty(codigoDescuento))
+    {
+        var codigo = _context.CodigosDescuento.FirstOrDefault(c => 
+            c.cod_codigo == codigoDescuento && 
+            !c.cod_utilizado &&
+            c.cod_fecha_expiracion >= DateTime.Now &&
+            (c.AutoparteId == null || c.AutoparteId == autoparte.aut_id));
             
-            var ofertaActiva = autoparte.Ofertas?.FirstOrDefault(o => 
-                o.ofe_activa && 
-                o.ofe_fecha_inicio <= DateTime.Now && 
-                o.ofe_fecha_fin >= DateTime.Now);
-                
-            if (ofertaActiva != null)
-            {
-                precio = autoparte.aut_precio * (1 - ofertaActiva.ofe_porcentaje / 100);
-            }
-            
-            return precio;
-        }
-
-        // MÉTODO PARA CALCULAR TOTAL DEL CARRITO CON OFERTAS
-        private decimal CalcularTotalCarritoConOfertas(List<CarritoAutoparte> items)
+        if (codigo != null)
         {
-            decimal total = 0;
-            foreach (var item in items)
-            {
-                decimal precioConOferta = CalcularPrecioConOferta(item.Autoparte);
-                total += precioConOferta * item.car_cantidad;
-            }
-            return total;
+            // Aplicar descuento adicional al precio (que ya puede tener oferta aplicada)
+            precio = precio * (1 - codigo.cod_porcentaje / 100);
         }
+    }
+    
+    return precio;
+}
+
+// MÉTODO PARA CALCULAR TOTAL DEL CARRITO CON OFERTAS Y DESCUENTOS
+private decimal CalcularTotalAutopartes(List<CarritoAutoparte> items, string codigoDescuento = null)
+{
+    decimal total = 0;
+    foreach (var item in items)
+    {
+        decimal precioFinal = CalcularPrecioAutopartes(item.Autoparte, codigoDescuento);
+        total += precioFinal * item.car_cantidad;
+    }
+    return total;
+}
+
+// MÉTODO PARA MARCAR CÓDIGO DE DESCUENTO COMO UTILIZADO
+private async Task MarcarCodigoComoUtilizadoAsync(string codigoDescuento)
+{
+    if (!string.IsNullOrEmpty(codigoDescuento))
+    {
+        var codigo = await _context.CodigosDescuento.FirstOrDefaultAsync(c => 
+            c.cod_codigo == codigoDescuento && 
+            !c.cod_utilizado);
+            
+        if (codigo != null)
+        {
+            codigo.cod_utilizado = true;
+            _context.CodigosDescuento.Update(codigo);
+        }
+    }
+}
 
 
         [HttpPost]
@@ -321,120 +357,123 @@ namespace Marimon.Controllers
 
 
         //STRIPE
-        [HttpPost]
-        public async Task<IActionResult> ProcesarPago(string tipoComprobante, string tipoDocumento, string metodoPago, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion)
+[HttpPost]
+public async Task<IActionResult> ProcesarPago(string tipoComprobante, string tipoDocumento, string metodoPago, 
+    string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion, string codigoDescuento = null)
+{
+    TempData["tipoComprobante"] = tipoComprobante;
+    TempData["tipoDocumento"] = tipoDocumento;
+    TempData["num_identificacion"] = num_identificacion;
+    TempData["fac_razon"] = fac_razon;
+    TempData["fac_ruc"] = fac_ruc;
+    TempData["fac_direccion"] = fac_direccion;
+    TempData["codigoDescuento"] = codigoDescuento;
+
+    var identityUserId = _userManager.GetUserId(User);
+    var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
+
+    if (usuario == null)
+    {
+        return Unauthorized("Usuario no encontrado.");
+    }
+
+    // IMPORTANTE: Incluir las ofertas en la consulta
+    var carrito = await _context.Carritos
+        .Include(c => c.CarritoAutopartes)
+            .ThenInclude(cp => cp.Autoparte)
+                .ThenInclude(a => a.Ofertas) // AGREGAR ESTA LÍNEA
+        .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
+
+    if (carrito == null || !carrito.CarritoAutopartes.Any())
+    {
+        return BadRequest("El carrito está vacío.");
+    }
+
+    // Si el método de pago es Yape
+    if (metodoPago == "yape")
+    {
+        // Calcular total con ofertas y descuentos para Yape
+        decimal totalAutopartesYape = CalcularTotalAutopartes(carrito.CarritoAutopartes.ToList(), codigoDescuento);
+        
+        TempData["tipoComprobante"] = tipoComprobante;
+        TempData["tipoDocumento"] = tipoDocumento;
+        TempData["num_identificacion"] = num_identificacion;
+        TempData["fac_razon"] = fac_razon;
+        TempData["fac_ruc"] = fac_ruc;
+        TempData["fac_direccion"] = fac_direccion;
+        TempData["codigoDescuento"] = codigoDescuento;
+        TempData["totalPago"] = totalAutopartesYape.ToString(CultureInfo.InvariantCulture);
+
+
+        return RedirectToAction("PagoYape");
+    }
+
+    // Para pagos con tarjeta - Calcular total con ofertas y descuentos
+    decimal totalAutopartes = CalcularTotalAutopartes(carrito.CarritoAutopartes.ToList(), codigoDescuento);
+
+    // Crear venta temporal con total correcto
+    var venta = new Venta
+    {
+        ven_fecha = DateOnly.FromDateTime(DateTime.Now),
+        UsuarioId = usuario.usu_id,
+        MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1,
+        Estado = "Completado",
+        Total = totalAutopartes // Usar total calculado
+    };
+
+    _context.Venta.Add(venta);
+    await _context.SaveChangesAsync();
+
+    // Marcar código de descuento como utilizado si existe
+    await MarcarCodigoComoUtilizadoAsync(codigoDescuento);
+
+    // Guardar datos de comprobante temporalmente
+    TempData["tipoComprobante"] = tipoComprobante;
+    TempData["num_identificacion"] = num_identificacion;
+    TempData["fac_razon"] = fac_razon;
+    TempData["fac_ruc"] = fac_ruc;
+    TempData["fac_direccion"] = fac_direccion;
+    TempData["codigoDescuento"] = codigoDescuento;
+    TempData["ventaId"] = venta.ven_id;
+
+    // Crear sesión de Stripe con precios correctos
+    var options = new SessionCreateOptions
+    {
+        PaymentMethodTypes = new List<string> { "card" },
+        LineItems = carrito.CarritoAutopartes.Select(item =>
         {
-            TempData["tipoComprobante"] = tipoComprobante;
-            TempData["tipoDocumento"] = tipoDocumento;
-            TempData["num_identificacion"] = num_identificacion;
-            TempData["fac_razon"] = fac_razon;
-            TempData["fac_ruc"] = fac_ruc;
-            TempData["fac_direccion"] = fac_direccion;
-
-            var identityUserId = _userManager.GetUserId(User);
-            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
-
-            if (usuario == null)
+            var autoparte = item.Autoparte;
+            decimal precioFinal = CalcularPrecioAutopartes(autoparte, codigoDescuento);
+            
+            return new SessionLineItemOptions
             {
-                return Unauthorized("Usuario no encontrado.");
-            }
-
-            // IMPORTANTE: Incluir las ofertas en la consulta
-            var carrito = await _context.Carritos
-                .Include(c => c.CarritoAutopartes)
-                    .ThenInclude(cp => cp.Autoparte)
-                        .ThenInclude(a => a.Ofertas) // AGREGAR ESTA LÍNEA
-                .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
-
-            if (carrito == null || !carrito.CarritoAutopartes.Any())
-            {
-                return BadRequest("El carrito está vacío.");
-            }
-
-            // Si el método de pago es Yape
-            if (metodoPago == "yape")
-            {
-                // Calcular total con ofertas para Yape
-                decimal totalYapeConOfertas = CalcularTotalCarritoConOfertas(carrito.CarritoAutopartes.ToList());
-                
-                TempData["tipoComprobante"] = tipoComprobante;
-                TempData["tipoDocumento"] = tipoDocumento;
-                TempData["num_identificacion"] = num_identificacion;
-                TempData["fac_razon"] = fac_razon;
-                TempData["fac_ruc"] = fac_ruc;
-                TempData["fac_direccion"] = fac_direccion;
-                TempData["totalPago"] = totalYapeConOfertas.ToString(CultureInfo.InvariantCulture);
-
-                return RedirectToAction("PagoYape");
-            }
-
-            // Para pagos con tarjeta - Calcular total con ofertas
-            decimal totalConOfertas = CalcularTotalCarritoConOfertas(carrito.CarritoAutopartes.ToList());
-
-            // Crear venta temporal con total correcto
-            var venta = new Venta
-            {
-                ven_fecha = DateOnly.FromDateTime(DateTime.Now),
-                UsuarioId = usuario.usu_id,
-                MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1,
-                Estado = "Completado",
-                Total = totalConOfertas // Usar total calculado con ofertas
-            };
-
-            _context.Venta.Add(venta);
-            await _context.SaveChangesAsync();
-
-            // Guardar datos de comprobante temporalmente
-            TempData["tipoComprobante"] = tipoComprobante;
-            TempData["num_identificacion"] = num_identificacion;
-            TempData["fac_razon"] = fac_razon;
-            TempData["fac_ruc"] = fac_ruc;
-            TempData["fac_direccion"] = fac_direccion;
-            TempData["ventaId"] = venta.ven_id;
-
-            // Crear sesión de Stripe con precios correctos
-            var options = new SessionCreateOptions
-            {
-                PaymentMethodTypes = new List<string> { "card" },
-                LineItems = carrito.CarritoAutopartes.Select(item =>
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    var autoparte = item.Autoparte;
-                    decimal precioConOferta = CalcularPrecioConOferta(autoparte);
-                    
-                    return new SessionLineItemOptions
+                    Currency = "pen",
+                    UnitAmount = (long)(precioFinal * 100), // Usar precio final
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
-                        {
-                            Currency = "pen",
-                            UnitAmount = (long)(precioConOferta * 100), // Usar precio con oferta
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = autoparte.aut_nombre,
-                                Description = autoparte.aut_descripcion,
-                                Images = new List<string> { autoparte.aut_imagen }
-                            },
-                        },
-                        Quantity = item.car_cantidad,
-                    };
-                }).ToList(),
-                Mode = "payment",
-                SuccessUrl = $"{Request.Scheme}://{Request.Host}/Comprobante/PagoExitoso?session_id={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = Url.Action("Index", "Comprobante", null, Request.Scheme)
+                        Name = autoparte.aut_nombre,
+                        Description = autoparte.aut_descripcion,
+                        Images = new List<string> { autoparte.aut_imagen }
+                    },
+                },
+                Quantity = item.car_cantidad,
             };
+        }).ToList(),
+        Mode = "payment",
+        SuccessUrl = $"{Request.Scheme}://{Request.Host}/Comprobante/PagoExitoso?session_id={{CHECKOUT_SESSION_ID}}",
+        CancelUrl = Url.Action("Index", "Comprobante", null, Request.Scheme)
+    };
 
-            var service = new SessionService();
-            var session = service.Create(options);
+    var service = new SessionService();
+    var session = service.Create(options);
 
-            venta.StripeSessionId = session.Id;
-            await _context.SaveChangesAsync();
+    venta.StripeSessionId = session.Id;
+    await _context.SaveChangesAsync();
 
-            return Redirect(session.Url);
-        }
-
-
-
-
-
+    return Redirect(session.Url);
+}
         private async Task EnviarCorreoEstadoAsync(int ventaId, string estado, string correoUsuario, string nombreUsuario, [FromServices] IEmailSenderWithAttachments emailSender)
         {
             try
@@ -945,9 +984,10 @@ namespace Marimon.Controllers
             foreach (var detalle in detallesVenta)
             {
                 var autoparte = detalle.Autoparte;
+                var venta_total = detalle.Venta;
                 decimal precioUnitario = Math.Round(autoparte.aut_precio / 1.18m, 2);
-                decimal subTotalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2);
-                decimal totalItem = Math.Round(autoparte.aut_precio * detalle.det_cantidad, 2);
+                decimal subTotalItem = venta_total.Total;
+                decimal totalItem = venta_total.Total;
 
                 htmlContent += $@"
                 <tr>
@@ -1182,168 +1222,171 @@ namespace Marimon.Controllers
             return View(viewModel);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ConfirmarPagoYape(IFormFile comprobanteFile)
+[HttpPost]
+public async Task<IActionResult> ConfirmarPagoYape(IFormFile comprobanteFile)
+{
+    if (comprobanteFile == null || comprobanteFile.Length == 0)
+    {
+        return BadRequest("No se ha seleccionado ningún archivo.");
+    }
+
+    string tipoComprobante = TempData["tipoComprobante"]?.ToString();
+    string num_identificacion = TempData["num_identificacion"]?.ToString();
+    string fac_razon = TempData["fac_razon"]?.ToString();
+    string fac_ruc = TempData["fac_ruc"]?.ToString();
+    string fac_direccion = TempData["fac_direccion"]?.ToString();
+    string codigoDescuento = TempData["codigoDescuento"]?.ToString();
+
+    // Validar tipo de archivo
+    string[] permitidos = { ".jpg", ".jpeg", ".png" };
+    var extension = Path.GetExtension(comprobanteFile.FileName).ToLowerInvariant();
+
+    if (!permitidos.Contains(extension))
+    {
+        return BadRequest("El archivo debe ser una imagen (JPG, JPEG o PNG).");
+    }
+
+    if (comprobanteFile.Length > 5 * 1024 * 1024)
+    {
+        return BadRequest("El archivo no debe exceder los 5MB.");
+    }
+
+    var identityUserId = _userManager.GetUserId(User);
+    var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
+
+    if (usuario == null)
+    {
+        return Unauthorized("Usuario no encontrado.");
+    }
+
+    // IMPORTANTE: Incluir ofertas en la consulta
+    var carrito = await _context.Carritos
+        .Include(c => c.CarritoAutopartes)
+            .ThenInclude(cp => cp.Autoparte)
+                .ThenInclude(a => a.Ofertas) // AGREGAR ESTA LÍNEA
+        .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
+
+    if (carrito == null || !carrito.CarritoAutopartes.Any())
+    {
+        return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
+    }
+
+    var metodoPagoId = 1;
+    var metodoPago = await _context.MetodoPago.FindAsync(metodoPagoId);
+    if (metodoPago == null)
+    {
+        return BadRequest("El método de pago especificado no es válido.");
+    }
+
+    // Calcular total con ofertas y descuentos para Yape
+    decimal totalAutopartes = CalcularTotalAutopartes(carrito.CarritoAutopartes.ToList(), codigoDescuento);
+    
+    // Crear venta con total correcto
+    var venta = new Venta
+    {
+        ven_fecha = DateOnly.FromDateTime(DateTime.Now),
+        UsuarioId = usuario.usu_id,
+        MetodoPagoId = metodoPagoId,
+        Total = totalAutopartes, // Usar total calculado
+        Estado = "Pendiente"
+    };
+
+    _context.Venta.Add(venta);
+    await _context.SaveChangesAsync();
+
+    // Marcar código de descuento como utilizado si existe
+    await MarcarCodigoComoUtilizadoAsync(codigoDescuento);
+
+    // Crear el comprobante
+    var comprobante = new Comprobante
+    {
+        tipo_comprobante = tipoComprobante,
+        VentaId = venta.ven_id,
+        com_imagen = ""
+    };
+    _context.Comprobante.Add(comprobante);
+    await _context.SaveChangesAsync();
+
+    if (!string.IsNullOrEmpty(usuario.usu_correo))
+    {
+        await EnviarCorreoEstadoAsync(venta.ven_id, "Pendiente", usuario.usu_correo, $"{usuario.usu_nombre} {usuario.usu_apellido}", _emailSender);
+    }
+
+    // Crear Boleta o Factura según corresponda
+    if (tipoComprobante?.ToLower() == "boleta")
+    {
+        var boleta = new Boleta
         {
-            if (comprobanteFile == null || comprobanteFile.Length == 0)
-            {
-                return BadRequest("No se ha seleccionado ningún archivo.");
-            }
+            ComprobanteId = comprobante.com_id,
+            num_identificacion = num_identificacion,
+        };
+        _context.Boleta.Add(boleta);
+    }
+    else if (tipoComprobante?.ToLower() == "factura")
+    {
+        var factura = new Factura
+        {
+            ComprobanteId = comprobante.com_id,
+            fac_ruc = fac_ruc,
+            fac_razonsocial = fac_razon,
+            fac_direccion = fac_direccion
+        };
+        _context.Factura.Add(factura);
+    }
 
-            string tipoComprobante = TempData["tipoComprobante"]?.ToString();
-            string num_identificacion = TempData["num_identificacion"]?.ToString();
-            string fac_razon = TempData["fac_razon"]?.ToString();
-            string fac_ruc = TempData["fac_ruc"]?.ToString();
-            string fac_direccion = TempData["fac_direccion"]?.ToString();
+    // Crear detalles de venta y actualizar stock
+    foreach (var item in carrito.CarritoAutopartes)
+    {
+        var detalle = new DetalleVentas
+        {
+            VentaId = venta.ven_id,
+            AutoParteId = item.AutoparteId,
+            det_cantidad = item.car_cantidad
+        };
+        _context.DetalleVentas.Add(detalle);
 
-            // Validar tipo de archivo
-            string[] permitidos = { ".jpg", ".jpeg", ".png" };
-            var extension = Path.GetExtension(comprobanteFile.FileName).ToLowerInvariant();
-
-            if (!permitidos.Contains(extension))
-            {
-                return BadRequest("El archivo debe ser una imagen (JPG, JPEG o PNG).");
-            }
-
-            if (comprobanteFile.Length > 5 * 1024 * 1024)
-            {
-                return BadRequest("El archivo no debe exceder los 5MB.");
-            }
-
-            var identityUserId = _userManager.GetUserId(User);
-            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.usu_id == identityUserId);
-
-            if (usuario == null)
-            {
-                return Unauthorized("Usuario no encontrado.");
-            }
-
-            // IMPORTANTE: Incluir ofertas en la consulta
-            var carrito = await _context.Carritos
-                .Include(c => c.CarritoAutopartes)
-                    .ThenInclude(cp => cp.Autoparte)
-                        .ThenInclude(a => a.Ofertas) // AGREGAR ESTA LÍNEA
-                .FirstOrDefaultAsync(c => c.UsuarioId == usuario.usu_id);
-
-            if (carrito == null || !carrito.CarritoAutopartes.Any())
-            {
-                return RedirectToAction("Index", "Carrito", new { mensaje = "Tu carrito está vacío" });
-            }
-
-            var metodoPagoId = 1;
-            var metodoPago = await _context.MetodoPago.FindAsync(metodoPagoId);
-            if (metodoPago == null)
-            {
-                return BadRequest("El método de pago especificado no es válido.");
-            }
-
-            // Calcular total con ofertas para Yape
-            decimal totalConOfertasYape = CalcularTotalCarritoConOfertas(carrito.CarritoAutopartes.ToList());
-            
-            // Crear venta con total correcto
-            var venta = new Venta
-            {
-                ven_fecha = DateOnly.FromDateTime(DateTime.Now),
-                UsuarioId = usuario.usu_id,
-                MetodoPagoId = metodoPagoId,
-                Total = totalConOfertasYape, // Usar total calculado con ofertas
-                Estado = "Pendiente"
-            };
-
-            _context.Venta.Add(venta);
-            await _context.SaveChangesAsync();
-
-            // Crear el comprobante
-            var comprobante = new Comprobante
-            {
-                tipo_comprobante = tipoComprobante,
-                VentaId = venta.ven_id,
-                com_imagen = ""
-            };
-            _context.Comprobante.Add(comprobante);
-            await _context.SaveChangesAsync();
-
-            if (!string.IsNullOrEmpty(usuario.usu_correo))
-            {
-                await EnviarCorreoEstadoAsync(venta.ven_id, "Pendiente", usuario.usu_correo, $"{usuario.usu_nombre} {usuario.usu_apellido}", _emailSender);
-            }
-
-            // Crear Boleta o Factura según corresponda
-            if (tipoComprobante?.ToLower() == "boleta")
-            {
-                var boleta = new Boleta
-                {
-                    ComprobanteId = comprobante.com_id,
-                    num_identificacion = num_identificacion,
-                };
-                _context.Boleta.Add(boleta);
-            }
-            else if (tipoComprobante?.ToLower() == "factura")
-            {
-                var factura = new Factura
-                {
-                    ComprobanteId = comprobante.com_id,
-                    fac_ruc = fac_ruc,
-                    fac_razonsocial = fac_razon,
-                    fac_direccion = fac_direccion
-                };
-                _context.Factura.Add(factura);
-            }
-
-            // Crear detalles de venta y actualizar stock
-            foreach (var item in carrito.CarritoAutopartes)
-            {
-                var detalle = new DetalleVentas
-                {
-                    VentaId = venta.ven_id,
-                    AutoParteId = item.AutoparteId,
-                    det_cantidad = item.car_cantidad
-                };
-                _context.DetalleVentas.Add(detalle);
-
-                // Reducir stock
-                var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
-                if (autoparte != null)
-                {
-                    autoparte.aut_cantidad -= item.car_cantidad;
-                    _context.Autopartes.Update(autoparte);
-                }
-
-                // Crear salida
-                var salida = new Salida
-                {
-                    sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
-                    sal_cantidad = item.car_cantidad,
-                    ComprobanteId = comprobante.com_id,
-                    AutoparteId = item.AutoparteId
-                };
-                _context.Salida.Add(salida);
-            }
-
-            // Guardar imagen del comprobante
-            string evidenciasDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "evidencias");
-            if (!Directory.Exists(evidenciasDir))
-            {
-                Directory.CreateDirectory(evidenciasDir);
-            }
-            string nombreArchivo = $"evidencias_{comprobante.com_id}{extension}";
-            string rutaCompleta = Path.Combine(evidenciasDir, nombreArchivo);
-
-            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-            {
-                await comprobanteFile.CopyToAsync(stream);
-            }
-
-            comprobante.com_evidencia = "/evidencias/" + nombreArchivo;
-            _context.Comprobante.Update(comprobante);
-
-            // Limpiar el carrito
-            _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("PagoYapeExitoso", new { id = comprobante.com_id });
+        // Reducir stock
+        var autoparte = await _context.Autopartes.FirstOrDefaultAsync(a => a.aut_id == item.AutoparteId);
+        if (autoparte != null)
+        {
+            autoparte.aut_cantidad -= item.car_cantidad;
+            _context.Autopartes.Update(autoparte);
         }
 
+        // Crear salida
+        var salida = new Salida
+        {
+            sal_fechasalida = DateOnly.FromDateTime(DateTime.Now),
+            sal_cantidad = item.car_cantidad,
+            ComprobanteId = comprobante.com_id,
+            AutoparteId = item.AutoparteId
+        };
+        _context.Salida.Add(salida);
+    }
+
+    // Guardar imagen del comprobante
+    string evidenciasDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "evidencias");
+    if (!Directory.Exists(evidenciasDir))
+    {
+        Directory.CreateDirectory(evidenciasDir);
+    }
+    string nombreArchivo = $"evidencias_{comprobante.com_id}{extension}";
+    string rutaCompleta = Path.Combine(evidenciasDir, nombreArchivo);
+
+    using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+    {
+        await comprobanteFile.CopyToAsync(stream);
+    }
+
+    comprobante.com_evidencia = "/evidencias/" + nombreArchivo;
+    _context.Comprobante.Update(comprobante);
+
+    // Limpiar el carrito
+    _context.CarritoAutopartes.RemoveRange(carrito.CarritoAutopartes);
+    await _context.SaveChangesAsync();
+
+    return RedirectToAction("PagoYapeExitoso", new { id = comprobante.com_id });
+}
 
 
 
