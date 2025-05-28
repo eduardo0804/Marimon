@@ -1552,7 +1552,7 @@ a[href="/Identity/Account/Login"]:hover {
   border-radius: 20px;
   font-size: 12px;
   font-weight: bold;
-  z-index: 1000;
+  z-index: 100;
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
   animation: bounce 2s infinite;
   pointer-events: none;
@@ -1588,7 +1588,7 @@ a[href="/Identity/Account/Login"]:hover {
   font-size: 12px;
   font-weight: bold;
   box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
-  z-index: 1000;
+  z-index: 100;
   pointer-events: none;
 }
 

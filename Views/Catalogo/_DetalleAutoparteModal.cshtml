@@ -98,7 +98,7 @@
 
                                 @if (Model.OfertaActiva == true && Model.PrecioOferta.HasValue)
                                 {
-                                    <span><del>@Model.aut_precio.ToString("C")</del> <strong class="text-danger">@Model.PrecioOferta.Value.ToString("C")</strong></span>
+                                    <span><del>S/ @Model.aut_precio.ToString("0.00")</del> <strong class="text-danger">S/ @Model.PrecioOferta.Value.ToString("0.00")</strong></span>
                                     <br/>
                                     <span class="text-success">Oferta: @Model.DescripcionOferta</span>
                                 }
