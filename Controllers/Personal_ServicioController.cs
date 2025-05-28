@@ -96,13 +96,14 @@ namespace Marimon.Controllers
             }
         }
 
-        public IActionResult ConsultarServicios(string nombreServicio, string fechaDesde, string fechaHasta)
+        public IActionResult ConsultarServicios(string nombreServicio, string fechaDesde, string fechaHasta, string estado)
         {
+            // Parse fechas y servicios como antes
+
             var serviciosSeleccionados = string.IsNullOrEmpty(nombreServicio)
                 ? new List<string>()
                 : nombreServicio.Split(',').ToList();
 
-            // Conversión segura a DateTime con tipo UTC
             DateTime? fechaInicio = null;
             DateTime? fechaFin = null;
 
@@ -115,24 +116,18 @@ namespace Marimon.Controllers
             var reservas = _context.Reserva
                 .Include(r => r.Servicio)
                 .Include(r => r.Usuario)
-                .Select(r => new Reserva
-                {
-                    res_id = r.res_id,
-                    res_placa = r.res_placa,
-                    res_fecha = r.res_fecha,
-                    res_hora = r.res_hora,
-                    Servicio = r.Servicio,
-                    Usuario = r.Usuario,
-                    Estado = r.Estado // Asegúrate de incluir el Estado aquí
-                })
                 .Where(r =>
                     (serviciosSeleccionados.Count == 0 || serviciosSeleccionados.Contains(r.Servicio.ser_nombre)) &&
                     (!fechaInicio.HasValue || r.res_fecha >= fechaInicio.Value) &&
-                    (!fechaFin.HasValue || r.res_fecha <= fechaFin.Value)
+                    (!fechaFin.HasValue || r.res_fecha <= fechaFin.Value) &&
+                    (string.IsNullOrEmpty(estado) || r.Estado.ToString() == estado)
                 )
-                .OrderBy(r => r.res_fecha) // Ordena por fecha
-                .ThenBy(r => r.res_hora) // Y luego por hora
+                .OrderBy(r => r.res_fecha)
+                .ThenBy(r => r.res_hora)
                 .ToList();
+
+            ViewBag.EstadoSeleccionado = estado;
+            ViewBag.Estados = reservas.Select(r => r.Estado.ToString()).Distinct().ToList();
 
             var model = new ServicioReservaViewModel
             {
@@ -143,7 +138,6 @@ namespace Marimon.Controllers
 
             return View(model);
         }
-
 
         public IActionResult MServicio()
         {

@@ -2,7 +2,7 @@
 @model Marimon.ViewModel.ServicioReservaViewModel
 @{
     ViewData["Title"] = "Consultar Reserva de Servicios";
-        Layout = "_LayoutServicio";
+    Layout = "_LayoutServicio";
 }
 <link rel="stylesheet" href="~/css/manejarVenta.css" />
 
@@ -76,15 +76,70 @@
                             value="@Context.Request.Query["fechaHasta"]" />
                     </div>
                 </div>
-
-                <div class="mt-4">
-                    <button class="filter-btn" onclick="filtrarReservas()" style="width: 250px !important; min-width: 250px !important; max-width: 150px !important; display: block !important; margin-left: auto !important; margin-right: auto !important;">
-                        <i class="fas fa-filter"></i> Aplicar Filtros
-                    </button>
-                </div>
+                <input type="hidden" id="estadoSeleccionado" value="@ViewBag.EstadoSeleccionado" />
+                <!-- Aquí filtro por estado como opciones clickeables -->
+                <<h6 class="mb-3">Filtrar por estado</h6>
+                    <div class="status-filters d-flex flex-column gap-2">
+                        <a href="javascript:void(0)" onclick="setEstado('')"
+                            class="status-filter d-flex align-items-center p-2 border rounded @(string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) ? "bg-light border-primary" : "")">
+                            <div class="me-2 bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center"
+                                style="width: 30px; height: 30px;">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <span class="d-block">Todos los estados</span>
+                            </div>
+                            <span
+                                class="badge bg-white text-dark border rounded-pill px-3">@Model.Reservas.Count()</span>
+                        </a>
+                        @if (ViewBag.Estados != null)
+                        {
+                            foreach (var est in ViewBag.Estados)
+                            {
+                                var count = Model.Reservas.Count(v => v.Estado.ToString() == est);
+                                var iconClass = "";
+                                var bgClass = "";
+                                switch (est)
+                                {
+                                    case "Pendiente":
+                                        iconClass = "fa-clock";
+                                        bgClass = "bg-warning";
+                                        break;
+                                    case "Completado":
+                                        iconClass = "fa-check-circle";
+                                        bgClass = "bg-success";
+                                        break;
+                                    case "Cancelado":
+                                        iconClass = "fa-times-circle";
+                                        bgClass = "bg-danger";
+                                        break;
+                                    default:
+                                        iconClass = "fa-circle";
+                                        bgClass = "bg-info";
+                                        break;
+                                }
+                                <a href="javascript:void(0)" onclick="setEstado('@est')"
+                                    class="status-filter d-flex align-items-center p-2 border rounded @(ViewBag.EstadoSeleccionado == est ? "bg-light border-primary" : "")">
+                                    <div class="me-2 @bgClass text-white rounded-circle d-flex justify-content-center align-items-center"
+                                        style="width: 30px; height: 30px;">
+                                        <i class="fas @iconClass"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <span class="d-block">@est</span>
+                                    </div>
+                                    <span class="badge bg-white text-dark border rounded-pill px-3">@count</span>
+                                </a>
+                            }
+                        }
+                    </div>
+                    <div class="mt-4">
+                        <button class="filter-btn" onclick="filtrarReservas()"
+                            style="width: 250px !important; min-width: 250px !important; max-width: 150px !important; display: block !important; margin-left: auto !important; margin-right: auto !important;">
+                            <i class="fas fa-filter"></i> Aplicar Filtros
+                        </button>
+                    </div>
             </div>
         </div>
-
         <!-- Table section (Right side) -->
         <div class="col-lg-9">
             <div class="table-container fade-in">
@@ -368,13 +423,17 @@
             });
         }
     });
-
+    function setEstado(estado) {
+        document.getElementById('estadoSeleccionado').value = estado;
+        filtrarReservas();
+    }
     // Function to filter reservations
     function filtrarReservas() {
         var checkboxes = document.querySelectorAll('input[name="servicios"]:checked');
         var serviciosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
         var desde = document.getElementById("fechaDesde").value;
         var hasta = document.getElementById("fechaHasta").value;
+        var estado = document.getElementById("estadoSeleccionado").value;
 
         if (desde && hasta && new Date(desde) > new Date(hasta)) {
             showToast('La fecha "Hasta" debe ser mayor o igual a la fecha "Desde".', 'error');
@@ -388,10 +447,12 @@
         }
 
         if (desde) url += 'fechaDesde=' + desde + '&';
-        if (hasta) url += 'fechaHasta=' + hasta;
+        if (hasta) url += 'fechaHasta=' + hasta + '&';
+        if (estado) url += 'estado=' + encodeURIComponent(estado);
 
         window.location.href = url;
     }
+
 
     // Toast notification function
     function showToast(message, type = 'success') {
