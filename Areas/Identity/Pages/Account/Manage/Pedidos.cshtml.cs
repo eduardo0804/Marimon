@@ -66,7 +66,12 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
                     Total = 0
                 };
 
-                string? codigoDescuento = null; // Si tienes un campo en Venta para cupón, úsalo aquí
+                string? codigoDescuento = null;
+                // Buscar si la venta tiene un campo de código de descuento
+                if (pedido.GetType().GetProperty("CodigoDescuento") != null)
+                {
+                    codigoDescuento = (string?)pedido.GetType().GetProperty("CodigoDescuento")?.GetValue(pedido);
+                }
 
                 foreach (var detalle in pedido.Detalles)
                 {
@@ -108,12 +113,24 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
         {
             decimal precio = autoparte.aut_precio;
             var hoy = DateTime.Now;
+            // Usar la fecha de la venta para la oferta (no la fecha actual)
+            // Pero aquí solo tenemos la autoparte y el código, así que asumimos oferta vigente si existe
             var ofertaActiva = autoparte.Ofertas?.FirstOrDefault(o => o.ofe_activa && o.ofe_fecha_inicio <= hoy && o.ofe_fecha_fin >= hoy);
             if (ofertaActiva != null)
             {
                 precio = autoparte.aut_precio * (1 - ofertaActiva.ofe_porcentaje / 100);
             }
-            // Si tienes lógica de cupones por venta, aquí puedes aplicar el descuento adicional
+            // Lógica de cupones: buscar el cupón por código, sin importar expiración ni si está usado
+            if (!string.IsNullOrEmpty(codigoDescuento))
+            {
+                var cupon = _context.CodigosDescuento.FirstOrDefault(c =>
+                    c.cod_codigo == codigoDescuento &&
+                    (c.AutoparteId == null || c.AutoparteId == autoparte.aut_id));
+                if (cupon != null)
+                {
+                    precio = precio * (1 - cupon.cod_porcentaje / 100);
+                }
+            }
             return precio;
         }
     }

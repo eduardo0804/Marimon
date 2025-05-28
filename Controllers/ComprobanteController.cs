@@ -96,6 +96,7 @@ public async Task<IActionResult> Index(string codigoDescuento = null)
     ViewBag.FacRuc = TempData["fac_ruc"]?.ToString();
     ViewBag.FacDireccion = TempData["fac_direccion"]?.ToString();
     ViewBag.CodigoDescuento = codigoDescuento; // Pasar el código a la vista
+    
 
     var modelo = new Tuple<Usuario, List<Carrito.CarritoItem>>(usuario, carritoItems);
 
@@ -169,8 +170,13 @@ private async Task MarcarCodigoComoUtilizadoAsync(string codigoDescuento)
 
 
         [HttpPost]
-        public async Task<IActionResult> RegistrarComprobante(string tipoComprobante, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion)
+        public async Task<IActionResult> RegistrarComprobante(string tipoComprobante, string num_identificacion, string fac_razon, string fac_ruc, string fac_direccion,string codigoDescuento = null)
         {
+            if (string.IsNullOrEmpty(codigoDescuento) && TempData["codigoDescuento"] != null)
+            {
+                codigoDescuento = TempData["codigoDescuento"].ToString();
+            }
+
             Console.WriteLine($"Tipo de comprobante recibido: {tipoComprobante}");
 
             // 1. Obtener el usuario autenticado
@@ -199,7 +205,8 @@ private async Task MarcarCodigoComoUtilizadoAsync(string codigoDescuento)
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
                 MetodoPagoId = 1, // Puedes modificar esto si es dinámico
-                Total = carrito.car_total
+                Total = carrito.car_total,
+                CodigoDescuento = codigoDescuento // <--- aquí lo guardas
             };
 
             _context.Venta.Add(venta);
@@ -418,7 +425,8 @@ public async Task<IActionResult> ProcesarPago(string tipoComprobante, string tip
         UsuarioId = usuario.usu_id,
         MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1,
         Estado = "Completado",
-        Total = totalAutopartes // Usar total calculado
+        Total = totalAutopartes, // Usar total calculado
+        CodigoDescuento = codigoDescuento // <--- aquí lo guardas
     };
 
     _context.Venta.Add(venta);
