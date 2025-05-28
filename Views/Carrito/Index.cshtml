@@ -14,8 +14,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="~/css/indexCarrito.css" asp-append-version="true">
-
-
 </head>
 
 <body>
@@ -40,58 +38,93 @@
                             <th></th>
                         </tr>
                     </thead>
-<tbody id="productos-carrito">
-    @foreach (var item in Model.CarritoAutopartes)
-    {
-        var autoparte = item.Autoparte;
+                    <tbody id="productos-carrito">
+                        @foreach (var item in Model.CarritoAutopartes)
+                        {
+                            var autoparte = item.Autoparte;
+                            var hoy = DateTime.Now;
+                            
+                            decimal precioMostrar = autoparte.aut_precio;
+                            bool tieneOferta = false;
 
-        decimal precioMostrar = autoparte.aut_precio;
+                            // Verificar ofertas activas con fechas
+                            if (autoparte.Ofertas != null && autoparte.Ofertas.Any())
+                            {
+                                var ofertaActiva = autoparte.Ofertas.FirstOrDefault(o => 
+                                    o.ofe_activa && 
+                                    o.ofe_fecha_inicio <= hoy && 
+                                    o.ofe_fecha_fin >= hoy);
+                                
+                                if (ofertaActiva != null)
+                                {
+                                    // Cálculo exacto del precio con oferta
+                                    precioMostrar = autoparte.aut_precio - (autoparte.aut_precio * ofertaActiva.ofe_porcentaje / 100);
+                                    tieneOferta = true;
+                                }
+                            }
+                            
+                            <tr id="producto-@item.carAut_id" data-stock="@autoparte.aut_cantidad" class="cart-item">
+                                <td class="text-start">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="product-img me-3">
+                                        <div>
+                                            <div class="product-name">@autoparte.aut_nombre</div>
+                                            <small class="text-muted">Código: @autoparte.aut_id</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="price">
+                                    @if (tieneOferta)
+                                    {
+                                        <span class="precio-oferta text-danger fw-bold">S/ @precioMostrar.ToString("0.00")</span>
+                                        <br />
+                                        <small class="text-muted text-decoration-line-through">S/ @autoparte.aut_precio.ToString("0.00")</small>
+                                    }
+                                    else
+                                    {
+                                        <span>S/ @precioMostrar.ToString("0.00")</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="quantity-control">
+                                        <button class="quantity-btn decrease-btn" data-producto-id="@item.carAut_id">-</button>
+                                        <span id="cantidad-@item.carAut_id" class="quantity-input">@item.car_cantidad</span>
+                                        <button class="quantity-btn increase-btn" data-producto-id="@item.carAut_id">+</button>
+                                    </div>
+                                </td>
+                                <td class="subtotal price" id="subtotal-@item.carAut_id">S/ @item.car_subtotal.ToString("F2")</td>
+                                <td>
+                                    <button class="remove-btn" data-producto-id="@item.carAut_id" title="Eliminar">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-        if (autoparte.Ofertas != null && autoparte.Ofertas.Any(o => o.ofe_activa))
-        {
-            var ofertaActiva = autoparte.Ofertas.First(o => o.ofe_activa);
-            precioMostrar = autoparte.aut_precio * (1 - ofertaActiva.ofe_porcentaje / 100);
-        }
-        <tr id="producto-@item.carAut_id" data-stock="@autoparte.aut_cantidad" class="cart-item">
-            <td class="text-start">
-                <div class="d-flex align-items-center">
-                    <img src="@autoparte.aut_imagen" alt="@autoparte.aut_nombre" class="product-img me-3">
-                    <div>
-                        <div class="product-name">@autoparte.aut_nombre</div>
-                        <small class="text-muted">Código: @autoparte.aut_id</small>
+            <!-- Sección de cupón de descuento -->
+            <div class="coupon-section mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-tag me-2 text-primary"></i>¿Tienes un cupón de descuento?
+                        </h6>
+                        <div class="row g-2">
+                            <div class="col-md-8">
+                                <input type="text" id="codigo-cupon" class="form-control" 
+                                    placeholder="Ingresa tu código de descuento" maxlength="50">
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" id="btn-aplicar-cupon" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-check me-1"></i>Aplicar Cupón
+                                </button>
+                            </div>
+                        </div>
+                        <div id="mensaje-cupon" class="mt-2"></div>
                     </div>
                 </div>
-            </td>
-            <td class="price">
-                @if (precioMostrar < autoparte.aut_precio)
-                {
-                    <span class="precio-oferta text-danger fw-bold">S/ @precioMostrar.ToString("0.00")</span>
-                    <br />
-                    <small class="text-muted text-decoration-line-through">S/ @autoparte.aut_precio.ToString("0.00")</small>
-                }
-                else
-                {
-                    <span>S/ @precioMostrar.ToString("0.00")</span>
-                }
-            </td>
-            <td>
-                <div class="quantity-control">
-                    <button class="quantity-btn decrease-btn" data-producto-id="@item.carAut_id">-</button>
-                    <span id="cantidad-@item.carAut_id" class="quantity-input">@item.car_cantidad</span>
-                    <button class="quantity-btn increase-btn" data-producto-id="@item.carAut_id">+</button>
-                </div>
-            </td>
-            <td class="subtotal price" id="subtotal-@item.carAut_id">S/ @item.car_subtotal.ToString("0.00")</td>
-            <td>
-                <button class="remove-btn" data-producto-id="@item.carAut_id" title="Eliminar">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </td>
-        </tr>
-    }
-</tbody>
-
-                </table>
             </div>
 
             <div class="summary-card">
@@ -115,8 +148,8 @@
                 <div class="empty-cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
-                <h3 class="mb-3">Tu carrito est vac�o</h3>
-                <p class="text-muted mb-4">A�n no has agregado ning�n producto a tu carrito de compras.</p>
+                <h3 class="mb-3">Tu carrito está vacío</h3>
+                <p class="text-muted mb-4">Aún no has agregado ningún producto a tu carrito de compras.</p>
                 <a href="/Catalogo" class="btn btn-dark px-4">
                     <i class="fas fa-arrow-left me-2"></i>Volver a la tienda
                 </a>
@@ -129,138 +162,388 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Funci�n para formatear n�meros como moneda
+        // Función para formatear números como moneda con precisión
         function formatCurrency(amount) {
-            return 'S/ ' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            return 'S/ ' + parseFloat(amount).toFixed(2);
         }
 
-        // Funci�n para calcular el total del carrito
+        // Función para calcular el total del carrito
         function calcularTotal() {
-            let total = 0;
-            document.querySelectorAll('.subtotal').forEach(sub => {
-                total += parseFloat(sub.textContent.replace('S/ ', '').replace(/,/g, '')) || 0;
-            });
-            document.getElementById('total').textContent = total.toFixed(2);
+            recalcularTotal(); // Usar la función mejorada
         }
 
-        // Eventos para los botones de cantidad
-        document.addEventListener('click', function (e) {
-            if (e.target.classList.contains('decrease-btn') || e.target.classList.contains('increase-btn')) {
-                const carritoId = @Model.car_id;
-                const productoId = e.target.dataset.productoId;
-                const cantidadSpan = document.getElementById('cantidad-' + productoId);
-                let cantidadActual = parseInt(cantidadSpan.textContent);
-                let nuevaCantidad = cantidadActual;
+document.addEventListener('click', function (e) {
+    // Manejar botones de cantidad
+    if (e.target.classList.contains('decrease-btn') || e.target.classList.contains('increase-btn')) {
+        e.preventDefault(); // Prevenir comportamiento por defecto
+        
+        const carritoId = @Model.car_id;
+        const productoId = parseInt(e.target.dataset.productoId);
+        const cantidadSpan = document.getElementById('cantidad-' + productoId);
+        
+        if (!cantidadSpan) {
+            console.error('No se encontró el elemento cantidad para el producto:', productoId);
+            return;
+        }
+        
+        let cantidadActual = parseInt(cantidadSpan.textContent);
+        let nuevaCantidad = cantidadActual;
 
-                if (e.target.classList.contains('decrease-btn')) {
-                    nuevaCantidad = Math.max(1, cantidadActual - 1);
-                } else {
-                    nuevaCantidad = cantidadActual + 1;
-                }
+        if (e.target.classList.contains('decrease-btn')) {
+            nuevaCantidad = Math.max(1, cantidadActual - 1);
+        } else if (e.target.classList.contains('increase-btn')) {
+            // Verificar stock disponible
+            const row = document.getElementById('producto-' + productoId);
+            const stock = parseInt(row.dataset.stock);
+            
+            if (cantidadActual >= stock) {
+                alert('No hay suficiente stock disponible. Stock máximo: ' + stock);
+                return;
+            }
+            nuevaCantidad = cantidadActual + 1;
+        }
 
-                cantidadSpan.textContent = nuevaCantidad;
+        // Solo proceder si la cantidad cambió
+        if (nuevaCantidad !== cantidadActual) {
+            // Deshabilitar botones temporalmente
+            const allButtons = document.querySelectorAll('.quantity-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            // Actualizar visualmente primero
+            cantidadSpan.textContent = nuevaCantidad;
 
-                $.ajax({
-                    url: '@Url.Action("ActualizarCantidad", "Carrito")',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ carritoId, productoId, nuevaCantidad }),
-                    success: function (data) {
-                        if (data.subtotal !== undefined) {
-                            document.getElementById('subtotal-' + productoId).textContent = formatCurrency(data.subtotal);
-                            calcularTotal();
+            $.ajax({
+                url: '@Url.Action("ActualizarCantidad", "Carrito")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ 
+                    carritoId: carritoId, 
+                    productoId: productoId, 
+                    nuevaCantidad: nuevaCantidad 
+                }),
+                success: function (data) {
+                    console.log('Respuesta del servidor:', data);
+                    
+                    if (data.subtotal !== undefined) {
+                        // Actualizar subtotal
+                        const subtotalElem = document.getElementById('subtotal-' + productoId);
+                        if (subtotalElem) {
+                            subtotalElem.textContent = formatCurrency(data.subtotal);
                         }
-                    },
-                    error: function () {
-                        console.error("Error al actualizar la cantidad.");
+                        
+                        // Recalcular total
+                        if (data.total !== undefined) {
+                            // Usar el total del servidor si está disponible
+                            const totalElem = document.getElementById('total');
+                            if (totalElem) {
+                                totalElem.textContent = parseFloat(data.total).toFixed(2);
+                            }
+                        } else {
+                            // Fallback: recalcular manualmente
+                            recalcularTotal();
+                        }
+                        
+                        console.log('Cantidad actualizada exitosamente');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al actualizar la cantidad:", error);
+                    console.error("Status:", status);
+                    console.error("Response:", xhr.responseText);
+                    
+                    // Revertir el cambio visual en caso de error
+                    cantidadSpan.textContent = cantidadActual;
+                    alert('Error al actualizar la cantidad. Por favor, intenta nuevamente.');
+                },
+                complete: function() {
+                    // Rehabilitar botones
+                    allButtons.forEach(btn => btn.disabled = false);
+                }
+            });
+        }
+    }
+
+    // Eliminar producto del carrito
+    if (e.target.closest('.remove-btn')) {
+        const btn = e.target.closest('.remove-btn');
+        const productoId = parseInt(btn.dataset.productoId);
+        const carritoId = @Model.car_id;
+        const productoRow = document.getElementById('producto-' + productoId);
+
+        if (!productoRow) {
+            console.error('No se encontró la fila del producto:', productoId);
+            return;
+        }
+
+        // Animación de eliminación
+        productoRow.style.transition = 'all 0.3s ease';
+        productoRow.style.opacity = '0';
+        productoRow.style.transform = 'translateX(-50px)';
+
+        setTimeout(() => {
+            $.ajax({
+                url: '@Url.Action("EliminarProducto", "Carrito")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ CarritoId: carritoId, ProductoId: productoId }),
+                success: function (data) {
+                    productoRow.remove();
+                    
+                    const totalElem = document.getElementById('total');
+                    if (totalElem) {
+                        totalElem.textContent = parseFloat(data.total).toFixed(2);
+                    }
+
+                    // Si no quedan productos, mostrar el carrito vacío
+                    if (document.querySelectorAll('#productos-carrito tr').length === 0) {
+                        location.reload();
+                    }
+                    
+                    // Resetear cupón si estaba aplicado
+                    if (cuponAplicado) {
+                        resetearCupon();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al eliminar producto:", error);
+                    productoRow.style.opacity = '1';
+                    productoRow.style.transform = 'translateX(0)';
+                    alert('Error al eliminar el producto. Por favor, intenta nuevamente.');
+                }
+            });
+        }, 300);
+    }
+});
+
+    // Finalizar compra
+    document.getElementById('btn-finalizar')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        let hayError = false;
+        let mensaje = "";
+
+        document.querySelectorAll('#productos-carrito tr').forEach(row => {
+            const stock = parseInt(row.dataset.stock);
+            const cantidad = parseInt(row.querySelector('span[id^="cantidad-"]').textContent);
+            if (cantidad > stock) {
+                const nombre = row.querySelector('.product-name').innerText.trim();
+                mensaje += `• La cantidad de "${nombre}" (${cantidad}) supera el stock disponible (${stock}).\n`;
+                hayError = true;
+
+                // Resaltar la fila con error
+                row.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+                setTimeout(() => {
+                    row.style.backgroundColor = '';
+                }, 2000);
+            }
+        });
+
+        const mensajeError = document.getElementById('mensaje-error');
+        if (hayError) {
+            mensajeError.innerHTML = '<strong>Error en stock:</strong><br>' + mensaje.replace(/\n/g, '<br>');
+        } else {
+            mensajeError.textContent = "";
+            // Animación del botón antes de redirigir
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+            this.disabled = true;
+
+            setTimeout(() => {
+                window.location.href = '/Comprobante?codigoDescuento=' + encodeURIComponent(codigoCuponAplicado);
+            }, 1000);
+        }
+    });
+        let cuponAplicado = false;
+        let codigoCuponAplicado = '';
+        let preciosOriginales = {}; // Para guardar precios originales
+
+        // Función para resetear el estado del cupón
+        function resetearCupon() {
+            cuponAplicado = false;
+            codigoCuponAplicado = '';
+            
+            // Restaurar precios originales si hay cupón aplicado
+            if (Object.keys(preciosOriginales).length > 0) {
+                Object.keys(preciosOriginales).forEach(productoId => {
+                    const row = document.getElementById('producto-' + productoId);
+                    if (row) {
+                        const priceCell = row.querySelector('.price');
+                        const subtotalCell = document.getElementById('subtotal-' + productoId);
+                        
+                        if (priceCell) {
+                            priceCell.innerHTML = 'S/ ' + preciosOriginales[productoId].precio.toFixed(2);
+                        }
+                        if (subtotalCell) {
+                            subtotalCell.textContent = 'S/ ' + preciosOriginales[productoId].subtotal.toFixed(2);
+                        }
                     }
                 });
+                preciosOriginales = {};
             }
 
-            // Eliminar producto del carrito
-            if (e.target.closest('.remove-btn')) {
-                const btn = e.target.closest('.remove-btn');
-                const productoId = btn.dataset.productoId;
-                const carritoId = @Model.car_id;
-                const productoRow = document.getElementById('producto-' + productoId);
+            const inputCupon = document.getElementById('codigo-cupon');
+            const btnAplicar = document.getElementById('btn-aplicar-cupon');
+            const mensajeCupon = document.getElementById('mensaje-cupon');
 
-                // Animaci�n de eliminaci�n
-                productoRow.style.transition = 'all 0.3s ease';
-                productoRow.style.opacity = '0';
-                productoRow.style.transform = 'translateX(-50px)';
+            if (inputCupon) {
+                inputCupon.disabled = false;
+                inputCupon.value = '';
+            }
+            if (btnAplicar) {
+                btnAplicar.style.display = 'inline-block';
+                btnAplicar.disabled = false;
+                btnAplicar.innerHTML = '<i class="fas fa-check me-1"></i>Aplicar Cupón';
+            }
+            if (mensajeCupon) mensajeCupon.innerHTML = '';
+            
+            // Recalcular total original
+            recalcularTotal();
+        }
 
-                setTimeout(() => {
-                    $.ajax({
-                        url: '@Url.Action("EliminarProducto", "Carrito")',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ CarritoId: carritoId, ProductoId: productoId }),
-                        success: function (data) {
-                            productoRow.remove();
-                            document.getElementById('total').textContent = data.total.toFixed(2);
+        // Función para recalcular total
+function recalcularTotal() {
+    let total = 0.00;
+    
+    // Obtener todos los subtotales y sumarlos
+    document.querySelectorAll('[id^="subtotal-"]').forEach(subtotalCell => {
+        const subtotalText = subtotalCell.textContent.replace(/[^\d.,-]/g, '').replace(',', '.').trim();
 
-                            // Si no quedan productos, mostrar el carrito vac�o
-                            if (document.querySelectorAll('#productos-carrito tr').length === 0) {
-                                location.reload();
-                            }
-                        },
-                        error: function () {
-                            productoRow.style.opacity = '1';
-                            productoRow.style.transform = 'translateX(0)';
-                            console.error("Error al eliminar producto.");
+        const subtotalValue = parseFloat(subtotalText);
+        
+        // Verificar que el valor sea válido antes de sumarlo
+        if (!isNaN(subtotalValue)) {
+            total += subtotalValue;
+        }
+    });
+    
+    const totalElem = document.getElementById('total');
+    if (totalElem) {
+        totalElem.textContent = total.toFixed(2);
+    }
+}
+
+
+
+        // Aplicar cupón de descuento
+        document.getElementById('btn-aplicar-cupon')?.addEventListener('click', function() {
+            const codigoCupon = document.getElementById('codigo-cupon').value.trim();
+            const mensajeCupon = document.getElementById('mensaje-cupon');
+            const btn = this;
+
+            if (!codigoCupon) {
+                mensajeCupon.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Por favor ingresa un código de descuento';
+                mensajeCupon.className = 'mt-2 error';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Aplicando...';
+
+            $.ajax({
+                url: '@Url.Action("AplicarCupon", "Carrito")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ CodigoCupon: codigoCupon }),
+                success: function(data) {
+                    if (data.success) {
+                        // Si había un cupón anterior, resetear primero
+                        if (cuponAplicado && codigoCupon !== codigoCuponAplicado) {
+                            resetearCupon();
                         }
-                    });
-                }, 300);
-            }
-        });
 
-        // Finalizar compra
-        document.getElementById('btn-finalizar')?.addEventListener('click', function (e) {
-            e.preventDefault();
-            let hayError = false;
-            let mensaje = "";
+                        cuponAplicado = true;
+                        codigoCuponAplicado = codigoCupon;
 
-            document.querySelectorAll('#productos-carrito tr').forEach(row => {
-                const stock = parseInt(row.dataset.stock);
-                const cantidad = parseInt(row.querySelector('span[id^="cantidad-"]').textContent);
-                if (cantidad > stock) {
-                    const nombre = row.querySelector('.product-name').innerText.trim();
-                    mensaje += `� La cantidad de "${nombre}" (${cantidad}) supera el stock disponible (${stock}).\n`;
-                    hayError = true;
+                        mensajeCupon.innerHTML = '<i class="fas fa-check-circle me-1"></i>' + data.message + 
+                            ' (' + data.porcentajeDescuento + '% de descuento)';
+                        mensajeCupon.className = 'mt-2 success';
 
-                    // Resaltar la fila con error
-                    row.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
-                    setTimeout(() => {
-                        row.style.backgroundColor = '';
-                    }, 2000);
+                        // Guardar precios originales antes de cambiar
+                        data.productosConDescuento.forEach(producto => {
+                            if (!preciosOriginales[producto.productoId]) {
+                                const row = document.getElementById('producto-' + producto.productoId);
+                                if (row) {
+                                    const priceCell = row.querySelector('.price');
+                                    const subtotalCell = document.getElementById('subtotal-' + producto.productoId);
+                                    
+                                    preciosOriginales[producto.productoId] = {
+                                        precio: producto.precioOriginal,
+                                        subtotal: parseFloat(subtotalCell.textContent.replace('S/ ', ''))
+                                    };
+                                }
+                            }
+                        });
+
+                        // Actualizar precios en la interfaz
+                        data.productosConDescuento.forEach(producto => {
+                            const row = document.getElementById('producto-' + producto.productoId);
+                            if (!row) return;
+                            const subtotalCell = document.getElementById('subtotal-' + producto.productoId);
+
+                            if (subtotalCell) {
+                                subtotalCell.textContent = formatCurrency(producto.nuevoSubtotal);
+                            }
+                        });
+
+                        // Actualizar total
+                        const totalElem = document.getElementById('total');
+                        if (totalElem) totalElem.textContent = data.total.toFixed(2);
+
+                        // Mostrar botón para quitar cupón
+                        const btnQuitar = document.getElementById('btn-quitar-cupon');
+                        if (btnQuitar) btnQuitar.style.display = 'inline-block';
+
+                        // Limpiar input
+                        document.getElementById('codigo-cupon').value = '';
+
+                    } else {
+                        mensajeCupon.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>' + data.message;
+                        mensajeCupon.className = 'mt-2 error';
+                    }
+                },
+                error: function() {
+                    mensajeCupon.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Error al aplicar el cupón';
+                    mensajeCupon.className = 'mt-2 error';
+                },
+                complete: function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check me-1"></i>Aplicar Cupón';
                 }
             });
-
-            const mensajeError = document.getElementById('mensaje-error');
-            if (hayError) {
-                mensajeError.innerHTML = '<strong>Error en stock:</strong><br>' + mensaje.replace(/\n/g, '<br>');
-            } else {
-                mensajeError.textContent = "";
-                // Animaci�n del bot�n antes de redirigir
-                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
-                this.disabled = true;
-
-                setTimeout(() => {
-                    window.location.href = '/Comprobante';
-                }, 1000);
-            }
         });
 
-        // Inicializaci�n
-        document.addEventListener('DOMContentLoaded', function () {
-            // Formatear todos los precios
-            document.querySelectorAll('.price').forEach(el => {
-                el.textContent = formatCurrency(el.textContent.replace('S/ ', ''));
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Página cargada, inicializando...');
+    
+    // Verificar que los elementos existen
+    const totalElem = document.getElementById('total');
+    const carritoProductos = document.querySelectorAll('#productos-carrito tr');
+    
+    console.log('Total element:', totalElem);
+    console.log('Productos en carrito:', carritoProductos.length);
+    
+    // Agregar botón para quitar cupón
+    const couponSection = document.querySelector('.coupon-section .card-body .row.g-2');
+    if (couponSection) {
+        const quitarCuponBtn = document.createElement('div');
+        quitarCuponBtn.className = 'col-12 mt-2';
+        quitarCuponBtn.innerHTML = `
+            <button type="button" id="btn-quitar-cupon" class="btn btn-outline-secondary btn-sm" style="display: none;">
+                <i class="fas fa-times me-1"></i>Quitar Cupón
+            </button>
+        `;
+        couponSection.appendChild(quitarCuponBtn);
 
-            calcularTotal();
+        // Event listener para quitar cupón
+        document.getElementById('btn-quitar-cupon').addEventListener('click', function() {
+            resetearCupon();
+            this.style.display = 'none';
         });
+    }
+
+    // Calcular total inicial
+    recalcularTotal();
+    
+    console.log('Inicialización completada');
+});
     </script>
 </body>
-
 </html>
