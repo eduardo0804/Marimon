@@ -33,19 +33,19 @@
         <div class="profile-details">
             <h2>Mis Pedidos</h2>
 
-            @if (Model.PedidosUsuario != null && Model.PedidosUsuario.Any())
+            @if (Model.PedidosUsuarioVM != null && Model.PedidosUsuarioVM.Any())
             {
                 <div class="accordion" id="accordionPedidos">
-                    @for (int i = 0; i < Model.PedidosUsuario.Count; i++)
+                    @for (int i = 0; i < Model.PedidosUsuarioVM.Count; i++)
                     {
-                        var pedido = Model.PedidosUsuario[i];
+                        var pedido = Model.PedidosUsuarioVM[i];
                         var collapseId = $"collapse{i}";
                         var headingId = $"heading{i}";
                         <div class="accordion-item mb-3">
                             <h2 class="accordion-header" id="@headingId">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
-                                    Pedido ID: @pedido.ven_id - Fecha: @pedido.ven_fecha.ToString("dd/MM/yyyy")
+                                    Pedido ID: @pedido.PedidoId - Fecha: @pedido.Fecha.ToString("dd/MM/yyyy")
                                     <span class="ms-3">
                                         @if (pedido.Estado == "Pendiente")
                                         {
@@ -74,7 +74,7 @@
                                             <tr>
                                                 <th>Producto</th>
                                                 <th>Cantidad</th>
-                                                <th>Precio</th>
+                                                <th>Precio unitario</th>
                                                 <th>Subtotal</th>
                                             </tr>
                                         </thead>
@@ -82,26 +82,27 @@
                                             @foreach (var detalle in pedido.Detalles)
                                             {
                                                 <tr>
-                                                    <td>@detalle.Autoparte.aut_nombre</td>
-                                                    <td>@detalle.det_cantidad</td>
-                                                    <td>S/. @detalle.Autoparte.aut_precio.ToString("0.00")</td>
-                                                    <td>S/. @detalle.det_subtotal.ToString("0.00")</td>
+                                                    <td>@detalle.NombreAutoparte</td>
+                                                    <td>@detalle.Cantidad</td>
+                                                    <td>S/. @detalle.PrecioUnitarioFinal.ToString("0.00")</td>
+                                                    <td>S/. @detalle.SubtotalFinal.ToString("0.00")</td>
                                                 </tr>
                                             }
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                                                <td><strong>S/. @pedido.Detalles.Sum(d =>
-                                                                                                        d.det_subtotal).ToString("0.00")</strong></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                            <p><strong>Método de pago:</strong> @pedido.MetodoPago?.pag_metodo</p>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="text-end"><strong>Total:</strong></td>
+                                                <td><strong>S/. @pedido.Total.ToString("0.00")</strong></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                    <p><strong>Método de pago:</strong> @pedido.MetodoPago</p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                                }
+                    }
                 </div>
             }
             else
