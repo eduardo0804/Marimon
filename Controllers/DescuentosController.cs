@@ -32,37 +32,39 @@ namespace Marimon.Controllers
         {
             var hoy = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Unspecified);
 
-            var autopartes = await _context.Autopartes
+            var autopartesDb = await _context.Autopartes
                 .Include(a => a.Categoria)
                 .Include(a => a.CodigosDescuento)
                 .Where(a => a.aut_cantidad >= 1)
                 .OrderBy(a => a.aut_id)
-                .Select(a => new AutoparteViewModel
+                .ToListAsync();
+
+            var autopartes = autopartesDb.Select(a => {
+                var codigos = a.CodigosDescuento ?? new List<CodigoDescuento>();
+                var ultimoDescuento = codigos.Any() ? codigos.OrderByDescending(c => c.cod_id).First() : null;
+                return new AutoparteViewModel
                 {
                     aut_id = a.aut_id,
-                    aut_nombre = a.aut_nombre,
+                    aut_nombre = a.aut_nombre ?? string.Empty,
                     aut_precio = a.aut_precio,
                     aut_cantidad = a.aut_cantidad,
-                    aut_imagen = a.aut_imagen,
-                    CategoriaNombre = a.Categoria.cat_nombre,
-
-                    CodigoDescuentoId = a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_id,
-                    CodigoDescuento = a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_codigo,
-                    PorcentajeDescuento = a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_porcentaje,
-                    DescripcionDescuento = a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_descripcion,
-                    FechaInicioDescuento = a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_fecha_creacion,
-                    FechaFinDescuento = a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_fecha_expiracion,
-                    PrecioDescuento = a.CodigosDescuento.Any() 
-                        ? a.aut_precio - (a.aut_precio * (a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_porcentaje / 100m))
+                    aut_imagen = a.aut_imagen ?? string.Empty,
+                    CategoriaNombre = a.Categoria?.cat_nombre ?? string.Empty,
+                    CodigoDescuentoId = ultimoDescuento != null ? ultimoDescuento.cod_id : 0,
+                    CodigoDescuento = ultimoDescuento != null ? ultimoDescuento.cod_codigo : null,
+                    PorcentajeDescuento = ultimoDescuento != null ? ultimoDescuento.cod_porcentaje : (decimal?)null,
+                    DescripcionDescuento = ultimoDescuento != null ? ultimoDescuento.cod_descripcion : null,
+                    FechaInicioDescuento = ultimoDescuento != null ? ultimoDescuento.cod_fecha_creacion : (DateTime?)null,
+                    FechaFinDescuento = ultimoDescuento != null ? ultimoDescuento.cod_fecha_expiracion : (DateTime?)null,
+                    PrecioDescuento = ultimoDescuento != null 
+                        ? a.aut_precio - (a.aut_precio * (ultimoDescuento.cod_porcentaje / 100m))
                         : (decimal?)null,
-                    DescuentoActivo = a.CodigosDescuento.Any() 
-                        ? (hoy >= a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_fecha_creacion 
-                        && hoy <= a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_fecha_expiracion 
-                        && !a.CodigosDescuento.OrderByDescending(c => c.cod_id).FirstOrDefault().cod_utilizado)
+                    DescuentoActivo = ultimoDescuento != null 
+                        ? (hoy >= ultimoDescuento.cod_fecha_creacion && hoy <= ultimoDescuento.cod_fecha_expiracion)
                         : (bool?)null,
-                    TieneDescuento = a.CodigosDescuento.Any()
-                })
-                .ToListAsync();
+                    TieneDescuento = codigos.Any()
+                };
+            }).ToList();
 
             int totalProductosEnStock = autopartes.Count;
 

@@ -993,7 +993,7 @@ public async Task<IActionResult> ProcesarPago(string tipoComprobante, string tip
             {
                 var autoparte = detalle.Autoparte;
                 var venta_total = detalle.Venta;
-                decimal precioUnitario = Math.Round(autoparte.aut_precio / 1.18m, 2);
+                decimal precioUnitario = Math.Round(autoparte.aut_precio, 2);
                 decimal subTotalItem = venta_total.Total;
                 decimal totalItem = venta_total.Total;
 
