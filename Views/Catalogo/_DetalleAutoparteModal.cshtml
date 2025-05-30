@@ -195,7 +195,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <form id="formReseniaAutoparte" asp-action="AgregarReseniaAutoparte" asp-controller="Catalogo"
-                                method="post" class="row">
+                                method="post" class="row" novalidate>
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="aut_id" value="@Model.aut_id" />
 
@@ -249,7 +249,7 @@
                                     <textarea class="form-control" id="res_comentario" name="res_comentario" rows="4"
                                     required placeholder="Comparte tu experiencia con esta autoparte..."
                                     style="border-radius: 12px; border: 1px solid #e0e0e0; padding: 15px; resize: none;"></textarea>
-                                    <div class="invalid-feedback" id="comentarioError">
+                                    <div class="invalid-feedback">
                                         Por favor, escribe un comentario para continuar.
                                     </div>
                                 </div>
@@ -858,6 +858,7 @@
             console.log('Mostrando sidebar del carrito...');
         }            
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
