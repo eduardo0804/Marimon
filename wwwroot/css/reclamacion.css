@@ -1,13 +1,22 @@
 :root {
-  --primary-color: #e53935; /* Rojo principal */
-  --primary-dark: #b71c1c; /* Rojo oscuro */
-  --primary-light: #ffcdd2; /* Rojo claro */
-  --dark-color: #212121; /* Negro */
-  --dark-secondary: #424242; /* Negro secundario */
-  --light-color: #ffffff; /* Blanco */
-  --gray-light: #f5f5f5; /* Gris claro casi blanco */
-  --danger-color: #d50000; /* Rojo alerta */
-  --text-color: #212121; /* Color texto principal */
+  --primary-color: #e53935;
+  /* Rojo principal */
+  --primary-dark: #b71c1c;
+  /* Rojo oscuro */
+  --primary-light: #ffcdd2;
+  /* Rojo claro */
+  --dark-color: #212121;
+  /* Negro */
+  --dark-secondary: #424242;
+  /* Negro secundario */
+  --light-color: #ffffff;
+  /* Blanco */
+  --gray-light: #f5f5f5;
+  /* Gris claro casi blanco */
+  --danger-color: #d50000;
+  /* Rojo alerta */
+  --text-color: #212121;
+  /* Color texto principal */
   --shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -57,7 +66,8 @@ h2:before {
 
 
 /* Contenedor principal con bordes rojos */
-#reclamacionForm, .text-center {
+#reclamacionForm,
+.text-center {
   background-color: var(--light-color);
   border-radius: 8px;
   box-shadow: var(--shadow);
@@ -69,9 +79,11 @@ h2:before {
   position: relative;
 }
 
-#reclamacionForm:hover, .text-center:hover {
+#reclamacionForm:hover,
+.text-center:hover {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
 }
+
 #reclamacionForm .form-group:last-of-type {
   margin-bottom: 2.5rem;
 }
@@ -83,6 +95,7 @@ h2:before {
   margin-right: auto;
   min-width: 200px;
 }
+
 /* Campos de formulario */
 .form-group {
   margin-bottom: 1.8rem;
@@ -124,7 +137,8 @@ label {
 }
 
 /* Secciones condicionales con estilo moderno */
-#productoSection, #servicioSection {
+#productoSection,
+#servicioSection {
   padding: 1.25rem;
   border-left: 4px solid var(--primary-color);
   margin-bottom: 1.5rem;
@@ -176,14 +190,14 @@ textarea.form-control {
   left: 100%;
 }
 
-.btn-primary {
+.btn-danger {
   background: var(--primary-color);
   border: none;
   color: white;
 }
 
-.btn-primary:hover {
-  background: var(--dark-color)!important;
+.btn-danger:hover {
+  background: var(--dark-color) !important;
   transform: translateY(-2px);
 
 }
@@ -206,17 +220,25 @@ textarea.form-control {
 
 /* Animación de entrada mejorada */
 @keyframes slideInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-#reclamacionForm, .text-center {
+#reclamacionForm,
+.text-center {
   animation: slideInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* Iconos tecnológicos para los tipos de reclamación */
 #TipoReclamacion option[value="1"]::before {
-  content: "⚠️ ";
+  content: "⚠ ";
 }
 
 #TipoReclamacion option[value="2"]::before {
@@ -228,7 +250,7 @@ textarea.form-control {
 }
 
 #tipoEntidad option[value="2"]::before {
-  content: "🛠️ ";
+  content: "🛠 ";
 }
 
 /* Efecto de enfoque en el formulario */
@@ -244,17 +266,19 @@ textarea.form-control {
 
 /* Responsividad mejorada */
 @media (max-width: 768px) {
-  #reclamacionForm, .text-center {
+
+  #reclamacionForm,
+  .text-center {
     padding: 1.5rem;
     margin: 1rem;
     border-radius: 6px;
   }
-  
+
   .btn {
     width: 100%;
     margin-top: 1rem;
   }
-  
+
   h2 {
     font-size: 1.5rem;
   }
