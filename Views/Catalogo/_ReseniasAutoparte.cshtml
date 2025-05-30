@@ -4,7 +4,6 @@
 
 @{
     var currentUserId = UserManager.GetUserId(User);
-    var autoparteId = ViewBag.AutoparteId;
 }
 
 @if (Model != null && Model.Any())
@@ -30,10 +29,12 @@
                         </div>
                         <small class="text-muted">@resenia.res_fecha.ToString("dd/MM/yyyy")</small>
                     </div>
+                    <small class="text-info">Autoparte ID: @resenia.AutoparteId</small> <!-- ✅ MOSTRARLO -->
                 </div>
                 @if (currentUserId == resenia.usuario_id)
                 {
-                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarResenia(@resenia.res_id, @autoparteId)">
+                    <button class="btn btn-sm btn-outline-danger"
+                            onclick="eliminarResenia(@resenia.res_id, @(resenia.AutoparteId))">
                         <i class="fas fa-trash"></i>
                     </button>
                 }

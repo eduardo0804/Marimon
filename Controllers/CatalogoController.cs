@@ -125,11 +125,11 @@ namespace Marimon.Controllers
                 DescripcionOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_descripcion,
                 FechaInicio = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio,
                 FechaFin = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin,
-                PrecioOferta = a.Ofertas.Any() 
+                PrecioOferta = a.Ofertas.Any()
                     ? a.aut_precio - (a.aut_precio * (a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje / 100m))
                     : (decimal?)null,
-                OfertaActiva = a.Ofertas.Any() 
-                    ? (hoy >= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio 
+                OfertaActiva = a.Ofertas.Any()
+                    ? (hoy >= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio
                     && hoy <= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin)
                     : (bool?)null
             }).ToList();
@@ -155,6 +155,7 @@ namespace Marimon.Controllers
         // GET: Catalogo/DetalleAutoparte/5
         public async Task<IActionResult> DetalleAutoparte(int id)
         {
+            Console.WriteLine($"[DEBUG] Detalle recibe aut_id = {id}");
             var autoparte = await _context.Autopartes
                 .Include(a => a.Categoria)
                 .FirstOrDefaultAsync(a => a.aut_id == id);
@@ -186,6 +187,7 @@ namespace Marimon.Controllers
                     res_puntuacion = r.res_puntuacion,
                     res_fecha = r.res_fecha,
                     res_gusto = r.res_gusto,
+                    AutoparteId = r.aut_id,
                     usuario_id = r.UsuarioId,
                     usuario_nombre = _context.Usuario
                         .Where(u => u.usu_id == r.UsuarioId)
@@ -193,6 +195,16 @@ namespace Marimon.Controllers
                         .FirstOrDefault()
                 })
                 .ToListAsync();
+
+            // Imprime el AutoparteId de la primera reseña (o recórrelas todas)
+            if (resenias.Any())
+            {
+                Console.WriteLine($"[DEBUG] Primera reseña AutoparteId = {resenias[0].AutoparteId}");
+            }
+            else
+            {
+                Console.WriteLine("[DEBUG] No hay reseñas para esta autoparte.");
+            }
 
             // Obtener la oferta más reciente
             var oferta = await _context.Ofertas
@@ -289,6 +301,8 @@ namespace Marimon.Controllers
         [HttpGet]
         public async Task<IActionResult> ObtenerSeccionResenias(int aut_id)
         {
+            // Esto imprimirá en la consola de la aplicación (ej. la ventana de salida en Visual Studio)
+            Console.WriteLine($"[DEBUG] ObtenerSeccionResenias recibe aut_id = {aut_id}");
             var resenias = await _context.Resenias
                 .Where(r => r.aut_id == aut_id)
                 .OrderByDescending(r => r.res_fecha) // Ordenar por fecha descendente
@@ -299,15 +313,15 @@ namespace Marimon.Controllers
                     res_puntuacion = r.res_puntuacion,
                     res_fecha = r.res_fecha,
                     res_gusto = r.res_gusto,
+                    AutoparteId = r.aut_id,
                     usuario_id = r.UsuarioId,
                     usuario_nombre = _context.Usuario
                         .Where(u => u.usu_id == r.UsuarioId)
                         .Select(u => u.usu_nombre)
                         .FirstOrDefault()
+
                 })
                 .ToListAsync();
-
-            ViewBag.AutoparteId = aut_id;
 
             // Devolver la vista parcial que incluye todo el contenedor de reseñas con estilos
             return PartialView("_SeccionResenias", resenias);

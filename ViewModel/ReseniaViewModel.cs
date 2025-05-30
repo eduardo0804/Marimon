@@ -15,6 +15,6 @@ namespace Marimon.ViewModel
         public string usuario_id { get; set; }
         public string usuario_nombre { get; set; }
         public int aut_id { get; set; }
-
+        public int? AutoparteId { get; set; }
     }
 }

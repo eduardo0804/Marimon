@@ -1,4 +1,19 @@
 // Unificar todos los eventos DOMContentLoaded en uno solo
+// Esta función debe ir fuera del DOMContentLoaded porque la usas en el onclick HTML
+function eliminarResenia(reseniaId, autoparteId) {
+  idReseniaPendiente = reseniaId;
+  idAutopartePendiente = autoparteId;
+
+  console.log("Eliminar reseña:", idReseniaPendiente, idAutopartePendiente); // <--- Esto ayuda a ver si llegan bien los datos
+
+  const modal = new bootstrap.Modal(document.getElementById('modalEliminarResenia'));
+  modal.show();
+}
+
+
+// Variables globales para guardar los IDs
+let idReseniaPendiente = null;
+let idAutopartePendiente = null;
 document.addEventListener("DOMContentLoaded", function () {
   // === Código del autocompletado ===
   const searchInput = document.getElementById("autocomplete-search");
@@ -472,74 +487,70 @@ function inicializarFormularioResenia() {
   }
 }
 
-// Función para eliminar reseña (agregar esta si no la tienes)
-function eliminarResenia(reseniaId, autoparteId) {
-  if (!confirm("¿Estás seguro de que quieres eliminar esta reseña?")) {
-    return;
-  }
+// Agrega el listener al botón eliminar del modal
+  const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
 
-  // Animar la reseña que se va a eliminar
-  const reseniaElement = document.querySelector(
-    `.resenia-item:has(button[onclick*="${reseniaId}"])`
-  );
-  if (reseniaElement) {
-    reseniaElement.style.opacity = "0.5";
-    reseniaElement.style.transform = "translateX(-20px)";
-  }
+  if (btnConfirmarEliminar) {
+    btnConfirmarEliminar.addEventListener("click", function () {
+      if (!idReseniaPendiente || !idAutopartePendiente) {
+        alert("No se ha seleccionado ninguna reseña para eliminar.");
+        return;
+      }
 
-  fetch(`/Catalogo/EliminarResenia/${reseniaId}?aut_id=${autoparteId}`, {
-    method: "DELETE",
-    headers: {
-      "X-Requested-With": "XMLHttpRequest",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        // Animar la eliminación
-        if (reseniaElement) {
-          reseniaElement.style.transition = "all 0.3s ease";
-          reseniaElement.style.transform = "translateX(-100%)";
-          reseniaElement.style.opacity = "0";
+      fetch(`/Catalogo/EliminarResenia/${idReseniaPendiente}?aut_id=${idAutopartePendiente}`, {
+        method: "DELETE",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "Content-Type": "application/json",
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminarResenia'));
+        modal.hide();
 
+        if (data.success) {
+          recargarResenias(idAutopartePendiente);
+
+          // Mostrar modal de éxito
+          const modalExito = new bootstrap.Modal(document.getElementById('modalExito'));
+          modalExito.show();
+
+          // Ocultarlo automáticamente después de 2 segundos
           setTimeout(() => {
-            reseniaElement.remove();
-
-            // Actualizar contador
-            actualizarContadorResenias();
-
-            // Verificar si no quedan reseñas
-            const remainingResenias =
-              document.querySelectorAll(".resenia-item");
-            if (remainingResenias.length === 0) {
-              mostrarMensajeSinResenias();
-            }
-          }, 300);
+            modalExito.hide();
+          }, 2000);
+        } else {
+          alert(data.message || "Error al eliminar la reseña.");
         }
+      })
+      .catch(error => {
+        console.error(error);
+        alert("Error al eliminar la reseña.");
+      })
+      .finally(() => {
+        idReseniaPendiente = null;
+        idAutopartePendiente = null;
+      });
+    });
+  } else {
+    console.warn("Botón btnConfirmarEliminar no encontrado.");
+  }
 
-        mostrarMensajeExito("Reseña eliminada correctamente.");
-      } else {
-        mostrarMensajeError(data.message || "Error al eliminar la reseña.");
 
-        // Restaurar la apariencia de la reseña
-        if (reseniaElement) {
-          reseniaElement.style.opacity = "1";
-          reseniaElement.style.transform = "translateX(0)";
-        }
-      }
+// Función para recargar la lista de reseñas desde el servidor
+function recargarResenias(autoparteId) {
+  fetch(`/Catalogo/ObtenerSeccionResenias?aut_id=${autoparteId}`)
+    .then(response => response.text())
+    .then(html => {
+      // Actualizar el div contenedor de reseñas
+      document.getElementById('reseniasList').innerHTML = html;
     })
-    .catch((error) => {
-      console.error("Error:", error);
-      mostrarMensajeError("Error al eliminar la reseña.");
-
-      // Restaurar la apariencia de la reseña
-      if (reseniaElement) {
-        reseniaElement.style.opacity = "1";
-        reseniaElement.style.transform = "translateX(0)";
-      }
+    .catch(error => {
+      console.error("Error al recargar reseñas:", error);
     });
 }
+
 
 // === Funciones de carrito ===
 function añadirAlCarritoAsync(autoparteId, cantidad) {
