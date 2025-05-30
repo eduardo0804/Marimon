@@ -271,6 +271,7 @@
                     }
                     // 👇 Copiar el valor de numeroPedido a numeroReferencia
                     numeroReferencia.value = numeroPedido.value;
+                    document.getElementById("montoServicio").value = montoProducto.value;
                 } else if (servicioSection.style.display === 'block') {
                     if (servicioSelect.value) {
                         entidadId = servicioSelect.value;
@@ -278,6 +279,7 @@
                     }
                     // 👇 Copiar el valor de numeroServicio a numeroReferencia
                     numeroReferencia.value = numeroServicio.value;
+                    document.getElementById("montoProducto").value = montoServicio.value;
                 }
 
                 hiddenEntidadId.value = entidadId;

@@ -89,7 +89,7 @@ namespace Marimon.Controllers
                 string emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
 
                 // URL del logo
-                var logoUrl = "https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Flogo-web-marimon.png?alt=media&token=e7fd3cab-30b0-4a6f-a675-30b3b69f836b";
+                var logoUrl = "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png";
 
                 // Determinar textos para el tipo de reclamación
                 string tipoTexto = model.TipoReclamacion == TipoReclamacion.Reclamo ? "Reclamo" : "Queja";
@@ -120,7 +120,7 @@ namespace Marimon.Controllers
                 emailBody = emailBody.Replace("{{HORA_REGISTRO}}", horaRegistro);
 
                 // Enviar correo
-                await _emailSender.SendEmailAsync("jesuslazaro0207@gmail.com",
+                await _emailSender.SendEmailAsync("marimonpruebas@gmail.com",
                     $"Nueva Reclamación #{model.Id} - {tipoTexto}",
                     emailBody);
 
