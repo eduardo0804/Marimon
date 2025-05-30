@@ -8,7 +8,7 @@ RUN dotnet restore
     
 # Copiar el resto del código y compilar
 COPY . ./
-RUN dotnet publish "marimon.csproj" -c Release -o /app/out
+RUN dotnet publish "Marimon.csproj" -c Release -o /app/out
 
 # Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
