@@ -557,6 +557,7 @@ namespace Marimon.Controllers
 
         public IActionResult ManejarVentas(string estado = null, decimal montoMaximo = 0)
         {
+            var todasLasVentas = _context.Venta.ToList();
             var ventasQuery = _context.Venta
                 .Include(v => v.Detalles)
                     .ThenInclude(d => d.Autoparte)
@@ -581,6 +582,7 @@ namespace Marimon.Controllers
             ViewBag.Estados = estados;
             ViewBag.EstadoSeleccionado = string.IsNullOrEmpty(estado) ? "" : estado;
             ViewBag.MontoMaximo = montoMaximo == 0 ? 5000 : montoMaximo; // Valor predeterminado
+            ViewBag.TodasLasVentas = todasLasVentas;
 
             return View(ventasQuery.ToList());
         }

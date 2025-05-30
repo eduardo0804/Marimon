@@ -36,18 +36,19 @@
                         <div class="status-filters">
                             <!-- Opción Todos -->
                             <a href="javascript:void(0)" onclick="setEstado('')"
-                               class="status-filter @(string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) ? "active" : "")">
+                                class="status-filter @(string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) ? "active" : "")">
                                 <div class="status-icon bg-secondary">
                                     <i class="fas fa-list text-white"></i>
                                 </div>
                                 <span class="status-label">Todos los estados</span>
-                                <span class="status-badge">@Model?.Count</span>
+                                <span class="status-badge">@((ViewBag.TodasLasVentas as List<Marimon.Models.Venta>)?.Count ?? 0)</span>
                             </a>
                             @if (ViewBag.Estados != null)
                             {
                                 foreach (var est in ViewBag.Estados)
                                 {
-                                    var count = Model?.Count(v => v.Estado == est) ?? 0;
+                                    var todasLasVentas = ViewBag.TodasLasVentas as List<Marimon.Models.Venta>;
+                                    var count = todasLasVentas?.Count(v => v.Estado == est) ?? 0;
                                     var iconClass = "";
                                     var bgClass = "";
                                     switch (est)
@@ -70,7 +71,7 @@
                                             break;
                                     }
                                     <a href="javascript:void(0)" onclick="setEstado('@est')"
-                                       class="status-filter @(ViewBag.EstadoSeleccionado == est ? "active" : "")">
+                                        class="status-filter @(ViewBag.EstadoSeleccionado == est ? "active" : "")">
                                         <div class="status-icon @bgClass">
                                             <i class="fas @iconClass text-white"></i>
                                         </div>
@@ -85,8 +86,7 @@
                         <!-- Filtro por monto -->
                         <label for="customRangeMonto" class="form-label">Filtrar por monto máximo ($)</label>
                         <input type="range" class="form-range" min="0" max="5000" step="100" id="customRangeMonto"
-                               value="@ViewBag.MontoMaximo"
-                               oninput="updateMontoValor(this.value)">
+                            value="@ViewBag.MontoMaximo" oninput="updateMontoValor(this.value)">
                         <div class="range-value" id="montoValor">$@ViewBag.MontoMaximo</div>
                         <input type="hidden" name="estado" id="estadoHidden" value="@ViewBag.EstadoSeleccionado">
                         <input type="hidden" name="montoMaximo" id="montoMaximoHidden" value="@ViewBag.MontoMaximo">
@@ -123,17 +123,17 @@
                 border: 1px solid transparent;
             }
 
-                .status-filter:hover {
-                    background-color: #f8f9fa;
-                    border-color: #e9ecef;
-                }
+            .status-filter:hover {
+                background-color: #f8f9fa;
+                border-color: #e9ecef;
+            }
 
-                .status-filter.active {
-                    background-color: #f0f7ff;
-                    border-color: #cfe2ff;
-                    color: #084298;
-                    font-weight: 500;
-                }
+            .status-filter.active {
+                background-color: #f0f7ff;
+                border-color: #cfe2ff;
+                color: #084298;
+                font-weight: 500;
+            }
 
             .status-icon {
                 width: 32px;
@@ -183,7 +183,7 @@
                         <div class="col-auto">
                             <div class="input-group search-container">
                                 <input type="text" class="form-control" id="searchTable"
-                                       placeholder="Buscar en tabla...">
+                                    placeholder="Buscar en tabla...">
                                 <button class="btn btn-outline-secondary" type="button">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -215,21 +215,19 @@
                                                 {
                                                     <li>@detalle.Autoparte?.aut_nombre <small>(@detalle.det_cantidad)</small></li>
                                                 }
-                                            </ul>
-                                        </td>
-                                        <td>@venta.Total.ToString("C")</td>
-                                        <td>
-                                            <a href="#"
-                                               class="status-badge status-@venta.Estado.ToLower() text-white px-2 py-1 rounded"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#cambiarEstadoModal"
-                                               data-estado-actual="@venta.Estado"
-                                               style="display: inline-flex; align-items: center; gap: 4px;
-              background-color:
-              @(venta.Estado == "Pendiente" ? "#ffc107" :
-                venta.Estado == "Completado" ? "#28a745" :
-                venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
-                                                @switch (venta.Estado)
+                                        </ul>
+                                    </td>
+                                    <td>@venta.Total.ToString("C")</td>
+                                    <td>
+                                        <a href="#"
+                                            class="status-badge status-@venta.Estado.ToLower() text-white px-2 py-1 rounded"
+                                            data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal"
+                                            data-estado-actual="@venta.Estado" style="display: inline-flex; align-items: center; gap: 4px;
+                  background-color:
+                  @(venta.Estado == "Pendiente" ? "#ffc107" :
+                                                                                               venta.Estado == "Completado" ? "#28a745" :
+                                                                                               venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
+                                        @switch (venta.Estado)
                                                 {
                                                     case "Pendiente":
                                                         <i class="fas fa-clock"></i>
@@ -303,7 +301,7 @@
         }
     });
 
-    window.onload = function() {
+    window.onload = function () {
         const montoInicial = document.getElementById('customRangeMonto').value;
         document.getElementById('montoValor').innerText = '$' + montoInicial;
     }
@@ -323,4 +321,3 @@
         event.currentTarget.classList.add('active');
     }
 </script>
-
