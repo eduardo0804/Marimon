@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="~/css/consultarServicio.css" />
 
 <div class="container-fluid mt-1 my-4">
-    <ol class="breadcrumb m-0 ">
+    <ol class="breadcrumb py-3 m-0 ">
         <li class="breadcrumb-item">
             <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Módulo de Autopartes</a>
         </li>
@@ -25,10 +25,10 @@
         <div class="col-lg-3">
             <div class="filter-panel shadow-sm rounded-3">
                 <form id="filtrosForm" method="get" action="">
-                    <div class="filter-header bg-light p-3 rounded-top">
+                    <div class="filter-header p-3 rounded-top">
                         <h5 class="mb-0 d-flex align-items-center">
-                            <i class="fas fa-filter me-2 text-primary"></i>
-                            <span style="color: #000000;">Filtrar resultados</span><!-- Cambien el color CARAJO -->
+                            <i class="fas fa-filter me-2 "></i>
+                            <span>Filtrar resultados</span><!-- Cambien el color CARAJO -->
                         </h5>
                     </div>
                     <div class="filter-body p-3">
@@ -84,7 +84,7 @@
                     </div>
                     <div class="p-3">
                         <!-- Filtro por monto -->
-                        <label for="customRangeMonto" class="form-label">Filtrar por monto máximo ($)</label>
+                        <label for="customRangeMonto" class="form-label">Filtrar por monto máximo (S/.)</label>
                         <input type="range" class="form-range" min="0" max="5000" step="100" id="customRangeMonto"
                             value="@ViewBag.MontoMaximo" oninput="updateMontoValor(this.value)">
                         <div class="range-value" id="montoValor">$@ViewBag.MontoMaximo</div>
@@ -92,8 +92,8 @@
                         <input type="hidden" name="montoMaximo" id="montoMaximoHidden" value="@ViewBag.MontoMaximo">
                     </div>
                     <div class="filter-footer p-3 bg-light rounded-bottom d-flex justify-content-between">
-                        <small class="text-muted">@(Model?.Count ?? 0) ventas encontradas</small>
-                        <button type="submit" class="btn btn-primary btn-sm">Aplicar filtros</button>
+                        <small class="text-dark">@(Model?.Count ?? 0) ventas encontradas</small>
+                        <button type="submit" class="btn btn-filtro">Aplicar filtros</button>
                     </div>
                 </form>
             </div>
@@ -162,14 +162,6 @@
                 background-color: #cfe2ff;
                 color: #084298;
             }
-
-            .filter-header {
-                border-bottom: 1px solid #e9ecef;
-            }
-
-            .filter-footer {
-                border-top: 1px solid #e9ecef;
-            }
         </style>
 
         <!-- Tabla (Right side) -->
@@ -181,11 +173,9 @@
                             <h5 class="mb-0">Listado de Ventas</h5>
                         </div>
                         <div class="col-auto">
-                            <div class="input-group search-container">
-                                <input type="text" class="form-control" id="searchTable"
-                                    placeholder="Buscar en tabla...">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fas fa-search"></i>
+                            <div class="search-container">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" id="searchTable" placeholder="Buscar por ID de venta o autoparte...">
                                 </button>
                             </div>
                         </div>
@@ -303,11 +293,11 @@
 
     window.onload = function () {
         const montoInicial = document.getElementById('customRangeMonto').value;
-        document.getElementById('montoValor').innerText = '$' + montoInicial;
+        document.getElementById('montoValor').innerText = 'S/.' + montoInicial;
     }
 
     function updateMontoValor(valor) {
-        document.getElementById('montoValor').innerText = '$' + valor;
+        document.getElementById('montoValor').innerText = 'S/.' + valor;
         document.getElementById('montoMaximoHidden').value = valor;
     }
 
