@@ -99,7 +99,6 @@ namespace Marimon.Controllers
         public IActionResult ConsultarServicios(string nombreServicio, string fechaDesde, string fechaHasta, string estado)
         {
             // Parse fechas y servicios como antes
-
             var serviciosSeleccionados = string.IsNullOrEmpty(nombreServicio)
                 ? new List<string>()
                 : nombreServicio.Split(',').ToList();
@@ -113,26 +112,56 @@ namespace Marimon.Controllers
             if (DateTime.TryParse(fechaHasta, out var hasta))
                 fechaFin = DateTime.SpecifyKind(hasta, DateTimeKind.Utc);
 
-            var reservas = _context.Reserva
+            // OBTENER TODAS LAS RESERVAS PRIMERO (sin filtro de estado)
+            var todasLasReservas = _context.Reserva
                 .Include(r => r.Servicio)
                 .Include(r => r.Usuario)
                 .Where(r =>
                     (serviciosSeleccionados.Count == 0 || serviciosSeleccionados.Contains(r.Servicio.ser_nombre)) &&
                     (!fechaInicio.HasValue || r.res_fecha >= fechaInicio.Value) &&
-                    (!fechaFin.HasValue || r.res_fecha <= fechaFin.Value) &&
-                    (string.IsNullOrEmpty(estado) || r.Estado.ToString() == estado)
+                    (!fechaFin.HasValue || r.res_fecha <= fechaFin.Value)
+                // NO filtrar por estado aquí
                 )
                 .OrderBy(r => r.res_fecha)
                 .ThenBy(r => r.res_hora)
                 .ToList();
 
+            // AHORA aplicar el filtro de estado solo para mostrar en la tabla
+            var reservasFiltradas = todasLasReservas;
+            if (!string.IsNullOrEmpty(estado))
+            {
+                reservasFiltradas = todasLasReservas
+                    .Where(r => r.Estado.ToString() == estado)
+                    .ToList();
+            }
+
+            // IMPORTANTE: Siempre mostrar TODOS los estados posibles
+            var todosLosEstados = new List<string>
+    {
+        "Pendiente",
+        "Confirmada",
+        "Completada",
+        "Cancelada"
+    };
+
             ViewBag.EstadoSeleccionado = estado;
-            ViewBag.Estados = reservas.Select(r => r.Estado.ToString()).Distinct().ToList();
+            // Usar todos los estados, NO los estados de las reservas filtradas
+            ViewBag.Estados = todosLosEstados;
+
+            // Para calcular los contadores correctos, usar todas las reservas (sin filtro de estado)
+            ViewBag.ContadoresEstados = new Dictionary<string, int>
+            {
+                ["Todos"] = todasLasReservas.Count(),
+                ["Pendiente"] = todasLasReservas.Count(r => r.Estado == EstadoReserva.Pendiente),
+                ["Confirmada"] = todasLasReservas.Count(r => r.Estado == EstadoReserva.Confirmada),
+                ["Completada"] = todasLasReservas.Count(r => r.Estado == EstadoReserva.Completada),
+                ["Cancelada"] = todasLasReservas.Count(r => r.Estado == EstadoReserva.Cancelada)
+            };
 
             var model = new ServicioReservaViewModel
             {
                 Servicios = _context.Servicio.ToList(),
-                Reservas = reservas,
+                Reservas = reservasFiltradas, // Solo las reservas filtradas para mostrar en la tabla
                 ServiciosSeleccionados = serviciosSeleccionados
             };
 

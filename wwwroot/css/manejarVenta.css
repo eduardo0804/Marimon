@@ -25,7 +25,137 @@
     --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.filter-body {
+    padding: 1rem 1.5rem !important; /* Reducir padding */
+}
 
+.filter-body h6 {
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 0.8rem; /* Reducir margen */
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.status-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* Reducir gap entre elementos */
+}
+
+.status-filter {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px; /* Reducir padding vertical y horizontal */
+    border-radius: 16px; /* Menos redondeado */
+    text-decoration: none;
+    color: var(--dark-gray);
+    transition: var(--transition);
+    border: 1px solid transparent;
+    background-color: #f8f9fa;
+    position: relative;
+    max-width: 100%; /* Limitar ancho máximo */
+}
+
+.status-filter:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    color: var(--dark-gray);
+}
+
+/* Estado activo - fondo rosado como en la imagen */
+.status-filter.active,
+.status-filter.bg-light.border-primary {
+    background-color: #fce4ec;
+    border-color: transparent;
+    color: var(--dark-gray);
+}
+
+.status-filter .status-icon {
+    width: 28px; /* Reducido de 36px a 28px */
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px; /* Reducir margen */
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+/* Colores específicos para cada icono */
+.status-filter .status-icon.bg-secondary {
+    background-color: #6c757d;
+}
+
+.status-filter .status-icon.bg-success {
+    background-color: var(--completado-color); /* Verde para "Completada" */
+}
+
+.status-filter .status-icon.bg-danger {
+    background-color: var(--cancelado-color); /* Rojo para "Cancelada" */
+}
+
+.status-filter .status-icon.bg-warning {
+    background-color: var(--pendiente-color); /* Amarillo para "Pendiente" */
+}
+
+.status-filter .status-icon.bg-info {
+    background-color: var(--confirmada-color); /* Azul para "Confirmada" */
+}
+
+/* Texto del estado */
+.status-filter .status-label {
+    flex-grow: 1;
+    font-weight: 500;
+    font-size: 0.85rem; /* Reducir tamaño de fuente */
+    color: var(--dark-gray);
+}
+
+/* Badge con el número - más pequeño */
+.status-filter .status-badge {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+    padding: 4px 8px; /* Reducir padding */
+    border-radius: 12px; /* Menos redondeado */
+    font-size: 0.75rem; /* Reducir tamaño de fuente */
+    font-weight: 700;
+    min-width: 24px; /* Reducir ancho mínimo */
+    text-align: center;
+    margin-left: auto;
+}
+
+/* Badge para estado no activo */
+.status-filter:not(.active) .status-badge {
+    background-color: #e9ecef;
+    color: var(--dark-gray);
+}
+
+/* Badge para estado activo - mantener rojo */
+.status-filter.active .status-badge,
+.status-filter.bg-light.border-primary .status-badge {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+}
+
+.status-filter.active .status-badge,
+.status-filter.bg-light.border-primary .status-badge {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+}
+
+/* Efectos hover mejorados */
+.status-filter:hover .status-icon {
+    transform: scale(1.05);
+}
+
+/* Asegurar que el layout sea más compacto */
+.status-filters .status-filter {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: auto; /* Permitir altura automática */
+}
 /* Estilos para el panel de filtros */
 .filter-panel {
     background-color: var(--pure-white);
