@@ -32,6 +32,7 @@ COPY --from=build-env /app/out .
 
 # Variables de entorno
 ENV APP_NET_CORE=Marimon.dll
+ENV ASPNETCORE_ENVIRONMENT=Development
 
 # CMD recomendado (JSON array)
 CMD ["dotnet", "Marimon.dll"]
