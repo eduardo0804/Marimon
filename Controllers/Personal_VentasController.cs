@@ -324,7 +324,7 @@ namespace Marimon.Controllers
                         emailBody = emailBody.Replace("{nombreCompleto}", venta.Usuario?.usu_nombre + " " + venta.Usuario?.usu_apellido)
                                         .Replace("{ventaID}", id.ToString())
                                         .Replace("{montoTotal}", venta.Total.ToString("0.00"))
-                                        .Replace("{{CallbackUrl}}", "http://localhost:5031/Catalogo");
+                                        .Replace("{{CallbackUrl}}", "https://marimon-fjv7.onrender.com/Catalogo");
 
                     }
                     else
@@ -392,7 +392,7 @@ namespace Marimon.Controllers
                                             .Replace("{{PedidoId}}", id.ToString())
                                             .Replace("{{Estado}}", estado)
                                             .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
-                                            .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
+                                            .Replace("{{CallbackUrl}}", "https://marimon-fjv7.onrender.com/Identity/Account/Manage/Pedidos")
                                             .Replace("{{StylePendiente}}", stylePendiente)
                                             .Replace("{{StyleCompletado}}", styleCompletado)
                                             .Replace("{{StyleCancelado}}", styleCancelado)
@@ -557,6 +557,7 @@ namespace Marimon.Controllers
 
         public IActionResult ManejarVentas(string estado = null, decimal montoMaximo = 0)
         {
+            var todasLasVentas = _context.Venta.ToList();
             var ventasQuery = _context.Venta
                 .Include(v => v.Detalles)
                     .ThenInclude(d => d.Autoparte)
@@ -581,6 +582,7 @@ namespace Marimon.Controllers
             ViewBag.Estados = estados;
             ViewBag.EstadoSeleccionado = string.IsNullOrEmpty(estado) ? "" : estado;
             ViewBag.MontoMaximo = montoMaximo == 0 ? 5000 : montoMaximo; // Valor predeterminado
+            ViewBag.TodasLasVentas = todasLasVentas;
 
             return View(ventasQuery.ToList());
         }

@@ -677,33 +677,6 @@ body {
   margin-top: 20px;
 }
 
-.btn-whatsapp,
-.btn-carrito {
-  border-radius: 40px;
-  padding: 10px 24px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  font-weight: 600;
-}
-
-.btn-whatsapp {
-  background-color: #25d366;
-  color: white;
-}
-
-.btn-whatsapp:hover {
-  background-color: #1ebd5a;
-}
-
-.btn-carrito {
-  background-color: #e63946;
-  color: white;
-}
-
-.btn-carrito:hover {
-  background-color: #c62828;
-}
-
 .close-btn {
   font-size: 34px;
   color: #999;
@@ -1627,6 +1600,7 @@ a[href="/Identity/Account/Login"]:hover {
   font-style: italic;
   margin-top: 5px;
 }
+
 /* Estilos adicionales para evitar superposición */
 .producto-imagen {
   position: relative;
@@ -1648,9 +1622,11 @@ a[href="/Identity/Account/Login"]:hover {
   0% {
     box-shadow: 0 8px 25px rgba(255, 107, 53, 0.2);
   }
+
   50% {
     box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
   }
+
   100% {
     box-shadow: 0 8px 25px rgba(255, 107, 53, 0.2);
   }
@@ -1664,9 +1640,11 @@ a[href="/Identity/Account/Login"]:hover {
   100% {
     transform: translateY(0);
   }
+
   40% {
     transform: translateY(-5px);
   }
+
   60% {
     transform: translateY(-3px);
   }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Http;
 using DinkToPdf.Contracts;
 using DinkToPdf;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Reflection;
 using Marimon.Helpers; // Necesario para SameSiteMode
@@ -20,7 +21,7 @@ using Microsoft.AspNetCore.Http.Features;  // <-- Aquí está el using para Stri
 
 var builder = WebApplication.CreateBuilder(args);
 // Configuración de PostgreSQL
-var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection") 
+var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection")
     ?? throw new InvalidOperationException("Connection string 'PostgreSQLConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -28,7 +29,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>(); ELIMINAR*/
 
 //  Configuración de Identity CON soporte para roles
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true; //requiere confirmación
     options.Password.RequireDigit = true;
@@ -83,10 +84,89 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Necesario para que no lo bloquee la política de cookies
 });
 
-// Configura DinkToPdf converter con el DLL cargado
+// Configura DinkToPdf converter con el DLL cargado  según el sistema operativo
 var context = new CustomAssemblyLoadContext();
-var path = Path.Combine(AppContext.BaseDirectory, "libwkhtmltox.dll");
-context.LoadUnmanagedLibrary(path);
+string libPath = "";
+bool libraryLoaded = false;
+
+// Log para diagnóstico
+Console.WriteLine($"Sistema operativo: {RuntimeInformation.OSDescription}");
+
+try
+{
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    {
+        libPath = Path.Combine(AppContext.BaseDirectory, "nativelibs", "win-x64", "libwkhtmltox.dll");
+
+        if (System.IO.File.Exists(libPath))
+        {
+            context.LoadUnmanagedLibrary(libPath);
+            libraryLoaded = true;
+            Console.WriteLine($"Biblioteca cargada con éxito desde: {libPath}");
+        }
+        else
+        {
+            Console.WriteLine($"No existe el archivo en: {libPath}");
+        }
+    }
+    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+    {
+        // Lista de posibles ubicaciones para buscar en Linux
+        var possiblePaths = new[]
+        {
+            Path.Combine(AppContext.BaseDirectory, "nativelibs", "linux-x64", "libwkhtmltox.so"),
+            Path.Combine(AppContext.BaseDirectory, "libwkhtmltox.so"),
+            "/usr/local/lib/libwkhtmltox.so",
+            "/usr/lib/libwkhtmltox.so",
+            "/usr/lib64/libwkhtmltox.so"
+        };
+
+        // Intentar cargar desde cada ubicación hasta encontrar una que funcione
+        foreach (var path in possiblePaths)
+        {
+            Console.WriteLine($"Intentando cargar desde: {path}");
+
+            if (System.IO.File.Exists(path))
+            {
+                Console.WriteLine($"El archivo existe en: {path}");
+                libPath = path;
+
+                try
+                {
+                    context.LoadUnmanagedLibrary(path);
+                    libraryLoaded = true;
+                    Console.WriteLine($"Biblioteca cargada con éxito desde: {path}");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al cargar {path}: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No existe el archivo en: {path}");
+            }
+        }
+    }
+    else
+    {
+        throw new PlatformNotSupportedException("Sistema operativo no compatible");
+    }
+
+    if (!libraryLoaded)
+    {
+        throw new FileNotFoundException($"No se pudo cargar la biblioteca libwkhtmltox en ninguna ubicación");
+    }
+
+    // Registrar el converter como singleton
+    builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error al cargar la biblioteca: {ex}");
+    throw;
+}
 
 // Registra el converter como singleton (para inyectar en controladores si quieres)
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
@@ -115,7 +195,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "Gerente_Operacion","Personal_Servicio","Personal_Ventas", "Cliente" }; // Agrega aquí los roles que necesites
+    string[] roles = { "Gerente_Operacion", "Personal_Servicio", "Personal_Ventas", "Cliente" }; // Agrega aquí los roles que necesites
 
     foreach (var role in roles)
     {
