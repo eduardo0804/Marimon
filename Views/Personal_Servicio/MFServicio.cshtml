@@ -1,90 +1,210 @@
 @model Marimon.Models.Servicio
 
-<div class="container" style="max-width: 100%;">
-    <form asp-action="Actualizar" asp-controller="Personal_Servicio" enctype="multipart/form-data" method="post" class="modern-form">
-        <input type="hidden" asp-for="ser_id" />
-        <div class="modal-header border-0 pb-0">
-            <h5 class="modal-title fw-bold">Modificar Servicio</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal-header-improved">
+    <div class="header-left">
+        <div class="header-icon">
+            <i class="fas fa-edit"></i>
         </div>
-        
-        <div class="modal-body pt-3">
-            <div class="form-floating mb-3">
-                <input asp-for="ser_nombre" class="form-control" id="ser_nombre" placeholder="Nombre del Servicio" required />
-                <label for="ser_nombre">Nombre del Servicio <span class="text-danger">*</span></label>
-            </div>
-            
-            <div class="form-floating mb-3">
-                <textarea asp-for="ser_descripcion" class="form-control" id="ser_descripcion" placeholder="Descripción" style="height: 100px" required></textarea>
-                <label for="ser_descripcion">Descripción <span class="text-danger">*</span></label>
-            </div>
-            
-            <div class="mb-3">
-                <label for="imagen" class="form-label">Imagen</label>
-                
-                @if (!string.IsNullOrEmpty(Model.ser_imagen))
-                {
-                    <div class="current-image-section mb-3">
-                        <p class="image-label">Imagen actual:</p>
-                        <div class="image-preview-container">
-                            <img src="@Model.ser_imagen" alt="Imagen Actual" class="current-image-preview" />
-                        </div>
-                    </div>
-                }
-                
-                <div class="file-upload-wrapper">
-                    <input type="file" class="file-upload-input" name="imagen" id="imagen" accept="image/*" />
-                    <div class="file-upload-text">
-                        <i class="fas fa-cloud-upload-alt me-2"></i>
-                        <span id="file-name">Seleccionar nueva imagen</span>
-                    </div>
-                </div>
-                <div id="imagePreview" class="mt-2 d-none">
-                    <p class="image-label">Vista previa:</p>
-                    <div class="image-preview-container">
-                        <img id="preview" src="#" alt="Vista previa" class="current-image-preview" />
-                        <button type="button" id="removeImage" class="btn-remove-image">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                <small class="text-muted fst-italic">Deja este campo vacío si no deseas cambiar la imagen actual.</small>
-            </div>
+        <div class="header-text">
+            <h5 class="modal-title">Modificar Servicio</h5>
+            <span class="modal-subtitle">Actualiza la información del servicio</span>
         </div>
-        
-        <div class="modal-footer border-0 pt-0">
-            <button type="submit" class="btn-submit">
-                <span>Guardar Cambios</span>
-                <i class="fas fa-save ms-2"></i>
-            </button>
-            <button type="button" class="btn-secondary" data-bs-dismiss="modal">
-                Cancelar
-            </button>
-        </div>
-    </form>
+    </div>
+    <button type="button" class="btn-close-improved" data-bs-dismiss="modal" aria-label="Close">
+        <i class="fas fa-times"></i>
+    </button>
 </div>
 
+<form asp-action="Actualizar" asp-controller="Personal_Servicio" enctype="multipart/form-data" method="post" class="form-improved">
+    <input type="hidden" asp-for="ser_id" />
+    
+    <div class="modal-body-improved">
+        <div class="form-floating mb-3">
+            <input asp-for="ser_nombre" class="form-control" id="ser_nombre" placeholder="Nombre del Servicio" required />
+            <label for="ser_nombre">Nombre del Servicio <span class="text-danger">*</span></label>
+        </div>
+        
+        <div class="form-floating mb-3">
+            <textarea asp-for="ser_descripcion" class="form-control" id="ser_descripcion" placeholder="Descripción" style="height: 100px" required></textarea>
+            <label for="ser_descripcion">Descripción <span class="text-danger">*</span></label>
+        </div>
+        
+        <div class="mb-3">
+            <label for="imagen" class="form-label fw-semibold">Imagen</label>
+            
+            @if (!string.IsNullOrEmpty(Model.ser_imagen))
+            {
+                <div class="current-image-section mb-3">
+                    <p class="image-label">Imagen actual:</p>
+                    <div class="image-preview-container">
+                        <img src="@Model.ser_imagen" alt="Imagen Actual" class="current-image-preview" />
+                    </div>
+                </div>
+            }
+            
+            <div class="file-upload-area">
+                <input type="file" class="file-input" name="imagen" id="imagen" accept="image/*" />
+                <div class="file-upload-content">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <span id="file-name" class="upload-text">Seleccionar nueva imagen</span>
+                </div>
+            </div>
+            
+            <div id="imagePreview" class="mt-3 d-none">
+                <p class="image-label">Vista previa:</p>
+                <div class="image-preview-container">
+                    <img id="preview" src="#" alt="Vista previa" class="current-image-preview" />
+                    <button type="button" id="removeImage" class="btn-remove-image">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <small class="text-muted fst-italic mt-2 d-block">Deja este campo vacío si no deseas cambiar la imagen actual.</small>
+        </div>
+    </div>
+    
+    <div class="modal-footer-improved">
+        <button type="submit" class="btn-save">
+            <i class="fas fa-save me-2"></i>
+            Guardar Cambios
+        </button>
+        <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>
+            Cancelar
+        </button>
+    </div>
+</form>
+
 <style>
-    .modern-form .form-control, .modern-form .form-select {
-        border-radius: 6px;
-        border: 1px solid #ced4da;
-        transition: all 0.3s ease;
-    }
-    
-    .modern-form .form-control:focus, .modern-form .form-select:focus {
-        border-color: #d42025;
-        box-shadow: 0 0 0 0.25rem rgba(212, 32, 37, 0.25);
-    }
-    
-    .file-upload-wrapper {
+    /* Header mejorado */
+    .modal-header-improved {
+        background: linear-gradient(135deg, #d42025 0%, #b91d21 100%);
+        color: white;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: none;
         position: relative;
-        width: 100%;
-        height: 45px;
         overflow: hidden;
+    }
+    
+    .modal-header-improved::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .header-icon {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .modal-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: white;
+        line-height: 1.2;
+    }
+    
+    .modal-subtitle {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 400;
+    }
+    
+    .btn-close-improved {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .btn-close-improved:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: rotate(90deg);
+        color: white;
+    }
+    
+    /* Cuerpo del modal */
+    .modal-body-improved {
+        padding: 24px;
+    }
+    
+    /* Campos de formulario */
+    .form-improved .form-control {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+        padding: 12px 16px;
+    }
+    
+    .form-improved .form-control:focus {
+        border-color: #d42025;
+        box-shadow: 0 0 0 0.2rem rgba(212, 32, 37, 0.15);
+    }
+    
+    .form-improved .form-floating > label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .form-improved .form-floating > .form-control:focus ~ label,
+    .form-improved .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: #d42025;
+    }
+    
+    /* Área de subida de archivos */
+    .file-upload-area {
+        position: relative;
+        border: 2px dashed #ced4da;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+        cursor: pointer;
         margin-bottom: 15px;
     }
     
-    .file-upload-input {
+    .file-upload-area:hover {
+        border-color: #d42025;
+        background: #f1f3f4;
+    }
+    
+    .file-input {
         position: absolute;
         top: 0;
         left: 0;
@@ -92,67 +212,57 @@
         height: 100%;
         opacity: 0;
         cursor: pointer;
-        z-index: 2;
     }
     
-    .file-upload-text {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #f8f9fa;
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        padding: 0 15px;
+    .file-upload-content {
+        pointer-events: none;
+    }
+    
+    .upload-icon {
+        font-size: 24px;
         color: #6c757d;
-        transition: all 0.3s ease;
+        margin-bottom: 8px;
+        display: block;
     }
     
-    .file-upload-input:hover + .file-upload-text {
-        background-color: #e9ecef;
-    }
-    
-    .file-upload-input:focus + .file-upload-text {
-        border-color: #d42025;
-        box-shadow: 0 0 0 0.25rem rgba(212, 32, 37, 0.25);
-    }
-    
-    .image-label {
-        margin-bottom: 5px;
+    .upload-text {
+        color: #6c757d;
         font-weight: 500;
+    }
+    
+    /* Previsualización de imagen */
+    .image-label {
+        margin-bottom: 8px;
+        font-weight: 600;
         color: #495057;
-        font-size: 0.9rem;
+        font-size: 14px;
     }
     
     .image-preview-container {
         position: relative;
         display: inline-block;
-        margin-top: 5px;
     }
     
     .current-image-preview {
         max-width: 100%;
         max-height: 180px;
-        border-radius: 6px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         transition: all 0.3s ease;
         display: block;
         margin: 0 auto;
     }
     
     .current-image-preview:hover {
-        transform: scale(1.03);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
     
     .btn-remove-image {
         position: absolute;
         top: -8px;
         right: -8px;
-        background-color: #d42025;
+        background: #d42025;
         color: white;
         border: none;
         width: 24px;
@@ -162,105 +272,87 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(212, 32, 37, 0.3);
     }
     
     .btn-remove-image:hover {
-        background-color: #b81920;
+        background: #b91d21;
         transform: scale(1.1);
     }
     
-    .btn-submit {
-        background-color: #d42025;
+    .current-image-section {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 15px;
+    }
+    
+    /* Footer del modal */
+    .modal-footer-improved {
+        padding: 20px 24px;
+        border-top: 1px solid #e9ecef;
+        background: #f8f9fa;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+    
+    /* Botones */
+    .btn-save {
+        background: linear-gradient(135deg, #d42025 0%, #b91d21 100%);
         color: white;
         border: none;
-        padding: 12px 30px;
+        padding: 12px 24px;
         border-radius: 6px;
         font-weight: 600;
-        font-size: 16px;
+        font-size: 14px;
         transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(212, 32, 37, 0.2);
-        margin-right: 10px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(212, 32, 37, 0.25);
     }
     
-    .btn-submit::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.7s ease;
+    .btn-save:hover {
+        background: linear-gradient(135deg, #b91d21 0%, #a01a1e 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(212, 32, 37, 0.35);
+        color: white;
     }
     
-    .btn-submit:hover {
-        background-color: #b81920;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(212, 32, 37, 0.3);
-    }
-    
-    .btn-submit:hover::before {
-        left: 100%;
-    }
-    
-    .btn-submit:active {
-        transform: translateY(1px);
-        box-shadow: 0 2px 3px rgba(212, 32, 37, 0.3);
-    }
-    
-    .btn-secondary {
-        background-color: #6c757d;
+    .btn-cancel {
+        background: #6c757d;
         color: white;
         border: none;
         padding: 12px 20px;
         border-radius: 6px;
         font-weight: 600;
-        font-size: 16px;
+        font-size: 14px;
         transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.25);
     }
     
-    .btn-secondary:hover {
-        background-color: #5a6268;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.35);
+        color: white;
     }
     
-    .btn-secondary:active {
-        transform: translateY(1px);
-        box-shadow: 0 2px 3px rgba(108, 117, 125, 0.3);
-    }
-    
-    .current-image-section {
-        margin-top: 15px;
-        padding: 10px;
-        border-radius: 6px;
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-    }
-    
-    .modal-header, .modal-footer {
-        border: none;
-    }
-    
-    .modal-title {
-        color: #212529;
-        font-size: 1.25rem;
+    /* Labels mejorados */
+    .form-label {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 8px;
     }
 </style>
 
 <script>
-    // Script para vista previa de imagen
+    // Vista previa de imagen
     document.getElementById('imagen').addEventListener('change', function(e) {
         const fileName = e.target.files[0]?.name || 'Seleccionar nueva imagen';
         document.getElementById('file-name').textContent = fileName;
