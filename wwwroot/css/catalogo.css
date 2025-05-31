@@ -8,7 +8,251 @@ body {
     pointer-events: none;
   }
 }
+/* Estilos modernos para botones de carrito y WhatsApp */
+.btn-whatsapp,
+.btn-carrito {
+  position: relative;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none !important;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.2px;
+  text-transform: none;
+  backdrop-filter: blur(10px);
+  transform: perspective(1px) translateZ(0);
+  backface-visibility: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: auto;
+  width: auto;
+  white-space: nowrap;
+}
 
+/* Botón de WhatsApp */
+.btn-whatsapp {
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%) !important;
+  color: white !important;
+  border: 2px solid transparent;
+}
+
+.btn-whatsapp:hover {
+  background: linear-gradient(135deg, #128c7e 0%, #25d366 100%) !important;
+  color: white !important;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+  border-color: rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.6);
+}
+
+/* Botón de Carrito */
+.btn-carrito {
+  background: linear-gradient(135deg, #000000 0%, #333333 100%) !important;
+  color: white !important;
+  border: 2px solid transparent;
+}
+
+.btn-carrito:hover {
+  background: linear-gradient(135deg, #333333 0%, #000000 100%) !important;
+  color: white !important;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-carrito:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+/* Efecto de ondas (ripple effect) */
+.btn-whatsapp::before,
+.btn-carrito::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  z-index: 0;
+}
+
+.btn-whatsapp:active::before,
+.btn-carrito:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Asegurar que el texto esté por encima del efecto */
+.btn-whatsapp i,
+.btn-whatsapp span,
+.btn-carrito i,
+.btn-carrito span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Efecto de brillo sutil */
+.btn-whatsapp::after,
+.btn-carrito::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  transform: rotate(45deg) translate(-100%, -100%);
+  transition: transform 0.6s;
+  z-index: 0;
+}
+
+.btn-whatsapp:hover::after,
+.btn-carrito:hover::after {
+  transform: rotate(45deg) translate(100%, 100%);
+}
+
+/* Estilos para iconos dentro de los botones */
+.btn-whatsapp .fab,
+.btn-carrito .fas {
+  margin-right: 4px;
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.btn-whatsapp:hover .fab,
+.btn-carrito:hover .fas {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Mejoras para accesibilidad */
+.btn-whatsapp:focus,
+.btn-carrito:focus {
+  outline: 3px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Estados deshabilitados */
+.btn-whatsapp:disabled,
+.btn-carrito:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-whatsapp:disabled:hover,
+.btn-carrito:disabled:hover {
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .btn-whatsapp,
+  .btn-carrito {
+    padding: 7px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+  
+  .btn-whatsapp .fab,
+  .btn-carrito .fas {
+    font-size: 13px;
+    margin-right: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-whatsapp,
+  .btn-carrito {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  
+  .btn-whatsapp .fab,
+  .btn-carrito .fas {
+    font-size: 12px;
+    margin-right: 2px;
+  }
+}
+
+/* Animación de carga para el botón del carrito */
+.btn-carrito.loading {
+  pointer-events: none;
+  position: relative;
+}
+
+.btn-carrito.loading::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Mejoras adicionales para el hover */
+.btn-whatsapp:hover {
+  animation: pulse-whatsapp 2s infinite;
+}
+
+.btn-carrito:hover {
+  animation: pulse-carrito 2s infinite;
+}
+
+@keyframes pulse-whatsapp {
+  0% {
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+  }
+  100% {
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+  }
+}
+
+@keyframes pulse-carrito {
+  0% {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  }
+  100% {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  }
+}
 /* Estructura para el layout con filtros a la izquierda */
 .catalogo-layout {
   display: flex;
