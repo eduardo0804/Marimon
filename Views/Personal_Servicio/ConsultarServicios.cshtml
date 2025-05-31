@@ -78,61 +78,61 @@
                 </div>
                 <input type="hidden" id="estadoSeleccionado" value="@ViewBag.EstadoSeleccionado" />
                 <div class="filter-body p-3">
-    <h6 class="mb-3">Filtrar por estado</h6>
-    <div class="status-filters">
-        <!-- Opción "Todos los estados" -->
-        <a href="javascript:void(0)" onclick="setEstado('')"
-            class="status-filter @(string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) ? "active" : "")">
-            <div class="status-icon bg-secondary">
-                <i class="fas fa-list text-white"></i>
-            </div>
-            <span class="status-label">Todos los estados</span>
-            <span class="status-badge">@(ViewBag.ContadoresEstados != null ? ViewBag.ContadoresEstados["Todos"] : Model.Reservas.Count())</span>
-        </a>
+                    <h6 class="mb-3">Filtrar por estado</h6>
+                    <div class="status-filters">
+                        <!-- Opción "Todos los estados" -->
+                        <a href="javascript:void(0)" onclick="setEstado('')"
+                            class="status-filter @(string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) ? "active" : "")">
+                            <div class="status-icon bg-secondary">
+                                <i class="fas fa-list text-white"></i>
+                            </div>
+                            <span class="status-label">Todos los estados</span>
+                            <span class="status-badge">@(ViewBag.ContadoresEstados != null ? ViewBag.ContadoresEstados["Todos"] : Model.Reservas.Count())</span>
+                        </a>
 
-        @if (ViewBag.Estados != null)
-        {
-            foreach (var est in ViewBag.Estados)
-            {
-                var count = ViewBag.ContadoresEstados != null ? ViewBag.ContadoresEstados[est] : Model.Reservas.Count(v => v.Estado.ToString() == est);
-                var iconClass = "";
-                var bgClass = "";
-                switch (est)
-                {
-                    case "Pendiente":
-                        iconClass = "fa-clock";
-                        bgClass = "bg-warning";
-                        break;
-                    case "Confirmada":
-                        iconClass = "fa-check-circle";
-                        bgClass = "bg-info";
-                        break;
-                    case "Completada": // Verde para completada
-                        iconClass = "fa-check-double";
-                        bgClass = "bg-success";
-                        break;
-                    case "Cancelada":
-                        iconClass = "fa-times-circle";
-                        bgClass = "bg-danger";
-                        break;
-                    default:
-                        iconClass = "fa-circle";
-                        bgClass = "bg-secondary";
-                        break;
-                }
-                
-                <a href="javascript:void(0)" onclick="setEstado('@est')"
-                    class="status-filter @(ViewBag.EstadoSeleccionado == est ? "active" : "")">
-                    <div class="status-icon @bgClass">
-                        <i class="fas @iconClass text-white"></i>
+                        @if (ViewBag.Estados != null)
+                        {
+                            foreach (var est in ViewBag.Estados)
+                            {
+                                var count = ViewBag.ContadoresEstados != null ? ViewBag.ContadoresEstados[est] : Model.Reservas.Count(v => v.Estado.ToString() == est);
+                                var iconClass = "";
+                                var bgClass = "";
+                                switch (est)
+                                {
+                                    case "Pendiente":
+                                        iconClass = "fa-clock";
+                                        bgClass = "bg-warning";
+                                        break;
+                                    case "Confirmada":
+                                        iconClass = "fa-check-circle";
+                                        bgClass = "bg-info";
+                                        break;
+                                    case "Completada": // Verde para completada
+                                        iconClass = "fa-check-double";
+                                        bgClass = "bg-success";
+                                        break;
+                                    case "Cancelada":
+                                        iconClass = "fa-times-circle";
+                                        bgClass = "bg-danger";
+                                        break;
+                                    default:
+                                        iconClass = "fa-circle";
+                                        bgClass = "bg-secondary";
+                                        break;
+                                }
+                                
+                                <a href="javascript:void(0)" onclick="setEstado('@est')"
+                                    class="status-filter @(ViewBag.EstadoSeleccionado == est ? "active" : "")">
+                                    <div class="status-icon @bgClass">
+                                        <i class="fas @iconClass text-white"></i>
+                                    </div>
+                                    <span class="status-label">@est</span>
+                                    <span class="status-badge">@count</span>
+                                </a>
+                            }
+                        }
                     </div>
-                    <span class="status-label">@est</span>
-                    <span class="status-badge">@count</span>
-                </a>
-            }
-        }
-    </div>
-</div>
+                </div>
                 <div class="mt-4">
                     <button class="filter-btn" onclick="filtrarReservas()"
                         style="width: 250px !important; min-width: 250px !important; max-width: 150px !important; display: block !important; margin-left: auto !important; margin-right: auto !important;">
