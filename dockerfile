@@ -6,49 +6,35 @@ WORKDIR /app
 COPY *.csproj ./
 RUN dotnet restore
     
-# Copiar el resto del código y compilar
+# Copy everything else and build
 COPY . ./
 RUN dotnet publish "Marimon.csproj" -c Release -o /app/out
 
-# Etapa de runtime
+# Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
-# Instalar dependencias básicas
-RUN apt-get update && apt-get install -y \
+# Install only basic dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     libgdiplus \
+    libc6-dev \
     libx11-dev \
-    libxext-dev \
-    libxrender-dev \
     fontconfig \
-    libfontconfig1 \
-    wget \
-    xfonts-75dpi \
-    xfonts-base \
-    libjpeg62-turbo \
+    libxext6 \
+    libxrender1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Descargar e instalar wkhtmltopdf
-RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb \
-    && apt-get update \
-    && apt-get install -y ./wkhtmltox_0.12.6.1-2.bullseye_amd64.deb || (apt-get -f install -y && apt-get install -y ./wkhtmltox_0.12.6.1-2.bullseye_amd64.deb) \
-    && rm wkhtmltox_0.12.6.1-2.bullseye_amd64.deb
-
-# Crear carpeta para las bibliotecas nativas
-RUN mkdir -p /app/nativelibs/linux-x64 \
-    && cp /usr/local/lib/libwkhtmltox.so /app/ || true \
-    && cp /usr/local/lib/libwkhtmltox.so /app/nativelibs/linux-x64/ || true
-
-# Crear carpeta para las claves de protección de datos
+# Create directory for data protection keys
 RUN mkdir -p /app/keys
 
-# Copiar los archivos publicados desde la etapa de build
+# Copy app files 
 COPY --from=build-env /app/out .
 
-# Establecer variables de entorno para las bibliotecas
+# Set environment variables
 ENV APP_NET_CORE Marimon.dll 
-ENV LD_LIBRARY_PATH=/app:/usr/local/lib:/usr/lib:/app/nativelibs/linux-x64
+ENV LD_LIBRARY_PATH=/app:/app/nativelibs/linux-x64:/usr/local/lib:/usr/lib
 
-# Comando para iniciar la aplicación
+# Start the application
 CMD ASPNETCORE_URLS=http://*:$PORT dotnet $APP_NET_CORE
