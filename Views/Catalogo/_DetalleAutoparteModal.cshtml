@@ -98,8 +98,9 @@
 
                                 @if (Model.OfertaActiva == true && Model.PrecioOferta.HasValue)
                                 {
-                                    <span><del>S/ @Model.aut_precio.ToString("0.00")</del> <strong class="text-danger">S/ @Model.PrecioOferta.Value.ToString("0.00")</strong></span>
-                                    <br/>
+                                    <span><del>S/ @Model.aut_precio.ToString("0.00")</del> <strong class="text-danger">S/
+                                            @Model.PrecioOferta.Value.ToString("0.00")</strong></span>
+                                    <br />
                                     <span class="text-success">Oferta: @Model.DescripcionOferta</span>
                                 }
                                 else
@@ -108,7 +109,7 @@
                                 }
                             </div>
 
-                            
+
                         </div>
 
                         <div class="tab-pane fade" id="similares" role="tabpanel" aria-labelledby="similares-tab">
@@ -194,7 +195,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <form id="formReseniaAutoparte" asp-action="AgregarReseniaAutoparte" asp-controller="Catalogo"
-                                method="post" class="row">
+                                method="post" class="row" novalidate>
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="aut_id" value="@Model.aut_id" />
 
@@ -609,153 +610,153 @@
 
         // Función corregida para enviar reseña manteniendo los estilos
         function enviarResenia() {
-    if (formSubmitted) {
-        console.log('Formulario ya enviado, evitando doble envío');
-        return;
-    }
-    
-    formSubmitted = true;
-    const submitBtn = document.getElementById('submitResenia');
-    const originalText = submitBtn?.innerHTML;
-    
-    // Cambiar estado del botón
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
-    }
-    
-    const form = document.getElementById('formReseniaAutoparte');
-    const formData = new FormData(form);
-    
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
-        }
-        return response.text();
-    })
-    .then(html => {
-        // SOLUCIÓN CORRECTA: Solo actualizar el contenido de #reseniasList
-        const reseniasList = document.getElementById('reseniasList');
-        if (reseniasList) {
-            reseniasList.innerHTML = html;
-            console.log('Lista de reseñas actualizada correctamente');
-        }
-        
-        // Actualizar el contador del badge
-        actualizarContadorResenias();
-        
-        // Limpiar y resetear el formulario
-        limpiarFormulario();
-        
-        // Mostrar mensaje de éxito
-        mostrarMensajeExito('¡Reseña agregada exitosamente!');
-        
-        // Re-inicializar el formulario para que las estrellas funcionen
-        setTimeout(() => {
-            inicializarFormularioResenia();
-        }, 100);
-        
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        mostrarMensajeError('Error al enviar la reseña. Por favor, inténtalo nuevamente.');
-    })
-    .finally(() => {
-        // Restaurar botón
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        }
-        formSubmitted = false;
-    });
-}
-        function actualizarContadorResenias() {
-    const reseniaItems = document.querySelectorAll('.resenia-item');
-    const badgeElement = document.querySelector('.col-md-6:last-child .badge span');
-    
-    if (badgeElement) {
-        const count = reseniaItems.length;
-        badgeElement.textContent = `${count} reseñas`;
-    }
-}
+            if (formSubmitted) {
+                console.log('Formulario ya enviado, evitando doble envío');
+                return;
+            }
 
-// Función para eliminar reseña (agregar esta si no la tienes)
-function eliminarResenia(reseniaId, autoparteId) {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta reseña?')) {
-        return;
-    }
-    
-    // Animar la reseña que se va a eliminar
-    const reseniaElement = document.querySelector(`.resenia-item:has(button[onclick*="${reseniaId}"])`);
-    if (reseniaElement) {
-        reseniaElement.style.opacity = '0.5';
-        reseniaElement.style.transform = 'translateX(-20px)';
-    }
-    
-    fetch(`/Catalogo/EliminarResenia/${reseniaId}?aut_id=${autoparteId}`, {
-        method: 'DELETE',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Animar la eliminación
-            if (reseniaElement) {
-                reseniaElement.style.transition = 'all 0.3s ease';
-                reseniaElement.style.transform = 'translateX(-100%)';
-                reseniaElement.style.opacity = '0';
-                
-                setTimeout(() => {
-                    reseniaElement.remove();
-                    
-                    // Actualizar contador
-                    actualizarContadorResenias();
-                    
-                    // Verificar si no quedan reseñas
-                    const remainingResenias = document.querySelectorAll('.resenia-item');
-                    if (remainingResenias.length === 0) {
-                        mostrarMensajeSinResenias();
+            formSubmitted = true;
+            const submitBtn = document.getElementById('submitResenia');
+            const originalText = submitBtn?.innerHTML;
+
+            // Cambiar estado del botón
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+            }
+
+            const form = document.getElementById('formReseniaAutoparte');
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
                     }
-                }, 300);
-            }
-            
-            mostrarMensajeExito('Reseña eliminada correctamente.');
-        } else {
-            mostrarMensajeError(data.message || 'Error al eliminar la reseña.');
-            
-            // Restaurar la apariencia de la reseña
-            if (reseniaElement) {
-                reseniaElement.style.opacity = '1';
-                reseniaElement.style.transform = 'translateX(0)';
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        mostrarMensajeError('Error al eliminar la reseña.');
-        
-        // Restaurar la apariencia de la reseña
-        if (reseniaElement) {
-            reseniaElement.style.opacity = '1';
-            reseniaElement.style.transform = 'translateX(0)';
-        }
-    });
-}
+                    return response.text();
+                })
+                .then(html => {
+                    // SOLUCIÓN CORRECTA: Solo actualizar el contenido de #reseniasList
+                    const reseniasList = document.getElementById('reseniasList');
+                    if (reseniasList) {
+                        reseniasList.innerHTML = html;
+                        console.log('Lista de reseñas actualizada correctamente');
+                    }
 
-function mostrarMensajeSinResenias() {
-    const reseniasList = document.getElementById('reseniasList');
-    if (reseniasList) {
-        reseniasList.innerHTML = `
+                    // Actualizar el contador del badge
+                    actualizarContadorResenias();
+
+                    // Limpiar y resetear el formulario
+                    limpiarFormulario();
+
+                    // Mostrar mensaje de éxito
+                    mostrarMensajeExito('¡Reseña agregada exitosamente!');
+
+                    // Re-inicializar el formulario para que las estrellas funcionen
+                    setTimeout(() => {
+                        inicializarFormularioResenia();
+                    }, 100);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarMensajeError('Error al enviar la reseña. Por favor, inténtalo nuevamente.');
+                })
+                .finally(() => {
+                    // Restaurar botón
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                    formSubmitted = false;
+                });
+        }
+        function actualizarContadorResenias() {
+            const reseniaItems = document.querySelectorAll('.resenia-item');
+            const badgeElement = document.querySelector('.col-md-6:last-child .badge span');
+
+            if (badgeElement) {
+                const count = reseniaItems.length;
+                badgeElement.textContent = `${count} reseñas`;
+            }
+        }
+
+        // Función para eliminar reseña (agregar esta si no la tienes)
+        function eliminarResenia(reseniaId, autoparteId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta reseña?')) {
+                return;
+            }
+
+            // Animar la reseña que se va a eliminar
+            const reseniaElement = document.querySelector(`.resenia-item:has(button[onclick*="${reseniaId}"])`);
+            if (reseniaElement) {
+                reseniaElement.style.opacity = '0.5';
+                reseniaElement.style.transform = 'translateX(-20px)';
+            }
+
+            fetch(`/Catalogo/EliminarResenia/${reseniaId}?aut_id=${autoparteId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Animar la eliminación
+                        if (reseniaElement) {
+                            reseniaElement.style.transition = 'all 0.3s ease';
+                            reseniaElement.style.transform = 'translateX(-100%)';
+                            reseniaElement.style.opacity = '0';
+
+                            setTimeout(() => {
+                                reseniaElement.remove();
+
+                                // Actualizar contador
+                                actualizarContadorResenias();
+
+                                // Verificar si no quedan reseñas
+                                const remainingResenias = document.querySelectorAll('.resenia-item');
+                                if (remainingResenias.length === 0) {
+                                    mostrarMensajeSinResenias();
+                                }
+                            }, 300);
+                        }
+
+                        mostrarMensajeExito('Reseña eliminada correctamente.');
+                    } else {
+                        mostrarMensajeError(data.message || 'Error al eliminar la reseña.');
+
+                        // Restaurar la apariencia de la reseña
+                        if (reseniaElement) {
+                            reseniaElement.style.opacity = '1';
+                            reseniaElement.style.transform = 'translateX(0)';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarMensajeError('Error al eliminar la reseña.');
+
+                    // Restaurar la apariencia de la reseña
+                    if (reseniaElement) {
+                        reseniaElement.style.opacity = '1';
+                        reseniaElement.style.transform = 'translateX(0)';
+                    }
+                });
+        }
+
+        function mostrarMensajeSinResenias() {
+            const reseniasList = document.getElementById('reseniasList');
+            if (reseniasList) {
+                reseniasList.innerHTML = `
             <div class="text-center py-5" id="noComments"
                 style="background-color: #f9f9f9; border-radius: 12px; padding: 40px 20px;">
                 <i class="far fa-comment-dots fa-4x mb-3" style="color: #E42229;"></i>
@@ -763,8 +764,8 @@ function mostrarMensajeSinResenias() {
                 <p class="text-muted mt-2" style="color: #626C66;">¡Sé el primero en compartir tu experiencia!</p>
             </div>
         `;
-    }
-}
+            }
+        }
 
         // Función para limpiar el formulario
         function limpiarFormulario() {
