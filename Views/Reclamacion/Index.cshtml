@@ -10,17 +10,18 @@
 }
 <link rel="stylesheet" href="~/css/reclamacion.css" />
 <h2>Libro de Reclamaciones</h2>
-<p>Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, esta institución cuenta con un Libro
-    de Reclamaciones a su disposición.</p>
 
 <form asp-action="CrearReclamacion" asp-controller="Reclamacion" method="post" id="reclamacionForm" novalidate>
     <input type="hidden" asp-for="UsuarioId" value="@usuario?.usu_id" />
     <div class="form-group mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
         <h5 class="mb-3" style="font-weight: 600; color: #D42025;">Datos de la Empresa</h5>
+        <p>Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, esta institución cuenta con un
+            Libro de Reclamaciones a su disposición.</p>
         <ul style="padding-left: 20px; margin: 0; color: #212529; font-size: 15px;">
             <li><strong>Razón Social:</strong> MARIMON S.A.C</li>
             <li><strong>RUC:</strong> 20601635152</li>
-            <li><strong>Dirección Fiscal:</strong>AV. ANGAMOS ESTE NRO. 1686 A.H. CASA HUERTAS LIMA - LIMA - SURQUILLO</li>
+            <li><strong>Dirección Fiscal:</strong> AV. ANGAMOS ESTE NRO. 1686 A.H. CASA HUERTAS LIMA - LIMA - SURQUILLO
+            </li>
         </ul>
     </div>
 
@@ -50,7 +51,7 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="TipoEntidad">Estimacion del bien contratado</label>
+        <label asp-for="TipoEntidad">Identificación del bien contratado</label>
         <select asp-for="TipoEntidad" class="form-control" id="tipoEntidad" required>
             <option value="">-- Seleccione --</option>
             <option value="@((int)TipoEntidad.Producto)">Producto</option>
@@ -82,7 +83,7 @@
 
         <div class="form-group">
             <label>Número de Pedido</label>
-            <input type="text"  class="form-control" name="NumeroPedido" id="numeroPedido" />
+            <input type="text" class="form-control" name="NumeroPedido" id="numeroPedido" />
             <div class="invalid-feedback">Por favor, ingresa el número de pedido.</div>
         </div>
 
@@ -109,8 +110,7 @@
 
         <div class="form-group">
             <label>Número de Servicio</label>
-            <input type="text"  class="form-control" name="NumeroServicio"
-                id="numeroServicio" />
+            <input type="text" class="form-control" name="NumeroServicio" id="numeroServicio" />
             <div class="invalid-feedback">Por favor, ingresa el número de servicio.</div>
         </div>
 
@@ -134,7 +134,7 @@
         <div class="invalid-feedback">Por favor, ingresa una descripción.</div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Enviar Reclamación</button>
+    <button type="submit" class="btn btn-danger">Enviar Reclamación</button>
 </form>
 
 
@@ -271,6 +271,7 @@
                     }
                     // 👇 Copiar el valor de numeroPedido a numeroReferencia
                     numeroReferencia.value = numeroPedido.value;
+                    document.getElementById("montoServicio").value = montoProducto.value;
                 } else if (servicioSection.style.display === 'block') {
                     if (servicioSelect.value) {
                         entidadId = servicioSelect.value;
@@ -278,6 +279,7 @@
                     }
                     // 👇 Copiar el valor de numeroServicio a numeroReferencia
                     numeroReferencia.value = numeroServicio.value;
+                    document.getElementById("montoProducto").value = montoServicio.value;
                 }
 
                 hiddenEntidadId.value = entidadId;

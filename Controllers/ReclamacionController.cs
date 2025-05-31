@@ -61,21 +61,74 @@ namespace Marimon.Controllers
                 _context.Reclamacion.Add(model);
                 await _context.SaveChangesAsync();
 
-                // Ruta del archivo HTML
+                // Obtener datos del usuario
+                var usuario = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.usu_id == model.UsuarioId);
+
+                // Obtener nombre de la entidad según el tipo
+                string nombreEntidad = "";
+                string entidadLabel = "";
+
+                if (model.TipoEntidad == TipoEntidad.Producto)
+                {
+                    var producto = await _context.Autopartes
+                        .FirstOrDefaultAsync(p => p.aut_id == model.EntidadId);
+                    nombreEntidad = producto?.aut_nombre ?? "Producto no encontrado";
+                    entidadLabel = "Producto";
+                }
+                else if (model.TipoEntidad == TipoEntidad.Servicio)
+                {
+                    var servicio = await _context.Servicio
+                        .FirstOrDefaultAsync(s => s.ser_id == model.EntidadId);
+                    nombreEntidad = servicio?.ser_nombre ?? "Servicio no encontrado";
+                    entidadLabel = "Servicio";
+                }
+
+                // Leer template del email
                 var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "emailRecla.html");
                 string emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
-                var logoUrl = "https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Flogo-web-marimon.png?alt=media&token=e7fd3cab-30b0-4a6f-a675-30b3b69f836b";
-                emailBody = emailBody.Replace("{{LogoUrl}}", logoUrl);
-                // Reemplazar el marcador con la descripción real
-                emailBody = emailBody.Replace("{{DESCRIPCION}}", model.Descripcion);
 
-                // Enviar correo con contenido HTML
-                await _emailSender.SendEmailAsync("cetoce64@gmail.com", "Nueva reclamación recibida", emailBody);
+                // URL del logo
+                var logoUrl = "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png";
+
+                // Determinar textos para el tipo de reclamación
+                string tipoTexto = model.TipoReclamacion == TipoReclamacion.Reclamo ? "Reclamo" : "Queja";
+                string tipoTextoLower = model.TipoReclamacion == TipoReclamacion.Reclamo ? "reclamo" : "queja";
+                string tipoEntidadTexto = model.TipoEntidad == TipoEntidad.Producto ? "Producto" : "Servicio";
+                string tipoEntidadTextoLower = model.TipoEntidad == TipoEntidad.Producto ? "producto" : "servicio";
+
+                // Obtener fecha y hora actual
+                var fechaActual = DateTime.Now;
+                var fechaRegistro = fechaActual.ToString("dd/MM/yyyy");
+                var horaRegistro = fechaActual.ToString("HH:mm");
+
+                // Reemplazar todos los placeholders
+                emailBody = emailBody.Replace("{{LogoUrl}}", logoUrl);
+                emailBody = emailBody.Replace("{{NOMBRE_COMPLETO}}", $"{usuario?.usu_nombre} {usuario?.usu_apellido}");
+                emailBody = emailBody.Replace("{{CORREO}}", usuario?.usu_correo ?? "No especificado");
+                emailBody = emailBody.Replace("{{TIPO_RECLAMACION}}", tipoTexto);
+                emailBody = emailBody.Replace("{{TIPO_RECLAMACION_LOWER}}", tipoTextoLower);
+                emailBody = emailBody.Replace("{{TIPO_ENTIDAD}}", tipoEntidadTexto);
+                emailBody = emailBody.Replace("{{TIPO_ENTIDAD_LOWER}}", tipoEntidadTextoLower);
+                emailBody = emailBody.Replace("{{ENTIDAD_LABEL}}", entidadLabel);
+                emailBody = emailBody.Replace("{{NOMBRE_ENTIDAD}}", nombreEntidad);
+                emailBody = emailBody.Replace("{{NUMERO_REFERENCIA}}", model.NumeroReferencia ?? "No especificado");
+                emailBody = emailBody.Replace("{{MONTO}}", model.Monto.ToString("F2"));
+                emailBody = emailBody.Replace("{{ID_RECLAMACION}}", model.Id.ToString());
+                emailBody = emailBody.Replace("{{DESCRIPCION}}", model.Descripcion ?? "Sin descripción");
+                emailBody = emailBody.Replace("{{FECHA_REGISTRO}}", fechaRegistro);
+                emailBody = emailBody.Replace("{{HORA_REGISTRO}}", horaRegistro);
+
+                // Enviar correo
+                await _emailSender.SendEmailAsync("marimonpruebas@gmail.com",
+                    $"Nueva Reclamación #{model.Id} - {tipoTexto}",
+                    emailBody);
 
                 return RedirectToAction("Confirmacion");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al crear reclamación");
                 var innerMessage = ex.InnerException != null ? ex.InnerException.Message : "No inner exception";
                 return Content("Error al guardar: " + ex.Message + " | Detalle interno: " + innerMessage);
             }
