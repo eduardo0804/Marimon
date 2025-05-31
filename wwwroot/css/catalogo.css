@@ -1,5 +1,5 @@
 body {
-  font-family: "Nunito", sans-serif;
+  font-family: "Nunito", sans-serif !important;
 }
 
 @media (max-width: 767.98px) {
@@ -1525,7 +1525,7 @@ a[href="/Identity/Account/Login"]:hover {
   border-radius: 20px;
   font-size: 12px;
   font-weight: bold;
-  z-index: 100;
+  z-index: 10;
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
   animation: bounce 2s infinite;
   pointer-events: none;
