@@ -987,22 +987,53 @@ public async Task<IActionResult> ProcesarPago(string tipoComprobante, string tip
                 </tr>
             </thead>
             <tbody>";
-
-            // Detalles de productos
             foreach (var detalle in detallesVenta)
             {
                 var autoparte = detalle.Autoparte;
-                var venta_total = detalle.Venta;
-                decimal precioUnitario = Math.Round(autoparte.aut_precio, 2);
-                decimal subTotalItem = venta_total.Total;
-                decimal totalItem = venta_total.Total;
+                if (autoparte == null) continue;
+
+                decimal precioBase = autoparte.aut_precio;
+                decimal precioFinal = precioBase;
+
+                // Buscar oferta activa
+                var ofertaActiva = _context.Ofertas.FirstOrDefault(o =>
+                    o.AutoparteId == autoparte.aut_id &&
+                    o.ofe_activa &&
+                    DateTime.Now >= o.ofe_fecha_inicio &&
+                    DateTime.Now <= o.ofe_fecha_fin
+                );
+
+                // Si hay oferta, aplicar descuento
+                if (ofertaActiva != null)
+                {
+                    precioFinal = Math.Round(precioBase * (1 - ofertaActiva.ofe_porcentaje / 100), 2);
+                }
+                // Si no hay oferta activa, verificar si se aplicó un código de descuento a la venta
+                else if (!string.IsNullOrEmpty(venta.CodigoDescuento))
+                {
+                    // Buscar el código de descuento que se aplicó a esta venta
+                    var codigoDescuentoAplicado = _context.CodigosDescuento.FirstOrDefault(cd =>
+                        cd.cod_codigo == venta.CodigoDescuento &&
+                        (cd.AutoparteId == null || cd.AutoparteId == autoparte.aut_id)
+                    );
+
+                    if (codigoDescuentoAplicado != null)
+                    {
+                        precioFinal = Math.Round(precioBase * (1 - codigoDescuentoAplicado.cod_porcentaje / 100), 2);
+                    }
+                }
+
+                // Calcular subtotales
+                int cantidad = detalle.det_cantidad;
+                decimal subTotalItem = Math.Round(precioFinal * cantidad, 2);
+                decimal totalItem = subTotalItem;
 
                 htmlContent += $@"
                 <tr>
-                    <td>{detalle.det_cantidad}</td>
+                    <td>{cantidad}</td>
                     <td>{autoparte.aut_id}</td>
                     <td class='description'>{autoparte.aut_nombre}</td>
-                    <td class='right'>{precioUnitario:N2}</td>
+                    <td class='right'>{precioFinal:N2}</td>
                     <td class='right'>{subTotalItem:N2}</td>
                     <td class='right'>{totalItem:N2}</td>
                 </tr>";
