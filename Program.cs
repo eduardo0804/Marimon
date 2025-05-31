@@ -86,36 +86,87 @@ builder.Services.AddSession(options =>
 
 // Configura DinkToPdf converter con el DLL cargado  según el sistema operativo
 var context = new CustomAssemblyLoadContext();
-string libPath;
+string libPath = "";
+bool libraryLoaded = false;
 
-if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-{
-    libPath = Path.Combine(AppContext.BaseDirectory, "nativelibs", "win-x64", "libwkhtmltox.dll");
-}
-else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-{
-    libPath = Path.Combine(AppContext.BaseDirectory, "nativelibs", "linux-x64", "libwkhtmltox.so");
-}
-else
-{
-    throw new PlatformNotSupportedException("Sistema operativo no compatible");
-}
+// Log para diagnóstico
+Console.WriteLine($"Sistema operativo: {RuntimeInformation.OSDescription}");
 
-// Primero intenta cargar desde la ubicación de la aplicación
-string localPath = Path.Combine(AppContext.BaseDirectory, libPath);
-string systemPath = "";
-
-if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+try
 {
-    // En Linux, también busca en ubicaciones del sistema
-    systemPath = "/usr/local/lib/libwkhtmltox.so";
-    if (!System.IO.File.Exists(localPath) && System.IO.File.Exists(systemPath))
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     {
-        localPath = systemPath;
-    }
-}
+        libPath = Path.Combine(AppContext.BaseDirectory, "nativelibs", "win-x64", "libwkhtmltox.dll");
 
-context.LoadUnmanagedLibrary(localPath);
+        if (System.IO.File.Exists(libPath))
+        {
+            context.LoadUnmanagedLibrary(libPath);
+            libraryLoaded = true;
+            Console.WriteLine($"Biblioteca cargada con éxito desde: {libPath}");
+        }
+        else
+        {
+            Console.WriteLine($"No existe el archivo en: {libPath}");
+        }
+    }
+    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+    {
+        // Lista de posibles ubicaciones para buscar en Linux
+        var possiblePaths = new[]
+        {
+            Path.Combine(AppContext.BaseDirectory, "nativelibs", "linux-x64", "libwkhtmltox.so"),
+            Path.Combine(AppContext.BaseDirectory, "libwkhtmltox.so"),
+            "/usr/local/lib/libwkhtmltox.so",
+            "/usr/lib/libwkhtmltox.so",
+            "/usr/lib64/libwkhtmltox.so"
+        };
+
+        // Intentar cargar desde cada ubicación hasta encontrar una que funcione
+        foreach (var path in possiblePaths)
+        {
+            Console.WriteLine($"Intentando cargar desde: {path}");
+
+            if (System.IO.File.Exists(path))
+            {
+                Console.WriteLine($"El archivo existe en: {path}");
+                libPath = path;
+
+                try
+                {
+                    context.LoadUnmanagedLibrary(path);
+                    libraryLoaded = true;
+                    Console.WriteLine($"Biblioteca cargada con éxito desde: {path}");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al cargar {path}: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No existe el archivo en: {path}");
+            }
+        }
+    }
+    else
+    {
+        throw new PlatformNotSupportedException("Sistema operativo no compatible");
+    }
+
+    if (!libraryLoaded)
+    {
+        throw new FileNotFoundException($"No se pudo cargar la biblioteca libwkhtmltox en ninguna ubicación");
+    }
+
+    // Registrar el converter como singleton
+    builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error al cargar la biblioteca: {ex}");
+    throw;
+}
 
 // Registra el converter como singleton (para inyectar en controladores si quieres)
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
