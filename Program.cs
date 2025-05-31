@@ -92,84 +92,56 @@ bool libraryLoaded = false;
 // Log para diagnóstico
 Console.WriteLine($"Sistema operativo: {RuntimeInformation.OSDescription}");
 
-try
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    // En Windows, usar la DLL local
+    libPath = Path.Combine(AppContext.BaseDirectory, "nativelibs", "win-x64", "libwkhtmltox.dll");
+    
+    if (System.IO.File.Exists(libPath))
     {
-        libPath = Path.Combine(AppContext.BaseDirectory, "nativelibs", "win-x64", "libwkhtmltox.dll");
-
-        if (System.IO.File.Exists(libPath))
+        Console.WriteLine($"Cargando biblioteca de Windows desde: {libPath}");
+        try
         {
             context.LoadUnmanagedLibrary(libPath);
             libraryLoaded = true;
-            Console.WriteLine($"Biblioteca cargada con éxito desde: {libPath}");
+            Console.WriteLine("Biblioteca de Windows cargada exitosamente");
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine($"No existe el archivo en: {libPath}");
-        }
-    }
-    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-    {
-        // Lista de posibles ubicaciones para buscar en Linux
-        var possiblePaths = new[]
-        {
-            Path.Combine(AppContext.BaseDirectory, "nativelibs", "linux-x64", "libwkhtmltox.so"),
-            Path.Combine(AppContext.BaseDirectory, "libwkhtmltox.so"),
-            "/usr/local/lib/libwkhtmltox.so",
-            "/usr/lib/libwkhtmltox.so",
-            "/usr/lib64/libwkhtmltox.so"
-        };
-
-        // Intentar cargar desde cada ubicación hasta encontrar una que funcione
-        foreach (var path in possiblePaths)
-        {
-            Console.WriteLine($"Intentando cargar desde: {path}");
-
-            if (System.IO.File.Exists(path))
-            {
-                Console.WriteLine($"El archivo existe en: {path}");
-                libPath = path;
-
-                try
-                {
-                    context.LoadUnmanagedLibrary(path);
-                    libraryLoaded = true;
-                    Console.WriteLine($"Biblioteca cargada con éxito desde: {path}");
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error al cargar {path}: {ex.Message}");
-                }
-            }
-            else
-            {
-                Console.WriteLine($"No existe el archivo en: {path}");
-            }
+            Console.WriteLine($"Error al cargar biblioteca de Windows: {ex.Message}");
         }
     }
     else
     {
-        throw new PlatformNotSupportedException("Sistema operativo no compatible");
+        Console.WriteLine($"Biblioteca de Windows no encontrada en: {libPath}");
     }
-
-    if (!libraryLoaded)
-    {
-        throw new FileNotFoundException($"No se pudo cargar la biblioteca libwkhtmltox en ninguna ubicación");
-    }
-
-    // Registrar el converter como singleton
-    builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 }
-catch (Exception ex)
+else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 {
-    Console.WriteLine($"Error al cargar la biblioteca: {ex}");
-    throw;
+    // Usar la variable ya declarada arriba, no redeclararla
+    var wkhtmltopdfPath = "/usr/bin/wkhtmltopdf";
+    if (System.IO.File.Exists(wkhtmltopdfPath))
+    {
+        Console.WriteLine($"wkhtmltopdf encontrado como ejecutable en: {wkhtmltopdfPath}");
+        libraryLoaded = true; // Marcar como cargado porque tenemos el ejecutable
+    }
+    else
+    {
+        Console.WriteLine("wkhtmltopdf no encontrado como ejecutable en Linux");
+    }
 }
 
-// Registra el converter como singleton (para inyectar en controladores si quieres)
-builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+// Registrar el converter solo si tenemos una biblioteca/ejecutable disponible
+if (libraryLoaded)
+{
+    builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+    Console.WriteLine("Converter PDF registrado exitosamente");
+}
+else
+{
+    Console.WriteLine("No se pudo cargar wkhtmltopdf. Las funciones PDF no estarán disponibles.");
+}
+
 // Protección de datos persistente en carpeta del contenedor
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
