@@ -20,6 +20,6 @@ RUN mkdir -p /app/keys
 # Copiar los archivos publicados desde la etapa de build
 COPY --from=build-env /app/out .
 
-ENV APP_NET_CORE marimon.dll 
+ENV APP_NET_CORE Marimon.dll 
 
 CMD ASPNETCORE_URLS=http://*:$PORT dotnet $APP_NET_CORE
