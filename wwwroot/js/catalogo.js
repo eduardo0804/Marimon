@@ -470,6 +470,9 @@ function inicializarFormularioResenia() {
             // Limpiar todas las validaciones después del envío exitoso
             limpiarValidaciones();
 
+            // Aquí es buen lugar para mostrar el toast
+            mostrarToastResenia(); // <-- mostrar mensaje tipo toast que diga "Reseña enviada con éxito" o similar
+
             // Animar nuevas reseñas
             document
               .querySelectorAll(".resenia-item")
@@ -485,6 +488,33 @@ function inicializarFormularioResenia() {
     });
   }
 }
+function mostrarToastResenia(mensaje = '¡Reseña enviada exitosamente!') {
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
+    toast.style.cssText = 'bottom: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>${mensaje}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+    `;
+
+    document.body.appendChild(toast);
+
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
 
 // Nueva función para limpiar validaciones
 function limpiarValidaciones() {
@@ -566,7 +596,30 @@ function eliminarResenia(reseniaId, autoparteId) {
       }
     });
 }
+function mostrarMensajeExito(mensaje) {
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
+    toast.style.cssText = 'bottom: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i> ${mensaje}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+    `;
 
+    document.body.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
+    bsToast.show();
+
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
 // === Funciones de carrito ===
 function añadirAlCarritoAsync(autoparteId, cantidad) {
   const formData = new FormData();

@@ -402,7 +402,7 @@
                 .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
         }
 
-        function añadirAlCarritoAsync(autoparteId, cantidad) {
+        @* function añadirAlCarritoAsync(autoparteId, cantidad) {
             const formData = new FormData();
             formData.append('autoparteId', autoparteId);
             formData.append('cantidad', cantidad);
@@ -438,7 +438,7 @@
                     console.error('Error:', error);
                     alert('Ocurrió un error al añadir el producto al carrito');
                 });
-        }
+        } *@
 
         function abrirZoomModal(imagenSrc) {
             const zoomModal = document.getElementById('zoomModal');
