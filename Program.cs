@@ -86,19 +86,15 @@ builder.Services.AddSession(options =>
 
 // Configura DinkToPdf converter con el DLL cargado  según el sistema operativo
 var context = new CustomAssemblyLoadContext();
-string libFileName;
+string libPath;
 
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 {
-    libFileName = "libwkhtmltox.dll";
+    libPath = Path.Combine(AppContext.BaseDirectory, "nativelibs", "win-x64", "libwkhtmltox.dll");
 }
 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 {
-    libFileName = "libwkhtmltox.so";
-}
-else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-{
-    libFileName = "libwkhtmltox.dylib";
+    libPath = Path.Combine(AppContext.BaseDirectory, "nativelibs", "linux-x64", "libwkhtmltox.so");
 }
 else
 {
@@ -106,7 +102,7 @@ else
 }
 
 // Primero intenta cargar desde la ubicación de la aplicación
-string localPath = Path.Combine(AppContext.BaseDirectory, libFileName);
+string localPath = Path.Combine(AppContext.BaseDirectory, libPath);
 string systemPath = "";
 
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

@@ -353,7 +353,7 @@ namespace Marimon.Controllers
                             .Replace("{{StyleCompletado}}", styleCompletado)
                             .Replace("{{StyleCancelado}}", styleCancelado)
                             .Replace("{{ColCancelado}}", colCancelado)
-                            .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Citas");
+                            .Replace("{{CallbackUrl}}", "https://marimon-fjv7.onrender.com/Identity/Account/Manage/Citas");
 
 
                 // Enviar correo
