@@ -204,9 +204,10 @@ private async Task MarcarCodigoComoUtilizadoAsync(string codigoDescuento)
             {
                 ven_fecha = DateOnly.FromDateTime(DateTime.Now),
                 UsuarioId = usuario.usu_id,
-                MetodoPagoId = 1, // Puedes modificar esto si es dinámico
+                MetodoPagoId = 1, // 1 ES YAPE
                 Total = carrito.car_total,
-                CodigoDescuento = codigoDescuento // <--- aquí lo guardas
+                CodigoDescuento = codigoDescuento, // <--- aquí lo guardas
+                StripeSessionId = null
             };
 
             _context.Venta.Add(venta);
@@ -423,10 +424,11 @@ public async Task<IActionResult> ProcesarPago(string tipoComprobante, string tip
     {
         ven_fecha = DateOnly.FromDateTime(DateTime.Now),
         UsuarioId = usuario.usu_id,
-        MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1,
+        MetodoPagoId = metodoPago == "tarjeta" ? 2 : 1, // 2 es tarjeta
         Estado = "Completado",
         Total = totalAutopartes, // Usar total calculado
-        CodigoDescuento = codigoDescuento // <--- aquí lo guardas
+        CodigoDescuento = codigoDescuento, // <--- aquí lo guardas
+        StripeSessionId = null
     };
 
     _context.Venta.Add(venta);
