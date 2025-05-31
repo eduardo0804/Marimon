@@ -14,7 +14,7 @@ RUN dotnet publish "Marimon.csproj" -c Release -o /app/out
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
-# Instalar wkhtmltopdf y sus dependencias
+# Instalar dependencias básicas
 RUN apt-get update && apt-get install -y \
     libgdiplus \
     libx11-dev \
@@ -29,15 +29,21 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Instalar libssl1.1 manualmente
+RUN wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1n-0+deb11u5_amd64.deb \
+    && dpkg -i libssl1.1_1.1.1n-0+deb11u5_amd64.deb \
+    && rm libssl1.1_1.1.1n-0+deb11u5_amd64.deb
+
 # Descargar e instalar wkhtmltopdf
 RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.stretch_amd64.deb \
     && apt-get update \
     && apt-get install -y ./wkhtmltox_0.12.6-1.stretch_amd64.deb \
     && rm wkhtmltox_0.12.6-1.stretch_amd64.deb
 
-# Crear enlaces simbólicos a las bibliotecas instaladas
-RUN cp /usr/local/lib/libwkhtmltox.so /app/ || true \
-    && cp /usr/local/lib/libwkhtmltox.so /app/nativelibs/linux-x64/ || mkdir -p /app/nativelibs/linux-x64/ && cp /usr/local/lib/libwkhtmltox.so /app/nativelibs/linux-x64/ || true
+# Crear carpeta para las bibliotecas nativas
+RUN mkdir -p /app/nativelibs/linux-x64 \
+    && cp /usr/local/lib/libwkhtmltox.so /app/ \
+    && cp /usr/local/lib/libwkhtmltox.so /app/nativelibs/linux-x64/
 
 # Crear carpeta para las claves de protección de datos
 RUN mkdir -p /app/keys
