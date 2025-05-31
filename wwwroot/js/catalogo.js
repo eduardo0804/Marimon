@@ -1,19 +1,4 @@
 // Unificar todos los eventos DOMContentLoaded en uno solo
-// Esta función debe ir fuera del DOMContentLoaded porque la usas en el onclick HTML
-function eliminarResenia(reseniaId, autoparteId) {
-  idReseniaPendiente = reseniaId;
-  idAutopartePendiente = autoparteId;
-
-  console.log("Eliminar reseña:", idReseniaPendiente, idAutopartePendiente); // <--- Esto ayuda a ver si llegan bien los datos
-
-  const modal = new bootstrap.Modal(document.getElementById('modalEliminarResenia'));
-  modal.show();
-}
-
-
-// Variables globales para guardar los IDs
-let idReseniaPendiente = null;
-let idAutopartePendiente = null;
 document.addEventListener("DOMContentLoaded", function () {
   // === Código del autocompletado ===
   const searchInput = document.getElementById("autocomplete-search");
@@ -260,42 +245,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // === Funciones de modal ===
 function cargarDetalleAutoparte(id) {
-  const modalContent = document.getElementById("contenidoModal");
-  const modalAutoparte = document.getElementById("modalAutoparte");
+  const contenidoModal = document.getElementById("contenidoModal");
+  if (!contenidoModal) return;
 
-  if (!modalContent || !modalAutoparte) {
-    console.error("No se encontró el contenedor del modal.");
-    return;
-  }
+  contenidoModal.innerHTML =
+    '<button class="cerrar-modal" onclick="cerrarModal()">×</button><div class="text-center p-5"><div class="spinner-border" role="status"></div><p class="mt-2">Cargando detalles...</p></div>';
+  document.getElementById("modalAutoparte").style.display = "block";
 
-  // Mostrar un indicador de carga mientras se obtiene el contenido
-  modalContent.innerHTML = `
-        <div class="text-center p-5">
-            <div class="spinner-border" role="status"></div>
-            <p class="mt-2">Cargando detalles...</p>
-        </div>`;
-  modalAutoparte.style.display = "block";
-
-  // Realizar la solicitud al servidor
   fetch(`/Catalogo/DetalleAutoparte/${id}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Error al cargar los detalles de la autoparte.");
-      }
-      return response.text();
-    })
+    .then((response) =>
+      response.ok ? response.text() : Promise.reject("Error en la carga")
+    )
     .then((html) => {
-      // Cargar el contenido en el modal
-      modalContent.innerHTML = html;
+      contenidoModal.innerHTML =
+        '<button class="cerrar-modal" onclick="cerrarModal()">×</button>' +
+        html;
+
+      setTimeout(() => {
+        // Inicializar todos los componentes
+        inicializarFormularioResenia();
+        inicializarSistemaEstrellas();
+        inicializarZoom();
+
+        // Asegurar que los botones de eliminar estén visibles desde el inicio
+        const resenias = document.querySelectorAll(".resenia-item");
+        resenias.forEach((item, index) => {
+          // Hacer visible la reseña
+          item.style.opacity = "1";
+        });
+      }, 200);
+
+      const zoomModal = document.getElementById("zoomModal");
+      if (zoomModal) zoomModal.style.display = "none";
     })
     .catch((error) => {
-      console.error("Error al cargar el detalle de la autoparte:", error);
-      modalContent.innerHTML = `
-                <div class="alert alert-danger text-center">
-                    Ocurrió un error al cargar los detalles. Intenta nuevamente.
-                </div>`;
+      console.error("Error:", error);
+      contenidoModal.innerHTML =
+        '<button class="cerrar-modal" onclick="cerrarModal()">×</button><div class="alert alert-danger">Error al cargar los detalles. Intente nuevamente.</div>';
     });
 }
+
 function abrirZoomModal(imagenSrc) {
   const zoomModal = document.getElementById("zoomModal");
   const zoomedImage = document.getElementById("zoomedImage");
@@ -417,6 +406,9 @@ function inicializarFormularioResenia() {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
 
+      // Limpiar validaciones anteriores
+      limpiarValidaciones();
+
       // Validación básica
       const comentario = document.getElementById("res_comentario");
       const valoracion = document.getElementById("valoracionInput");
@@ -428,6 +420,10 @@ function inicializarFormularioResenia() {
           .getElementById("comentarioError")
           ?.style.setProperty("display", "block");
         isValid = false;
+      } else {
+        // Si el comentario está completo, remover clase de error
+        comentario?.classList.remove("is-invalid");
+        comentario?.classList.add("is-valid");
       }
 
       if (valoracion?.value === "0") {
@@ -471,6 +467,9 @@ function inicializarFormularioResenia() {
             valoracion.value = "0";
             highlightStars(0, true);
 
+            // Limpiar todas las validaciones después del envío exitoso
+            limpiarValidaciones();
+
             // Animar nuevas reseñas
             document
               .querySelectorAll(".resenia-item")
@@ -487,70 +486,86 @@ function inicializarFormularioResenia() {
   }
 }
 
-// Agrega el listener al botón eliminar del modal
-  const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
+// Nueva función para limpiar validaciones
+function limpiarValidaciones() {
+  // Limpiar mensajes de error
+  const comentarioError = document.getElementById("comentarioError");
+  const valoracionError = document.getElementById("valoracionError");
 
-  if (btnConfirmarEliminar) {
-    btnConfirmarEliminar.addEventListener("click", function () {
-      if (!idReseniaPendiente || !idAutopartePendiente) {
-        alert("No se ha seleccionado ninguna reseña para eliminar.");
-        return;
-      }
-
-      fetch(`/Catalogo/EliminarResenia/${idReseniaPendiente}?aut_id=${idAutopartePendiente}`, {
-        method: "DELETE",
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          "Content-Type": "application/json",
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminarResenia'));
-        modal.hide();
-
-        if (data.success) {
-          recargarResenias(idAutopartePendiente);
-
-          // Mostrar modal de éxito
-          const modalExito = new bootstrap.Modal(document.getElementById('modalExito'));
-          modalExito.show();
-
-          // Ocultarlo automáticamente después de 2 segundos
-          setTimeout(() => {
-            modalExito.hide();
-          }, 2000);
-        } else {
-          alert(data.message || "Error al eliminar la reseña.");
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        alert("Error al eliminar la reseña.");
-      })
-      .finally(() => {
-        idReseniaPendiente = null;
-        idAutopartePendiente = null;
-      });
-    });
-  } else {
-    console.warn("Botón btnConfirmarEliminar no encontrado.");
+  if (comentarioError) {
+    comentarioError.style.display = "none";
   }
 
+  if (valoracionError) {
+    valoracionError.style.display = "none";
+  }
 
-// Función para recargar la lista de reseñas desde el servidor
-function recargarResenias(autoparteId) {
-  fetch(`/Catalogo/ObtenerSeccionResenias?aut_id=${autoparteId}`)
-    .then(response => response.text())
-    .then(html => {
-      // Actualizar el div contenedor de reseñas
-      document.getElementById('reseniasList').innerHTML = html;
-    })
-    .catch(error => {
-      console.error("Error al recargar reseñas:", error);
-    });
+  // Limpiar clases de validación del comentario
+  const comentario = document.getElementById("res_comentario");
+  if (comentario) {
+    comentario.classList.remove("is-invalid", "is-valid");
+  }
 }
 
+// Función para eliminar reseña (agregar esta si no la tienes)
+function eliminarResenia(reseniaId, autoparteId) {
+  // Animar la reseña que se va a eliminar
+  const reseniaElement = document.querySelector(
+    `.resenia-item:has(button[onclick*="${reseniaId}"])`
+  );
+  if (reseniaElement) {
+    reseniaElement.style.opacity = "0.5";
+    reseniaElement.style.transform = "translateX(-20px)";
+  }
+
+  fetch(`/Catalogo/EliminarResenia/${reseniaId}?aut_id=${autoparteId}`, {
+    method: "DELETE",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        // Resto del código existente...
+        if (reseniaElement) {
+          reseniaElement.style.transition = "all 0.3s ease";
+          reseniaElement.style.transform = "translateX(-100%)";
+          reseniaElement.style.opacity = "0";
+
+          setTimeout(() => {
+            reseniaElement.remove();
+            actualizarContadorResenias();
+
+            const remainingResenias =
+              document.querySelectorAll(".resenia-item");
+            if (remainingResenias.length === 0) {
+              mostrarMensajeSinResenias();
+            }
+          }, 300);
+        }
+
+        mostrarMensajeExito("Reseña eliminada correctamente.");
+      } else {
+        mostrarMensajeError(data.message || "Error al eliminar la reseña.");
+
+        if (reseniaElement) {
+          reseniaElement.style.opacity = "1";
+          reseniaElement.style.transform = "translateX(0)";
+        }
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      mostrarMensajeError("Error al eliminar la reseña.");
+
+      if (reseniaElement) {
+        reseniaElement.style.opacity = "1";
+        reseniaElement.style.transform = "translateX(0)";
+      }
+    });
+}
 
 // === Funciones de carrito ===
 function añadirAlCarritoAsync(autoparteId, cantidad) {
@@ -674,3 +689,89 @@ function inicializarFiltrosDesdeURL() {
     }
   }
 }
+
+// Variables globales para el modal de confirmación
+let reseniaIdAEliminar = null;
+let autoparteIdAEliminar = null;
+
+// Función para mostrar el modal de confirmación
+function mostrarModalConfirmacion(reseniaId, autoparteId) {
+  reseniaIdAEliminar = reseniaId;
+  autoparteIdAEliminar = autoparteId;
+
+  const modal = document.getElementById("modalConfirmarEliminar");
+  if (modal) {
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    modal.style.position = "fixed";
+    modal.style.top = "0";
+    modal.style.left = "0";
+    modal.style.width = "100%";
+    modal.style.height = "100%";
+    modal.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    modal.style.zIndex = "9999";
+
+    // Agregar animación de entrada
+    const modalContent = modal.querySelector(".modal-content");
+    if (modalContent) {
+      modalContent.style.transform = "scale(0.7)";
+      modalContent.style.opacity = "0";
+      modalContent.style.transition = "all 0.3s ease";
+
+      setTimeout(() => {
+        modalContent.style.transform = "scale(1)";
+        modalContent.style.opacity = "1";
+      }, 10);
+    }
+  }
+}
+
+// Función para cerrar el modal de confirmación
+function cerrarModalConfirmacion() {
+  const modal = document.getElementById("modalConfirmarEliminar");
+  if (modal) {
+    const modalContent = modal.querySelector(".modal-content");
+
+    if (modalContent) {
+      modalContent.style.transform = "scale(0.7)";
+      modalContent.style.opacity = "0";
+
+      setTimeout(() => {
+        modal.style.display = "none";
+        reseniaIdAEliminar = null;
+        autoparteIdAEliminar = null;
+      }, 300);
+    } else {
+      modal.style.display = "none";
+      reseniaIdAEliminar = null;
+      autoparteIdAEliminar = null;
+    }
+  }
+}
+
+// Función para confirmar la eliminación
+function confirmarEliminacion() {
+  if (reseniaIdAEliminar && autoparteIdAEliminar) {
+    cerrarModalConfirmacion();
+    eliminarResenia(reseniaIdAEliminar, autoparteIdAEliminar);
+  }
+}
+
+// Cerrar modal al hacer clic fuera de él
+document.addEventListener("click", function (event) {
+  const modal = document.getElementById("modalConfirmarEliminar");
+  if (modal && event.target === modal) {
+    cerrarModalConfirmacion();
+  }
+});
+
+// Cerrar modal con tecla Escape
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    const modal = document.getElementById("modalConfirmarEliminar");
+    if (modal && modal.style.display !== "none") {
+      cerrarModalConfirmacion();
+    }
+  }
+});

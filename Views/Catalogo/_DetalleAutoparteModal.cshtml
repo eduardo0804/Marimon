@@ -140,9 +140,9 @@
                         {
                             @if (@Model.aut_cantidad > 0)
                             {
-                                <button class="btn btn-whatsapp w-100"
-                                    style="text-decoration: none; display: inline-block; text-align: center; background-color: black"
-                                    type="button" onclick="añadirAlCarritoAsync(@Model.aut_id, 1)">
+                                <button class="btn btn-carrito"
+                                    style="text-decoration: none; display: inline-block; text-align: center" type="button"
+                                    onclick="añadirAlCarritoAsync(@Model.aut_id, 1)">
                                     Añadir al Carrito
                                 </button>
                             }
@@ -194,7 +194,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <form id="formReseniaAutoparte" asp-action="AgregarReseniaAutoparte" asp-controller="Catalogo"
-                                method="post" class="row">
+                                method="post" class="row" novalidate>
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="aut_id" value="@Model.aut_id" />
 
@@ -202,7 +202,7 @@
                                     <label class="form-label" style="font-weight: 600; color: #000000;">Tu
                                         Puntuación:</label>
                                     <div class="d-flex">
-                                        <input type="hidden" name="res_puntuacion" id="valoracionInput" value="0" required>
+                                        <input type="hidden" name="res_puntuacion" id="valoracionInput" value="0">
                                         <div class="stars d-flex">
                                             @for (int i = 1; i <= 5; i++)
                                             {
@@ -246,9 +246,9 @@
                                     <label for="res_comentario" class="form-label"
                                         style="font-weight: 600; color: #000000;">Tu Comentario</label>
                                     <textarea class="form-control" id="res_comentario" name="res_comentario" rows="4"
-                                    required placeholder="Comparte tu experiencia con esta autoparte..."
+                                    placeholder="Comparte tu experiencia con esta autoparte..."
                                     style="border-radius: 12px; border: 1px solid #e0e0e0; padding: 15px; resize: none;"></textarea>
-                                    <div class="invalid-feedback" id="comentarioError">
+                                    <div class="invalid-feedback">
                                         Por favor, escribe un comentario para continuar.
                                     </div>
                                 </div>
@@ -855,7 +855,7 @@ function mostrarMensajeSinResenias() {
         function mostrarSidebarCarrito() {
             // Esta función debería implementarse según tu sistema de carrito
             console.log('Mostrando sidebar del carrito...');
-        }            
+        }             
     </script>
 </body>
 
