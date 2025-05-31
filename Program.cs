@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Http;
 using DinkToPdf.Contracts;
 using DinkToPdf;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Reflection;
 using Marimon.Helpers; // Necesario para SameSiteMode
@@ -20,7 +21,7 @@ using Microsoft.AspNetCore.Http.Features;  // <-- Aquí está el using para Stri
 
 var builder = WebApplication.CreateBuilder(args);
 // Configuración de PostgreSQL
-var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection") 
+var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection")
     ?? throw new InvalidOperationException("Connection string 'PostgreSQLConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -28,7 +29,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>(); ELIMINAR*/
 
 //  Configuración de Identity CON soporte para roles
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true; //requiere confirmación
     options.Password.RequireDigit = true;
@@ -83,10 +84,42 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Necesario para que no lo bloquee la política de cookies
 });
 
-// Configura DinkToPdf converter con el DLL cargado
+// Configura DinkToPdf converter con el DLL cargado  según el sistema operativo
 var context = new CustomAssemblyLoadContext();
-var path = Path.Combine(AppContext.BaseDirectory, "libwkhtmltox.dll");
-context.LoadUnmanagedLibrary(path);
+string libFileName;
+
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+{
+    libFileName = "libwkhtmltox.dll";
+}
+else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+{
+    libFileName = "libwkhtmltox.so";
+}
+else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+{
+    libFileName = "libwkhtmltox.dylib";
+}
+else
+{
+    throw new PlatformNotSupportedException("Sistema operativo no compatible");
+}
+
+// Primero intenta cargar desde la ubicación de la aplicación
+string localPath = Path.Combine(AppContext.BaseDirectory, libFileName);
+string systemPath = "";
+
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+{
+    // En Linux, también busca en ubicaciones del sistema
+    systemPath = "/usr/local/lib/libwkhtmltox.so";
+    if (!System.IO.File.Exists(localPath) && System.IO.File.Exists(systemPath))
+    {
+        localPath = systemPath;
+    }
+}
+
+context.LoadUnmanagedLibrary(localPath);
 
 // Registra el converter como singleton (para inyectar en controladores si quieres)
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
@@ -115,7 +148,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "Gerente_Operacion","Personal_Servicio","Personal_Ventas", "Cliente" }; // Agrega aquí los roles que necesites
+    string[] roles = { "Gerente_Operacion", "Personal_Servicio", "Personal_Ventas", "Cliente" }; // Agrega aquí los roles que necesites
 
     foreach (var role in roles)
     {
