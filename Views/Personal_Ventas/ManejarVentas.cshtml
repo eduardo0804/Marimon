@@ -41,7 +41,8 @@
                                     <i class="fas fa-list text-white"></i>
                                 </div>
                                 <span class="status-label">Todos los estados</span>
-                                <span class="status-badge">@((ViewBag.TodasLasVentas as List<Marimon.Models.Venta>)?.Count ?? 0)</span>
+                                <span class="status-badge">@((ViewBag.TodasLasVentas as
+                                                                        List<Marimon.Models.Venta>)?.Count ?? 0)</span>
                             </a>
                             @if (ViewBag.Estados != null)
                             {
@@ -91,78 +92,16 @@
                         <input type="hidden" name="estado" id="estadoHidden" value="@ViewBag.EstadoSeleccionado">
                         <input type="hidden" name="montoMaximo" id="montoMaximoHidden" value="@ViewBag.MontoMaximo">
                     </div>
-                    <div class="filter-footer p-3 bg-light rounded-bottom d-flex justify-content-between">
-                        <small class="text-dark">@(Model?.Count ?? 0) ventas encontradas</small>
-                        <button type="submit" class="btn btn-filtro">Aplicar filtros</button>
+                    <div class="filter-footer p-3 bg-light rounded-bottom">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <small class="text-dark mb-2">@(Model?.Count ?? 0) ventas encontradas</small>
+                            <button type="submit" class="btn btn-primary btn-filtro-large">Aplicar filtros</button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
 
-        <style>
-            .filter-panel {
-                background: white;
-                border: 1px solid #e9ecef;
-                margin-bottom: 20px;
-            }
-
-            .status-filters {
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .status-filter {
-                display: flex;
-                align-items: center;
-                padding: 10px 12px;
-                border-radius: 6px;
-                text-decoration: none;
-                color: #495057;
-                transition: all 0.2s;
-                border: 1px solid transparent;
-            }
-
-            .status-filter:hover {
-                background-color: #f8f9fa;
-                border-color: #e9ecef;
-            }
-
-            .status-filter.active {
-                background-color: #f0f7ff;
-                border-color: #cfe2ff;
-                color: #084298;
-                font-weight: 500;
-            }
-
-            .status-icon {
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-right: 12px;
-                flex-shrink: 0;
-            }
-
-            .status-label {
-                flex-grow: 1;
-            }
-
-            .status-badge {
-                background-color: #e9ecef;
-                color: #495057;
-                padding: 2px 8px;
-                border-radius: 10px;
-                font-size: 0.8rem;
-            }
-
-            .status-filter.active .status-badge {
-                background-color: #cfe2ff;
-                color: #084298;
-            }
-        </style>
 
         <!-- Tabla (Right side) -->
         <div class="col-lg-9">
@@ -174,9 +113,8 @@
                         </div>
                         <div class="col-auto">
                             <div class="search-container">
-                                    <i class="fas fa-search search-icon"></i>
-                                    <input type="text" id="searchTable" placeholder="Buscar por ID de venta o autoparte...">
-                                </button>
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="searchTable" placeholder="Buscar por ID de venta o autoparte...">
                             </div>
                         </div>
                     </div>
@@ -212,11 +150,12 @@
                                         <a href="#"
                                             class="status-badge status-@venta.Estado.ToLower() text-white px-2 py-1 rounded"
                                             data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal"
-                                            data-estado-actual="@venta.Estado" style="display: inline-flex; align-items: center; gap: 4px;
-                  background-color:
-                  @(venta.Estado == "Pendiente" ? "#ffc107" :
-                                                                                               venta.Estado == "Completado" ? "#28a745" :
-                                                                                               venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
+                                            data-estado-actual="@venta.Estado"
+                                            style="display: inline-flex; align-items: center; gap: 4px;
+                          background-color:
+                          @(venta.Estado == "Pendiente" ? "#ffc107" :
+                                                                                                                                                                                       venta.Estado == "Completado" ? "#28a745" :
+                                                                                                                                                                                       venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
                                         @switch (venta.Estado)
                                                 {
                                                     case "Pendiente":
