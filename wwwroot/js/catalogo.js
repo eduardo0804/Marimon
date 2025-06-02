@@ -735,8 +735,8 @@ function mostrarMensajeError(mensaje) {
 }
 function agregarFavorito(icon, aut_id) {
   const EsFavoritos = icon.classList.contains('fa-solid');
-  const accion = EsFavoritos ? 'QuitarFavorito' : 'AgregarFavorito';
-  fetch('/Catalogo/AgregarFavorito', {
+  const url = EsFavoritos ? '/Catalogo/QuitarFavorito' : '/Catalogo/AgregarFavorito';  
+  fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
