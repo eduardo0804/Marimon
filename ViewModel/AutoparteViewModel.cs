@@ -38,5 +38,6 @@ namespace Marimon.Models.ViewModels
         public bool? DescuentoActivo { get; set; }
         public int? CodigoDescuentoId { get; set; }
         public bool? TieneDescuento { get; set; }
+        public bool EsFavoritos { get; set; }
     }
 }

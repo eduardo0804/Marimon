@@ -235,6 +235,16 @@ namespace Marimon.Controllers
                 PrecioOferta = precioOferta,
                 OfertaActiva = ofertaActiva
             };
+            if (User.Identity.IsAuthenticated)
+            {
+                var usuarioId = _userManager.GetUserId(User);
+                modelo.EsFavoritos = await _context.Favoritos
+                    .AnyAsync(f => f.UsuarioId == usuarioId && f.AutoparteId == id);
+            }
+            else
+            {
+                modelo.EsFavoritos = false;
+            }
             return PartialView("_DetalleAutoparteModal", modelo);
         }
 
