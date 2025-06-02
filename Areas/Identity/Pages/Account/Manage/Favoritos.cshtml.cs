@@ -10,14 +10,14 @@ using Microsoft.AspNetCore.Identity;
 namespace Marimon.Areas.Identity.Pages.Account.Manage
 {
     [Authorize]
-    public class FavoritosModel : PageModel
+    public class Favoritos : PageModel
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly ILogger<FavoritosModel> _logger;
+        private readonly ILogger<Favoritos> _logger;
 
-        public FavoritosModel(ApplicationDbContext context, ILogger<FavoritosModel> logger,
+        public Favoritos(ApplicationDbContext context, ILogger<Favoritos> logger,
                               UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _context = context;
@@ -26,13 +26,14 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        public List<FavoritoDto> Favoritos { get; set; } = new();
+        public FavoritosViewModel FavoritosDM { get; set; } = new();
 
         // ==================== VISTA PRINCIPAL DE FAVORITOS ====================
         public async Task<IActionResult> OnGetAsync()
         {
             var usuarioId = GetCurrentUserId();
-            Favoritos = await ObtenerFavoritosUsuario(usuarioId);
+            FavoritosDM.Favoritos = await ObtenerFavoritosUsuario(usuarioId);
+            FavoritosDM.TotalFavoritos = FavoritosDM.Favoritos.Count;
             return Page();
         }
 
@@ -84,8 +85,9 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
             try
             {
                 var usuarioId = GetCurrentUserId();
-                var favoritos = await ObtenerFavoritosUsuario(usuarioId, termino);
-                return Partial("_FavoritosLista", favoritos);
+                FavoritosDM.Favoritos = await ObtenerFavoritosUsuario(usuarioId, termino);
+                FavoritosDM.TerminoBusqueda = termino;
+                return Partial("_FavoritosLista", FavoritosDM);
             }
             catch (Exception ex)
             {
