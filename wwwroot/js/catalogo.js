@@ -734,8 +734,8 @@ function mostrarMensajeError(mensaje) {
   });
 }
 function agregarFavorito(icon, aut_id) {
-  const EsFavorito = icon.classList.contains('fa-solid');
-  const accion = EsFavorito ? 'QuitarFavorito' : 'AgregarFavorito';
+  const EsFavoritos = icon.classList.contains('fa-solid');
+  const accion = EsFavoritos ? 'QuitarFavorito' : 'AgregarFavorito';
   fetch('/Catalogo/AgregarFavorito', {
     method: 'POST',
     headers: {
@@ -747,8 +747,8 @@ function agregarFavorito(icon, aut_id) {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        icon.classList.remove(EsFavorito ? 'fa-solid' : 'fa-regular');
-        icon.classList.add(EsFavorito ? 'fa-regular' : 'fa-solid');
+        icon.classList.remove(EsFavoritos ? 'fa-solid' : 'fa-regular');
+        icon.classList.add(EsFavoritos ? 'fa-regular' : 'fa-solid');
         mostrarMensajeExito(data.message);
       } else {
         mostrarMensajeError(data.message);
