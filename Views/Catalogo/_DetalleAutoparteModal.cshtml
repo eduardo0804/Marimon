@@ -78,8 +78,8 @@
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="similares-tab" data-bs-toggle="tab" data-bs-target="#similares"
-                                type="button" role="tab" aria-controls="similares" aria-selected="false">Ver productos
-                                similares</button>
+                                type="button" role="tab" aria-controls="similares" aria-selected="false">Ver Productos
+                                Similares</button>
                         </li>
                     </ul>
 
@@ -271,7 +271,7 @@
                                         <i class="fas fa-exclamation-circle fa-2x" style="color: #E42229;"></i>
                                     </div>
                                     <div>
-                                        <h5 style="color: #000000; font-weight: 600;">Acceso requerido</h5>
+                                        <h5 style="color: #000000; font-weight: 600;">Acceso Requerido</h5>
                                         <p class="mb-2" style="color: #626C66;">Debes iniciar sesión para agregar una
                                             reseña.</p>
                                         <a href="/Identity/Account/Login" class="btn mt-2"
@@ -440,22 +440,22 @@
                 });
         } *@
 
-        function abrirZoomModal(imagenSrc) {
-            const zoomModal = document.getElementById('zoomModal');
-            const zoomedImage = document.getElementById('zoomedImage');
+            function abrirZoomModal(imagenSrc) {
+                const zoomModal = document.getElementById('zoomModal');
+                const zoomedImage = document.getElementById('zoomedImage');
 
-            if (zoomModal && zoomedImage) {
-                zoomedImage.src = imagenSrc;
-                zoomModal.style.display = 'flex';
+                if (zoomModal && zoomedImage) {
+                    zoomedImage.src = imagenSrc;
+                    zoomModal.style.display = 'flex';
 
-                // Animar la aparición
-                zoomModal.style.opacity = '0';
-                setTimeout(() => {
-                    zoomModal.style.transition = 'opacity 0.3s ease';
-                    zoomModal.style.opacity = '1';
-                }, 10);
+                    // Animar la aparición
+                    zoomModal.style.opacity = '0';
+                    setTimeout(() => {
+                        zoomModal.style.transition = 'opacity 0.3s ease';
+                        zoomModal.style.opacity = '1';
+                    }, 10);
+                }
             }
-        }
 
         function cerrarZoom() {
             const zoomModal = document.getElementById('zoomModal');
