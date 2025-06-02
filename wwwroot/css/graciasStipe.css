@@ -30,7 +30,6 @@
 /* Reseteo y estilos base */
 body {
     font-family: 'Nunito', sans-serif;
-    background: linear-gradient(135deg, #f9f9f9 0%, #f0f2f1 100%);
     color: var(--gray-dark);
     line-height: 1.8;
     margin: 0;
@@ -366,7 +365,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: 
+    background-image:
         radial-gradient(circle at 10% 20%, rgba(228, 34, 41, 0.03) 0%, transparent 8%),
         radial-gradient(circle at 90% 30%, rgba(228, 34, 41, 0.03) 0%, transparent 8%),
         radial-gradient(circle at 30% 70%, rgba(228, 34, 41, 0.03) 0%, transparent 8%),
@@ -381,9 +380,11 @@ body {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.05);
     }
+
     100% {
         transform: scale(1);
     }
@@ -394,6 +395,7 @@ body {
         transform: translate(-50%, -50%) scale(0.5);
         opacity: 0.5;
     }
+
     100% {
         transform: translate(-50%, -50%) scale(1.5);
         opacity: 0;
@@ -401,23 +403,46 @@ body {
 }
 
 /* Animaciones de entrada */
-.success-title, .success-message, .receipt-info, .action-buttons, .success-footer {
+.success-title,
+.success-message,
+.receipt-info,
+.action-buttons,
+.success-footer {
     animation: fadeInUp 0.8s forwards;
     opacity: 0;
 }
 
-.success-icon { animation: zoomIn 0.5s forwards; opacity: 0; }
-.success-title { animation-delay: 0.3s; }
-.success-message { animation-delay: 0.5s; }
-.receipt-info { animation-delay: 0.7s; }
-.action-buttons { animation-delay: 0.9s; }
-.success-footer { animation-delay: 1.1s; }
+.success-icon {
+    animation: zoomIn 0.5s forwards;
+    opacity: 0;
+}
+
+.success-title {
+    animation-delay: 0.3s;
+}
+
+.success-message {
+    animation-delay: 0.5s;
+}
+
+.receipt-info {
+    animation-delay: 0.7s;
+}
+
+.action-buttons {
+    animation-delay: 0.9s;
+}
+
+.success-footer {
+    animation-delay: 1.1s;
+}
 
 @keyframes fadeInUp {
     from {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -429,6 +454,7 @@ body {
         opacity: 0;
         transform: scale(0.5);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -440,27 +466,27 @@ body {
     .success-card {
         padding: 3.5rem 1.5rem 2.5rem;
     }
-    
+
     .success-title {
         font-size: 2rem;
     }
-    
+
     .receipt-row {
         flex-direction: column;
         align-items: center;
         text-align: center;
         gap: 0.5rem;
     }
-    
+
     .action-buttons {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .btn {
         width: 100%;
     }
-    
+
     .success-badge {
         width: 60px;
         height: 60px;
@@ -471,25 +497,25 @@ body {
     .success-container {
         padding: 1.5rem 1rem;
     }
-    
+
     .success-title {
         font-size: 1.8rem;
     }
-    
+
     .success-icon i {
         font-size: 4.5rem;
     }
-    
+
     .ring1 {
         width: 80px;
         height: 80px;
     }
-    
+
     .ring2 {
         width: 110px;
         height: 110px;
     }
-    
+
     .ring3 {
         width: 140px;
         height: 140px;
