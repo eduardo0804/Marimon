@@ -16,6 +16,118 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Estilos para la encuesta de satisfacción */
+        .btn-survey {
+            background: linear-gradient(135deg, #626C66, #4a554f);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+        }
+
+        .btn-survey:hover {
+            background: linear-gradient(135deg, #4a554f, #3a453f);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(98, 108, 102, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-survey i {
+            margin-right: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem 1rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-radius: 12px 12px 0 0;
+            z-index: 1;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 1.5rem 2rem 2rem 2rem;
+        }
+
         .survey-container {
             background: white;
             border-radius: 12px;
@@ -197,6 +309,151 @@
             display: block;
         }
 
+        .progress-container {
+            margin-bottom: 2rem;
+            background: #f5f5f5;
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #E42229, #ff6b6b);
+            width: 33.33%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-labels {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 0.3rem;
+        }
+
+        .required {
+            color: #E42229;
+        }
+
+        .nps-scale {
+            margin: 1.5rem 0;
+        }
+
+        .nps-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .nps-options {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nps-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .nps-option input {
+            display: none;
+        }
+
+        .nps-option span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .nps-option input:checked+span {
+            background: #E42229;
+            color: white;
+            border-color: #E42229;
+        }
+
+        .nps-option.selected span {
+            background: #E42229 !important;
+            color: white !important;
+            border-color: #E42229 !important;
+        }
+
+        .rating-option.selected {
+            border-color: #E42229 !important;
+            background-color: #E42229 !important;
+            color: white !important;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        .btn-prev,
+        .btn-next {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-prev {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-next {
+            background: #626C66;
+            color: white;
+            border: none;
+        }
+
+        .discount-offer {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .discount-code {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #E42229;
+            background: #fff;
+            padding: 0.8rem;
+            border: 2px dashed #E42229;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .discount-note {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .form-input.invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+        }
+
+        .form-group.invalid-group {
+            border-left: 4px solid #dc3545;
+            padding-left: 15px;
+            background-color: #fff5f5;
         }
     </style>
 </head>
@@ -252,8 +509,11 @@
                             <i class="fas fa-store"></i>
                             <span>Volver a la Tienda</span>
                         </a>
-                        <a asp-area="Identity" asp-page="/Account/Manage/Pedidos"
-                            class="btn btn-outline-secondary ml-3">
+                        <button type="button" class="btn btn-survey" id="openSurveyModal">
+                            <i class="fas fa-star"></i>
+                            <span>Encuesta de Satisfacción</span>
+                        </button>
+                        <a asp-area="Identity" asp-page="/Account/Manage/Pedidos" class="btn btn-outline-secondary">
                             <i class="fas fa-list-alt mr-1"></i>
                             <span>Mis Pedidos</span>
                         </a>
@@ -273,103 +533,170 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal de Encuesta de Satisfacción -->
+    <div class="modal-overlay" id="surveyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Encuesta de Satisfacción</h2>
+                <button type="button" class="modal-close" id="closeSurveyModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
                 <!-- Encuesta de Satisfacción -->
                 <div class="survey-container">
-                    <h2 class="survey-title">Encuesta de Satisfacción</h2>
+                    <!-- Barra de progreso -->
+                    <div class="progress-container">
+                        <div class="progress-bar" id="surveyProgress" style="width: 33.33%;"></div>
+                        <div class="progress-labels">
+                            <span>Paso <span id="currentStep">1</span> de <span id="totalSteps">3</span></span>
+                        </div>
+                    </div>
 
                     <form class="survey-form" id="satisfactionSurvey">
-                        <div class="form-group">
-                            <label class="form-label">Nombre:</label>
-                            <input type="text" class="form-input" name="nombre" placeholder="Ingresa tu nombre">
-                        </div>
+                        <!-- Paso 1: Información personal -->
+                        <div class="survey-step" id="step1">
+                            <div class="form-group">
+                                <label class="form-label">Nombre: <span class="required">*</span></label>
+                                <input type="text" class="form-input" name="nombre" placeholder="Ingresa tu nombre"
+                                    required value="@(User.Identity.IsAuthenticated? User.Identity.Name : "")">
+                            </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Correo Electrónico:</label>
-                            <input type="email" class="form-input" name="correo"
-                                placeholder="Ingresa tu correo electrónico">
-                        </div>
+                            <div class="form-group">
+                                <label class="form-label">Correo Electrónico: <span class="required">*</span></label>
+                                <input type="email" class="form-input" name="correo"
+                                    placeholder="Ingresa tu correo electrónico" required
+                                    value="@(ViewBag.UserEmail ?? "")">
+                            </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Grado de Satisfacción:</label>
-                            <div class="satisfaction-rating">
-                                <label class="rating-option">
-                                    <input type="radio" name="satisfaccion" value="excelente">
-                                    <span>Excelente</span>
-                                    <span class="rating-emoji">😊</span>
-                                </label>
-                                <label class="rating-option">
-                                    <input type="radio" name="satisfaccion" value="normal">
-                                    <span>Normal</span>
-                                    <span class="rating-emoji">😐</span>
-                                </label>
-                                <label class="rating-option">
-                                    <input type="radio" name="satisfaccion" value="malo">
-                                    <span>Malo</span>
-                                    <span class="rating-emoji">😞</span>
-                                </label>
+                            <div class="form-actions">
+                                <div></div> <!-- Espacio vacío para alinear el botón a la derecha -->
+                                <button type="button" class="btn-next">Siguiente <i
+                                        class="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
 
-                        <div class="question-group">
-                            <div class="question-text">¿El servicio o producto cumplió sus expectativas?</div>
-                            <div class="yes-no-options">
-                                <label class="yes-no-option">
-                                    <input type="radio" name="expectativas" value="si">
-                                    <span>Sí</span>
-                                </label>
-                                <label class="yes-no-option">
-                                    <input type="radio" name="expectativas" value="no">
-                                    <span>No</span>
-                                </label>
+                        <!-- Paso 2: Experiencia con el sistema -->
+                        <div class="survey-step" id="step2" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label">¿Cuál fue su nivel de satisfacción con el sistema de pago
+                                    Yape?
+                                    <span class="required">*</span></label>
+                                <div class="satisfaction-rating">
+                                    <label class="rating-option">
+                                        <input type="radio" name="agrado_sistema" value="excelente" required>
+                                        <span>Excelente</span>
+                                        <span class="rating-emoji">😊</span>
+                                    </label>
+                                    <label class="rating-option">
+                                        <input type="radio" name="agrado_sistema" value="bueno">
+                                        <span>Bueno</span>
+                                        <span class="rating-emoji">🙂</span>
+                                    </label>
+                                    <label class="rating-option">
+                                        <input type="radio" name="agrado_sistema" value="normal">
+                                        <span>Normal</span>
+                                        <span class="rating-emoji">😐</span>
+                                    </label>
+                                    <label class="rating-option">
+                                        <input type="radio" name="agrado_sistema" value="malo">
+                                        <span>Malo</span>
+                                        <span class="rating-emoji">😞</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">¿Qué tan fácil fue completar su pago usando Yape? <span
+                                        class="required">*</span></label>
+                                <div class="satisfaction-rating">
+                                    <label class="rating-option">
+                                        <input type="radio" name="facilidad_yape" value="muy_facil" required>
+                                        <span>Muy fácil</span>
+                                        <span class="rating-emoji">😊</span>
+                                    </label>
+                                    <label class="rating-option">
+                                        <input type="radio" name="facilidad_yape" value="facil">
+                                        <span>Fácil</span>
+                                        <span class="rating-emoji">🙂</span>
+                                    </label>
+                                    <label class="rating-option">
+                                        <input type="radio" name="facilidad_yape" value="normal">
+                                        <span>Regular</span>
+                                        <span class="rating-emoji">😐</span>
+                                    </label>
+                                    <label class="rating-option">
+                                        <input type="radio" name="facilidad_yape" value="dificil">
+                                        <span>Difícil</span>
+                                        <span class="rating-emoji">😞</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-prev"><i class="fas fa-chevron-left"></i>
+                                    Anterior</button>
+                                <button type="button" class="btn-next">Siguiente <i
+                                        class="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
 
-                        <div class="question-group">
-                            <div class="question-text">¿La calidad del servicio/producto fue adecuada?</div>
-                            <div class="yes-no-options">
-                                <label class="yes-no-option">
-                                    <input type="radio" name="calidad" value="si">
-                                    <span>Sí</span>
-                                </label>
-                                <label class="yes-no-option">
-                                    <input type="radio" name="calidad" value="no">
-                                    <span>No</span>
-                                </label>
+                        <!-- Paso 3: Recomendación y comentarios -->
+                        <div class="survey-step" id="step3" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label">¿Qué tan probable es que recomiende nuestro servicio a un
+                                    amigo o
+                                    colega? <span class="required">*</span></label>
+                                <div class="nps-scale">
+                                    <div class="nps-labels">
+                                        <span>Poco probable</span>
+                                        <span>Muy probable</span>
+                                    </div>
+                                    <div class="nps-options">
+                                        @for (int i = 0; i <= 10; i++)
+                                        {
+                                            <label class="nps-option">
+                                                <input type="radio" name="nps_score" value="@i" required>
+                                                <span>@i</span>
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">¿Tiene alguna sugerencia para mejorar nuestra plataforma de
+                                    pagos?</label>
+                                <textarea class="comment-area" name="sugerencias"
+                                    placeholder="Sus comentarios nos ayudan a mejorar continuamente..."></textarea>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-prev"><i class="fas fa-chevron-left"></i>
+                                    Anterior</button>
+                                <button type="submit" class="submit-survey-btn">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Enviar Encuesta
+                                </button>
                             </div>
                         </div>
-
-                        <div class="question-group">
-                            <div class="question-text">¿Recomendaría este servicio/producto?</div>
-                            <div class="yes-no-options">
-                                <label class="yes-no-option">
-                                    <input type="radio" name="recomendaria" value="si">
-                                    <span>Sí</span>
-                                </label>
-                                <label class="yes-no-option">
-                                    <input type="radio" name="recomendaria" value="no">
-                                    <span>No</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Tu comentario:</label>
-                            <textarea class="comment-area" name="comentario"
-                                placeholder="Comparte tu experiencia con nosotros..."></textarea>
-                        </div>
-
-                        <button type="submit" class="submit-survey-btn">
-                            <i class="fas fa-paper-plane mr-2"></i>
-                            Enviar Encuesta
-                        </button>
                     </form>
 
                     <div class="survey-thank-you" id="surveyThankYou">
                         <i class="fas fa-heart" style="font-size: 2rem; color: #E42229; margin-bottom: 1rem;"></i>
                         <h3 style="color: #333; margin-bottom: 0.5rem;">¡Gracias por tu opinión!</h3>
-                        <p style="color: #666;">Tu feedback es muy importante para nosotros y nos ayuda a mejorar
-                            continuamente.</p>
+                        <p style="color: #666;">Tu feedback es muy valioso y nos ayuda a mejorar nuestros servicios.</p>
+                        <div class="discount-offer">
+                            <p style="font-weight: bold; margin-top: 1rem;">Como agradecimiento, aquí tienes un código
+                                de
+                                descuento para tu próxima compra:</p>
+                            <div class="discount-code">GRACIAS10</div>
+                            <p class="discount-note">10% de descuento en tu próxima compra</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -381,6 +708,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
         $(document).ready(function () {
+            console.log('=== DOCUMENTO LISTO ===');
+
             $(".success-card").hide().fadeIn(800);
 
             setTimeout(function () {
@@ -445,56 +774,255 @@
                 }
             );
 
-            // Funcionalidad de la encuesta
-            $('.rating-option').click(function () {
-                $('.rating-option').removeClass('selected');
+            // Funcionalidad del modal
+            $('#openSurveyModal').click(function () {
+                console.log('=== ABRIENDO MODAL ===');
+                $('#surveyModal').addClass('show');
+                $('body').css('overflow', 'hidden');
+
+                // Resetear la encuesta al paso 1
+                $('.survey-step').hide();
+                $('#step1').show();
+                $('#currentStep').text('1');
+                $('#surveyProgress').css('width', '33.33%');
+
+                // Limpiar validaciones anteriores
+                $('.form-group').css({
+                    'border-left': 'none',
+                    'padding-left': '0',
+                    'background-color': 'transparent'
+                });
+
+                $('input, textarea').css({
+                    'border-color': '#e9ecef',
+                    'box-shadow': 'none'
+                });
+            });
+
+            $('#closeSurveyModal, .modal-overlay').click(function (e) {
+                if (e.target === this) {
+                    $('#surveyModal').removeClass('show');
+                    $('body').css('overflow', 'auto');
+                }
+            });
+
+            $('.modal-content').click(function (e) {
+                e.stopPropagation();
+            });
+
+            $(document).keydown(function (e) {
+                if (e.key === 'Escape') {
+                    $('#surveyModal').removeClass('show');
+                    $('body').css('overflow', 'auto');
+                }
+            });
+
+            // Event handlers para rating y NPS
+            $(document).on('click', '.rating-option', function () {
+                console.log('=== CLICK EN RATING OPTION ===');
+                var groupName = $(this).find('input[type="radio"]').attr('name');
+                console.log('Grupo:', groupName);
+                $('input[name="' + groupName + '"]').closest('.rating-option').removeClass('selected');
                 $(this).addClass('selected');
                 $(this).find('input[type="radio"]').prop('checked', true);
             });
 
-            $('.yes-no-option').click(function () {
-                var groupName = $(this).find('input').attr('name');
-                $('input[name="' + groupName + '"]').parent().removeClass('selected');
+            $(document).on('click', '.nps-option', function () {
+                console.log('=== CLICK EN NPS OPTION ===');
+                $('.nps-option').removeClass('selected');
                 $(this).addClass('selected');
                 $(this).find('input[type="radio"]').prop('checked', true);
+            });
+
+            $(document).on('click', '.btn-next', function (e) {
+                console.log('=== CLICK EN BOTÓN SIGUIENTE ===');
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Encontrar el paso actual de manera más robusta
+                var currentStepElement = $('.survey-step:visible');
+                console.log('Pasos visibles:', currentStepElement.length);
+
+                if (currentStepElement.length === 0) {
+                    console.error('No hay pasos visibles');
+                    return;
+                }
+
+                var stepId = currentStepElement.first().attr('id');
+                var currentStep = parseInt(stepId.replace('step', ''));
+
+                console.log('Paso actual determinado:', currentStep);
+
+                if (currentStep && currentStep < 3) {
+                    nextStep(currentStep);
+                }
+            });
+
+            $(document).on('click', '.btn-prev', function (e) {
+                console.log('=== CLICK EN BOTÓN ANTERIOR ===');
+                e.preventDefault();
+                e.stopPropagation();
+
+                var currentStepElement = $('.survey-step:visible');
+                var stepId = currentStepElement.first().attr('id');
+                var currentStep = parseInt(stepId.replace('step', ''));
+
+                if (currentStep && currentStep > 1) {
+                    prevStep(currentStep);
+                }
             });
 
             $('#satisfactionSurvey').submit(function (e) {
                 e.preventDefault();
+                console.log('=== ENVIANDO FORMULARIO ===');
 
-                // Aquí puedes agregar la lógica para enviar los datos al servidor
                 var formData = {
                     nombre: $('input[name="nombre"]').val(),
                     correo: $('input[name="correo"]').val(),
-                    satisfaccion: $('input[name="satisfaccion"]:checked').val(),
-                    expectativas: $('input[name="expectativas"]:checked').val(),
-                    calidad: $('input[name="calidad"]:checked').val(),
-                    recomendaria: $('input[name="recomendaria"]:checked').val(),
-                    comentario: $('textarea[name="comentario"]').val()
+                    agrado_sistema: $('input[name="agrado_sistema"]:checked').val(),
+                    facilidad_yape: $('input[name="facilidad_yape"]:checked').val(),
+                    nps_score: $('input[name="nps_score"]:checked').val(),
+                    sugerencias: $('textarea[name="sugerencias"]').val()
                 };
 
                 console.log('Datos de la encuesta:', formData);
 
-                // Mostrar mensaje de agradecimiento
                 $('.survey-form').hide();
                 $('#surveyThankYou').addClass('show');
 
-                // Opcional: enviar datos vía AJAX
-                /*
-                $.ajax({
-                    url: '/tu-endpoint-para-guardar-encuesta',
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        console.log('Encuesta enviada exitosamente');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error al enviar encuesta');
-                    }
-                });
-                */
+                setTimeout(function () {
+                    $('#surveyModal').removeClass('show');
+                    $('body').css('overflow', 'auto');
+
+                    setTimeout(function () {
+                        $('.survey-form').show();
+                        $('#surveyThankYou').removeClass('show');
+                        $('#satisfactionSurvey')[0].reset();
+                        $('.rating-option, .nps-option').removeClass('selected');
+                        // Resetear a step 1
+                        $('.survey-step').hide();
+                        $('#step1').show();
+                        $('#currentStep').text('1');
+                        $('#surveyProgress').css('width', '33.33%');
+                    }, 500);
+                }, 3000);
             });
         });
+
+        // FUNCIONES DE NAVEGACIÓN
+        function nextStep(currentStep) {
+            console.log('=== EJECUTANDO NEXTSTEP ===');
+            console.log('Paso actual:', currentStep);
+
+            const currentStepDiv = document.getElementById(`step${currentStep}`);
+
+            if (!currentStepDiv) {
+                console.error('No se encontró el elemento del paso:', `step${currentStep}`);
+                return false;
+            }
+
+            let isValid = true;
+
+            // Validar campos requeridos del paso actual
+            const requiredInputs = currentStepDiv.querySelectorAll('input[required], textarea[required]');
+
+            requiredInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    const radioGroup = currentStepDiv.querySelectorAll(`input[name="${input.name}"]`);
+                    const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+
+                    if (!isChecked) {
+                        isValid = false;
+                        const formGroup = input.closest('.form-group');
+                        if (formGroup) {
+                            formGroup.style.borderLeft = '4px solid #dc3545';
+                            formGroup.style.paddingLeft = '15px';
+                            formGroup.style.backgroundColor = '#fff5f5';
+                        }
+                    } else {
+                        const formGroup = input.closest('.form-group');
+                        if (formGroup) {
+                            formGroup.style.borderLeft = 'none';
+                            formGroup.style.paddingLeft = '0';
+                            formGroup.style.backgroundColor = 'transparent';
+                        }
+                    }
+                } else {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.style.borderColor = '#dc3545';
+                        input.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+                    } else {
+                        input.style.borderColor = '#e9ecef';
+                        input.style.boxShadow = 'none';
+                    }
+                }
+            });
+
+            if (!isValid) {
+                alert('Por favor complete todos los campos obligatorios antes de continuar.');
+                return false;
+            }
+
+            // Cambiar de paso
+            currentStepDiv.style.display = 'none';
+
+            const nextStepElement = document.getElementById(`step${currentStep + 1}`);
+            if (nextStepElement) {
+                nextStepElement.style.display = 'block';
+
+                // Actualizar contador y progreso
+                document.getElementById('currentStep').textContent = currentStep + 1;
+                const progress = ((currentStep + 1) / 3) * 100;
+                document.getElementById('surveyProgress').style.width = `${progress}%`;
+
+                console.log('Navegación exitosa al paso:', currentStep + 1);
+                return true;
+            }
+
+            return false;
+        }
+
+        function prevStep(currentStep) {
+            console.log('=== EJECUTANDO PREVSTEP ===');
+
+            // Limpiar validaciones visuales del paso actual
+            const currentStepDiv = document.getElementById(`step${currentStep}`);
+            if (currentStepDiv) {
+                const formGroups = currentStepDiv.querySelectorAll('.form-group');
+                formGroups.forEach(group => {
+                    group.style.borderLeft = 'none';
+                    group.style.paddingLeft = '0';
+                    group.style.backgroundColor = 'transparent';
+                });
+
+                const inputs = currentStepDiv.querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                    input.style.borderColor = '#e9ecef';
+                    input.style.boxShadow = 'none';
+                });
+            }
+
+            // Cambiar de paso
+            document.getElementById(`step${currentStep}`).style.display = 'none';
+            document.getElementById(`step${currentStep - 1}`).style.display = 'block';
+            document.getElementById('currentStep').textContent = currentStep - 1;
+
+            const progress = ((currentStep - 1) / 3) * 100;
+            document.getElementById('surveyProgress').style.width = `${progress}%`;
+        }
+
+        // Función de debug para llamar manualmente
+        function debugSurvey() {
+            console.log('=== DEBUG MANUAL ===');
+            console.log('Modal visible:', $('#surveyModal').hasClass('show'));
+            console.log('Steps disponibles:');
+            console.log('- Step 1:', document.getElementById('step1') !== null);
+            console.log('- Step 2:', document.getElementById('step2') !== null);
+            console.log('- Step 3:', document.getElementById('step3') !== null);
+            console.log('Botones siguiente:', document.querySelectorAll('.btn-next').length);
+            console.log('Botones anterior:', document.querySelectorAll('.btn-prev').length);
+        }
     </script>
 </body>
 
