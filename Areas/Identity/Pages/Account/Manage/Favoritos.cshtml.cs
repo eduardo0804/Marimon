@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Marimon.Models;
 using System.Security.Claims;
@@ -9,15 +10,15 @@ using Microsoft.AspNetCore.Identity;
 namespace Marimon.Areas.Identity.Pages.Account.Manage
 {
     [Authorize]
-    public class FavoritosController : Controller
+    public class FavoritosModel : PageModel
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly ILogger<FavoritosController> _logger;
+        private readonly ILogger<FavoritosModel> _logger;
 
-        public FavoritosController(ApplicationDbContext context, ILogger<FavoritosController> logger,
-                                   UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public FavoritosModel(ApplicationDbContext context, ILogger<FavoritosModel> logger,
+                              UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _context = context;
             _logger = logger;
@@ -25,18 +26,18 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
+        public List<FavoritoDto> Favoritos { get; set; } = new();
+
         // ==================== VISTA PRINCIPAL DE FAVORITOS ====================
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> OnGetAsync()
         {
             var usuarioId = GetCurrentUserId();
-            var favoritos = await ObtenerFavoritosUsuario(usuarioId);
-            return View(favoritos);
+            Favoritos = await ObtenerFavoritosUsuario(usuarioId);
+            return Page();
         }
 
         // ==================== ELIMINAR FAVORITO ====================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Eliminar(int autoparteId)
+        public async Task<IActionResult> OnPostEliminarAsync(int autoparteId)
         {
             try
             {
@@ -47,7 +48,7 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
 
                 if (favorito == null)
                 {
-                    return Json(new { success = false, message = "No está en favoritos", esFavorito = false });
+                    return new JsonResult(new { success = false, message = "No está en favoritos", esFavorito = false });
                 }
 
                 _context.Favoritos.Remove(favorito);
@@ -57,11 +58,11 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
 
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    return Json(new { success = true, message = "Eliminado de favoritos", esFavorito = false });
+                    return new JsonResult(new { success = true, message = "Eliminado de favoritos", esFavorito = false });
                 }
 
                 TempData["Success"] = "Autoparte eliminada de favoritos";
-                return RedirectToAction(nameof(Index));
+                return RedirectToPage();
             }
             catch (Exception ex)
             {
@@ -69,28 +70,27 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
 
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    return Json(new { success = false, message = "Error interno del servidor" });
+                    return new JsonResult(new { success = false, message = "Error interno del servidor" });
                 }
 
                 TempData["Error"] = "Error al eliminar de favoritos";
-                return RedirectToAction(nameof(Index));
+                return RedirectToPage();
             }
         }
 
         // ==================== BUSCAR FAVORITOS (AJAX) ====================
-        [HttpGet]
-        public async Task<IActionResult> Buscar(string? termino)
+        public async Task<IActionResult> OnGetBuscarAsync(string? termino)
         {
             try
             {
                 var usuarioId = GetCurrentUserId();
                 var favoritos = await ObtenerFavoritosUsuario(usuarioId, termino);
-                return PartialView("_FavoritosLista", favoritos);
+                return Partial("_FavoritosLista", favoritos);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al buscar favoritos - Término: {Termino}", termino);
-                return PartialView("_FavoritosLista", new List<FavoritoDto>());
+                return Partial("_FavoritosLista", new List<FavoritoDto>());
             }
         }
 
