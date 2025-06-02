@@ -113,12 +113,17 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
 
             if (!string.IsNullOrWhiteSpace(terminoBusqueda))
             {
+                terminoBusqueda = terminoBusqueda.ToLower();
+
                 query = query.Where(f =>
                     EF.Functions.Like(f.Autoparte.aut_nombre, $"%{terminoBusqueda}%") ||
-                    EF.Functions.Like(f.Autoparte.aut_descripcion ?? "", $"%{terminoBusqueda}%"));
+                    (f.Autoparte.aut_descripcion != null &&
+                     EF.Functions.Like(f.Autoparte.aut_descripcion, $"%{terminoBusqueda}%"))
+                );
+
             }
 
-            return await query
+            var favoritos = await query
                 .OrderByDescending(f => f.fav_id)
                 .Select(f => new FavoritoDto
                 {
@@ -126,11 +131,46 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
                     AutoparteId = f.AutoparteId,
                     AutoparteNombre = f.Autoparte.aut_nombre,
                     AutopartePrecio = f.Autoparte.aut_precio,
-                    AutoparteDescripcion = f.Autoparte.aut_descripcion,
-                    AutoparteImagen = f.Autoparte.aut_imagen,
+                    AutoparteDescripcion = f.Autoparte.aut_descripcion ?? "",
+                    AutoparteImagen = f.Autoparte.aut_imagen ?? "",
                     EsFavorito = true
                 })
                 .ToListAsync();
+
+            if (!string.IsNullOrWhiteSpace(terminoBusqueda) && favoritos.Count == 0)
+            {
+                var todosLosFavoritos = await _context.Favoritos
+                    .Include(f => f.Autoparte)
+                    .Where(f => f.UsuarioId == usuarioId)
+                    .OrderByDescending(f => f.fav_id)
+                    .Select(f => new FavoritoDto
+                    {
+                        Id = f.fav_id,
+                        AutoparteId = f.AutoparteId,
+                        AutoparteNombre = f.Autoparte.aut_nombre,
+                        AutopartePrecio = f.Autoparte.aut_precio,
+                        AutoparteDescripcion = f.Autoparte.aut_descripcion ?? "",
+                        AutoparteImagen = f.Autoparte.aut_imagen ?? "",
+                        EsFavorito = true
+                    })
+                    .ToListAsync();
+
+                var palabras = terminoBusqueda.Split(' ')
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .ToList();
+
+                if (palabras.Any())
+                {
+                    favoritos = todosLosFavoritos.Where(f =>
+                        palabras.Any(palabra =>
+                            f.AutoparteNombre.ToLower().Contains(palabra) ||
+                            f.AutoparteDescripcion.ToLower().Contains(palabra)
+                        )
+                    ).ToList();
+                }
+            }
+
+            return favoritos;
         }
 
         // ==================== OBTENER ID DEL USUARIO ACTUAL ====================

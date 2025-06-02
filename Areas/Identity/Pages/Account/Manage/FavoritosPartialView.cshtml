@@ -2,69 +2,28 @@
 <link rel="stylesheet" href="~/css/favoritos.css" asp-append-version="true">
 
 <div class="container">
-    @if (!string.IsNullOrEmpty(Model.TerminoBusqueda))
-    {
-        <div class="search-info">
-            <div class="d-flex align-items-center justify-content-between flex-wrap">
-                <div>
-                    <i class="fas fa-search me-2"></i>
-                    <strong>Búsqueda:</strong> "@Model.TerminoBusqueda"
-                </div>
-                <button class="btn btn-light btn-sm mt-2 mt-md-0" onclick="buscarFavoritos('')">
-                    <i class="fas fa-times me-1"></i>Limpiar filtro
-                </button>
-            </div>
-        </div>
-    }
-
     @if (Model.Favoritos == null || !Model.Favoritos.Any())
     {
-        <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-8">
-                <div class="empty-state text-center">
-                    <div class="empty-icon">
-                        <i class="fas fa-heart-broken"></i>
-                    </div>
-                    <h4 class="empty-title">
-                        @if (!string.IsNullOrEmpty(Model.TerminoBusqueda))
-                        {
-                            <span>No encontramos favoritos</span>
-                        }
-                        else
-                        {
-                            <span>No tienes favoritos guardados</span>
-                        }
-                    </h4>
-                    <p class="empty-description">
-                        @if (!string.IsNullOrEmpty(Model.TerminoBusqueda))
-                        {
-                            <span>Intenta con otros términos de búsqueda o explora todos tus favoritos</span>
-                        }
-                        else
-                        {
-                            <span>Descubre nuestro catálogo y guarda las autopartes que más te interesen</span>
-                        }
-                    </p>
-
-                    @if (!string.IsNullOrEmpty(Model.TerminoBusqueda))
-                    {
-                        <div class="d-flex gap-3 justify-content-center flex-wrap">
-                            <button class="btn btn-custom-outline" onclick="buscarFavoritos('')">
-                                <i class="fas fa-arrow-left me-2"></i>Ver Todos los Favoritos
-                            </button>
-                            <a asp-controller="Catalogo" asp-action="Index" class="btn btn-custom-primary">
-                                <i class="fas fa-shopping-basket me-2"></i>Explorar Catálogo
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <a asp-controller="Catalogo" asp-action="Index" class="btn btn-custom-primary">
-                            <i class="fas fa-shopping-basket me-2"></i>Explorar Catálogo
-                        </a>
-                    }
-                </div>
-            </div>
+        <div class="empty-favorites">
+            @if (!string.IsNullOrEmpty(Model.TerminoBusqueda))
+            {
+                <i class="fas fa-search-minus"></i>
+                <h4>No se encontraron resultados</h4>
+                <p class="text-muted">No hay favoritos que coincidan con "<strong>@Model.TerminoBusqueda</strong>"</p>
+                <button onclick="document.getElementById('searchInput').value=''; buscarFavoritos('');" 
+                        class="btn btn-cart mt-2">
+                    <i class="fas fa-times-circle me-1"></i>Limpiar búsqueda
+                </button>
+            }
+            else
+            {
+                <i class="fas fa-heart-broken"></i>
+                <h4>Aún no tienes favoritos</h4>
+                <p class="text-muted">Explora nuestra tienda y guarda tus productos favoritos</p>
+                <a href="/Catalogo" class="btn btn-primary mt-2">
+                    <i class="fas fa-shopping-cart me-2"></i>Ir a la tienda
+                </a>
+            }
         </div>
     }
     else

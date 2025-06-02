@@ -51,11 +51,11 @@
 
                             <!-- Buscador -->
                             <div class="input-group" style="max-width: 300px;">
-                                <form id="formBuscarFavoritos" class="d-flex w-100">
+                                <form id="formBuscarFavoritos" class="d-flex w-100" method="get">
+                                    <input type="hidden" asp-antiforgery="true" />
                                     <input type="text" id="searchInput" class="form-control"
                                         placeholder="Buscar en favoritos...">
-                                    <button type="button" class="btn btn-outline-secondary"
-                                        onclick="buscarFavoritos($('#searchInput').val().trim())">
+                                    <button type="button" id="searchBtn" class="btn btn-outline-secondary">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </form>

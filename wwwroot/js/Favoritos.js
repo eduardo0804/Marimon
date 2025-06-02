@@ -1,62 +1,114 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const searchForm = document.getElementById('formBuscarFavoritos');
     const searchInput = document.getElementById('searchInput');
-    
-    if (searchForm) {
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            buscarFavoritos(searchInput.value.trim());
-        });
-    }
+    const searchClearBtn = document.getElementById('searchClearBtn');
+    const searchSubmitBtn = document.getElementById('searchSubmitBtn');
     
     if (searchInput) {
-        let searchTimeout;
         searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            const termino = this.value.trim();
+            if (searchClearBtn) {
+                searchClearBtn.style.display = this.value.trim() ? 'block' : 'none';
+            }
             
-            searchTimeout = setTimeout(function() {
-                if (termino.length >= 1 || termino.length === 0) {
-                    buscarFavoritos(termino);
-                }
-            }, 500);
+            clearTimeout(searchInput.searchTimeout);
+            searchInput.searchTimeout = setTimeout(() => {
+                buscarFavoritos(this.value.trim());
+            }, 300); 
+        });
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarFavoritos(this.value.trim());
+            }
         });
     }
+    
+    if (searchClearBtn) {
+        searchClearBtn.addEventListener('click', function() {
+            if (searchInput) {
+                searchInput.value = '';
+                this.style.display = 'none';
+                buscarFavoritos('');
+                searchInput.focus();
+            }
+        });
+    }
+    
+    if (searchSubmitBtn) {
+        searchSubmitBtn.addEventListener('click', function() {
+            buscarFavoritos(searchInput ? searchInput.value.trim() : '');
+        });
+    }
+    actualizarContadorFavoritos();
 });
 
 function buscarFavoritos(termino) {
     const favoritosContainer = document.getElementById('favoritosContainer');
     
-    if (favoritosContainer) {
-        favoritosContainer.classList.add('loading');
-        
-        fetch(`?handler=Buscar&termino=${encodeURIComponent(termino)}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
-            }
-            return response.text();
-        })
-        .then(html => {
-            favoritosContainer.innerHTML = html;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            favoritosContainer.innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    Error al buscar favoritos. Intente nuevamente.
-                </div>
-            `;
-        })
-        .finally(() => {
-            favoritosContainer.classList.remove('loading');
-        });
+    if (!favoritosContainer) return;
+    
+    favoritosContainer.classList.add('searching');
+    favoritosContainer.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Buscando...</span>
+            </div>
+            <p class="mt-3">Buscando en favoritos...</p>
+        </div>
+    `;
+    
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+    const headers = {
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+    
+    if (token) {
+        headers['RequestVerificationToken'] = token;
     }
+    
+    const timestamp = new Date().getTime();
+    
+    fetch(`?handler=Buscar&termino=${encodeURIComponent(termino)}&_=${timestamp}`, {
+        headers: headers
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        return response.text();
+    })
+    .then(html => {
+        favoritosContainer.classList.remove('searching');
+        
+        favoritosContainer.innerHTML = html;
+        actualizarContadorFavoritos();
+        if (termino && termino.trim() !== '') {
+            setTimeout(() => {
+                resaltarTerminosBusqueda(termino);
+            }, 50);
+        }
+        
+        if (!document.querySelector('#favoritoScript')) {
+            const script = document.createElement('script');
+            script.id = 'favoritoScript';
+            script.src = '/js/favoritos.js';
+            script.defer = true;
+            document.body.appendChild(script);
+        }
+    })
+    .catch(error => {
+        console.error('Error en búsqueda:', error);
+        favoritosContainer.classList.remove('searching');
+        favoritosContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Error al buscar favoritos: ${error.message}
+            </div>
+            <button class="btn btn-outline-primary mt-3" onclick="window.location.reload()">
+                <i class="fas fa-sync me-2"></i>Reintentar
+            </button>
+        `;
+    });
 }
 
 function eliminarFavorito(autoparteId) {
@@ -76,26 +128,15 @@ function eliminarFavorito(autoparteId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                favoritoItem.style.height = `${favoritoItem.offsetHeight}px`;
+                favoritoItem.style.opacity = '0';
+                favoritoItem.style.transform = 'scale(0.9)';
                 
                 setTimeout(() => {
-                    favoritoItem.style.height = '0';
-                    favoritoItem.style.opacity = '0';
-                    favoritoItem.style.margin = '0';
-                    favoritoItem.style.padding = '0';
+                    favoritoItem.remove();
                     
-                    setTimeout(() => {
-                        favoritoItem.remove();
-                        
-                        // Si no quedan favoritos, recargar para mostrar estado vacío
-                        const remainingItems = document.querySelectorAll('.favorito-item');
-                        if (remainingItems.length === 0) {
-                            buscarFavoritos(document.getElementById('searchInput')?.value.trim() || '');
-                        }
-                    }, 300);
-                }, 10);
-                
-                mostrarNotificacion('Eliminado de favoritos', 'success');
+                    actualizarContadorFavoritos();
+                    mostrarNotificacion('Eliminado de favoritos', 'success');
+                }, 300);
             } else {
                 favoritoItem.classList.remove('removing');
                 mostrarNotificacion(data.message || 'Error al eliminar favorito', 'error');
@@ -132,20 +173,57 @@ function añadirAlCarritoDesdeVista(autoparteId, cantidad) {
             
             setTimeout(() => {
                 window.location.reload();
-            }, 1000);
+            }, 2000);
         } else {
             mostrarNotificacion(data.message || 'Error al añadir al carrito', 'error');
             button.innerHTML = originalHtml;
-            button.disabled = false;
         }
     })
     .catch(error => {
         console.error('Error:', error);
         mostrarNotificacion('Error al añadir al carrito', 'error');
         button.innerHTML = originalHtml;
+    })
+    .finally(() => {
         button.disabled = false;
     });
 }
+
+function actualizarContadorFavoritos() {
+    const items = document.querySelectorAll('.favorito-item');
+    const contadorElement = document.querySelector('small.text-muted');
+    
+    if (contadorElement) {
+        contadorElement.textContent = `${items.length} autopartes guardadas`;
+        if (window.FavoritosDM) {
+            window.FavoritosDM.TotalFavoritos = items.length;
+        }
+    }
+}
+
+function resaltarTerminosBusqueda(termino) {
+    if (!termino) return;
+    
+    const palabras = termino.split(' ')
+        .filter(p => p.trim() !== '')
+        .map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    
+    if (palabras.length === 0) return;
+    
+    const regex = new RegExp(`(${palabras.join('|')})`, 'gi');
+    
+    function resaltar(text) {
+        return text.replace(regex, '<mark>$1</mark>');
+    }
+    
+    document.querySelectorAll('.card-title, .card-description, .card-text').forEach(elemento => {
+        const textoOriginal = elemento.textContent;
+        if (regex.test(textoOriginal)) {
+            elemento.innerHTML = resaltar(textoOriginal);
+        }
+    });
+}
+
 function mostrarNotificacion(mensaje, tipo) {
     const toast = document.createElement('div');
     toast.className = `toast align-items-center text-white bg-${tipo === 'success' ? 'success' : 'danger'} border-0 position-fixed`;
