@@ -407,6 +407,37 @@ namespace Marimon.Controllers
                 return Json(new List<object>());
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> AgregarFavorito([FromBody] JsonElement data)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Json(new { success = false, message = "Debes iniciar sesión." });
+
+            int aut_id = data.GetProperty("aut_id").GetInt32();
+
+            var identityUser = await _userManager.GetUserAsync(User);
+            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.usu_id == identityUser.Id);
+
+            if (usuario == null)
+                return Json(new { success = false, message = "Usuario no encontrado." });
+
+            var existe = await _context.Favoritos
+                .AnyAsync(f => f.UsuarioId == usuario.usu_id && f.AutoparteId == aut_id);
+
+            if (existe)
+                return Json(new { success = false, message = "Ya está en favoritos." });
+
+            var favorito = new Favoritos
+            {
+                UsuarioId = usuario.usu_id,
+                AutoparteId = aut_id
+            };
+
+            _context.Favoritos.Add(favorito);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Agregado a favoritos." });
+        }
     }
 
     // NUEVA CLASE: ViewModel modificado para usar AutoparteViewModel

@@ -55,10 +55,10 @@
 
             <div class="row g-4 align-items-center">
                 <div class="col-md-6 text-center position-relative">
-                    @* <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
-                        onclick="agregarFavorito(this, @Model.aut_id)"></i> *@
                     <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
-                        onclick="agregarFavorito(this)"></i></i>
+                        onclick="agregarFavorito(this, @Model.aut_id)"></i>
+                    @* <i class="fa-regular fa-heart favorito-icon position-absolute top-0 end-0 m-3" id="iconFavorito"
+                        onclick="agregarFavorito(this)"></i></i> *@
                     <div class="image-container position-relative">
                         <img id="imgAutoparte" src="@Model.aut_imagen" alt="Autoparte" class="autoparte-img" />
                         <i class="fa-solid fa-magnifying-glass zoom-icon position-absolute"

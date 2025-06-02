@@ -6,6 +6,7 @@ using Marimon.Models;
 using System.Security.Claims;
 using Marimon.Data;
 using Microsoft.AspNetCore.Identity;
+using Marimon.ViewModel;
 
 namespace Marimon.Areas.Identity.Pages.Account.Manage
 {
