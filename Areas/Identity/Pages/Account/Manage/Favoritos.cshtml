@@ -1,4 +1,5 @@
-@model FavoritosViewModel
+@page
+@model Marimon.Areas.Identity.Pages.Account.Manage.Favoritos
 @{
     ViewData["Title"] = "Mis Favoritos";
 }
@@ -44,19 +45,19 @@
                                     <i class="fas fa-heart text-danger me-2"></i>
                                     Mis Favoritos
                                 </h2>
-                                <small class="text-muted">@Model.TotalFavoritos autopartes guardadas</small>
+                                <small class="text-muted">@Model.FavoritosDM.TotalFavoritos autopartes guardadas</small>
                             </div>
 
                             <!-- Buscador -->
                             <div class="search-container" style="width: 350px;">
                                 <form asp-action="Index" method="get" class="d-flex">
                                     <div class="input-group">
-                                        <input type="text" name="buscar" value="@Model.TerminoBusqueda"
+                                        <input type="text" name="buscar" value="@Model.FavoritosDM.TerminoBusqueda"
                                             class="form-control" placeholder="Buscar en favoritos..." id="searchInput">
                                         <button class="btn btn-outline-primary" type="submit">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        @if (!string.IsNullOrEmpty(Model.TerminoBusqueda))
+                                        @if (!string.IsNullOrEmpty(Model.FavoritosDM.TerminoBusqueda))
                                         {
                                             <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
                                                 <i class="fas fa-times"></i>
@@ -88,12 +89,12 @@
 
                         <!-- Contenido principal -->
                         <div id="favoritosContainer">
-                            @if (!string.IsNullOrEmpty(Model.MensajeEstado))
+                            @if (!string.IsNullOrEmpty(Model.FavoritosDM.MensajeEstado))
                             {
                                 <div class="text-center py-5">
                                     <i class="fas fa-heart fa-4x text-muted mb-4"></i>
-                                    <h4 class="text-muted mb-3">@Model.MensajeEstado</h4>
-                                    @if (string.IsNullOrEmpty(Model.TerminoBusqueda))
+                                    <h4 class="text-muted mb-3">@Model.FavoritosDM.MensajeEstado</h4>
+                                    @if (string.IsNullOrEmpty(Model.FavoritosDM.TerminoBusqueda))
                                     {
                                         <p class="text-muted mb-4">Empieza a agregar autopartes a tus favoritos para verlas aquí
                                         </p>
@@ -114,7 +115,6 @@
                             }
                             else
                             {
-                                @Html.Partial("_FavoritosLista", Model.Favoritos)
                             }
                         </div>
                     </div>
@@ -211,13 +211,13 @@
             const iconClass = tipo === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
 
             const alertHtml = `
-                            <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
-                                 style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
-                                <i class="fas ${iconClass} me-2"></i>
-                                ${mensaje}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        `;
+                                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                                    <i class="fas ${iconClass} me-2"></i>
+                                    ${mensaje}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            `;
 
             $('body').append(alertHtml);
             setTimeout(() => {
