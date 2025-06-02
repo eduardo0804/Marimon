@@ -1,202 +1,61 @@
-@page
-@model Marimon.Areas.Identity.Pages.Account.Manage.Favoritos
-@{
-    ViewData["Title"] = "Mis Favoritos";
-}
+@model Marimon.ViewModel.FavoritosViewModel
 
-<link rel="stylesheet" href="~/css/perfil_usuario.css" asp-append-version="true" />
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<div class="user-profile-container">
-    <div class="profile-header">
-        <h1>Detalle Usuario</h1>
+@if (Model.Favoritos == null || !Model.Favoritos.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-heart-broken fa-4x text-muted mb-4"></i>
+        <h4 class="text-muted mb-3">No tienes favoritos @(!string.IsNullOrEmpty(Model.TerminoBusqueda) ? "que coincidan con tu búsqueda" : "guardados")</h4>
+        @if (!string.IsNullOrEmpty(Model.TerminoBusqueda))
+        {
+            <p class="text-muted mb-4">Intenta con otros términos de búsqueda</p>
+            <button class="btn btn-outline-primary" onclick="buscarFavoritos('')">
+                <i class="fas fa-arrow-left me-2"></i>Ver todos los favoritos
+            </button>
+        }
+        else
+        {
+            <p class="text-muted mb-4">Explora nuestra tienda y guarda tus autopartes favoritas</p>
+            <a asp-controller="Catalogo" asp-action="Index" class="btn btn-primary">
+                <i class="fas fa-shopping-basket me-2"></i>Explorar catálogo
+            </a>
+        }
     </div>
-    <div class="profile-content">
-        <div class="sidebar">
-            <div class="sidebar-menu-item">
-                <a asp-area="Identity" asp-page="/Account/Manage/Index">Detalle de la cuenta</a>
-            </div>
-            <div class="sidebar-menu-item">
-                <a asp-area="Identity" asp-page="/Account/Manage/Pedidos">Mis Pedidos</a>
-            </div>
-            <div class="sidebar-menu-item">
-                <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis Citas</a>
-            </div>
-            <div class="sidebar-menu-item active">
-                <span>Favoritos</span>
-            </div>
-            <div class="sidebar-menu-item exit">
-                <form asp-area="Identity" asp-page="/Account/Logout"
-                    asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button type="submit">SALIR</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="profile-details">
-            <div class="container-fluid py-4">
-                <div class="row">
-                    <div class="col-12">
-                        <!-- Header -->
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <h2 class="mb-0">
-                                    <i class="fas fa-heart text-danger me-2"></i>
-                                    Mis Favoritos
-                                </h2>
-                                <small class="text-muted">@Model.FavoritosDM.TotalFavoritos autopartes guardadas</small>
-                            </div>
-
-                            <!-- Buscador -->
-                            <div class="search-container" style="width: 350px;">
-                                <form asp-action="Index" method="get" class="d-flex">
-                                    <div class="input-group">
-                                        <input type="text" name="buscar" value="@Model.FavoritosDM.TerminoBusqueda"
-                                            class="form-control" placeholder="Buscar en favoritos..." id="searchInput">
-                                        <button class="btn btn-outline-primary" type="submit">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                        @if (!string.IsNullOrEmpty(Model.FavoritosDM.TerminoBusqueda))
-                                        {
-                                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
-                                                <i class="fas fa-times"></i>
-                                            </a>
-                                        }
-                                    </div>
-                                </form>
-                            </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var favorito in Model.Favoritos)
+        {
+            <div class="col favorito-item" id="favorito-@favorito.AutoparteId">
+                <div class="card h-100 shadow-sm">
+                    <div class="position-relative">
+                        <img src="@favorito.AutoparteImagen" class="card-img-top" alt="@favorito.AutoparteNombre" 
+                            style="height: 180px; object-fit: cover;">
+                        <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" 
+                                onclick="eliminarFavorito(@favorito.AutoparteId)" title="Quitar de favoritos">
+                            <i class="fas fa-heart-broken"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-truncate">@favorito.AutoparteNombre</h5>
+                        <p class="card-text text-muted small mb-2 text-truncate">@favorito.AutoparteDescripcion</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-primary fw-bold">S/ @favorito.AutopartePrecio.ToString("0.00")</span>
+                            <a asp-controller="Catalogo" asp-action="DetalleAutoparte" asp-route-id="@favorito.AutoparteId" 
+                                class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>Ver detalles
+                            </a>
                         </div>
-
-                        <!-- Mensajes de estado -->
-                        @if (TempData["Success"] != null)
-                        {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fas fa-check-circle me-2"></i>
-                                @TempData["Success"]
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        }
-
-                        @if (TempData["Error"] != null)
-                        {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                @TempData["Error"]
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        }
-
-                        <!-- Contenido principal -->
-                        <div id="favoritosContainer">
-                            <partial name="FavoritosPartialView" model="Model.FavoritosDM" />
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-grid">
+                            <button class="btn btn-success btn-sm" onclick="añadirAlCarritoDesdeVista(@favorito.AutoparteId, 1)">
+                                <i class="fas fa-cart-plus me-1"></i>Añadir al carrito
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
-</div>
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            let searchTimeout;
-            $('#searchInput').on('input', function () {
-                clearTimeout(searchTimeout);
-                const termino = $(this).val().trim();
-
-                searchTimeout = setTimeout(function () {
-                    if (termino.length >= 2 || termino.length === 0) {
-                        buscarFavoritos(termino);
-                    }
-                }, 500);
-            });
-        });
-
-        function buscarFavoritos(termino) {
-            $.get('@Url.Action("Buscar")', { termino: termino })
-                .done(function (data) {
-                    $('#favoritosContainer').html(data);
-                })
-                .fail(function () {
-                    mostrarNotificacion('Error al buscar favoritos', 'error');
-                });
-        }
-
-        function eliminarFavorito(autoparteId) {
-            if (confirm('¿Estás seguro de que deseas eliminar esta autoparte de favoritos?')) {
-                $.post('@Url.Action("Eliminar")', {
-                    autoparteId: autoparteId,
-                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                })
-                    .done(function (response) {
-                        if (response.success) {
-                            mostrarNotificacion(response.message, 'success');
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            mostrarNotificacion(response.message, 'error');
-                        }
-                    })
-                    .fail(function () {
-                        mostrarNotificacion('Error al eliminar favorito', 'error');
-                    });
-            }
-        }
-
-        function toggleFavorito(autoparteId, button) {
-            const $button = $(button);
-            const originalHtml = $button.html();
-
-            $button.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
-
-            $.post('@Url.Action("Toggle")', {
-                autoparteId: autoparteId,
-                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-            })
-                .done(function (response) {
-                    if (response.success) {
-                        if (response.esFavorito) {
-                            $button.removeClass('btn-outline-danger').addClass('btn-danger');
-                            $button.html('<i class="fas fa-heart"></i>');
-                            $button.attr('title', 'Eliminar de favoritos');
-                        } else {
-                            $button.removeClass('btn-danger').addClass('btn-outline-danger');
-                            $button.html('<i class="far fa-heart"></i>');
-                            $button.attr('title', 'Agregar a favoritos');
-                        }
-                        mostrarNotificacion(response.message, 'success');
-                    } else {
-                        $button.html(originalHtml);
-                        mostrarNotificacion(response.message, 'error');
-                    }
-                })
-                .fail(function () {
-                    $button.html(originalHtml);
-                    mostrarNotificacion('Error al procesar la solicitud', 'error');
-                })
-                .always(function () {
-                    $button.prop('disabled', false);
-                });
-        }
-
-        function mostrarNotificacion(mensaje, tipo) {
-            const alertClass = tipo === 'error' ? 'alert-danger' : 'alert-success';
-            const iconClass = tipo === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
-
-            const alertHtml = `
-                                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
-                                         style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
-                                        <i class="fas ${iconClass} me-2"></i>
-                                        ${mensaje}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                `;
-
-            $('body').append(alertHtml);
-            setTimeout(() => {
-                $('.alert').alert('close');
-            }, 5000);
-        }
-    </script>
 }

@@ -86,14 +86,21 @@ namespace Marimon.Areas.Identity.Pages.Account.Manage
             try
             {
                 var usuarioId = GetCurrentUserId();
-                FavoritosDM.Favoritos = await ObtenerFavoritosUsuario(usuarioId, termino);
-                FavoritosDM.TerminoBusqueda = termino;
-                return Partial("_FavoritosLista", FavoritosDM);
+                var favoritos = await ObtenerFavoritosUsuario(usuarioId, termino);
+
+                FavoritosDM = new FavoritosViewModel
+                {
+                    Favoritos = favoritos,
+                    TerminoBusqueda = termino,
+                    TotalFavoritos = favoritos.Count
+                };
+
+                return Partial("FavoritosPartialView", FavoritosDM);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al buscar favoritos - Término: {Termino}", termino);
-                return Partial("_FavoritosLista", new List<FavoritoDto>());
+                return Partial("FavoritosPartialView", new FavoritosViewModel());
             }
         }
 
