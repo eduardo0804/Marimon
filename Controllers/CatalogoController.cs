@@ -70,8 +70,7 @@ namespace Marimon.Controllers
             if (esNovedades)
             {
                 autopartesQuery = autopartesQuery
-                    .OrderByDescending(a => a.aut_id)
-                    .Take(3);
+                    .OrderByDescending(a => a.aut_id);
             }
             else if (orden == "asc")
             {
@@ -101,13 +100,9 @@ namespace Marimon.Controllers
                 ViewBag.Mensaje = "No se encontraron productos que coincidan con tu búsqueda.";
             }
 
-            // Paginación (solo si no es novedades)
-            if (!esNovedades)
-            {
-                autopartesQuery = autopartesQuery
-                    .Skip((pagina - 1) * PaginasPorPagina)
-                    .Take(PaginasPorPagina);
-            }
+            autopartesQuery = autopartesQuery
+                .Skip((pagina - 1) * PaginasPorPagina)
+                .Take(PaginasPorPagina);
 
             // MODIFICACIÓN: Convertir a AutoparteViewModel con información de ofertas
             var autopartes = autopartesQuery.Select(a => new AutoparteViewModel
@@ -134,7 +129,7 @@ namespace Marimon.Controllers
                     : (bool?)null
             }).ToList();
 
-            var totalPaginas = esNovedades ? 1 : (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
+            var totalPaginas = (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
 
             var carrito = _context.Carritos.FirstOrDefault(c => c.UsuarioId == User.Identity.Name);
 

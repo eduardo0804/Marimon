@@ -8,6 +8,7 @@ body {
     pointer-events: none;
   }
 }
+
 /* Estilos modernos para botones de carrito y WhatsApp */
 .btn-whatsapp,
 .btn-carrito {
@@ -115,12 +116,10 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 70%
-  );
+  background: linear-gradient(45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%);
   transform: rotate(45deg) translate(-100%, -100%);
   transition: transform 0.6s;
   z-index: 0;
@@ -168,13 +167,14 @@ body {
 
 /* Responsive design */
 @media (max-width: 768px) {
+
   .btn-whatsapp,
   .btn-carrito {
     padding: 7px 10px;
     font-size: 12px;
     border-radius: 8px;
   }
-  
+
   .btn-whatsapp .fab,
   .btn-carrito .fas {
     font-size: 13px;
@@ -183,12 +183,13 @@ body {
 }
 
 @media (max-width: 480px) {
+
   .btn-whatsapp,
   .btn-carrito {
     padding: 6px 8px;
     font-size: 11px;
   }
-  
+
   .btn-whatsapp .fab,
   .btn-carrito .fas {
     font-size: 12px;
@@ -217,8 +218,13 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 /* Mejoras adicionales para el hover */
@@ -234,9 +240,11 @@ body {
   0% {
     box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
   }
+
   50% {
     box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
   }
+
   100% {
     box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
   }
@@ -246,13 +254,16 @@ body {
   0% {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   }
+
   50% {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
   }
+
   100% {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   }
 }
+
 /* Estructura para el layout con filtros a la izquierda */
 .catalogo-layout {
   display: flex;
@@ -449,7 +460,7 @@ body {
 }
 
 /* Ajustamos el ícono cuando está expandido */
-.categories-container.expanded + .show-more-btn i {
+.categories-container.expanded+.show-more-btn i {
   transform: rotate(180deg);
 }
 
@@ -545,6 +556,7 @@ body {
     font-size: 12px;
     padding: 0 15px;
   }
+
 }
 
 @media (max-width: 768px) {
@@ -582,6 +594,7 @@ body {
     justify-content: center;
     height: 45px;
   }
+
 }
 
 /* Corrigiendo el script para el botón Ver más */
@@ -727,21 +740,18 @@ body {
   position: relative;
 }
 
-.dropdown-menu {
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  border: none;
-  padding: 10px 0;
-}
-
 .dropdown-item {
   padding: 8px 15px;
   transition: all 0.2s ease;
 }
 
 .dropdown-item:hover {
-  background-color: #f8f9fa;
-  color: #e63946;
+  background-color: #fafafa !important;
+  color: #e42229 !important;
+}
+
+.dropdown-item:active {
+  background-color: #f0f0f0 !important;
 }
 
 .search-with-icon::before {
@@ -764,6 +774,27 @@ body {
 
 .search-with-icon:focus-within::before {
   color: #e63946;
+}
+
+.search-dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border: none;
+  padding: 10px 0;
+}
+
+.search-dropdown .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: auto;
+  transform: none;
+  width: 100%;
+  z-index: 1000;
 }
 
 .pagination .page-item .page-link {
@@ -834,11 +865,9 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 0, 0, 0.8) 0%,
-    rgba(0, 0, 0, 0.6) 100%
-  );
+  background: radial-gradient(circle at center,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.6) 100%);
   overflow: auto;
   padding: 60px 20px;
 }
@@ -1415,7 +1444,7 @@ h4 {
   transform: translateY(0);
 }
 
-.search-input-group:focus-within + .search-suggestion {
+.search-input-group:focus-within+.search-suggestion {
   opacity: 1;
   transform: translateY(3px);
   color: #000;
@@ -1877,6 +1906,7 @@ a[href="/Identity/Account/Login"]:hover {
 }
 
 @keyframes bounce {
+
   0%,
   20%,
   50%,
