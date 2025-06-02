@@ -104,7 +104,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<CarritoAutoparte> CarritoAutopartes { get; set; } = null!;
     public DbSet<Reclamacion> Reclamacion { get; set; } = null!;
     public DbSet<Resenia> Resenias { get; set; }
-    
     public DbSet<Oferta> Ofertas { get; set; }
     public DbSet<CodigoDescuento> CodigosDescuento { get; set; }
+    public DbSet<Favoritos> Favoritos { get; set; }
 }
