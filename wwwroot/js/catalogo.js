@@ -189,8 +189,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const limpiarLi = document.createElement("li");
       const limpiarA = document.createElement("a");
-      limpiarA.classList.add("dropdown-item", "text-danger");
+      limpiarA.classList.add("dropdown-item");
       limpiarA.href = "#";
+      limpiarA.style.color = "#e42229"; // Rojo
+      limpiarA.style.fontWeight = "600";
       limpiarA.textContent = "Limpiar historial";
       limpiarA.addEventListener("click", function (e) {
         e.preventDefault();
@@ -241,6 +243,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Inicializar filtros desde URL
   inicializarFiltrosDesdeURL();
+  const dropdownToggle = document.getElementById("historialBusqueda");
+  if (dropdownToggle) {
+    dropdownToggle.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const dropdownMenu = this.nextElementSibling;
+      const isOpen = dropdownMenu.classList.contains("show");
+      
+      // Cerrar todos los dropdowns abiertos
+      document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+        menu.classList.remove('show');
+      });
+      
+      // Abrir/cerrar el dropdown actual
+      if (!isOpen) {
+        dropdownMenu.classList.add("show");
+      }
+    });
+    
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener("click", function(e) {
+      if (!dropdownToggle.contains(e.target)) {
+        document.getElementById("historial-busquedas").classList.remove("show");
+      }
+    });
+  }
 });
 
 // === Funciones de modal ===
