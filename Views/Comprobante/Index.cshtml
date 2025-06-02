@@ -293,7 +293,7 @@
 
                     </div>
                 </div>
-
+                <input type="hidden" id="codigoDescuento" name="codigoDescuento" value="@ViewBag.CodigoDescuento" />
                 <!-- Botón para Stripe -->
                 <div id="botonStripe" class="text-center animated-card">
                     <button type="submit" class="btn btn-marimon">
@@ -320,6 +320,61 @@
         const terminosError = document.getElementById('terminosError');
         const formulario = document.getElementById('miFormulario');
 
+        const total = @total;
+        const pagoYapeRadio = document.getElementById('pagoYape');
+        const botonYape = document.getElementById('botonYape');
+        const botonStripe = document.getElementById('botonStripe');
+
+        function validarMetodoPago() {
+            if (total > 500 && pagoYapeRadio.checked) {
+                // Mostrar alerta y cambiar automáticamente a tarjeta
+                alert('Para montos mayores a S/ 500, solo se permite el pago con tarjeta de crédito/débito.');
+                document.getElementById('pagoTarjeta').checked = true;
+                pagoYapeRadio.checked = false;
+                
+                // Actualizar la visibilidad de los botones
+                botonStripe.style.display = 'block';
+                botonYape.style.display = 'none';
+                
+                return false;
+            }
+            return true;
+        }
+
+        if (total > 500) {
+            pagoYapeRadio.disabled = true;
+            pagoYapeRadio.closest('.custom-radio-btn').style.opacity = '0.5';
+            pagoYapeRadio.closest('.custom-radio-btn').style.cursor = 'not-allowed';
+            
+            // Agregar texto explicativo
+            const labelYape = pagoYapeRadio.closest('.custom-radio-btn').querySelector('label');
+            const restriccionTexto = document.createElement('small');
+            restriccionTexto.className = 'text-danger mt-1 d-block';
+            restriccionTexto.innerHTML = '<i class="bi bi-exclamation-circle"></i> No disponible para montos mayores a S/ 500';
+            labelYape.appendChild(restriccionTexto);
+            
+            // Asegurar que esté seleccionado tarjeta
+            document.getElementById('pagoTarjeta').checked = true;
+        }
+
+        // Evento para cuando cambie el método de pago
+        document.querySelectorAll('input[name="metodoPago"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'yape' && !validarMetodoPago()) {
+                    return;
+                }
+                
+                // Lógica existente para mostrar/ocultar botones
+                if (this.value === 'tarjeta') {
+                    botonStripe.style.display = 'block';
+                    botonYape.style.display = 'none';
+                } else if (this.value === 'yape') {
+                    botonStripe.style.display = 'none';
+                    botonYape.style.display = 'block';
+                }
+            });
+        });
+
         if (customCheckbox && aceptaTerminos) {
             customCheckbox.addEventListener('click', () => {
                 aceptaTerminos.checked = !aceptaTerminos.checked;
@@ -337,6 +392,14 @@
                 event.preventDefault();
                 let esValido = true;
 
+                // Validar método de pago según monto
+                const metodoPagoSeleccionado = formulario.querySelector('input[name="metodoPago"]:checked')?.value;
+                if (metodoPagoSeleccionado === 'yape' && total > 500) {
+                    alert('Para montos mayores a S/ 500, solo se permite el pago con tarjeta de crédito/débito.');
+                    esValido = false;
+                    return;
+                }
+                
                 // Obtener tipo de comprobante
                 const tipoComprobante = formulario.querySelector('input[name="tipoComprobante"]:checked')?.value;
 
@@ -423,7 +486,5 @@
             });
         }
     });
-
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

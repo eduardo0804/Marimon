@@ -1,10 +1,10 @@
 @using Marimon.Enums
 @model Marimon.ViewModel.ServicioReservaViewModel
 @{
-    ViewData["Title"] = "Consultar Servicios";
-        Layout = "_LayoutServicio";
+    ViewData["Title"] = "Consultar Reserva de Servicios";
+    Layout = "_LayoutServicio";
 }
-<link rel="stylesheet" href="~/css/consultarServicio.css" />
+<link rel="stylesheet" href="~/css/manejarVenta.css" />
 
 
 <div class="container-fluid mt-4 my-4">
@@ -12,10 +12,10 @@
         <li class="breadcrumb-item">
             <a asp-area="" asp-controller="Personal_Servicio" asp-action="Index">Módulo de Servicio</a>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">Consultar Servicios</li>
+        <li class="breadcrumb-item active" aria-current="page">Consultar Reserva de Servicios</li>
     </ol>
     <div class="page-header text-center m-0 p-0 pb-2">
-        <h2>Consultar Servicios</h2>
+        <h2>Consultar Reserva de Servicios</h2>
     </div>
 
     <div class="row">
@@ -76,15 +76,71 @@
                             value="@Context.Request.Query["fechaHasta"]" />
                     </div>
                 </div>
+                <input type="hidden" id="estadoSeleccionado" value="@ViewBag.EstadoSeleccionado" />
+                <div class="filter-body p-3">
+                    <h6 class="mb-3">Filtrar por estado</h6>
+                    <div class="status-filters">
+                        <!-- Opción "Todos los estados" -->
+                        <a href="javascript:void(0)" onclick="setEstado('')"
+                            class="status-filter @(string.IsNullOrEmpty(ViewBag.EstadoSeleccionado) ? "active" : "")">
+                            <div class="status-icon bg-secondary">
+                                <i class="fas fa-list text-white"></i>
+                            </div>
+                            <span class="status-label">Todos los estados</span>
+                            <span class="status-badge">@(ViewBag.ContadoresEstados != null ? ViewBag.ContadoresEstados["Todos"] : Model.Reservas.Count())</span>
+                        </a>
 
+                        @if (ViewBag.Estados != null)
+                        {
+                            foreach (var est in ViewBag.Estados)
+                            {
+                                var count = ViewBag.ContadoresEstados != null ? ViewBag.ContadoresEstados[est] : Model.Reservas.Count(v => v.Estado.ToString() == est);
+                                var iconClass = "";
+                                var bgClass = "";
+                                switch (est)
+                                {
+                                    case "Pendiente":
+                                        iconClass = "fa-clock";
+                                        bgClass = "bg-warning";
+                                        break;
+                                    case "Confirmada":
+                                        iconClass = "fa-check-circle";
+                                        bgClass = "bg-info";
+                                        break;
+                                    case "Completada": // Verde para completada
+                                        iconClass = "fa-check-double";
+                                        bgClass = "bg-success";
+                                        break;
+                                    case "Cancelada":
+                                        iconClass = "fa-times-circle";
+                                        bgClass = "bg-danger";
+                                        break;
+                                    default:
+                                        iconClass = "fa-circle";
+                                        bgClass = "bg-secondary";
+                                        break;
+                                }
+                                
+                                <a href="javascript:void(0)" onclick="setEstado('@est')"
+                                    class="status-filter @(ViewBag.EstadoSeleccionado == est ? "active" : "")">
+                                    <div class="status-icon @bgClass">
+                                        <i class="fas @iconClass text-white"></i>
+                                    </div>
+                                    <span class="status-label">@est</span>
+                                    <span class="status-badge">@count</span>
+                                </a>
+                            }
+                        }
+                    </div>
+                </div>
                 <div class="mt-4">
-                    <button class="filter-btn" onclick="filtrarReservas()">
+                    <button class="filter-btn" onclick="filtrarReservas()"
+                        style="width: 250px !important; min-width: 250px !important; max-width: 150px !important; display: block !important; margin-left: auto !important; margin-right: auto !important;">
                         <i class="fas fa-filter"></i> Aplicar Filtros
                     </button>
                 </div>
             </div>
         </div>
-
         <!-- Table section (Right side) -->
         <div class="col-lg-9">
             <div class="table-container fade-in">
@@ -368,30 +424,50 @@
             });
         }
     });
+    function setEstado(estado) {
+    // SOLO actualizar el valor hidden - NO recargar la página
+    document.getElementById('estadoSeleccionado').value = estado;
 
+    // Actualizar SOLO la clase active visual en los filtros de estado
+    document.querySelectorAll('.status-filter').forEach(el => {
+        el.classList.remove('active');
+        // También remover clases de Bootstrap si existen
+        el.classList.remove('bg-light', 'border-primary');
+    });
+
+    // Agregar clase active al filtro seleccionado
+    event.currentTarget.classList.add('active');
+
+    // *** IMPORTANTE: NO llamar filtrarReservas() aquí ***
+    // Los filtros solo se aplicarán cuando presionen el botón "APLICAR FILTROS"
+}
     // Function to filter reservations
-    function filtrarReservas() {
-        var checkboxes = document.querySelectorAll('input[name="servicios"]:checked');
-        var serviciosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
-        var desde = document.getElementById("fechaDesde").value;
-        var hasta = document.getElementById("fechaHasta").value;
+   function filtrarReservas() {
+    var checkboxes = document.querySelectorAll('input[name="servicios"]:checked');
+    var serviciosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
+    var desde = document.getElementById("fechaDesde").value;
+    var hasta = document.getElementById("fechaHasta").value;
+    var estado = document.getElementById("estadoSeleccionado").value;
 
-        if (desde && hasta && new Date(desde) > new Date(hasta)) {
-            showToast('La fecha "Hasta" debe ser mayor o igual a la fecha "Desde".', 'error');
-            return;
-        }
-
-        var url = '@Url.Action("ConsultarServicios", "Personal_Servicio")' + '?';
-
-        if (serviciosSeleccionados.length > 0) {
-            url += 'nombreServicio=' + encodeURIComponent(serviciosSeleccionados.join(',')) + '&';
-        }
-
-        if (desde) url += 'fechaDesde=' + desde + '&';
-        if (hasta) url += 'fechaHasta=' + hasta;
-
-        window.location.href = url;
+    if (desde && hasta && new Date(desde) > new Date(hasta)) {
+        showToast('La fecha "Hasta" debe ser mayor o igual a la fecha "Desde".', 'error');
+        return;
     }
+
+    var url = '@Url.Action("ConsultarServicios", "Personal_Servicio")' + '?';
+
+    if (serviciosSeleccionados.length > 0) {
+        url += 'nombreServicio=' + encodeURIComponent(serviciosSeleccionados.join(',')) + '&';
+    }
+
+    if (desde) url += 'fechaDesde=' + desde + '&';
+    if (hasta) url += 'fechaHasta=' + hasta + '&';
+    if (estado) url += 'estado=' + encodeURIComponent(estado);
+
+    // SOLO aquí se recarga la página con los filtros aplicados
+    window.location.href = url;
+}
+
 
     // Toast notification function
     function showToast(message, type = 'success') {

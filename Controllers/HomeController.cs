@@ -37,6 +37,12 @@ public class HomeController : Controller
         return View();
     }
 
+    [HttpGet("/api/esta-logueado")]
+    public IActionResult EstaLogueado()
+    {
+        return Json(new { logueado = User.Identity.IsAuthenticated });
+    }
+
     public IActionResult Privacy()
     {
         return View();

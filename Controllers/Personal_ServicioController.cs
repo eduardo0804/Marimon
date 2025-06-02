@@ -7,6 +7,7 @@ using Google.Apis.Auth.OAuth2;
 using Marimon.Data;
 using Marimon.Enums;
 using Marimon.Models;
+using Marimon.Services;
 using Marimon.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -95,13 +96,13 @@ namespace Marimon.Controllers
             }
         }
 
-        public IActionResult ConsultarServicios(string nombreServicio, string fechaDesde, string fechaHasta)
+        public IActionResult ConsultarServicios(string nombreServicio, string fechaDesde, string fechaHasta, string estado)
         {
+            // Parse fechas y servicios como antes
             var serviciosSeleccionados = string.IsNullOrEmpty(nombreServicio)
                 ? new List<string>()
                 : nombreServicio.Split(',').ToList();
 
-            // Conversión segura a DateTime con tipo UTC
             DateTime? fechaInicio = null;
             DateTime? fechaFin = null;
 
@@ -111,38 +112,61 @@ namespace Marimon.Controllers
             if (DateTime.TryParse(fechaHasta, out var hasta))
                 fechaFin = DateTime.SpecifyKind(hasta, DateTimeKind.Utc);
 
-            var reservas = _context.Reserva
+            // OBTENER TODAS LAS RESERVAS PRIMERO (sin filtro de estado)
+            var todasLasReservas = _context.Reserva
                 .Include(r => r.Servicio)
                 .Include(r => r.Usuario)
-                .Select(r => new Reserva
-                {
-                    res_id = r.res_id,
-                    res_placa = r.res_placa,
-                    res_fecha = r.res_fecha,
-                    res_hora = r.res_hora,
-                    Servicio = r.Servicio,
-                    Usuario = r.Usuario,
-                    Estado = r.Estado // Asegúrate de incluir el Estado aquí
-                })
                 .Where(r =>
                     (serviciosSeleccionados.Count == 0 || serviciosSeleccionados.Contains(r.Servicio.ser_nombre)) &&
                     (!fechaInicio.HasValue || r.res_fecha >= fechaInicio.Value) &&
                     (!fechaFin.HasValue || r.res_fecha <= fechaFin.Value)
+                // NO filtrar por estado aquí
                 )
-                .OrderBy(r => r.res_fecha) // Ordena por fecha
-                .ThenBy(r => r.res_hora) // Y luego por hora
+                .OrderBy(r => r.res_fecha)
+                .ThenBy(r => r.res_hora)
                 .ToList();
+
+            // AHORA aplicar el filtro de estado solo para mostrar en la tabla
+            var reservasFiltradas = todasLasReservas;
+            if (!string.IsNullOrEmpty(estado))
+            {
+                reservasFiltradas = todasLasReservas
+                    .Where(r => r.Estado.ToString() == estado)
+                    .ToList();
+            }
+
+            // IMPORTANTE: Siempre mostrar TODOS los estados posibles
+            var todosLosEstados = new List<string>
+    {
+        "Pendiente",
+        "Confirmada",
+        "Completada",
+        "Cancelada"
+    };
+
+            ViewBag.EstadoSeleccionado = estado;
+            // Usar todos los estados, NO los estados de las reservas filtradas
+            ViewBag.Estados = todosLosEstados;
+
+            // Para calcular los contadores correctos, usar todas las reservas (sin filtro de estado)
+            ViewBag.ContadoresEstados = new Dictionary<string, int>
+            {
+                ["Todos"] = todasLasReservas.Count(),
+                ["Pendiente"] = todasLasReservas.Count(r => r.Estado == EstadoReserva.Pendiente),
+                ["Confirmada"] = todasLasReservas.Count(r => r.Estado == EstadoReserva.Confirmada),
+                ["Completada"] = todasLasReservas.Count(r => r.Estado == EstadoReserva.Completada),
+                ["Cancelada"] = todasLasReservas.Count(r => r.Estado == EstadoReserva.Cancelada)
+            };
 
             var model = new ServicioReservaViewModel
             {
                 Servicios = _context.Servicio.ToList(),
-                Reservas = reservas,
+                Reservas = reservasFiltradas, // Solo las reservas filtradas para mostrar en la tabla
                 ServiciosSeleccionados = serviciosSeleccionados
             };
 
             return View(model);
         }
-
 
         public IActionResult MServicio()
         {
@@ -253,21 +277,131 @@ namespace Marimon.Controllers
             return RedirectToAction("LServicio");
         }
 
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
+        // public IActionResult CambiarEstadoReserva(int reservaId, string nuevoEstado)
+        // {
+        //     var reserva = _context.Reserva.FirstOrDefault(r => r.res_id == reservaId);
+        //     if (reserva == null) return NotFound();
+
+        //     if (Enum.TryParse<EstadoReserva>(nuevoEstado, out var estado))
+        //     {
+        //         reserva.Estado = estado;
+        //         _context.SaveChanges();
+        //         return RedirectToAction("ConsultarServicios"); // o la acción donde muestras la tabla
+        //     }
+
+        //     return BadRequest("Estado inválido");
+        // }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CambiarEstadoReserva(int reservaId, string nuevoEstado)
+        public async Task<IActionResult> CambiarEstadoReserva(int reservaId, string nuevoEstado, [FromServices] IEmailSenderWithAttachments emailSender)
         {
-            var reserva = _context.Reserva.FirstOrDefault(r => r.res_id == reservaId);
-            if (reserva == null) return NotFound();
-
-            if (Enum.TryParse<EstadoReserva>(nuevoEstado, out var estado))
+            try
             {
+                if (!Enum.TryParse<EstadoReserva>(nuevoEstado, out var estado))
+                {
+                    TempData["Error"] = "Estado no válido.";
+                    return RedirectToAction("ConsultarServicios");
+                }
+
+                var reserva = await _context.Reserva
+                    .Include(r => r.Usuario)
+                    .FirstOrDefaultAsync(r => r.res_id == reservaId);
+
+                if (reserva == null)
+                {
+                    TempData["Error"] = "Reserva no encontrada.";
+                    return RedirectToAction("ConsultarServicios");
+                }
+
+                var estadoAnterior = reserva.Estado;
+                if (estadoAnterior == estado)
+                {
+                    TempData["Mensaje"] = $"La reserva #{reservaId} ya se encuentra en estado {estado}.";
+                    return RedirectToAction("ConsultarServicios");
+                }
+
                 reserva.Estado = estado;
-                _context.SaveChanges();
-                return RedirectToAction("ConsultarServicios"); // o la acción donde muestras la tabla
+                await _context.SaveChangesAsync();
+
+                // Cargar plantilla de correo
+                var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "EstadosReserva.html");
+                var emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+                string subject = $"Estado de tu reserva #{reservaId} actualizado a {estado}";
+                string mensaje = "";
+                string claseColor = "";
+                string mensajeCambio = $"El estado de tu pedido <strong>#{reservaId}</strong> ha cambiado a:";
+                // Determinar las clases CSS según el estado
+                string stylePendiente = "opacity:0.4; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                string styleCompletado = "opacity:0.4; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
+                string styleCancelado = "opacity:0.4; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;";
+                string colCancelado = "";
+
+                switch (estado)
+                {
+                    case EstadoReserva.Pendiente:
+                        mensaje = "Tu reserva está pendiente de confirmación. Te contactaremos pronto.";
+                        stylePendiente = "opacity:1; color:#F39C12; font-weight:bold; font-size:14px; padding:0 15px;";
+                        claseColor = "color: #F39C12;"; // Naranja
+                        break;
+                    case EstadoReserva.Confirmada:
+                        mensaje = "¡Tu reserva ha sido confirmada! Te esperamos en el local.";
+                        claseColor = "color:#2980b9;"; // Azul
+                        break;
+                    case EstadoReserva.Cancelada:
+                        mensaje = "Tu reserva ha sido cancelada. Si tienes dudas, contáctanos.";
+                        colCancelado = @"<td style=""opacity:1; color:#E74C3C; font-weight:bold; font-size:14px; padding:0 15px;"">
+                    <img src=""https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fel-tiempo-de-entrega.png?alt=media&token=3eed4a09-a993-40fc-9989-4abcc4c2359b.jpg""
+                        alt=""Cancelado"" width=""50"" height=""50"" style=""display:block; margin:0 auto 10px auto;"">
+                    Cancelado
+                </td>";
+                        claseColor = "color: #E42229;"; ; // Rojo
+                        break;
+                    case EstadoReserva.Completada:
+                        mensaje = "¡Gracias por visitarnos! Tu reserva ha sido completada con éxito.";
+                        styleCompletado = "opacity:1; color:#27ae60; font-weight:bold; font-size:14px; padding:0 15px;";
+                        claseColor = "color:#27ae60;"; // Verde
+                        break;
+                }
+
+                emailBody = emailBody
+                            .Replace("{{UserName}}", reserva.Usuario?.usu_nombre ?? "Cliente")
+                            .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
+                            .Replace("{{ReservaId}}", reservaId.ToString())
+                            .Replace("{{NumeroReserva}}", reservaId.ToString())
+                            .Replace("{{Servicio}}", reserva.Servicio?.ser_nombre ?? "Servicio reservado") // Asegúrate de tener esto en el modelo
+                            .Replace("{{FechaReserva}}", reserva.res_fecha.ToString("dd/MM/yyyy"))
+                            .Replace("{{Estado}}", estado.ToString())
+                            .Replace("{{MensajeEstado}}", mensaje)
+                            .Replace("{{ClaseEstadoTexto}}", claseColor)
+                            .Replace("{{HoraReserva}}", reserva.res_hora.ToString(@"hh\:mm"))
+                            .Replace("{{StylePendiente}}", stylePendiente)
+                            .Replace("{{StyleCompletado}}", styleCompletado)
+                            .Replace("{{StyleCancelado}}", styleCancelado)
+                            .Replace("{{ColCancelado}}", colCancelado)
+                            .Replace("{{CallbackUrl}}", "https://marimon-fjv7.onrender.com/Identity/Account/Manage/Citas");
+
+
+                // Enviar correo
+                if (!string.IsNullOrEmpty(reserva.Usuario?.usu_correo))
+                {
+                    await emailSender.SendEmailAsync(reserva.Usuario.usu_correo, subject, emailBody);
+                    TempData["Mensaje"] = $"La reserva #{reservaId} ha cambiado de {estadoAnterior} a {estado}. Se notificó al usuario.";
+                }
+                else
+                {
+                    TempData["Mensaje"] = $"La reserva #{reservaId} ha cambiado de {estadoAnterior} a {estado}. No se pudo notificar (sin correo).";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error al cambiar estado de la reserva: {ex.Message}";
             }
 
-            return BadRequest("Estado inválido");
+            return RedirectToAction("ConsultarServicios");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

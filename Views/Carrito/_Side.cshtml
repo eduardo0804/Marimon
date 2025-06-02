@@ -1,40 +1,41 @@
 ﻿@model Marimon.Models.Carrito
-
 @{
     int cantidadTotal = Model?.CarritoAutopartes?.Sum(x => x.car_cantidad) ?? 0;
-    
-}
 
+}
 <style>
     .link-btn {
         display: block;
         padding: 10px;
-        border: 1px solid #ffffff;
+        border: 1px solid 
+#ffffff;
         border-radius: 5px;
-        color: #ffffff;
+        color: 
+#ffffff;
         text-decoration: none;
         transition: all 0.3s ease;
     }
-
     .link-btn:hover {
-        background-color: #E42229;
-        color: #ffffff;
-        border-color: #E42229;
+        background-color: 
+#E42229;
+        color: 
+#ffffff;
+        border-color: 
+#E42229;
     }
 </style>
-
 <div class="offcanvas offcanvas-end bg-black text-white" tabindex="-1" id="offcanvasCarrito"
     aria-labelledby="offcanvasCarritoLabel">
     <div class="offcanvas-header border-bottom border-secondary">
         <h5 class="offcanvas-title fw-bold" id="offcanvasCarritoLabel">
-            <svg class="bi me-2" width="24" height="24" fill="#E42229">
+            <svg class="bi me-2" width="24" height="24" fill="
+#E42229">
                 <use xlink:href="#cart"></use>
             </svg>
             CARRITO (@cantidadTotal)
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-
     <div class="offcanvas-body d-flex flex-column p-3">
         <!-- Lista de productos -->
         <div class="list-group list-group-flush border-bottom flex-grow-1 overflow-auto mb-3">
@@ -43,15 +44,14 @@
                 foreach (var item in Model.CarritoAutopartes)
                 {
                     var autoparte = item.Autoparte;
-                    var precioItem = autoparte.aut_precio * item.car_cantidad;
-
+                    decimal precioUnitario = item.car_subtotal / item.car_cantidad;
                     <div class="d-flex align-items-center mb-3 border-bottom pb-2">
                         <img src="@autoparte.aut_imagen" alt="Imagen de @autoparte.aut_nombre"
                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 10px;" />
                         <div class="flex-grow-1">
                             <div class="fw-bold">@autoparte.aut_nombre</div>
                             <small>Cantidad: @item.car_cantidad</small><br />
-                            <small>Precio unitario: S/@autoparte.aut_precio.ToString("0.00")</small><br />
+                            <small>Precio unitario: S/@precioUnitario.ToString("0.00")</small><br />
                             <small>Subtotal: <span class="fw-bold">S/@item.car_subtotal.ToString("0.00")</span></small>
                         </div>
                     </div>
@@ -64,7 +64,6 @@
                 </div>
             }
         </div>
-
         <!-- Resumen -->
         <div class="border-secondary pt-3">
             <!-- Aquí mostramos los productos si el carrito no está vacío -->
@@ -72,6 +71,7 @@
             {
                 <div class="d-flex justify-content-between mb-2">
                     <span>Total:</span>
+
                    <span class="fw-bold">S/ @Model.car_total.ToString("0.00")</span>
                 </div>
                 <div class="d-flex flex-column gap-2 text-center mb-3">

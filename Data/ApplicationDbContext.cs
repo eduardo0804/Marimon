@@ -1,4 +1,4 @@
-﻿using Marimon.Models;
+using Marimon.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Marimon.Models;
@@ -27,20 +27,65 @@ public class ApplicationDbContext : IdentityDbContext
             .HasOne<IdentityUser>(u => u.IdentityUser)
             .WithOne()
             .HasForeignKey<Usuario>(u => u.usu_id)
-            .OnDelete(DeleteBehavior.Cascade); // Esta línea hace que se elimine en cascada
-        
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.Entity<Reserva>()
             .HasOne(r => r.Usuario)
             .WithMany(u => u.Reservas)
             .HasForeignKey(r => r.UsuarioId)
-            .HasPrincipalKey(u => u.usu_id); 
+            .HasPrincipalKey(u => u.usu_id);
 
         builder.Entity<Reserva>()
             .Property(r => r.Estado)
             .HasConversion<string>();
 
-    }
+        builder.Entity<Reclamacion>()
+            .Property(r => r.TipoReclamacion)
+            .HasConversion<string>();
 
+        builder.Entity<Reclamacion>()
+            .Property(r => r.TipoEntidad)
+            .HasConversion<string>();
+
+        builder.Entity<Reclamacion>()
+            .Property(r => r.Estado)
+            .HasConversion<string>();
+
+        // Configuraciones para las nuevas entidades
+        builder.Entity<Oferta>()
+            .HasOne(o => o.Autoparte)
+            .WithMany(a => a.Ofertas)
+            .HasForeignKey(o => o.AutoparteId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<CodigoDescuento>()
+            .HasOne(c => c.Usuario)
+            .WithMany()
+            .HasForeignKey(c => c.UsuarioId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<CodigoDescuento>()
+            .HasOne(c => c.Autoparte)
+            .WithMany(a => a.CodigosDescuento)
+            .HasForeignKey(c => c.AutoparteId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Oferta>()
+            .Property(o => o.ofe_fecha_inicio)
+            .HasColumnType("date");
+
+        builder.Entity<Oferta>()
+            .Property(o => o.ofe_fecha_fin)
+            .HasColumnType("date");
+
+        builder.Entity<CodigoDescuento>()
+            .Property(c => c.cod_fecha_creacion)
+            .HasColumnType("date");
+
+        builder.Entity<CodigoDescuento>()
+            .Property(c => c.cod_fecha_expiracion)
+            .HasColumnType("date");
+    }
 
     public DbSet<Autoparte> Autopartes { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
@@ -57,4 +102,9 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Reserva> Reserva { get; set; }
     public DbSet<Carrito> Carritos { get; set; }
     public DbSet<CarritoAutoparte> CarritoAutopartes { get; set; } = null!;
+    public DbSet<Reclamacion> Reclamacion { get; set; } = null!;
+    public DbSet<Resenia> Resenias { get; set; }
+    
+    public DbSet<Oferta> Ofertas { get; set; }
+    public DbSet<CodigoDescuento> CodigosDescuento { get; set; }
 }

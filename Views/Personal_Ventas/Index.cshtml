@@ -9,17 +9,34 @@
     <!-- Contenido principal -->
     <main class="modulo-content">
         <div class="modulo-grid">
-            <!-- Consultar Autopartes -->
-            <a href="@Url.Action("ConsultarAutoparte", "Personal_Ventas")" class="modulo-item-link">
-                <div class="modulo-item">
-                    <div class="card-content">
-                        <img src="~/images/auto.png" alt="Consultar Autopartes">
-                    </div>
-                    <div class="card-footer">
-                        <span>CONSULTAR AUTOPARTES</span>
-                    </div>
+            <!-- Ventas y Promociones | consultar ventas -->
+            <div class="modulo-item">
+                <div class="card-content flujo-section">
+                    <a href="@Url.Action("ManejarVentas", "Personal_Ventas")" class="flujo-column-link">
+                        <div class="flujo-column">
+                            <div class="flujo-item">
+                                <img src="~/images/auto.png" alt="Manejar Ventas" class="small-icon">
+                            </div>
+                            <div class="flujo-badge-container">
+                                <span class="flujo-badge entrada">VENTAS</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a asp-area="" asp-controller="GestionPromociones" asp-action="Index" class="flujo-column-link">
+                        <div class="flujo-column">
+                            <div class="flujo-item">
+                                <img src="~/images/promociones.png" alt="Gestión Promociones" class="small-icon">
+                            </div>
+                            <div class="flujo-badge-container">
+                                <span class="flujo-badge salida">PROMOCIONES</span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            </a>
+                <div class="card-footer">
+                    <span class="flujo-text">VENTAS Y PROMOCIONES</span>
+                </div>
+            </div>
 
             <!-- Autopartes -->
             <a href="@Url.Action("ListaAutopartes", "Personal_Ventas")" class="modulo-item-link">

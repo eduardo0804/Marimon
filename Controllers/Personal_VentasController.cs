@@ -324,7 +324,7 @@ namespace Marimon.Controllers
                         emailBody = emailBody.Replace("{nombreCompleto}", venta.Usuario?.usu_nombre + " " + venta.Usuario?.usu_apellido)
                                         .Replace("{ventaID}", id.ToString())
                                         .Replace("{montoTotal}", venta.Total.ToString("0.00"))
-                                        .Replace("{{CallbackUrl}}", "http://localhost:5031/Catalogo");
+                                        .Replace("{{CallbackUrl}}", "https://marimon-fjv7.onrender.com/Catalogo");
 
                     }
                     else
@@ -392,7 +392,7 @@ namespace Marimon.Controllers
                                             .Replace("{{PedidoId}}", id.ToString())
                                             .Replace("{{Estado}}", estado)
                                             .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
-                                            .Replace("{{CallbackUrl}}", "http://localhost:5031/Identity/Account/Manage/Pedidos")
+                                            .Replace("{{CallbackUrl}}", "https://marimon-fjv7.onrender.com/Identity/Account/Manage/Pedidos")
                                             .Replace("{{StylePendiente}}", stylePendiente)
                                             .Replace("{{StyleCompletado}}", styleCompletado)
                                             .Replace("{{StyleCancelado}}", styleCancelado)
@@ -491,16 +491,12 @@ namespace Marimon.Controllers
                 }
 
                 var comprobante = await _context.Comprobante
-                    .Include(c => c.Boletas)
-                    .Include(c => c.Facturas)
                     .FirstOrDefaultAsync(c => c.VentaId == ventaId);
 
                 string cliente = venta.Usuario?.usu_nombre + " " + venta.Usuario?.usu_apellido;
                 string documento = "";
                 string evidenciaUrl = "";
-                bool esStripe = false;
-
-                esStripe = !string.IsNullOrEmpty(venta.StripeSessionId);
+                bool esStripe = !string.IsNullOrEmpty(venta.StripeSessionId);
 
                 if (comprobante != null)
                 {
@@ -515,32 +511,40 @@ namespace Marimon.Controllers
                         var boleta = comprobante.Boletas.First();
                         documento = "DNI: " + boleta.num_identificacion;
                     }
-
-                    // Obtener la URL de la evidencia solo para pagos que no son por Stripe
-                    if (!esStripe && !string.IsNullOrEmpty(comprobante.com_evidencia))
+                    if (!string.IsNullOrEmpty(comprobante.com_evidencia))
                     {
                         evidenciaUrl = comprobante.com_evidencia;
-                        if (!evidenciaUrl.StartsWith("http") && !evidenciaUrl.StartsWith("/"))
+                        if (!evidenciaUrl.StartsWith("/") && !evidenciaUrl.StartsWith("http"))
                         {
                             evidenciaUrl = "/" + evidenciaUrl;
                         }
+                        
+                        _logger.LogInformation($"Evidencia URL para venta {ventaId}: {evidenciaUrl}");
                     }
                 }
 
-                // Obtener el nombre del método de pago
+                // Obtener el nombre del método de pago y especificar si es Stripe
+                bool esYape = venta.MetodoPago?.pag_metodo?.ToLower() == "yape";
+                if (esYape)
+                {
+                    esStripe = false;
+                }
+
                 string metodoPago = venta.MetodoPago?.pag_metodo ?? "No especificado";
-                if (esStripe)
+
+                if (esStripe && !esYape)
                 {
                     metodoPago += " (Stripe)";
                 }
 
                 return Json(new
                 {
-                    cliente = cliente,
-                    documento = documento,
+                    cliente = cliente ?? "Cliente no registrado",
+                    documento = documento ?? "Sin documento",
                     total = venta.Total.ToString("0.00"),
                     evidenciaUrl = evidenciaUrl,
                     esStripe = esStripe,
+                    esYape = esYape,
                     metodoPago = metodoPago
                 });
             }
@@ -551,20 +555,104 @@ namespace Marimon.Controllers
             }
         }
 
+        public IActionResult ManejarVentas(string estado = null, decimal montoMaximo = 0)
+        {
+            var todasLasVentas = _context.Venta.ToList();
+            var ventasQuery = _context.Venta
+                .Include(v => v.Detalles)
+                    .ThenInclude(d => d.Autoparte)
+                .AsQueryable();
+
+            // Filtro por estado
+            if (!string.IsNullOrEmpty(estado))
+            {
+                ventasQuery = ventasQuery.Where(v => v.Estado == estado);
+            }
+
+            // Filtro por monto máximo (si es mayor a 0)
+            if (montoMaximo > 0)
+            {
+                ventasQuery = ventasQuery.Where(v => v.Total <= montoMaximo);
+            }
+
+            // Para el dropdown de estados únicos
+            var estados = _context.Venta.Select(v => v.Estado).Distinct().ToList();
+
+            // Configurar ViewBag para la vista
+            ViewBag.Estados = estados;
+            ViewBag.EstadoSeleccionado = string.IsNullOrEmpty(estado) ? "" : estado;
+            ViewBag.MontoMaximo = montoMaximo == 0 ? 5000 : montoMaximo; // Valor predeterminado
+            ViewBag.TodasLasVentas = todasLasVentas;
+
+            return View(ventasQuery.ToList());
+        }
+
+
+
+
+
 
 
         //AUTOPARTE - CRUD
 
         // GET: Admin/ListaAutopartes
-        public async Task<IActionResult> ListaAutopartes()
+        public IActionResult ListaAutopartes(string orden = null, List<int> categorias = null)
         {
-            var autopartes = await _context.Autopartes
-                .Include(a => a.Categoria)  // Cargar la categoría relacionada
-                .OrderBy(a => a.aut_id) // Aquí defines el orden
-                .ToListAsync();
+            var autopartes = _context.Autopartes.Include(a => a.Categoria).AsQueryable();
 
-            return View(autopartes);
+            if (categorias != null && categorias.Any())
+            {
+                autopartes = autopartes.Where(a => categorias.Contains(a.CategoriaId));
+            }
+
+            var ventasOnline = _context.DetalleVentas
+                .GroupBy(d => d.AutoParteId)
+                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(d => d.det_cantidad) });
+
+            var ventasPresenciales = _context.Salida
+                .GroupBy(s => s.AutoparteId)
+                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(s => s.sal_cantidad) });
+
+            var ventasTotales = ventasOnline
+                .Concat(ventasPresenciales)
+                .GroupBy(v => v.AutoparteId)
+                .Select(g => new { AutoparteId = g.Key, Total = g.Sum(x => x.Cantidad) })
+                .ToList();
+
+            if (orden == "asc")
+            {
+                autopartes = autopartes.OrderBy(a => a.aut_precio);
+            }
+            else if (orden == "desc")
+            {
+                autopartes = autopartes.OrderByDescending(a => a.aut_precio);
+            }
+            else if (orden == "mas_vendidas")
+            {
+                autopartes = autopartes
+                    .AsEnumerable()
+                    .OrderByDescending(a =>
+                        ventasTotales.FirstOrDefault(v => v.AutoparteId == a.aut_id)?.Total ?? 0)
+                    .AsQueryable();
+            }
+            else
+            {
+                autopartes = autopartes.OrderBy(a => a.aut_id);
+            }
+
+            var lista = autopartes.ToList();
+
+            // Asignar la cantidad vendida
+            foreach (var autoparte in lista)
+            {
+                autoparte.CantidadVendida = ventasTotales
+                    .FirstOrDefault(v => v.AutoparteId == autoparte.aut_id)?.Total ?? 0;
+            }
+
+            ViewBag.Categorias = _context.Categorias.ToList();
+            return View(lista);
         }
+
         public IActionResult Create()
         {
             ViewBag.Title = "Registrar Autoparte";

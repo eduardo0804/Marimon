@@ -1,0 +1,42 @@
+@{
+    Layout = "_LayoutVentas";
+}
+
+<link rel="stylesheet" href="~/css/promociones.css" asp-append-version="true" />
+
+<ol class="breadcrumb m-0 py-2">
+    <li class="breadcrumb-item">
+        <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Modulo de Autopartes</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Gestión de Promociones</li>
+</ol>
+
+<div class="promociones-container">
+    <main class="promociones-content">
+        <div class="cards-grid">
+            <!-- Card de Ofertas -->
+            <a asp-controller="Ofertas" asp-action="Index" class="card-link">
+                <div class="promotion-card">
+                    <div class="card-image-section">
+                        <img src="~/images/ofertas.png" alt="Ofertas" class="card-image">
+                    </div>
+                    <div class="card-title-section">
+                        <span class="card-title">OFERTAS</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Card de Cupones de Descuento -->
+            <a asp-controller="Descuentos" asp-action="Index" class="card-link">
+                <div class="promotion-card">
+                    <div class="card-image-section">
+                        <img src="~/images/cupones.png" alt="Cupones de Descuento" class="card-image">
+                    </div>
+                    <div class="card-title-section">
+                        <span class="card-title">CUPONES DE DESCUENTO</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </main>
+</div>

@@ -381,7 +381,6 @@
         }
 
         // Configuración del modal de estados
-        const estadoModal = document.getElementById('estadoModal');
         estadoModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const estado = button.getAttribute('data-estado');
@@ -395,6 +394,16 @@
             // Mostrar el ID de la venta
             document.getElementById('ventaIdDisplay').textContent = salidaId;
             
+            // Limpiar valores anteriores para evitar que se muestren datos viejos
+            document.getElementById('clienteDisplay').textContent = '-';
+            document.getElementById('documentoDisplay').textContent = '-';
+            document.getElementById('totalDisplay').textContent = '-';
+            document.getElementById('metodoPagoDisplay').textContent = '-';
+            
+            // Ocultar contenedor de evidencia por defecto
+            const evidenciaContainer = document.getElementById('evidenciaContainer');
+            evidenciaContainer.style.display = 'none';
+            
             // Cargar datos adicionales de la venta usando AJAX
             fetch(`/Personal_Ventas/ObtenerDatosVenta?ventaId=${salidaId}`)
                 .then(response => {
@@ -404,6 +413,9 @@
                     return response.json();
                 })
                 .then(data => {
+                    console.log("Datos recibidos:", data); // Para depuración
+                    
+                    // Mostrar datos básicos
                     document.getElementById('clienteDisplay').textContent = data.cliente || '-';
                     document.getElementById('documentoDisplay').textContent = data.documento || '-';
                     document.getElementById('totalDisplay').textContent = `S/ ${data.total || '0.00'}`;
@@ -411,14 +423,14 @@
                     
                     // Referencias a elementos del DOM
                     const infoVentaPanel = document.getElementById('infoVentaPanel');
-                    const evidenciaContainer = document.getElementById('evidenciaContainer');
                     const evidenciaImage = document.getElementById('evidenciaImage');
                     const evidenciaEnlace = document.getElementById('evidenciaEnlace');
                     
                     // Configurar opciones del select de estado según el método de pago
                     select.innerHTML = ''; 
                     
-                    if (data.esStripe) {
+                    if (data.esStripe && !data.esYape) {
+                        // Solo para pagos con Stripe: Completado y Cancelado
                         const optionCompletado = document.createElement('option');
                         optionCompletado.value = 'Completado';
                         optionCompletado.textContent = 'Completado';
@@ -430,6 +442,7 @@
                         select.appendChild(optionCompletado);
                         select.appendChild(optionCancelado);
                         
+                        // Ocultar evidencia para Stripe y centrar el panel
                         evidenciaContainer.style.display = 'none';
                         infoVentaPanel.className = 'col-md-8 mx-auto';
                     } else {
@@ -450,14 +463,20 @@
                         select.appendChild(optionPendiente);
                         select.appendChild(optionCancelado);
                         
-                        infoVentaPanel.className = 'col-md-6';
-                        
+                        // Gestionar la visualización de evidencia
                         if (data.evidenciaUrl && data.evidenciaUrl !== '') {
+                            console.log("Mostrando evidencia:", data.evidenciaUrl);
+                            // Mostrar la evidencia
                             evidenciaContainer.style.display = 'block';
                             evidenciaImage.src = data.evidenciaUrl;
                             evidenciaEnlace.href = data.evidenciaUrl;
+                            // Dividir el layout en dos columnas
+                            infoVentaPanel.className = 'col-md-6';
                         } else {
+                            console.warn("No se encontró evidencia para la venta:", salidaId);
+                            // Ocultar la evidencia y centrar el panel
                             evidenciaContainer.style.display = 'none';
+                            infoVentaPanel.className = 'col-md-8 mx-auto';
                         }
                     }
                     

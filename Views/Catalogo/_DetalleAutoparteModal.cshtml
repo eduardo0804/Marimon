@@ -1,4 +1,9 @@
+@using Microsoft.AspNetCore.Identity
 @model Marimon.Models.ViewModels.AutoparteViewModel
+@inject UserManager<IdentityUser> UserManager
+@{
+    var currentUserId = UserManager.GetUserId(User);
+}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -13,6 +18,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/catalogo.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reseniaatuparte.css" asp-append-version="true" />
 
 </head>
 <style>
@@ -72,8 +78,8 @@
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="similares-tab" data-bs-toggle="tab" data-bs-target="#similares"
-                                type="button" role="tab" aria-controls="similares" aria-selected="false">Ver productos
-                                similares</button>
+                                type="button" role="tab" aria-controls="similares" aria-selected="false">Ver Productos
+                                Similares</button>
                         </li>
                     </ul>
 
@@ -87,9 +93,23 @@
                                 <li><i class="fa-solid fa-circle-check text-danger me-2"></i><strong>Categoría:</strong>
                                     @Model.CategoriaNombre</li>
                             </ul>
+
                             <div class="precio2 mb-4">
-                                <span class="fs-3 fw-bold text-danger">S/ @Model.aut_precio.ToString("0.00")</span>
+
+                                @if (Model.OfertaActiva == true && Model.PrecioOferta.HasValue)
+                                {
+                                    <span><del>S/ @Model.aut_precio.ToString("0.00")</del> <strong class="text-danger">S/
+                                            @Model.PrecioOferta.Value.ToString("0.00")</strong></span>
+                                    <br />
+                                    <span class="text-success">Oferta: @Model.DescripcionOferta</span>
+                                }
+                                else
+                                {
+                                    <span class="fs-3 fw-bold text-danger">S/ @Model.aut_precio.ToString("0.00")</span>
+                                }
                             </div>
+
+
                         </div>
 
                         <div class="tab-pane fade" id="similares" role="tabpanel" aria-labelledby="similares-tab">
@@ -121,9 +141,9 @@
                         {
                             @if (@Model.aut_cantidad > 0)
                             {
-                                <button class="btn btn-whatsapp w-100"
-                                    style="text-decoration: none; display: inline-block; text-align: center; background-color: black"
-                                    type="button" onclick="añadirAlCarritoAsync(@Model.aut_id, 1)">
+                                <button class="btn btn-carrito"
+                                    style="text-decoration: none; display: inline-block; text-align: center" type="button"
+                                    onclick="añadirAlCarritoAsync(@Model.aut_id, 1)">
                                     Añadir al Carrito
                                 </button>
                             }
@@ -147,6 +167,157 @@
                     </div>
                 </div>
             </div>
+
+            <div class="container-fluid mt-5 px-4">
+                <div class="row my-4"> <!-- Reducido de my-5 a my-4 -->
+                    <div class="col-12 text-center" data-aos="fade-up">
+                        <h2 class="fw-bold mb-2"
+                            style="color: #000000; letter-spacing: 1px; text-transform: uppercase;">
+                            Reseña de Clientes
+                        </h2>
+                        <p class="text-muted mb-0" style="color: #626C66; font-size: 1rem;">
+                            Tu opinión sobre esta autoparte nos ayuda a mejorar
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Columna izquierda para formulario -->
+                <div class="col-md-6 mb-5">
+                    <div class="bg-white rounded-4 shadow-lg p-5"
+                        style="border-top: 5px solid #E42229; position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: rgba(228, 34, 41, 0.1); border-radius: 0 0 0 120px;">
+                        </div>
+
+                        <h4 class="mb-4" style="color: #000000; font-weight: 700;">Comparte tu Experiencia</h4>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form id="formReseniaAutoparte" asp-action="AgregarReseniaAutoparte" asp-controller="Catalogo"
+                                method="post" class="row" novalidate>
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="aut_id" value="@Model.aut_id" />
+
+                                <div class="col-12 mb-4">
+                                    <label class="form-label" style="font-weight: 600; color: #000000;">Tu
+                                        Puntuación:</label>
+                                    <div class="d-flex">
+                                        <input type="hidden" name="res_puntuacion" id="valoracionInput" value="0">
+                                        <div class="stars d-flex">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <span class="star" data-value="@i"
+                                                    style="font-size: 2.2rem; margin-right: 10px; cursor: pointer; color: #dddddd; transition: color 0.3s ease;">
+                                                    <i class="far fa-star"></i>
+                                                </span>
+                                            }
+                                        </div>
+                                        <div class="invalid-feedback" id="valoracionError" style="display: none;">
+                                            Por favor, selecciona una valoración.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mb-4">
+                                    <label class="form-label" style="font-weight: 600; color: #000000;">¿Te gustó esta
+                                        autoparte?</label>
+                                    <div class="d-flex gap-4 mt-2">
+                                        <div class="form-check form-check-inline custom-radio">
+                                            <input class="form-check-input" type="radio" name="res_gusto" id="gustoSi"
+                                                value="Si" checked
+                                                style="width: 20px; height: 20px; border: 2px solid #E42229;">
+                                            <label class="form-check-label ms-2" for="gustoSi" style="font-size: 1rem;">
+                                                <i class="fas fa-thumbs-up me-1" style="color: #E42229;"></i> Sí me
+                                                gustó
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline custom-radio">
+                                            <input class="form-check-input" type="radio" name="res_gusto" id="gustoNo"
+                                                value="No" style="width: 20px; height: 20px; border: 2px solid #626C66;">
+                                            <label class="form-check-label ms-2" for="gustoNo" style="font-size: 1rem;">
+                                                <i class="fas fa-thumbs-down me-1" style="color: #626C66;"></i> No me
+                                                gustó
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mb-4">
+                                    <label for="res_comentario" class="form-label"
+                                        style="font-weight: 600; color: #000000;">Tu Comentario</label>
+                                    <textarea class="form-control" id="res_comentario" name="res_comentario" rows="4"
+                                    placeholder="Comparte tu experiencia con esta autoparte..."
+                                    style="border-radius: 12px; border: 1px solid #e0e0e0; padding: 15px; resize: none;"></textarea>
+                                    <div class="invalid-feedback">
+                                        Por favor, escribe un comentario para continuar.
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-lg w-100 py-3" id="submitResenia"
+                                        style="background-color: #E42229; border: none; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: #FFFFFF;">
+                                        <i class="fas fa-paper-plane me-2"></i> Enviar Reseña
+                                    </button>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert border-0 p-4"
+                                style="background-color: rgba(228, 34, 41, 0.1); border-radius: 12px;">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="fas fa-exclamation-circle fa-2x" style="color: #E42229;"></i>
+                                    </div>
+                                    <div>
+                                        <h5 style="color: #000000; font-weight: 600;">Acceso Requerido</h5>
+                                        <p class="mb-2" style="color: #626C66;">Debes iniciar sesión para agregar una
+                                            reseña.</p>
+                                        <a href="/Identity/Account/Login" class="btn mt-2"
+                                            style="background-color: #E42229; color: #FFFFFF; border-radius: 30px; padding: 8px 20px; font-weight: 600;">
+                                            <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Columna derecha para comentarios existentes -->
+                <div class="col-md-6">
+                    <div class="bg-white rounded-4 shadow-lg p-5"
+                        style="border-top: 5px solid #626C66; position: relative;">
+                        <div
+                            style="position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: rgba(98, 108, 102, 0.1); border-radius: 0 0 0 120px;">
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 style="color: #000000; font-weight: 700;">Opiniones de Clientes</h4>
+                            <span class="badge rounded-pill"
+                                style="background-color: #626C66; padding: 8px 15px; font-size: 0.9rem;">
+                                <i class="fas fa-comments me-1"></i>
+                                @if (Model.Resenias != null)
+                                {
+                                    <span>@(Model.Resenias.Count()) reseñas</span>
+                                }
+                                else
+                                {
+                                    <span>0 reseñas</span>
+                                }
+                            </span>
+                        </div>
+
+                        <div id="reseniasList" class="resenias-list"
+                            style="max-height: 550px; overflow-y: auto; scrollbar-width: thin; padding-right: 10px;">
+                            <div class="resenias-list">
+                                @await Html.PartialAsync("_SeccionResenias", Model.Resenias)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -162,6 +333,48 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // Variables globales para el sistema de reseñas
+        let valoracionSeleccionada = 0;
+        let formSubmitted = false;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Animación de aparición secuencial (código original)
+            const reseniaItems = document.querySelectorAll('.resenia-item');
+            reseniaItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transition = 'opacity 0.5s ease';
+                }, 100 * index);
+            });
+
+            // Asignar ID al modal para eliminar (código original)
+            const botonesEliminar = document.querySelectorAll('.eliminar-resenia');
+            const reseniaIdInput = document.getElementById('reseniaIdEliminar');
+
+            botonesEliminar.forEach(boton => {
+                boton.addEventListener('click', function () {
+                    const reseniaId = this.getAttribute('data-id');
+                    reseniaIdInput.value = reseniaId;
+                });
+            });
+
+            // Mostrar modal si viene con parámetro en URL (código original)
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+
+            if (status === 'success') {
+                const reseniaExitoModal = new bootstrap.Modal(document.getElementById('reseniaExitoModal'));
+                reseniaExitoModal.show();
+            } else if (status === 'deleted') {
+                const reseniaEliminadaModal = new bootstrap.Modal(document.getElementById('reseniaEliminadaModal'));
+                reseniaEliminadaModal.show();
+            }
+
+            // Inicializar formulario de reseñas (nuevo)
+            inicializarFormularioResenia();
+        });
+
+        // Funciones originales
         function cerrarModal() {
             document.getElementById("modalAutoparte").style.display = "none";
             const zoomModal = document.getElementById("zoomModal");
@@ -179,6 +392,7 @@
             var toast = new bootstrap.Toast(document.getElementById("toastFavorito"));
             toast.show();
         }
+
         function cargarDetalleAutoparte(id) {
             fetch(`/Catalogo/DetalleAutoparte/${id}`)
                 .then(response => response.text())
@@ -187,7 +401,8 @@
                 })
                 .catch(error => console.error("Error al cargar el detalle de la autoparte:", error));
         }
-        function añadirAlCarritoAsync(autoparteId, cantidad) {
+
+        @* function añadirAlCarritoAsync(autoparteId, cantidad) {
             const formData = new FormData();
             formData.append('autoparteId', autoparteId);
             formData.append('cantidad', cantidad);
@@ -223,8 +438,427 @@
                     console.error('Error:', error);
                     alert('Ocurrió un error al añadir el producto al carrito');
                 });
+        } *@
+
+            function abrirZoomModal(imagenSrc) {
+                const zoomModal = document.getElementById('zoomModal');
+                const zoomedImage = document.getElementById('zoomedImage');
+
+                if (zoomModal && zoomedImage) {
+                    zoomedImage.src = imagenSrc;
+                    zoomModal.style.display = 'flex';
+
+                    // Animar la aparición
+                    zoomModal.style.opacity = '0';
+                    setTimeout(() => {
+                        zoomModal.style.transition = 'opacity 0.3s ease';
+                        zoomModal.style.opacity = '1';
+                    }, 10);
+                }
+            }
+
+        function cerrarZoom() {
+            const zoomModal = document.getElementById('zoomModal');
+            if (zoomModal) {
+                zoomModal.style.transition = 'opacity 0.3s ease';
+                zoomModal.style.opacity = '0';
+                setTimeout(() => {
+                    zoomModal.style.display = 'none';
+                }, 300);
+            }
         }
+
+        // ===== NUEVAS FUNCIONES PARA EL SISTEMA DE RESEÑAS =====
+
+        function inicializarFormularioResenia() {
+            console.log('Inicializando formulario de reseñas...');
+
+            // Configurar sistema de estrellas
+            const stars = document.querySelectorAll('.star');
+            const valoracionInput = document.getElementById('valoracionInput');
+            const submitBtn = document.getElementById('submitResenia');
+            const form = document.getElementById('formReseniaAutoparte');
+
+            if (stars.length === 0) {
+                console.log('No se encontraron estrellas, el usuario no está autenticado');
+                return;
+            }
+
+            // Event listeners para las estrellas
+            stars.forEach((star, index) => {
+                // Hover effect
+                star.addEventListener('mouseenter', function () {
+                    highlightStars(index + 1);
+                });
+
+                // Click effect
+                star.addEventListener('click', function () {
+                    const rating = parseInt(this.getAttribute('data-value'));
+                    seleccionarValoracion(rating);
+                });
+            });
+
+            // Reset al salir del área de estrellas
+            const starsContainer = document.querySelector('.stars');
+            if (starsContainer) {
+                starsContainer.addEventListener('mouseleave', function () {
+                    if (valoracionSeleccionada > 0) {
+                        highlightStars(valoracionSeleccionada);
+                    } else {
+                        resetStars();
+                    }
+                });
+            }
+
+            // Validación del formulario
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    if (validarFormulario()) {
+                        enviarResenia();
+                    }
+                });
+            }
+        }
+
+        function highlightStars(rating) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                const icon = star.querySelector('i');
+                if (index < rating) {
+                    icon.className = 'fas fa-star';
+                    star.style.color = '#E42229';
+                } else {
+                    icon.className = 'far fa-star';
+                    star.style.color = '#dddddd';
+                }
+            });
+        }
+
+        function resetStars() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                const icon = star.querySelector('i');
+                icon.className = 'far fa-star';
+                star.style.color = '#dddddd';
+            });
+        }
+
+        function seleccionarValoracion(rating) {
+            valoracionSeleccionada = rating;
+            const valoracionInput = document.getElementById('valoracionInput');
+
+            if (valoracionInput) {
+                valoracionInput.value = rating;
+            }
+
+            highlightStars(rating);
+
+            // Ocultar mensaje de error si existe
+            const errorElement = document.getElementById('valoracionError');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+
+            console.log('Valoración seleccionada:', rating);
+
+            // Añadir animación de confirmación
+            const stars = document.querySelectorAll('.star');
+            stars[rating - 1].style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                stars[rating - 1].style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        function validarFormulario() {
+            let isValid = true;
+
+            // Validar valoración
+            const valoracionInput = document.getElementById('valoracionInput');
+            const valoracionError = document.getElementById('valoracionError');
+
+            if (!valoracionInput || valoracionInput.value == '0') {
+                if (valoracionError) {
+                    valoracionError.style.display = 'block';
+                    valoracionError.textContent = 'Por favor, selecciona una valoración.';
+                }
+                isValid = false;
+            } else if (valoracionError) {
+                valoracionError.style.display = 'none';
+            }
+
+            // Validar comentario
+            const comentarioInput = document.getElementById('res_comentario');
+            const comentarioError = document.getElementById('comentarioError');
+
+            if (!comentarioInput || comentarioInput.value.trim().length < 10) {
+                if (comentarioError) {
+                    comentarioError.style.display = 'block';
+                    comentarioError.textContent = 'El comentario debe tener al menos 10 caracteres.';
+                }
+                comentarioInput?.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                if (comentarioError) {
+                    comentarioError.style.display = 'none';
+                }
+                comentarioInput?.classList.remove('is-invalid');
+            }
+
+            return isValid;
+        }
+
+        // Función corregida para enviar reseña manteniendo los estilos
+        function enviarResenia() {
+            if (formSubmitted) {
+                console.log('Formulario ya enviado, evitando doble envío');
+                return;
+            }
+
+            formSubmitted = true;
+            const submitBtn = document.getElementById('submitResenia');
+            const originalText = submitBtn?.innerHTML;
+
+            // Cambiar estado del botón
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+            }
+
+            const form = document.getElementById('formReseniaAutoparte');
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    // SOLUCIÓN CORRECTA: Solo actualizar el contenido de #reseniasList
+                    const reseniasList = document.getElementById('reseniasList');
+                    if (reseniasList) {
+                        reseniasList.innerHTML = html;
+                        console.log('Lista de reseñas actualizada correctamente');
+                    }
+
+                    // Actualizar el contador del badge
+                    actualizarContadorResenias();
+
+                    // Limpiar y resetear el formulario
+                    limpiarFormulario();
+
+                    // Mostrar mensaje de éxito
+                    mostrarMensajeExito('¡Reseña agregada exitosamente!');
+
+                    // Re-inicializar el formulario para que las estrellas funcionen
+                    setTimeout(() => {
+                        inicializarFormularioResenia();
+                    }, 100);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarMensajeError('Error al enviar la reseña. Por favor, inténtalo nuevamente.');
+                })
+                .finally(() => {
+                    // Restaurar botón
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                    formSubmitted = false;
+                });
+        }
+        function actualizarContadorResenias() {
+            const reseniaItems = document.querySelectorAll('.resenia-item');
+            const badgeElement = document.querySelector('.col-md-6:last-child .badge span');
+
+            if (badgeElement) {
+                const count = reseniaItems.length;
+                badgeElement.textContent = `${count} reseñas`;
+            }
+        }
+
+        // Función para eliminar reseña (agregar esta si no la tienes)
+        function eliminarResenia(reseniaId, autoparteId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta reseña?')) {
+                return;
+            }
+
+            // Animar la reseña que se va a eliminar
+            const reseniaElement = document.querySelector(`.resenia-item:has(button[onclick*="${reseniaId}"])`);
+            if (reseniaElement) {
+                reseniaElement.style.opacity = '0.5';
+                reseniaElement.style.transform = 'translateX(-20px)';
+            }
+
+            fetch(`/Catalogo/EliminarResenia/${reseniaId}?aut_id=${autoparteId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Animar la eliminación
+                        if (reseniaElement) {
+                            reseniaElement.style.transition = 'all 0.3s ease';
+                            reseniaElement.style.transform = 'translateX(-100%)';
+                            reseniaElement.style.opacity = '0';
+
+                            setTimeout(() => {
+                                reseniaElement.remove();
+
+                                // Actualizar contador
+                                actualizarContadorResenias();
+
+                                // Verificar si no quedan reseñas
+                                const remainingResenias = document.querySelectorAll('.resenia-item');
+                                if (remainingResenias.length === 0) {
+                                    mostrarMensajeSinResenias();
+                                }
+                            }, 300);
+                        }
+
+                        mostrarMensajeExito('Reseña eliminada correctamente.');
+                    } else {
+                        mostrarMensajeError(data.message || 'Error al eliminar la reseña.');
+
+                        // Restaurar la apariencia de la reseña
+                        if (reseniaElement) {
+                            reseniaElement.style.opacity = '1';
+                            reseniaElement.style.transform = 'translateX(0)';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarMensajeError('Error al eliminar la reseña.');
+
+                    // Restaurar la apariencia de la reseña
+                    if (reseniaElement) {
+                        reseniaElement.style.opacity = '1';
+                        reseniaElement.style.transform = 'translateX(0)';
+                    }
+                });
+        }
+
+        function mostrarMensajeSinResenias() {
+            const reseniasList = document.getElementById('reseniasList');
+            if (reseniasList) {
+                reseniasList.innerHTML = `
+            <div class="text-center py-5" id="noComments"
+                style="background-color: #f9f9f9; border-radius: 12px; padding: 40px 20px;">
+                <i class="far fa-comment-dots fa-4x mb-3" style="color: #E42229;"></i>
+                <h5 style="color: #000000; font-weight: 600;">No hay comentarios todavía</h5>
+                <p class="text-muted mt-2" style="color: #626C66;">¡Sé el primero en compartir tu experiencia!</p>
+            </div>
+        `;
+            }
+        }
+
+        // Función para limpiar el formulario
+        function limpiarFormulario() {
+            // Resetear estrellas
+            valoracionSeleccionada = 0;
+            resetStars();
+
+            // Limpiar campos
+            const valoracionInput = document.getElementById('valoracionInput');
+            const comentarioInput = document.getElementById('res_comentario');
+            const gustoSi = document.getElementById('gustoSi');
+
+            if (valoracionInput) valoracionInput.value = '0';
+            if (comentarioInput) comentarioInput.value = '';
+            if (gustoSi) gustoSi.checked = true;
+
+            // Ocultar errores
+            const errores = document.querySelectorAll('.invalid-feedback');
+            errores.forEach(error => error.style.display = 'none');
+
+            // Quitar clases de validación
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => input.classList.remove('is-invalid'));
+        }
+
+        function mostrarMensajeExito(mensaje) {
+            // Crear toast de éxito
+            const toast = document.createElement('div');
+            toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>${mensaje}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            // Eliminar el toast del DOM después de que se oculte
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function mostrarMensajeError(mensaje) {
+            // Crear toast de error
+            const toast = document.createElement('div');
+            toast.className = 'toast align-items-center text-white bg-danger border-0 position-fixed';
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-exclamation-triangle me-2"></i>${mensaje}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            // Eliminar el toast del DOM después de que se oculte
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Función para mostrar toast genérico (para compatibilidad con el código existente)
+        function mostrarToast() {
+            mostrarMensajeExito('Producto añadido al carrito exitosamente!');
+        }
+
+        // Función para actualizar sidebar del carrito (placeholder)
+        function actualizarSidebarCarrito() {
+            // Esta función debería implementarse según tu sistema de carrito
+            console.log('Actualizando sidebar del carrito...');
+        }
+
+        // Función para mostrar sidebar del carrito (placeholder)
+        function mostrarSidebarCarrito() {
+            // Esta función debería implementarse según tu sistema de carrito
+            console.log('Mostrando sidebar del carrito...');
+        }             
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

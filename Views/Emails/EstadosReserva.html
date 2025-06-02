@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Incluir Font Awesome para los iconos -->
+
+    <style>
+      body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f8f8;
+        text-align: center;
+        color: #333333;
+        line-height: 1.6;
+      }
+
+      .email-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .email-header {
+        background-color: #000000;
+        padding: 25px;
+        text-align: center;
+      }
+
+      .email-header img {
+        max-width: 180px;
+        height: auto;
+      }
+
+      .email-body {
+        padding: 35px 30px;
+        color: #333333;
+        text-align: left;
+      }
+
+      .email-body h1 {
+        color: #000000;
+        font-size: 28px;
+        margin-top: 0;
+        margin-bottom: 25px;
+        text-align: center;
+        font-weight: 700;
+      }
+
+      .greeting {
+        margin-bottom: 25px;
+        font-size: 16px;
+      }
+
+      .estado-texto {
+        font-weight: 700;
+        font-size: 24px;
+        margin: 30px 0 15px;
+        color: #2eb85c;
+        text-align: center;
+      }
+
+      .reserva-detalle {
+        margin: 30px 0;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .reserva-detalle p {
+        margin: 10px 0;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+      }
+
+      .reserva-detalle strong {
+        min-width: 80px;
+        display: inline-block;
+        color: #555555;
+      }
+
+      .status-container {
+        margin: 30px auto;
+      }
+
+      .status-table {
+        margin: 20px auto;
+        text-align: center;
+        border-spacing: 30px 15px;
+      }
+
+      .status-step {
+        padding: 15px;
+        text-align: center;
+        font-weight: 500;
+        color: #555555;
+      }
+
+      .status-icon {
+        font-size: 36px;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .icon-pending {
+        color: #ffc107;
+      }
+
+      .icon-confirmed {
+        color: #28a745;
+      }
+
+      .email-footer {
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 20px;
+        font-size: 14px;
+        color: #777777;
+      }
+
+      .button {
+        display: inline-block;
+        padding: 12px 30px;
+        margin-top: 25px;
+        background-color: #e42229;
+        color: #ffffff !important;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 16px;
+        text-align: center;
+        transition: background-color 0.2s ease;
+      }
+
+      .button:hover {
+        background-color: #d01b22;
+      }
+
+      .instructions {
+        margin: 30px 0 20px;
+        text-align: center;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <img src="{{LogoUrl}}" alt="Marimon Logo" />
+      </div>
+      <div class="email-body">
+        <h1>Actualización de tu reserva</h1>
+        <p class="greeting">Hola {{UserName}},</p>
+        <!-- Se eliminó la línea de {{MensajeCambio}} -->
+
+        <h2 class="estado-texto" style="{{ClaseEstadoTexto}}">{{Estado}}</h2>
+        <p>{{MensajeEstado}}</p>
+
+        <div class="reserva-detalle">
+          <p><strong>Fecha:</strong> {{FechaReserva}}</p>
+          <p><strong>Hora:</strong> {{HoraReserva}}</p>
+          <p><strong>Servicio:</strong> {{Servicio}}</p>
+        </div>
+
+        <div class="status-container">
+          <table class="status-table" cellpadding="0" cellspacing="0">
+            <tr>
+              <td class="status-step" style="{{StylePendiente}}">
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fpedido.png?alt=media&token=5ee9139d-4292-4e9e-9cec-b81e6a187efa"
+                  alt="Pendiente"
+                  width="36"
+                  height="36"
+                  style="display: block; margin: 0 auto 10px"
+                />
+                Pendiente
+              </td>
+              <td class="status-step" style="{{StyleConfirmado}}">
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2FPedidos%2Fentrega.png?alt=media&token=82dd484b-d894-46b0-82f0-550398fe144f"
+                  alt="Confirmado"
+                  width="36"
+                  height="36"
+                  style="display: block; margin: 0 auto 10px"
+                />
+                Confirmado
+              </td>
+              {{ColCancelado}}
+            </tr>
+          </table>
+        </div>
+
+        <p class="instructions">
+          Para revisar el historial de tus reservas accede a tu cuenta:
+        </p>
+        <div style="text-align: center">
+          <a href="{{CallbackUrl}}" class="button">Ver mis reservas</a>
+        </div>
+      </div>
+      <div class="email-footer">
+        <p>Marimon © 2025. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </body>
+</html>

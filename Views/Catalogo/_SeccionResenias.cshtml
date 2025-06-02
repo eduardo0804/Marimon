@@ -1,0 +1,82 @@
+@model List<Marimon.ViewModel.ReseniaViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    var currentUserId = UserManager.GetUserId(User);
+    
+}
+
+@* SOLO las reseñas, sin contenedores *@
+@if (Model != null && Model.Any())
+{
+    foreach (var resenia in Model)
+    {
+        <div class="resenia-item mb-4 p-4 border-bottom"
+             style="border-radius: 12px; background-color: #f9f9f9; border: none !important; transition: transform 0.2s ease-in-out; opacity: 1;">
+            <div class="d-flex align-items-center mb-3">
+                <div class="me-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 50px; height: 50px; background: linear-gradient(135deg, #E42229, #D42025); color: white;">
+                        <i class="fas fa-user-circle fa-2x"></i>
+                    </div>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-0 fw-bold" style="color: #000000; font-size: 1.1rem;">
+                        @resenia.usuario_nombre
+                    </h6>
+                    <div class="d-flex align-items-center">
+                        <div class="rating-stars me-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= resenia.res_puntuacion ? "fas" : "far") fa-star"
+                                   style="color: @(i <= resenia.res_puntuacion ? "#E42229" : "#dddddd");"></i>
+                            }
+                        </div>
+                        <small style="color: #626C66;">@resenia.res_fecha.ToString("dd/MM/yyyy")</small>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 ps-2" style="border-left: 3px solid #E42229; padding-left: 15px;">
+                <p class="mb-3" style="color: #000000; line-height: 1.6;">
+                    @resenia.res_comentario
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge"
+                          style="background-color: @(resenia.res_gusto == "Si" ? "#E42229" : "#626C66"); 
+                                 padding: 6px 12px; font-size: 0.85rem; border-radius: 30px;">
+                        @if (resenia.res_gusto == "Si")
+                        {
+                            <i class="fas fa-thumbs-up me-1"></i>
+                            <span>Me gustó</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-thumbs-down me-1"></i>
+                            <span>No me gustó</span>
+                        }
+                    </span>
+                    
+                    @* Botón de eliminar en la misma fila que "Me gustó" *@
+                    @if (currentUserId == resenia.usuario_id)
+                    {
+                        <button class="btn btn-sm" 
+                                onclick="mostrarModalConfirmacion(@resenia.res_id, @resenia.AutoparteId)"
+                                style="border: none; background: transparent; color: #dc3545; padding: 5px 8px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="text-center py-5" id="noComments"
+         style="background-color: #f9f9f9; border-radius: 12px; padding: 40px 20px;">
+        <i class="far fa-comment-dots fa-4x mb-3" style="color: #E42229;"></i>
+        <h5 style="color: #000000; font-weight: 600;">No hay comentarios todavía</h5>
+        <p class="text-muted mt-2" style="color: #626C66;">¡Sé el primero en compartir tu experiencia!</p>
+    </div>
+}

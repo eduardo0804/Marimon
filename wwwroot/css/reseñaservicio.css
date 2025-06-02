@@ -1,0 +1,62 @@
+#reseniasList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#reseniasList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#reseniasList::-webkit-scrollbar-thumb {
+    background: #E42229;
+    border-radius: 10px;
+    color: white;
+}
+
+#reseniasList::-webkit-scrollbar-thumb:hover {
+    background: #D42025;
+}
+
+/* Efecto hover para las reseñas */
+.resenia-item {
+    opacity: 0.9;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.resenia-item:hover {
+    opacity: 1;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Efecto hover para el botón de enviar */
+#submitResenia:hover {
+    background-color: #D42025 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(228, 34, 41, 0.3);
+}
+
+/* Efecto para los inputs al enfocar */
+.form-control:focus {
+    border-color: #E42229;
+    box-shadow: 0 0 0 0.25rem rgba(228, 34, 41, 0.25);
+}
+
+/* Animación para el botón eliminar */
+.eliminar-resenia:hover {
+    background-color: #E42229 !important;
+    color: white !important;
+    border-color: #E42229 !important;
+}
+
+/* Estilo para los radio buttons */
+.form-check-input:checked {
+    background-color: #E42229;
+    border-color: #E42229;
+}
+
+/* Animación para las estrellas */
+.star:hover {
+    transform: scale(1.2);
+}

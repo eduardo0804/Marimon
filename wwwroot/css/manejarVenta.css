@@ -1,0 +1,1041 @@
+:root {
+    --primary-color: #e50914;          /* Rojo brillante */
+    --primary-dark: #b30710;           /* Rojo oscuro para hover */
+    --secondary-color: #141414;        /* Negro para elementos secundarios */
+    --light-color: #f5f5f5;            /* Blanco ligeramente grisáceo */
+    --pure-white: #ffffff;             /* Blanco puro */
+    --dark-gray: #333333;              /* Gris oscuro para textos */
+    --mid-gray: #8c8c8c;               /* Gris medio para elementos secundarios */
+    --light-gray: #e6e6e6;             /* Gris claro para bordes y separadores */
+    
+    /* Colores de estado */
+    --pendiente-color: #ffbe0b;        /* Amarillo para pendiente */
+    --pendiente-bg: rgba(255, 190, 11, 0.15);
+    --completado-color: #3cb371;       /* Verde para completado */
+    --completado-bg: rgba(60, 179, 113, 0.15);
+    --cancelado-color: #e50914;        /* Rojo para cancelado */
+    --cancelado-bg: rgba(229, 9, 20, 0.15);
+    --confirmada-color: #2196f3;       /* Azul para confirmada */
+    --confirmada-bg: rgba(33, 150, 243, 0.15);
+    
+    /* Variables de diseño */
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.filter-body {
+    padding: 1rem 1.5rem !important; /* Reducir padding */
+}
+
+.filter-body h6 {
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 0.8rem; /* Reducir margen */
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.status-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* Reducir gap entre elementos */
+}
+
+.status-filter {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px; /* Reducir padding vertical y horizontal */
+    border-radius: 16px; /* Menos redondeado */
+    text-decoration: none;
+    color: var(--dark-gray);
+    transition: var(--transition);
+    border: 1px solid transparent;
+    background-color: #f8f9fa;
+    position: relative;
+    max-width: 100%; /* Limitar ancho máximo */
+}
+
+.status-filter:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    color: var(--dark-gray);
+}
+
+/* Estado activo - fondo rosado como en la imagen */
+.status-filter.active,
+.status-filter.bg-light.border-primary {
+    background-color: #fce4ec;
+    border-color: transparent;
+    color: var(--dark-gray);
+}
+
+.status-filter .status-icon {
+    width: 28px; /* Reducido de 36px a 28px */
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px; /* Reducir margen */
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+/* Colores específicos para cada icono */
+.status-filter .status-icon.bg-secondary {
+    background-color: #6c757d;
+}
+
+.status-filter .status-icon.bg-success {
+    background-color: var(--completado-color); /* Verde para "Completada" */
+}
+
+.status-filter .status-icon.bg-danger {
+    background-color: var(--cancelado-color); /* Rojo para "Cancelada" */
+}
+
+.status-filter .status-icon.bg-warning {
+    background-color: var(--pendiente-color); /* Amarillo para "Pendiente" */
+}
+
+.status-filter .status-icon.bg-info {
+    background-color: var(--confirmada-color); /* Azul para "Confirmada" */
+}
+
+/* Texto del estado */
+.status-filter .status-label {
+    flex-grow: 1;
+    font-weight: 500;
+    font-size: 0.85rem; /* Reducir tamaño de fuente */
+    color: var(--dark-gray);
+}
+
+/* Badge con el número - más pequeño */
+.status-filter .status-badge {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+    padding: 4px 8px; /* Reducir padding */
+    border-radius: 12px; /* Menos redondeado */
+    font-size: 0.75rem; /* Reducir tamaño de fuente */
+    font-weight: 700;
+    min-width: 24px; /* Reducir ancho mínimo */
+    text-align: center;
+    margin-left: auto;
+}
+
+/* Badge para estado no activo */
+.status-filter:not(.active) .status-badge {
+    background-color: #e9ecef;
+    color: var(--dark-gray);
+}
+
+/* Badge para estado activo - mantener rojo */
+.status-filter.active .status-badge,
+.status-filter.bg-light.border-primary .status-badge {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+}
+
+.status-filter.active .status-badge,
+.status-filter.bg-light.border-primary .status-badge {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+}
+
+/* Efectos hover mejorados */
+.status-filter:hover .status-icon {
+    transform: scale(1.05);
+}
+
+/* Asegurar que el layout sea más compacto */
+.status-filters .status-filter {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: auto; /* Permitir altura automática */
+}
+/* Estilos para el panel de filtros */
+.filter-panel {
+    background-color: var(--pure-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow);
+    height: 100%;
+    transition: var(--transition);
+    overflow: hidden;
+    border: none;
+    margin-bottom: 1.5rem;
+}
+
+.filter-panel:hover {
+    box-shadow: var(--box-shadow-hover);
+}
+
+.filter-panel h5 {
+    font-weight: 600;
+    color: var(--primary-color);
+    padding: 1.5rem;
+    margin: 0;
+    background: var(--secondary-color);
+    color: var(--pure-white);
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+/* Contenedor de servicios y secciones */
+.services-section, .date-filter {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.services-section p, .date-filter p {
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estilos para checkboxes de servicios */
+.services-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.service-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.form-check-input {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    border: 2px solid var(--mid-gray);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.service-checkbox label {
+    font-weight: 500;
+    color: var(--dark-gray);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.service-checkbox input:checked + label {
+    color: var(--primary-color);
+}
+
+/* Botón "Ver más servicios" */
+.show-more-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-top: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    border: 1px solid rgba(229, 9, 20, 0.2);
+    background-color: rgba(229, 9, 20, 0.05);
+}
+
+.show-more-btn:hover {
+    background-color: rgba(229, 9, 20, 0.1);
+}
+
+.show-more-btn i {
+    margin-left: 6px;
+    transition: var(--transition);
+}
+
+.show-more-btn:hover i {
+    transform: translateY(2px);
+}
+
+/* Animación para expandir servicios */
+.services-container.expanded {
+    animation: expandServices 0.3s ease-out forwards;
+}
+
+@keyframes expandServices {
+    from {
+        opacity: 0.8;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Estilos para las fechas */
+.date-filter label {
+    display: block;
+    font-weight: 500;
+    color: var(--dark-gray);
+    margin-bottom: 0.5rem;
+}
+
+.date-filter .form-control {
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    color: var(--dark-gray);
+    background-color: var(--light-color);
+}
+
+.date-filter .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+    outline: none;
+}
+
+/* Botón para aplicar filtros */
+.filter-btn {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+    font-weight: 600;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    width: 100%;
+    margin: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+
+.filter-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(179, 7, 16, 0.3);
+}
+
+.filter-btn i {
+    margin-right: 8px;
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+}
+
+.toast {
+    background-color: var(--pure-white);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    width: 320px;
+    opacity: 0;
+    transform: translateX(30px);
+    animation: slideIn 0.4s forwards;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.toast-header {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toast-header h6 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.toast-body {
+    padding: 1rem;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--pure-white);
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: var(--transition);
+}
+
+.toast-close:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Estilos para la tabla de servicios */
+.table-container {
+    background-color: var(--pure-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: none;
+    transition: var(--transition);
+}
+
+.table-container:hover {
+    box-shadow: var(--box-shadow-hover);
+}
+
+.table-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--light-gray);
+    background-color: var(--secondary-color);
+    color: var(--pure-white);
+}
+
+.table-header h5 {
+    color: var(--pure-white);
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+/* Barra de búsqueda */
+.search-container {
+    position: relative;
+    max-width: 300px;
+}
+
+.search-container input {
+    border-radius: 25px;
+    padding: 0.7rem 1rem 0.7rem 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--pure-white);
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.search-container input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-container input:focus {
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.3);
+    border-color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.15);
+    outline: none;
+}
+
+.search-container button {
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    padding: 0.5rem;
+}
+
+.search-container button:hover {
+    color: var(--pure-white);
+}
+
+.table-scroll-container {
+    overflow-y: auto;
+    max-height: 600px;
+    flex-grow: 1;
+}
+
+/* Estilo de tabla */
+.services-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: var(--pure-white);
+}
+
+.services-table th {
+    background-color: var(--secondary-color);
+    color: var(--pure-white);
+    padding: 1.2rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    border-bottom: 3px solid var(--primary-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.services-table th:first-child {
+    padding-left: 1.5rem;
+}
+
+.services-table td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--light-gray);
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+.services-table tr {
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.services-table tr:hover {
+    background-color: rgba(245, 245, 245, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Estado vacío */
+.empty-state {
+    padding: 4rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--light-gray);
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+}
+
+.empty-state p {
+    color: var(--mid-gray);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Animaciones */
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Badges de estado modernos */
+.status-badge {
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+    cursor: pointer;
+    min-width: 120px;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+.status-badge:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.status-badge i {
+    font-size: 0.9rem;
+}
+
+.status-pendiente {
+    background-color: var(--pendiente-color);
+    color: #000000;
+}
+
+.status-pendiente:hover {
+    background-color: #ffc827;
+}
+
+.status-completada, .status-completado {
+    background-color: var(--completado-color);
+    color: var(--pure-white);
+}
+
+.status-completada:hover, .status-completado:hover {
+    background-color: #47d384;
+}
+
+.status-cancelada, .status-cancelado {
+    background-color: var(--cancelado-color);
+    color: var(--pure-white);
+}
+
+.status-cancelada:hover, .status-cancelado:hover {
+    background-color: #ff1a24;
+}
+
+.status-confirmada {
+    background-color: var(--confirmada-color);
+    color: var(--pure-white);
+}
+
+.status-confirmada:hover {
+    background-color: #32a8ff;
+}
+.filter-btn,
+button[type="submit"].filter-btn,
+button[onclick="filtrarReservas()"],
+button.btn-primary,
+button[onclick*="filtrar"] {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    transition: var(--transition);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilo específico para coincidir con el botón de la captura */
+[class*="aplicar"],
+button[onclick*="filtrar"],
+button[type="submit"].filter-btn {
+    background-color: #e50914;
+    color: white;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    padding: 0.8rem 1.5rem;
+    width: 100%;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+/* Estilo hover */
+[class*="aplicar"]:hover,
+button[onclick*="filtrar"]:hover,
+button[type="submit"].filter-btn:hover {
+    background-color: #b30710;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(179, 7, 16, 0.3);
+}
+
+/* Estilo específico para el botón con filtro en la imagen */
+button[class*="aplicar"],
+button[onclick="filtrarReservas()"] {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    background-color: #e50914;
+}
+
+/* Estilo para el ícono dentro del botón */
+button[class*="aplicar"] i,
+button[onclick="filtrarReservas()"] i {
+    margin-right: 8px;
+}
+
+/* Sobrescribir estilos específicos para el botón en la imagen */
+.btn-primary,
+button[class*="aplicar filtros"] {
+    border-radius: 4px !important;
+    margin: 0 !important;
+    padding: 0.75rem 0 !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    background-color: #e50914 !important;
+}
+
+/* Sobrescribir cualquier estilo específico que pueda estar afectando al botón */
+#filtrosForm button[type="submit"],
+form button[type="submit"],
+button[onclick*="filtrar"] {
+    width: 100% !important;
+    border-radius: 4px !important;
+    background-color: #e50914 !important;
+    color: white !important;
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Estilo específico para el botón visto en la imagen */
+.col-lg-3 button[class*="aplicar"],
+.filter-panel + button[class*="aplicar"],
+button[class*="filtros"] {
+    width: 100px !important;           /* Cambiado de 100% a 200px */
+    text-align: center !important;
+    background-color: #e50914 !important;
+    color: white !important;
+    border-radius: 4px !important;
+    padding: 0.75rem 0 !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+    margin-left: auto !important;      /* Añadido para centrar */
+    margin-right: auto !important;     /* Añadido para centrar */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Asegurar que cualquier botón con texto "aplicar filtros" tenga este estilo */
+button:contains("Aplicar Filtros"),
+button:contains("APLICAR FILTROS") {
+    width: 100px !important;           /* Cambiado de 100% a 200px */
+    text-align: center !important;
+    background-color: #e50914 !important;
+    color: white !important;
+    border-radius: 4px !important;
+    padding: 0.75rem 0 !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+    margin-left: auto !important;      /* Añadido para centrar */
+    margin-right: auto !important;     /* Añadido para centrar */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+/* Estilos para el modal de cambio de estado */
+.status-modal .modal-content {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.status-modal .modal-header {
+    background-color: var(--secondary-color);
+    color: var(--pure-white);
+    border-bottom: 3px solid var(--primary-color);
+    padding: 1.2rem 1.5rem;
+}
+
+.status-modal .modal-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.status-modal .modal-title:before {
+    content: '\f021';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    margin-right: 10px;
+    color: var(--primary-color);
+}
+
+.status-modal .btn-close {
+    filter: invert(1) brightness(200%); /* Esto convierte la X negra en blanca */
+    opacity: 0.8;
+    transition: var(--transition);
+}
+
+.status-modal .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+.status-modal .modal-body {
+    padding: 1.8rem;
+}
+
+/* Estado actual styling */
+.status-modal #estadoActualText {
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 0.9rem;
+}
+
+/* Contenedor de opciones de estado */
+.status-select-container {
+    margin-top: 1.5rem;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    background-color: var(--light-color);
+}
+
+/* Opciones de estado */
+.status-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: var(--border-radius);
+    border: 2px solid transparent;
+    background-color: var(--pure-white);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.status-option:last-child {
+    margin-bottom: 0;
+}
+
+.status-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.status-option.selected {
+    border-color: currentColor;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Iconos de estado */
+.status-icon {
+    font-size: 1.2rem;
+    margin-right: 12px;
+}
+
+/* Texto de estado */
+.status-text {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Colores específicos para cada estado */
+.status-option-pendiente {
+    color: var(--pendiente-color);
+}
+
+.status-option-confirmada {
+    color: var(--confirmada-color);
+}
+
+.status-option-cancelada {
+    color: var(--cancelado-color);
+}
+
+.status-option-completada {
+    color: var(--completado-color);
+}
+
+/* Ocultar los radio buttons nativos */
+.status-option-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Estilo para el marcador personalizado */
+.status-option:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.status-option.selected:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    margin: 0 5px;
+    background-color: currentColor;
+    border-radius: 50%;
+}
+
+/* Estilos para los botones del footer */
+.status-modal .modal-footer {
+    background-color: var(--light-color);
+    border-top: 1px solid var(--light-gray);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.status-modal .btn-save {
+    background-color: var(--primary-color);
+    color: var(--pure-white);
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--border-radius);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.status-modal .btn-save:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(179, 7, 16, 0.3);
+}
+
+.status-modal .btn-cancel {
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--border-radius);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.status-modal .btn-cancel:hover {
+    background-color: #d4d4d4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Animación de entrada del modal */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+    transform: translateY(-50px);
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+/* Colores de fondo para el estado actual */
+#estadoActualText {
+    font-size: 0.9rem;
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+#estadoActualText:empty {
+    display: none;
+}
+
+/* Color condicional para el estado actual */
+#estadoActualText[data-estado="Pendiente"] {
+    background-color: var(--pendiente-bg);
+    color: var(--pendiente-color);
+}
+
+#estadoActualText[data-estado="Confirmada"] {
+    background-color: var(--confirmada-bg);
+    color: var(--confirmada-color);
+}
+
+#estadoActualText[data-estado="Cancelada"] {
+    background-color: var(--cancelada-bg);
+    color: var(--cancelado-color);
+}
+
+#estadoActualText[data-estado="Completada"] {
+    background-color: var(--completado-bg);
+    color: var(--completado-color);
+}
+
+/* Animación de selección */
+.status-option.selected {
+    animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+/* Media queries para responsive */
+@media (max-width: 992px) {
+    .filter-panel {
+        margin-bottom: 2rem;
+    }
+    
+    .table-scroll-container {
+        max-height: 450px;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-container {
+        max-width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .services-table th, .services-table td {
+        padding: 1rem;
+    }
+    
+    .filter-btn {
+        margin: 1rem;
+    }
+}

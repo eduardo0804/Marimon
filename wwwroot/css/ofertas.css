@@ -1,0 +1,155 @@
+/* Breadcrumb - Quitar estilos de enlaces */
+.breadcrumb-item a {
+    text-decoration: none !important;
+    color: #626C66 !important;
+    border: none !important;
+    outline: none !important;
+}
+
+.breadcrumb-item a:hover {
+    color: #E42229 !important;
+    text-decoration: none !important;
+}
+
+.breadcrumb-item.active {
+    color: #000000 !important;
+}
+
+/* Checkboxes personalizados */
+.form-check-input:checked {
+    background-color: #E42229 !important;
+    border-color: #D42025 !important;
+}
+
+.form-check-input:focus {
+    border-color: #E42229 !important;
+    box-shadow: 0 0 0 0.2rem rgba(228, 34, 41, 0.25) !important;
+}
+
+.form-check-input:checked:focus {
+    box-shadow: 0 0 0 0.2rem rgba(228, 34, 41, 0.25) !important;
+}
+
+/* Botones principales */
+.btn-success {
+    background-color: #E42229 !important;
+    border-color: #D42025 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-success:hover {
+    background-color: #D42025 !important;
+    border-color: #c01d22 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-primary {
+    background-color: #626C66 !important;
+    border-color: #626C66 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-primary:hover {
+    background-color: #4a544e !important;
+    border-color: #4a544e !important;
+    color: #FFFFFF !important;
+}
+
+.btn-danger {
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-danger:hover {
+    background-color: #333333 !important;
+    border-color: #333333 !important;
+    color: #FFFFFF !important;
+}
+
+/* Botón secundario en modales */
+.btn-secondary {
+    background-color: #626C66 !important;
+    border-color: #626C66 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-secondary:hover {
+    background-color: #4a544e !important;
+    border-color: #4a544e !important;
+    color: #FFFFFF !important;
+}
+
+/* Header de la tabla */
+.table-dark {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+}
+
+.table-dark th {
+    border-color: #333333 !important;
+}
+
+/* Badges */
+.badge.bg-success {
+    background-color: #E42229 !important;
+}
+
+.badge.bg-danger {
+    background-color: #000000 !important;
+}
+
+/* Alertas */
+.alert-success {
+    background-color: rgba(228, 34, 41, 0.1) !important;
+    border-color: #E42229 !important;
+    color: #D42025 !important;
+}
+
+.alert-danger {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    border-color: #000000 !important;
+    color: #000000 !important;
+}
+
+.alert-info {
+    background-color: rgba(98, 108, 102, 0.1) !important;
+    border-color: #626C66 !important;
+    color: #626C66 !important;
+}
+
+/* Formularios */
+.form-control:focus {
+    border-color: #E42229 !important;
+    box-shadow: 0 0 0 0.2rem rgba(228, 34, 41, 0.25) !important;
+}
+
+/* Card header */
+.card-header {
+    background-color: #FFFFFF !important;
+    border-bottom: 2px solid #E42229 !important;
+}
+
+.card-title {
+    color: #000000 !important;
+}
+
+/* Enlaces de texto con información */
+.text-success {
+    color: #E42229 !important;
+}
+
+/* Modal header */
+.modal-header {
+    background-color: #FFFFFF !important;
+    border-bottom: 2px solid #E42229 !important;
+}
+
+.modal-title {
+    color: #000000 !important;
+}
+
+/* Icono de advertencia en modal */
+.text-warning {
+    color: #E42229 !important;
+}

@@ -1,0 +1,669 @@
+<style>
+    :root {
+        --primary-red: #E42229;
+        --dark-red: #D42025;
+        --gray-green: #626C66;
+        --light-gray: #f8f9fa;
+        --border-radius: 12px;
+        --shadow: 0 8px 25px rgba(0,0,0,0.15);
+        --gradient: linear-gradient(135deg, #E42229 0%, #D42025 100%);
+    }
+
+    #exampleModal .modal-dialog {
+        max-width: 900px;
+        min-height: 80vh;
+    }
+
+    #exampleModal .modal-content {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        min-height: 80vh;
+    }
+
+    #exampleModal .modal-header {
+        background: var(--gradient);
+        border: none;
+        padding: 1.5rem 2rem;
+        position: relative;
+    }
+
+        #exampleModal .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.2) 100%);
+        }
+
+    #exampleModal .modal-title {
+        font-weight: 600;
+        font-size: 1.4rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+        #exampleModal .modal-title::before {
+            content: '🧠';
+            margin-right: 0.5rem;
+            font-size: 1.2em;
+        }
+
+    #exampleModal .modal-body {
+        padding: 2rem;
+        background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+        min-height: 60vh;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    #exampleModal .container {
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        min-height: 100%;
+    }
+
+    /* Área de subida de archivos mejorada */
+    .upload-drop-zone {
+        border: 2px dashed #E42229;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+        cursor: pointer;
+        position: relative;
+        min-height: 250px;
+        max-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+        .upload-drop-zone:hover {
+            border-color: var(--dark-red);
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(228, 34, 41, 0.15);
+        }
+
+        .upload-drop-zone.dragover {
+            border-color: var(--dark-red);
+            background: linear-gradient(135deg, #fff0f0 0%, #fff5f5 100%);
+            transform: scale(1.02);
+            box-shadow: 0 12px 35px rgba(228, 34, 41, 0.2);
+        }
+
+    .upload-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upload-icon {
+        margin-bottom: 1rem;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+    }
+
+    .upload-drop-zone:hover .upload-icon {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+
+    .upload-title {
+        color: #333;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        margin-top: 0;
+    }
+
+    .upload-subtitle {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .image-preview-hidden {
+        width: 100%;
+        max-height: 250px;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .remove-image-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--primary-red);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 10;
+    }
+
+        .remove-image-btn:hover {
+            background: var(--dark-red);
+            transform: scale(1.1);
+        }
+
+    /* Ocultar el input de archivo original */
+    #imageUpload {
+        display: none;
+    }
+
+    /* Formulario mejorado */
+    #exampleModal .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        #exampleModal .form-label::before {
+            content: '📁';
+            font-size: 1.1em;
+        }
+
+        #exampleModal .form-label:last-of-type::before {
+            content: '💬';
+        }
+
+    #imageUpload {
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        position: relative;
+    }
+
+        #imageUpload:hover {
+            border-color: var(--primary-red);
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(228, 34, 41, 0.1);
+        }
+
+        #imageUpload:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 0.2rem rgba(228, 34, 41, 0.15);
+            outline: none;
+        }
+
+    #commentInput {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        resize: vertical;
+        min-height: 150px;
+        max-height: 200px;
+    }
+
+        #commentInput:hover {
+            border-color: #ccc;
+            background: white;
+        }
+
+        #commentInput:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 0.2rem rgba(228, 34, 41, 0.15);
+            background: white;
+            outline: none;
+        }
+
+        #commentInput::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+    /* Botón de análisis mejorado */
+    #btnIntegration {
+        background: var(--gradient);
+        border: none;
+        border-radius: 8px;
+        padding: 0.9rem 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(228, 34, 41, 0.3);
+    }
+
+        #btnIntegration:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(228, 34, 41, 0.4);
+        }
+
+        #btnIntegration:active {
+            transform: translateY(0);
+        }
+
+        #btnIntegration::before {
+            content: '🔍';
+            margin-right: 0.5rem;
+            font-size: 1.1em;
+        }
+
+        #btnIntegration:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+    /* Loading mejorado */
+    #loadingIndicator {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border: 2px solid #f0f0f0;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+        #loadingIndicator .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+            animation: spin 1s linear infinite;
+        }
+
+        #loadingIndicator p {
+            margin: 1rem 0 0;
+            font-weight: 500;
+            color: #666;
+        }
+
+    /* Resultados mejorados */
+    #resultIntegration {
+        border: none;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        animation: slideIn 0.5s ease-out;
+        min-height: 200px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+        #resultIntegration .card-header {
+            background: linear-gradient(135deg, #626C66 0%, #4a5450 100%);
+            border: none;
+            padding: 1.2rem 1.5rem;
+            position: relative;
+        }
+
+            #resultIntegration .card-header::before {
+                content: '📊';
+                margin-right: 0.5rem;
+                font-size: 1.2em;
+            }
+
+            #resultIntegration .card-header h5 {
+                margin: 0;
+                font-weight: 600;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            }
+
+        #resultIntegration .card-body {
+            padding: 1.5rem;
+            background: white;
+            line-height: 1.7;
+        }
+
+        /* Botón de servicio recomendado */
+        #resultIntegration a.btn {
+            background: var(--gradient);
+            border: none;
+            border-radius: 6px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(228, 34, 41, 0.2);
+        }
+
+            #resultIntegration a.btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(228, 34, 41, 0.3);
+                color: white;
+            }
+
+            #resultIntegration a.btn::before {
+                content: '🔗';
+                font-size: 1em;
+            }
+
+    /* Footer mejorado */
+    #exampleModal .modal-footer {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        padding: 1.2rem 2rem;
+        position: sticky;
+        bottom: 0;
+    }
+
+        #exampleModal .modal-footer .btn {
+            border-radius: 6px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            #exampleModal .modal-footer .btn:hover {
+                transform: translateY(-1px);
+            }
+
+    /* Alertas mejoradas */
+    .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+
+</style>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #E42229; color: #FFFFFF;">
+                <h5 class="modal-title" id="exampleModalLabel">Análisis con Inteligencia Artificial</h5>
+                <button type="button" class="btn-close d-none" data-bs-dismiss="modal" aria-label="Close" id="closeModalButton" style="background-color: #FFFFFF;"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container py-2">
+                    <p class="mb-2" style="font-weight: 500; color: #333; text-align: center; font-size: 1.1rem;">Sube una imagen o escribe un comentario para analizar con IA.</p>
+
+                    <!-- Alerta de validación -->
+                    <div id="validationAlert" class="alert alert-danger mb-3" style="display: none;">
+                        Por favor, completa al menos un campo (imagen o comentario) para realizar el análisis.
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3 text-center">
+                            <div id="uploadDropZone" class="upload-drop-zone" onclick="document.getElementById('imageUpload').click()">
+                                <div id="uploadPlaceholder" class="upload-placeholder">
+                                    <div class="upload-icon">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#E42229" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17,8 12,3 7,8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                    </div>
+                                    <h6 class="upload-title">Sube tu imagen</h6>
+                                    <p class="upload-subtitle">JPG, JPEG, PNG (Máx 5MB)</p>
+                                </div>
+                                <img src="/img/placeholder-image.png" alt="Imagen a analizar" id="imagePreview" class="image-preview-hidden" style="display: none;">
+                                <button type="button" id="removeImageBtn" class="remove-image-btn" style="display: none;" onclick="event.stopPropagation(); removeSelectedImage();">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <form id="analysisForm" enctype="multipart/form-data">
+                                <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;">
+
+                                <div class="mb-3">
+                                    <label for="commentInput" class="form-label">Comentario (opcional):</label>
+                                    <textarea class="form-control" id="commentInput" name="comment" rows="5" placeholder="Escribe tu comentario aquí..."></textarea>
+                                </div>
+
+                                <button type="button" class="btn w-100 mb-3" id="btnIntegration" style="background-color: #D42025; color: #FFFFFF;">Analizar</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Resultados del análisis -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div id="loadingIndicator" class="text-center" style="display:none;">
+                                <div class="spinner-border" role="status" style="color: #E42229;">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p class="mt-2">Analizando con IA...</p>
+                            </div>
+                            <div id="resultIntegration" class="card" style="display:none;">
+                                <div class="card-header" style="background-color: #626C66; color: #FFFFFF;">
+                                    <h5 class="mb-0">Resultados del análisis</h5>
+                                </div>
+                                <div class="card-body" id="resultContent">
+                                    <!-- Contenido del análisis se insertará aquí -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal" style="color: #FFFFFF;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    <!-- Solo muestro la parte del JavaScript que necesitas modificar -->
+    <script>
+        // Función para hacer scroll suave hacia los resultados
+        function scrollToResults() {
+            const resultSection = document.getElementById('resultIntegration');
+            const loadingSection = document.getElementById('loadingIndicator');
+
+            // Scroll hacia el loading primero, luego hacia resultados cuando aparezcan
+            if (loadingSection.style.display !== 'none') {
+                loadingSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                    inline: 'nearest'
+                });
+            }
+        }
+
+        // Función para scroll hacia resultados finales
+        function scrollToFinalResults() {
+            const resultSection = document.getElementById('resultIntegration');
+            if (resultSection.style.display !== 'none') {
+                // Pequeño delay para asegurar que el contenido se haya renderizado
+                setTimeout(() => {
+                    resultSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }, 100);
+            }
+        }
+
+        // Manejo de drag and drop (mantén tu código original)
+        const uploadDropZone = document.getElementById('uploadDropZone');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const imagePreview = document.getElementById('imagePreview');
+        const removeImageBtn = document.getElementById('removeImageBtn');
+
+        // Eventos de drag and drop (mantén tu código original)
+        uploadDropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadDropZone.classList.add('dragover');
+        });
+
+        uploadDropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadDropZone.classList.remove('dragover');
+        });
+
+        uploadDropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadDropZone.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    handleImageUpload(file);
+                }
+            }
+        });
+
+        // Previsualización de la imagen (mantén tu código original)
+        document.getElementById("imageUpload").addEventListener("change", function() {
+          const fileInput = this;
+          if (fileInput.files && fileInput.files[0]) {
+            handleImageUpload(fileInput.files[0]);
+          }
+        });
+
+        function handleImageUpload(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                uploadPlaceholder.style.display = 'none';
+                imagePreview.style.display = 'block';
+                removeImageBtn.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeSelectedImage() {
+            document.getElementById('imageUpload').value = '';
+            imagePreview.src = '/img/placeholder-image.png';
+            imagePreview.style.display = 'none';
+            uploadPlaceholder.style.display = 'flex';
+            removeImageBtn.style.display = 'none';
+        }
+
+        // Limpiar al cerrar el modal (mantén tu código original)
+        function resetModal() {
+            removeSelectedImage();
+            document.getElementById('commentInput').value = '';
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('resultIntegration').style.display = 'none';
+            document.getElementById('validationAlert').style.display = 'none';
+        }
+
+        // Eventos para cerrar el modal (mantén tu código original)
+        document.getElementById('closeModalButton').addEventListener('click', resetModal);
+        document.getElementById('exampleModal').addEventListener('hidden.bs.modal', resetModal);
+        document.querySelector('.modal-footer .btn').addEventListener('click', resetModal);
+
+        // *** CÓDIGO MODIFICADO: Envío del formulario con scroll automático ***
+        document.getElementById("btnIntegration").addEventListener("click", function() {
+            const fileInput = document.getElementById("imageUpload");
+            const commentInput = document.getElementById("commentInput").value.trim();
+
+            // Validación: al menos un campo debe estar completo
+            if ((!fileInput.files || fileInput.files.length === 0) && commentInput === "") {
+                const validationAlert = document.getElementById("validationAlert");
+                validationAlert.style.display = "block";
+
+                // Scroll hacia la alerta de validación
+                validationAlert.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
+
+                // Ocultar la alerta después de 5 segundos
+                setTimeout(() => {
+                    validationAlert.style.display = "none";
+                }, 5000);
+                return;
+            }
+
+            const formData = new FormData();
+
+            // Agregar imagen si existe
+            if (fileInput.files && fileInput.files[0]) {
+                formData.append("image", fileInput.files[0]);
+            }
+
+            // Agregar comentario si existe
+            if (commentInput !== "") {
+                formData.append("comment", commentInput);
+            }
+
+            // Mostrar loading y hacer scroll hacia él
+            document.getElementById("loadingIndicator").style.display = "block";
+            document.getElementById("resultIntegration").style.display = "none";
+            document.getElementById("validationAlert").style.display = "none";
+
+            // *** NUEVO: Scroll automático hacia la sección de loading ***
+            scrollToResults();
+
+            fetch("/Servicios/AnalyzeContent", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("loadingIndicator").style.display = "none";
+                document.getElementById("resultIntegration").style.display = "block";
+
+                if (data.success === false) {
+                    document.getElementById("resultContent").innerHTML = `<div class="alert alert-danger">${data.result}</div>`;
+                } else {
+                    document.getElementById("resultContent").innerHTML = data.result;
+                    if (data.url) {
+                        document.getElementById("resultContent").innerHTML += `
+                            <div class="mt-3 text-center">
+                                <a href="${data.url}" class="btn mt-2" style="background-color: #E42229; color: #FFFFFF;">Ir al servicio recomendado</a>
+                            </div>
+                        `;
+                    }
+                }
+
+                // *** NUEVO: Scroll automático hacia los resultados finales ***
+                scrollToFinalResults();
+            })
+            .catch(error => {
+                document.getElementById("loadingIndicator").style.display = "none";
+                document.getElementById("resultIntegration").style.display = "block";
+                document.getElementById("resultContent").innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+
+                // *** NUEVO: Scroll hacia error también ***
+                scrollToFinalResults();
+            });
+        });
+    </script>
+</div>

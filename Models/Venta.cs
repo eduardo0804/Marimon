@@ -35,5 +35,7 @@ namespace Marimon.Models
         public decimal AutoPartePrecio { get; internal set; }
         [NotMapped]
         public int Cantidad { get; internal set; }
+
+        public string? CodigoDescuento { get; set; } // Nuevo campo para el código de descuento
     }
 }
