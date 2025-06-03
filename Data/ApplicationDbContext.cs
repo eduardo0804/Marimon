@@ -107,4 +107,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Oferta> Ofertas { get; set; }
     public DbSet<CodigoDescuento> CodigosDescuento { get; set; }
     public DbSet<Favoritos> Favoritos { get; set; }
+    public DbSet<Encuesta> Encuestas { get; set; }
+
 }

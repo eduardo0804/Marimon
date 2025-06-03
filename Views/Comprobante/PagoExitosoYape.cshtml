@@ -93,9 +93,13 @@
                 </div>
             </div>
         </div>
+        <input type="hidden" name="user-name-hidden" value="@(ViewBag.FullName ?? "")" />
+        <input type="hidden" name="user-email-hidden" value="@(ViewBag.UserEmail ?? "")" />
+        <input type="hidden" name="user-id-hidden" value="@(ViewBag.UserId ?? "")" />
+        @Html.AntiForgeryToken()
+        @await Html.PartialAsync("EncuestaPartialView")
     </div>
-    <input type="hidden" name="user-name-hidden" value="@(ViewBag.FullName ?? "")" />
-    <input type="hidden" name="user-email-hidden" value="@(ViewBag.UserEmail ?? "")" />
+
     @await Html.PartialAsync("EncuestaPartialView")
 
     <!-- JS scripts -->

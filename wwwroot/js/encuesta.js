@@ -5,6 +5,27 @@ class EncuestaSatisfaccion {
         this.formData = {};
         this.init();
     }
+    
+    debugUserData() {
+        console.log('🔍 === DEBUGGING DATOS DEL USUARIO ===');
+        console.log('User ID:', $('input[name="user-id-hidden"]').val() || 'NO ENCONTRADO');
+        console.log('User Name:', $('input[name="user-name-hidden"]').val() || 'NO ENCONTRADO');
+        console.log('User Email:', $('input[name="user-email-hidden"]').val() || 'NO ENCONTRADO');
+        console.log('Token:', $('input[name="__RequestVerificationToken"]').val() ? 'SÍ EXISTE' : 'NO ENCONTRADO');
+        
+        // Verificar si los elementos existen en el DOM
+        console.log('=== ELEMENTOS EN DOM ===');
+        console.log('- user-id-hidden elementos:', $('input[name="user-id-hidden"]').length);
+        console.log('- user-name-hidden elementos:', $('input[name="user-name-hidden"]').length);
+        console.log('- user-email-hidden elementos:', $('input[name="user-email-hidden"]').length);
+        console.log('- __RequestVerificationToken elementos:', $('input[name="__RequestVerificationToken"]').length);
+        
+        // Mostrar todos los inputs hidden que existen
+        console.log('=== TODOS LOS INPUTS HIDDEN ===');
+        $('input[type="hidden"]').each(function() {
+            console.log(`- ${$(this).attr('name')}: "${$(this).val()}"`);
+        });
+    }
 
     init() {
         console.log('Inicializando Encuesta de Satisfacción');
@@ -262,47 +283,99 @@ class EncuestaSatisfaccion {
 
         this.saveCurrentStepData();
 
+        // Obtener solo el userId desde los campos ocultos
+        const userId = $('input[name="user-id-hidden"]').val() || '';
+
+        console.log('🔍 Usuario ID capturado:', userId);
+
+        // Validar que tenemos el userId
+        if (!userId) {
+            this.showNotification('Error: No se pudo identificar al usuario. Por favor recarga la página.', 'error');
+            return;
+        }
+
+        // Formatear los datos EXACTAMENTE como espera el modelo Encuesta
+        const formattedData = {
+            usu_id: userId,
+            agrado_sistema: this.formData.agrado_sistema || '',
+            facilidad_pago: this.formData.facilidad_pago || '',
+            nps_score: parseInt(this.formData.nps_score) || 0,
+            comentarios: this.formData.comentarios || ''
+            // No incluir fecha_envio ni encuesta_id (se asignan automáticamente)
+            // No incluir Usuario (es solo para navegación)
+        };
+
+        console.log('📤 Datos formateados para envío:', formattedData);
+
         const submitBtn = $('#submitBtn');
         const originalText = submitBtn.html();
         submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Enviando...').prop('disabled', true);
 
         try {
-            const response = await this.sendSurveyData(this.formData);
+            const response = await this.sendSurveyData(formattedData);
 
             if (response.success) {
                 this.showThankYou();
-                console.log('Encuesta enviada exitosamente');
+                this.showNotification('¡Encuesta enviada exitosamente!', 'success');
+                console.log('✅ Encuesta enviada exitosamente');
             } else {
                 throw new Error(response.message || 'Error al enviar la encuesta');
             }
         } catch (error) {
-            console.error('Error al enviar encuesta:', error);
-            this.showNotification('Error al enviar la encuesta. Por favor intenta nuevamente.', 'error');
+            console.error('❌ Error al enviar encuesta:', error);
+            this.showNotification(error.message || 'Error al enviar la encuesta. Por favor intenta nuevamente.', 'error');
         } finally {
             submitBtn.html(originalText).prop('disabled', false);
         }
     }
-
     async sendSurveyData(data) {
-        // Simular envío AJAX - Reemplazar con tu endpoint real
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('📊 Datos enviados:', data);
-                resolve({ success: true, message: 'Encuesta guardada correctamente' });
-            }, 2000);
-        });
+        try {
+            // Obtener el token antiforgery
+            const token = $('input[name="__RequestVerificationToken"]').val();
 
-        /* Implementación real con AJAX:
-        return $.ajax({
-            url: '/api/encuesta-satisfaccion',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            headers: {
-                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            // Si existe el token, agregarlo a los headers
+            if (token) {
+                headers['RequestVerificationToken'] = token;
             }
-        });
-        */
+
+            console.log('📤 Enviando datos:', data);
+
+            const response = await fetch('/Comprobante/GuardarEncuesta', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
+            }
+
+            const result = await response.json();
+
+            console.log('✅ Respuesta del servidor:', result);
+
+            // Verificar si la respuesta indica éxito
+            if (result.success === false) {
+                // Mostrar errores específicos si están disponibles
+                if (result.errors && result.errors.length > 0) {
+                    console.log('❌ Errores de validación:', result.errors);
+                    const errorMessages = result.errors.join(', ');
+                    throw new Error(`Errores de validación: ${errorMessages}`);
+                }
+                throw new Error(result.message || 'Error desconocido');
+            }
+
+            return { success: true, data: result };
+
+        } catch (error) {
+            console.error('❌ Error al enviar la encuesta:', error);
+            return { success: false, message: error.message };
+        }
     }
 
     showThankYou() {
@@ -347,13 +420,22 @@ class EncuestaSatisfaccion {
     }
 
     showNotification(message, type = 'info') {
+        const iconMap = {
+            'error': 'exclamation-circle',
+            'warning': 'exclamation-triangle',
+            'success': 'check-circle',
+            'info': 'info-circle'
+        };
+
+        const icon = iconMap[type] || 'info-circle';
+
         // Crear notificación toast
         const notification = $(`
-            <div class="survey-notification ${type}">
-                <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            </div>
-        `);
+        <div class="survey-notification ${type}">
+            <i class="fas fa-${icon}"></i>
+            <span>${message}</span>
+        </div>
+    `);
 
         $('body').append(notification);
 
@@ -364,7 +446,7 @@ class EncuestaSatisfaccion {
         setTimeout(() => {
             notification.removeClass('show');
             setTimeout(() => notification.remove(), 300);
-        }, 3000);
+        }, 4000);
     }
 
     isValidEmail(email) {
@@ -425,6 +507,10 @@ const notificationStyles = `
 
 .survey-notification.info {
     border-left: 4px solid #3498db;
+}
+
+.survey-notification.success {
+    border-left: 4px solid #27ae60;
 }
 
 .error-tooltip {
