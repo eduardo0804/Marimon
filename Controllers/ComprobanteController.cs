@@ -1531,66 +1531,46 @@ namespace Marimon.Controllers
         {
             return View("Error!");
         }
+
         [HttpPost]
         public async Task<IActionResult> GuardarEncuesta([FromBody] Encuesta encuesta)
         {
-            // Log de los datos recibidos para debugging
-            _logger.LogInformation($"Datos recibidos: {System.Text.Json.JsonSerializer.Serialize(encuesta)}");
-
-            var identityUser = await _userManager.GetUserAsync(User);
-            if (identityUser == null)
-                return Json(new { success = false, message = "Usuario no autenticado" });
-
-            // Si no viene el usu_id en el objeto, obtenerlo del usuario autenticado
-            if (string.IsNullOrEmpty(encuesta.usu_id))
+            try
             {
+                if (!ModelState.IsValid)
+                {
+                    var errors = ModelState
+                        .Where(x => x.Value.Errors.Count > 0)
+                        .Select(x => x.Value.Errors.First().ErrorMessage)
+                        .ToList();
+
+                    return Json(new { success = false, message = "Datos inválidos", errors });
+                }
+
                 var usuario = await _context.Usuarios
-                    .FirstOrDefaultAsync(u => u.usu_id == identityUser.Id);
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.usu_id == encuesta.usu_id);
 
                 if (usuario == null)
                 {
-                    _logger.LogWarning($"Usuario no encontrado en tabla Usuarios para ID: {identityUser.Id}");
-                    return Json(new { success = false, message = "Usuario no encontrado en el sistema" });
+                    return Json(new { success = false, message = "Usuario no encontrado" });
                 }
 
                 encuesta.usu_id = usuario.usu_id;
-            }
+                encuesta.Usuario = null;
+                encuesta.fecha_envio = DateTime.UtcNow;
 
-            // Asegurar que la fecha de envío esté establecida
-            encuesta.fecha_envio = DateTime.Now;
-
-            // Validar el modelo
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-
-                foreach (var modelError in ModelState)
-                {
-                    if (modelError.Value.Errors.Count > 0)
-                    {
-                        _logger.LogWarning($"Campo '{modelError.Key}': {string.Join(", ", modelError.Value.Errors.Select(e => e.ErrorMessage))}");
-                    }
-                }
-
-                return Json(new { success = false, message = "Datos inválidos", errors = errors });
-            }
-
-            try
-            {
                 _context.Encuestas.Add(encuesta);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Encuesta guardada exitosamente para usuario: {encuesta.usu_id}");
-
-                return Json(new { success = true, mensaje = "Encuesta guardada correctamente." });
+                return Json(new { success = true, message = "Encuesta guardada exitosamente" });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error guardando encuesta para usuario {encuesta.usu_id}: {ex.Message}");
-                return Json(new { success = false, message = "Error interno del servidor", detalle = ex.Message });
+                _logger.LogError(ex, "Error al guardar la encuesta");
+
+                var errorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return Json(new { success = false, message = $"Error: {errorMessage}" });
             }
         }
     }

@@ -19,7 +19,7 @@ namespace Marimon.Models
         [Range(0, 10)]
         public int nps_score { get; set; }
 
-        public DateTime fecha_envio { get; set; } = DateTime.Now;
+        public DateTime fecha_envio { get; set; } = DateTime.UtcNow;
 
         public string? comentarios { get; set; }
 

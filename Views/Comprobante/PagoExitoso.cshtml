@@ -76,12 +76,12 @@
             </div>
         </div>
     </div>
-    <input type="hidden" name="user-name-hidden" value="@(ViewBag.FullName ?? "")" />
-    <input type="hidden" name="user-email-hidden" value="@(ViewBag.UserEmail ?? "")" />
-    <input type="hidden" name="user-id-hidden" value="@(ViewBag.UserId ?? "")" />
-    @Html.AntiForgeryToken()
-    @await Html.PartialAsync("EncuestaPartialView")
 </div>
+<input type="hidden" name="user-name-hidden" value="@(ViewBag.FullName ?? "")" />
+<input type="hidden" name="user-email-hidden" value="@(ViewBag.UserEmail ?? "")" />
+<input type="hidden" name="user-id-hidden" value="@(ViewBag.UserId ?? "")" />
+@Html.AntiForgeryToken()
+@await Html.PartialAsync("EncuestaPartialView")
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
