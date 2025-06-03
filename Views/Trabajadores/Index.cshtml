@@ -1,0 +1,198 @@
+@model List<Marimon.Controllers.UsuarioConRol>
+@{
+    Layout = "_LayoutGerente";
+}
+<link rel="stylesheet" href="~/css/trabajadores.css" asp-append-version="true" />
+
+<ol class="breadcrumb mt-4">
+    <li class="breadcrumb-item">
+        <a asp-area="" asp-controller="Gerente" asp-action="Index">Modulo de Autopartes</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Gestión de Trabajadores</li>
+</ol>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Lista de Trabajadores</h3>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearTrabajador">
+                        <i class="fas fa-plus"></i> Agregar Trabajador
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Correo</th>
+                                        <th>Rol</th>
+                                        <th>Acción Editar</th>
+                                        <th>Acción Eliminar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var usuario in Model)
+                                    {
+                                        <tr>
+                                            <td>@usuario.Id</td>
+                                            <td>@usuario.Email</td>
+                                            <td>
+                                                <span class="badge @(usuario.Rol == "Personal_Servicio" ? "bg-primary" : "bg-success")">
+                                                    @usuario.Rol
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-primary" 
+                                                        onclick="editarUsuario('@usuario.Id', '@usuario.Email', '@usuario.Rol')">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-danger" 
+                                                        onclick="eliminarUsuario('@usuario.Id', '@usuario.Email')">
+                                                    <i class="fas fa-trash"></i> Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            No hay trabajadores registrados en el sistema.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Trabajador -->
+<div class="modal fade" id="modalCrearTrabajador" tabindex="-1" aria-labelledby="modalCrearTrabajadorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCrearTrabajadorLabel">Agregar Trabajador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formCrearTrabajador">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="crearEmail" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="crearEmail" name="Email" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="crearRol" class="form-label">Tipo de Rol <span class="text-danger">*</span></label>
+                        <select class="form-select" id="crearRol" name="Rol" required>
+                            <option value="">Seleccionar rol...</option>
+                            <option value="Personal_Servicio">Personal de Servicio</option>
+                            <option value="Personal_Ventas">Personal de Ventas</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="crearPassword" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="crearPassword" name="Password" required minlength="6">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="crearConfirmPassword" class="form-label">Confirmar Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="crearConfirmPassword" name="ConfirmPassword" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Trabajador -->
+<div class="modal fade" id="modalEditarTrabajador" tabindex="-1" aria-labelledby="modalEditarTrabajadorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarTrabajadorLabel">Editar Trabajador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEditarTrabajador">
+                <div class="modal-body">
+                    <input type="hidden" id="editarId" name="Id">
+                    <div class="mb-3">
+                        <label for="editarEmail" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="editarEmail" name="Email" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editarRol" class="form-label">Tipo de Rol <span class="text-danger">*</span></label>
+                        <select class="form-select" id="editarRol" name="Rol" required>
+                            <option value="">Seleccionar rol...</option>
+                            <option value="Personal_Servicio">Personal de Servicio</option>
+                            <option value="Personal_Ventas">Personal de Ventas</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editarPassword" class="form-label">Nueva Contraseña (opcional)</label>
+                        <input type="password" class="form-control" id="editarPassword" name="Password" minlength="6">
+                        <div class="invalid-feedback"></div>
+                        <small class="form-text text-muted">Deje en blanco si no desea cambiar la contraseña</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editarConfirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="editarConfirmPassword" name="ConfirmPassword">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar Trabajador -->
+<div class="modal fade" id="modalEliminarTrabajador" tabindex="-1" aria-labelledby="modalEliminarTrabajadorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEliminarTrabajadorLabel">Eliminar Trabajador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEliminarTrabajador">
+                <div class="modal-body">
+                    <input type="hidden" id="eliminarId" name="Id">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        ¿Está seguro de que desea eliminar este trabajador?
+                    </div>
+                    <p>Esta acción eliminará permanentemente el trabajador con correo: <strong id="eliminarEmail"></strong></p>
+                    <p class="text-muted">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/trabajadores.js" asp-append-version="true" defer></script>
