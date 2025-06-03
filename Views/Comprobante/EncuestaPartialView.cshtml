@@ -37,7 +37,7 @@
                                 Nombre: <span class="required">*</span>
                             </label>
                             <input type="text" class="form-input" name="nombre" placeholder="Ingresa tu nombre completo"
-                                required value="@(User.Identity.IsAuthenticated? User.Identity.Name : "")">
+                                required value="@(ViewBag.FullName ?? "")">
                         </div>
 
                         <div class="form-group">
@@ -164,7 +164,7 @@
                                     <span><i class="fas fa-smile"></i> Muy probable</span>
                                 </div>
                                 <div class="nps-options">
-                                    @for (int i = 0; i <= 10; i++)
+                                    @for (int i = 1; i <= 10; i++)
                                     {
                                         <label class="nps-option" title="@i puntos">
                                             <input type="radio" name="nps_score" value="@i" required>
@@ -181,8 +181,7 @@
                                 ¿Tienes alguna sugerencia para mejorar?
                             </label>
                             <textarea class="comment-area" name="sugerencias" rows="4"
-                                placeholder="Tus comentarios son muy valiosos para nosotros. Compártenos qué te gustó más o qué podríamos mejorar..."></textarea>
-                            <small class="form-text">Opcional - Pero muy apreciado 😊</small>
+                                placeholder="Tus comentarios son muy valiosos para nosotros. Compártenos qué te gustó más o qué podríamos mejorar. Opcional - Pero muy apreciado 😊"></textarea>
                         </div>
                     </div>
 
@@ -218,18 +217,11 @@
                     </div>
                     <h3>¡Muchas gracias por tu tiempo!</h3>
                     <p>Tu opinión es muy valiosa y nos ayuda a mejorar nuestros servicios continuamente.</p>
-
-                    <div class="discount-offer">
-                        <div class="discount-header">
-                            <i class="fas fa-gift"></i>
-                            <h4>¡Tenemos un regalo para ti!</h4>
-                        </div>
-                        <div class="discount-code">GRACIAS10</div>
-                        <p class="discount-note">
-                            <i class="fas fa-percent"></i>
-                            10% de descuento en tu próxima compra
-                        </p>
-                        <small>Válido por 30 días desde hoy</small>
+                    <div class="thank-you-actions d-flex justify-content-center mt-4">
+                        <button type="button" class="btn-nav btn-submit" id="closeThankYou">
+                            <i class="fas fa-check"></i>
+                            Entendido
+                        </button>
                     </div>
                 </div>
             </div>

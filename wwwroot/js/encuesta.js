@@ -63,9 +63,9 @@ class EncuestaSatisfaccion {
         console.log('Abriendo modal de encuesta');
         $('#surveyModal').addClass('show');
         $('body').css('overflow', 'hidden');
-        
+
         this.resetForm();
-        
+
         setTimeout(() => {
             $('.modal-content').addClass('animate-in');
         }, 100);
@@ -75,7 +75,7 @@ class EncuestaSatisfaccion {
         console.log('Cerrando modal de encuesta');
         $('#surveyModal').removeClass('show');
         $('body').css('overflow', 'auto');
-        
+
         setTimeout(() => {
             this.resetForm();
         }, 300);
@@ -84,25 +84,25 @@ class EncuestaSatisfaccion {
     resetForm() {
         this.currentStep = 1;
         this.formData = {};
-        
+
         $('#satisfactionSurvey')[0].reset();
-        
+
         $('.rating-option, .nps-option').removeClass('selected');
-        
+
         this.showStep(1);
-        
+
         this.clearAllErrors();
-        
+
         $('#surveyThankYou').removeClass('show');
         $('.survey-form').show();
     }
 
     nextStep() {
         console.log(`Avanzando del paso ${this.currentStep}`);
-        
+
         if (this.validateCurrentStep()) {
             this.saveCurrentStepData();
-            
+
             if (this.currentStep < this.totalSteps) {
                 this.currentStep++;
                 this.showStep(this.currentStep);
@@ -113,7 +113,7 @@ class EncuestaSatisfaccion {
 
     prevStep() {
         console.log(`⬅Retrocediendo del paso ${this.currentStep}`);
-        
+
         if (this.currentStep > 1) {
             this.currentStep--;
             this.showStep(this.currentStep);
@@ -123,13 +123,13 @@ class EncuestaSatisfaccion {
 
     showStep(stepNumber) {
         $('.survey-step').removeClass('active');
-        
+
         setTimeout(() => {
             $(`#step${stepNumber}`).addClass('active');
         }, 150);
 
         this.updateNavigationButtons();
-        
+
         $('.modal-content').scrollTop(0);
     }
 
@@ -163,7 +163,7 @@ class EncuestaSatisfaccion {
 
     validateCurrentStep() {
         console.log(`Validando paso ${this.currentStep}`);
-        
+
         const currentStepElement = $(`#step${this.currentStep}`);
         const requiredFields = currentStepElement.find('[required]');
         let isValid = true;
@@ -172,11 +172,11 @@ class EncuestaSatisfaccion {
 
         requiredFields.each((index, field) => {
             const $field = $(field);
-            
+
             if (field.type === 'radio') {
                 const groupName = field.name;
                 const isGroupValid = currentStepElement.find(`input[name="${groupName}"]:checked`).length > 0;
-                
+
                 if (!isGroupValid) {
                     isValid = false;
                     this.showFieldError($field.closest('.form-group'), 'Por favor selecciona una opción');
@@ -207,7 +207,7 @@ class EncuestaSatisfaccion {
 
         inputs.each((index, input) => {
             const $input = $(input);
-            
+
             if (input.type === 'radio') {
                 if (input.checked) {
                     this.formData[input.name] = input.value;
@@ -223,39 +223,39 @@ class EncuestaSatisfaccion {
     selectRatingOption(option) {
         const $option = $(option);
         const groupName = $option.find('input[type="radio"]').attr('name');
-        
+
         // Remover selección anterior del grupo
         $(`.rating-option input[name="${groupName}"]`).closest('.rating-option').removeClass('selected');
-        
+
         // Seleccionar opción actual
         $option.addClass('selected');
         $option.find('input[type="radio"]').prop('checked', true);
-        
+
         // Limpiar error si existe
         this.clearFieldError($option.closest('.form-group'));
-        
+
         console.log(`⭐ Seleccionado ${groupName}: ${$option.find('input').val()}`);
     }
 
     selectNpsOption(option) {
         const $option = $(option);
-        
+
         // Remover selección anterior
         $('.nps-option').removeClass('selected');
-        
+
         // Seleccionar opción actual
         $option.addClass('selected');
         $option.find('input[type="radio"]').prop('checked', true);
-        
+
         // Limpiar error si existe
         this.clearFieldError($option.closest('.form-group'));
-        
+
         console.log(`📊 NPS seleccionado: ${$option.find('input').val()}`);
     }
 
     async submitSurvey() {
         console.log('📤 Enviando encuesta');
-        
+
         if (!this.validateCurrentStep()) {
             return;
         }
@@ -268,7 +268,7 @@ class EncuestaSatisfaccion {
 
         try {
             const response = await this.sendSurveyData(this.formData);
-            
+
             if (response.success) {
                 this.showThankYou();
                 console.log('Encuesta enviada exitosamente');
@@ -308,12 +308,6 @@ class EncuestaSatisfaccion {
     showThankYou() {
         $('.survey-form').hide();
         $('#surveyThankYou').addClass('show');
-        
-        // Cerrar modal automáticamente después de 5 segundos
-        setTimeout(() => {
-            this.closeModal();
-        }, 5000);
-        
         // Confetti celebration
         if (typeof confetti !== 'undefined') {
             confetti({
@@ -327,13 +321,13 @@ class EncuestaSatisfaccion {
 
     showFieldError(element, message) {
         const $element = $(element);
-        
+
         if ($element.hasClass('form-group')) {
             $element.addClass('invalid-group');
         } else {
             $element.addClass('invalid');
         }
-        
+
         // Mostrar tooltip de error si no existe
         if (!$element.find('.error-tooltip').length) {
             $element.append(`<div class="error-tooltip">${message}</div>`);
@@ -362,7 +356,7 @@ class EncuestaSatisfaccion {
         `);
 
         $('body').append(notification);
-        
+
         setTimeout(() => {
             notification.addClass('show');
         }, 100);
@@ -387,9 +381,15 @@ class EncuestaSatisfaccion {
 }
 
 // Inicializar cuando el DOM esté listo
-$(document).ready(function() {
+$(document).ready(function () {
     console.log('DOM listo - Inicializando encuesta');
     window.encuestaSatisfaccion = new EncuestaSatisfaccion();
+});
+$(document).on('click', '#closeThankYou', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('🔘 Cerrando modal desde mensaje de agradecimiento');
+    this.closeModal();
 });
 
 const notificationStyles = `

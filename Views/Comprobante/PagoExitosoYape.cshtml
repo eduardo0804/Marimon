@@ -94,13 +94,14 @@
             </div>
         </div>
     </div>
-
+    <input type="hidden" name="user-name-hidden" value="@(ViewBag.FullName ?? "")" />
+    <input type="hidden" name="user-email-hidden" value="@(ViewBag.UserEmail ?? "")" />
     @await Html.PartialAsync("EncuestaPartialView")
 
     <!-- JS scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-        <script src="~/js/encuesta.js" asp-append-version="true"></script>
+    <script src="~/js/encuesta.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
             console.log('=== DOCUMENTO LISTO ===');
@@ -168,12 +169,6 @@
                     });
                 }
             );
-
-            setTimeout(function() {
-                if (window.encuestaSatisfaccion) {
-                    window.encuestaSatisfaccion.mostrar();
-                }
-            }, 8000);
         });
     </script>
 </body>
