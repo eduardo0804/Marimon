@@ -1,7 +1,37 @@
 @{
     Layout = "_LayoutGerente";
+    ViewData["Title"] = "Módulo de Gerencia - Administración";
 }
 
-<div>
-    Vista Gerente
+<link href="/css/gerenteIndex.css" rel="stylesheet" type="text/css">
+
+<div class="admin-container">
+    <!-- Contenido principal -->
+    <main class="modulo-content">
+        <div class="modulo-grid">
+            <!-- Trabajadores -->
+            <a href="@Url.Action("Trabajadores", "Gerente")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/img_trabajador.jpg" alt="Trabajadores">
+                    </div>
+                    <div class="card-footer">
+                        <span>TRABAJADORES</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Reportes -->
+            <a href="@Url.Action("Reportes", "Gerente")" class="modulo-item-link">
+                <div class="modulo-item">
+                    <div class="card-content">
+                        <img src="~/images/img_reportes.jpg" alt="Reportes">
+                    </div>
+                    <div class="card-footer">
+                        <span>REPORTES</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </main>
 </div>

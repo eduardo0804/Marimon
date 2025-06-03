@@ -1,7 +1,6 @@
 using Marimon.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Marimon.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Marimon.Data;
@@ -28,6 +27,7 @@ public class ApplicationDbContext : IdentityDbContext
             .WithOne()
             .HasForeignKey<Usuario>(u => u.usu_id)
             .OnDelete(DeleteBehavior.Cascade);
+
 
         builder.Entity<Reserva>()
             .HasOne(r => r.Usuario)
