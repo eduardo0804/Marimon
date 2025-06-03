@@ -1558,10 +1558,27 @@ namespace Marimon.Controllers
 
                 encuesta.usu_id = usuario.usu_id;
                 encuesta.Usuario = null;
-                encuesta.fecha_envio = DateTime.UtcNow;
+                
+                // CAMBIO: Convertir la hora actual de Perú a UTC para guardar en PostgreSQL
+                var timeZonePeru = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+                var fechaHoraPeru = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZonePeru);
+                
+                var fechaPeruConKind = DateTime.SpecifyKind(fechaHoraPeru, DateTimeKind.Unspecified);
+                encuesta.fecha_envio = TimeZoneInfo.ConvertTimeToUtc(fechaPeruConKind, timeZonePeru);
 
                 _context.Encuestas.Add(encuesta);
                 await _context.SaveChangesAsync();
+
+                // ENVÍO DEL EMAIL AL ADMINISTRADOR
+                try
+                {
+                    await EnviarEmailEncuestaAsync(encuesta, usuario);
+                    _logger.LogInformation($"Email de encuesta enviado para encuesta ID: {encuesta.encuesta_id}");
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(emailEx, "Error al enviar email de encuesta");
+                }
 
                 return Json(new { success = true, message = "Encuesta guardada exitosamente" });
             }
@@ -1572,6 +1589,37 @@ namespace Marimon.Controllers
                 var errorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return Json(new { success = false, message = $"Error: {errorMessage}" });
             }
+        }
+
+        private async Task EnviarEmailEncuestaAsync(Encuesta encuesta, Usuario usuario)
+        {
+            var emailTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Emails", "Encuesta.html");
+            string emailBody = await System.IO.File.ReadAllTextAsync(emailTemplatePath);
+
+            var logoUrl = "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png";
+
+            var timeZonePeru = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
+            var fechaHoraPeru = TimeZoneInfo.ConvertTimeFromUtc(encuesta.fecha_envio, timeZonePeru);
+            var fechaEnvio = fechaHoraPeru.ToString("dd/MM/yyyy");
+            var horaEnvio = fechaHoraPeru.ToString("HH:mm");
+
+            emailBody = emailBody.Replace("{{LogoUrl}}", logoUrl);
+            emailBody = emailBody.Replace("{{ID_ENCUESTA}}", encuesta.encuesta_id.ToString());
+            emailBody = emailBody.Replace("{{NOMBRE_CLIENTE}}", $"{usuario.usu_nombre} {usuario.usu_apellido}");
+            emailBody = emailBody.Replace("{{CORREO_CLIENTE}}", usuario.usu_correo ?? "No especificado");
+            emailBody = emailBody.Replace("{{FECHA_ENVIO}}", fechaEnvio);
+            emailBody = emailBody.Replace("{{HORA_ENVIO}}", horaEnvio);
+
+            emailBody = emailBody.Replace("{{AGRADO_SISTEMA}}", encuesta.agrado_sistema);
+            emailBody = emailBody.Replace("{{FACILIDAD_PAGO}}", encuesta.facilidad_pago);
+            emailBody = emailBody.Replace("{{NPS_SCORE}}", encuesta.nps_score.ToString());
+
+            emailBody = emailBody.Replace("{{COMENTARIOS}}",
+                string.IsNullOrEmpty(encuesta.comentarios) ? "Sin comentarios adicionales" : encuesta.comentarios);
+
+            await _emailSender.SendEmailAsync("marimonpruebas@gmail.com",
+                $"Nueva Encuesta de Satisfacción #{encuesta.encuesta_id} - {usuario.usu_nombre} {usuario.usu_apellido}",
+                emailBody);
         }
     }
 }
