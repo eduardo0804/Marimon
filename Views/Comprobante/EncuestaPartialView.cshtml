@@ -1,0 +1,238 @@
+<!-- Modal de Encuesta de Satisfacción -->
+<div class="modal-overlay" id="surveyModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">
+                <i class="fas fa-star text-warning me-2"></i>
+                Encuesta de Satisfacción
+            </h2>
+            <button type="button" class="modal-close" id="closeSurveyModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="survey-container">
+                <!-- Barra de progreso mejorada -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="surveyProgress"></div>
+                    <div class="progress-labels">
+                        <span>Paso <span id="currentStep">1</span> de <span id="totalSteps">3</span></span>
+                    </div>
+                </div>
+
+                <form class="survey-form" id="satisfactionSurvey">
+                    <!-- Paso 1: Información personal -->
+                    <div class="survey-step active" id="step1">
+                        <div class="step-header">
+                            <div class="step-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3>Información Personal</h3>
+                            <p>Ayúdanos a conocerte mejor</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user me-2"></i>
+                                Nombre: <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" name="nombre" placeholder="Ingresa tu nombre completo"
+                                required value="@(User.Identity.IsAuthenticated? User.Identity.Name : "")">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-envelope me-2"></i>
+                                Correo Electrónico: <span class="required">*</span>
+                            </label>
+                            <input type="email" class="form-input" name="correo" placeholder="tu-email@ejemplo.com"
+                                required value="@(ViewBag.UserEmail ?? "")">
+                        </div>
+                    </div>
+
+                    <!-- Paso 2: Experiencia con el sistema -->
+                    <div class="survey-step" id="step2">
+                        <div class="step-header">
+                            <div class="step-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <h3>Experiencia de Pago</h3>
+                            <p>Cuéntanos sobre tu experiencia</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                ¿Cuál fue su nivel de satisfacción con el sistema de pago?
+                                <span class="required">*</span>
+                            </label>
+                            <div class="satisfaction-rating">
+                                <label class="rating-option">
+                                    <input type="radio" name="agrado_sistema" value="excelente" required>
+                                    <div class="rating-content">
+                                        <span class="rating-emoji">🤩</span>
+                                        <span class="rating-text">Excelente</span>
+                                        <small>Superó mis expectativas</small>
+                                    </div>
+                                </label>
+                                <label class="rating-option">
+                                    <input type="radio" name="agrado_sistema" value="bueno">
+                                    <div class="rating-content">
+                                        <span class="rating-emoji">😊</span>
+                                        <span class="rating-text">Bueno</span>
+                                        <small>Muy satisfactorio</small>
+                                    </div>
+                                </label>
+                                <label class="rating-option">
+                                    <input type="radio" name="agrado_sistema" value="normal">
+                                    <div class="rating-content">
+                                        <span class="rating-emoji">😐</span>
+                                        <span class="rating-text">Regular</span>
+                                        <small>Cumplió lo básico</small>
+                                    </div>
+                                </label>
+                                <label class="rating-option">
+                                    <input type="radio" name="agrado_sistema" value="malo">
+                                    <div class="rating-content">
+                                        <span class="rating-emoji">😞</span>
+                                        <span class="rating-text">Malo</span>
+                                        <small>Necesita mejorar</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                ¿Qué tan fácil fue completar su pago?
+                                <span class="required">*</span>
+                            </label>
+                            <div class="satisfaction-rating">
+                                <label class="rating-option">
+                                    <input type="radio" name="facilidad_pago" value="muy_facil" required>
+                                    <div class="rating-content">
+                                        <span class="rating-emoji">🚀</span>
+                                        <span class="rating-text">Muy fácil</span>
+                                        <small>Rápido y sencillo</small>
+                                    </div>
+                                </label>
+                                <label class="rating-option">
+                                    <input type="radio" name="facilidad_pago" value="facil">
+                                    <div class="rating-content">
+                                        <span class="rating-emoji">👍</span>
+                                        <span class="rating-text">Fácil</span>
+                                        <small>Sin complicaciones</small>
+                                    </div>
+                                </label>
+                                <label class="rating-option">
+                                    <input type="radio" name="facilidad_pago" value="normal">
+                                    <div class="rating-content">
+                                        <span class="rating-emoji">👌</span>
+                                        <span class="rating-text">Regular</span>
+                                        <small>Algunos pasos confusos</small>
+                                    </div>
+                                </label>
+                                <label class="rating-option">
+                                    <input type="radio" name="facilidad_pago" value="dificil">
+                                    <div class="rating-content">
+                                        <span class="rating-emoji">😓</span>
+                                        <span class="rating-text">Difícil</span>
+                                        <small>Muy complicado</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Recomendación y comentarios -->
+                    <div class="survey-step" id="step3">
+                        <div class="step-header">
+                            <div class="step-icon">
+                                <i class="fas fa-thumbs-up"></i>
+                            </div>
+                            <h3>Recomendación</h3>
+                            <p>Tu opinión nos ayuda a crecer</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                ¿Qué tan probable es que recomiende nuestro servicio?
+                                <span class="required">*</span>
+                            </label>
+                            <div class="nps-scale">
+                                <div class="nps-labels">
+                                    <span><i class="fas fa-frown"></i> Poco probable</span>
+                                    <span><i class="fas fa-smile"></i> Muy probable</span>
+                                </div>
+                                <div class="nps-options">
+                                    @for (int i = 0; i <= 10; i++)
+                                    {
+                                        <label class="nps-option" title="@i puntos">
+                                            <input type="radio" name="nps_score" value="@i" required>
+                                            <span>@i</span>
+                                        </label>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-comment-dots me-2"></i>
+                                ¿Tienes alguna sugerencia para mejorar?
+                            </label>
+                            <textarea class="comment-area" name="sugerencias" rows="4"
+                                placeholder="Tus comentarios son muy valiosos para nosotros. Compártenos qué te gustó más o qué podríamos mejorar..."></textarea>
+                            <small class="form-text">Opcional - Pero muy apreciado 😊</small>
+                        </div>
+                    </div>
+
+                    <!-- Navegación -->
+                    <div class="form-navigation">
+                        <button type="button" class="btn-nav btn-prev" id="prevBtn" style="display: none;">
+                            <i class="fas fa-chevron-left"></i>
+                            Anterior
+                        </button>
+                        <div class="nav-spacer"></div>
+                        <button type="button" class="btn-nav btn-next" id="nextBtn">
+                            Siguiente
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button type="submit" class="btn-nav btn-submit" id="submitBtn" style="display: none;">
+                            <i class="fas fa-paper-plane"></i>
+                            Enviar Encuesta
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Mensaje de agradecimiento -->
+                <div class="survey-thank-you" id="surveyThankYou">
+                    <div class="thank-you-animation">
+                        <div class="success-checkmark">
+                            <div class="check-icon">
+                                <span class="icon-line line-tip"></span>
+                                <span class="icon-line line-long"></span>
+                                <div class="icon-circle"></div>
+                                <div class="icon-fix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>¡Muchas gracias por tu tiempo!</h3>
+                    <p>Tu opinión es muy valiosa y nos ayuda a mejorar nuestros servicios continuamente.</p>
+
+                    <div class="discount-offer">
+                        <div class="discount-header">
+                            <i class="fas fa-gift"></i>
+                            <h4>¡Tenemos un regalo para ti!</h4>
+                        </div>
+                        <div class="discount-code">GRACIAS10</div>
+                        <p class="discount-note">
+                            <i class="fas fa-percent"></i>
+                            10% de descuento en tu próxima compra
+                        </p>
+                        <small>Válido por 30 días desde hoy</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

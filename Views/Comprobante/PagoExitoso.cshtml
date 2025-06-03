@@ -73,9 +73,10 @@
         </div>
     </div>
 </div>
-
+@await Html.PartialAsync("EncuestaPartialView")
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="~/js/encuesta.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
             // Efecto visual para mejorar la experiencia
@@ -136,6 +137,11 @@
                     $(this).removeClass("badge-hover");
                 }
             );
+            setTimeout(function () {
+                if (window.encuestaSatisfaccion) {
+                    window.encuestaSatisfaccion.mostrar();
+                }
+            }, 8000);
         });
     </script>
 }
