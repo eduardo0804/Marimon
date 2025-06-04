@@ -51,6 +51,160 @@ namespace Marimon.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ObtenerComprobantesUsuario(string usuarioId)
+        {
+            try
+            {
+                // Obtener todos los comprobantes del usuario
+                var comprobantes = await _context.Comprobante
+                    .Include(c => c.Venta)
+                    .ThenInclude(v => v.Usuario)
+                    .Include(c => c.Venta)
+                    .ThenInclude(v => v.Detalles)
+                    .ThenInclude(dv => dv.Autoparte)
+                    .ThenInclude(a => a.Categoria)
+                    .Where(c => c.Venta.Usuario.usu_id == usuarioId)
+                    .Select(c => new
+                    {
+                        numero = c.com_id,
+                        tipo = c.tipo_comprobante,
+                        fecha = c.Venta.ven_fecha.ToString("dd/MM/yyyy"),
+                        total = c.Venta.Total,
+                        productos = c.Venta.Detalles.Select(dv => new
+                        {
+                            id = dv.Autoparte.aut_id,
+                            nombre = dv.Autoparte.aut_nombre,
+                            categoria = dv.Autoparte.Categoria.cat_nombre,
+                            precio = dv.Autoparte.aut_precio,
+                            cantidad = dv.det_cantidad,
+                            montoTotal = dv.det_cantidad * dv.Autoparte.aut_precio
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                var reservas = await _context.Reserva
+                    .Include(r => r.Servicio)
+                    .Include(r => r.Usuario)
+                    .Where(r => r.Usuario.usu_id == usuarioId)
+                    .Select(r => new
+                    {
+                        numero = r.res_id,
+                        servicio = new
+                        {
+                            id = r.Servicio.ser_id,
+                            nombre = r.Servicio.ser_nombre
+                        },
+                        fecha = r.res_fecha.ToString("dd/MM/yyyy"),
+                        hora = r.res_hora.ToString(@"hh\:mm"),
+                        estado = r.Estado
+                    })
+                    .ToListAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    comprobantes = comprobantes,
+                    reservas = reservas
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener comprobantes del usuario");
+                return Json(new { success = false, message = "Error al obtener comprobantes" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerDatosComprobante(string numeroComprobante, string usuarioId)
+        {
+            try
+            {
+                if (!int.TryParse(numeroComprobante, out int numero))
+                {
+                    return Json(new { success = false, message = "Número de comprobante inválido" });
+                }
+
+                var comprobante = await _context.Comprobante
+                    .Include(c => c.Venta)
+                    .ThenInclude(v => v.Usuario)
+                    .Include(c => c.Venta)
+                    .ThenInclude(v => v.Detalles)
+                    .ThenInclude(dv => dv.Autoparte)
+                    .ThenInclude(a => a.Categoria)
+                    .FirstOrDefaultAsync(c => c.com_id == numero && c.Venta.Usuario.usu_id == usuarioId);
+
+                if (comprobante == null)
+                {
+                    return Json(new { success = false, message = "Comprobante no encontrado" });
+                }
+
+                var productos = comprobante.Venta.Detalles.Select(dv => new
+                {
+                    id = dv.Autoparte.aut_id,
+                    nombre = dv.Autoparte.aut_nombre,
+                    categoria = dv.Autoparte.Categoria.cat_nombre,
+                    precio = dv.Autoparte.aut_precio,
+                    cantidad = dv.det_cantidad,
+                    montoTotal = dv.det_cantidad * dv.Autoparte.aut_precio
+                }).ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    productos = productos,
+                    tieneProductos = productos.Any()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener datos del comprobante");
+                return Json(new { success = false, message = "Error al obtener datos del comprobante" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerDatosReserva(string numeroReserva, string usuarioId)
+        {
+            try
+            {
+                if (!int.TryParse(numeroReserva, out int numero))
+                {
+                    return Json(new { success = false, message = "Número de reserva inválido" });
+                }
+
+                var reserva = await _context.Reserva
+                    .Include(r => r.Servicio)
+                    .Include(r => r.Usuario)
+                    .FirstOrDefaultAsync(r => r.res_id == numero && r.Usuario.usu_id == usuarioId);
+
+                if (reserva == null)
+                {
+                    return Json(new { success = false, message = "Reserva no encontrada" });
+                }
+
+                var servicio = new
+                {
+                    id = reserva.Servicio.ser_id,
+                    nombre = reserva.Servicio.ser_nombre,
+                    reservaId = reserva.res_id,
+                    fecha = reserva.res_fecha.ToString("dd/MM/yyyy"),
+                    hora = reserva.res_hora.ToString(@"hh\:mm")
+                };
+
+                return Json(new
+                {
+                    success = true,
+                    servicio = servicio,
+                    tieneServicio = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener datos de la reserva");
+                return Json(new { success = false, message = "Error al obtener datos de la reserva" });
+            }
+        }
         // POST: Recibir datos del formulario y guardar la reclamación
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -58,8 +212,26 @@ namespace Marimon.Controllers
         {
             try
             {
+                var validacionComprobante = await ValidarComprobanteAsync(model.UsuarioId, model.NumeroReferencia);
+                if (!validacionComprobante.EsValido)
+                {
+                    ModelState.AddModelError("NumeroReferencia", validacionComprobante.MensajeError);
+                    await CargarDatosParaVista(model.UsuarioId);
+                    return View("Index", model);
+                }
+
+                // NUEVA VALIDACIÓN: Verificar que el producto/servicio está en el comprobante
+                var validacionProductoServicio = await ValidarProductoServicioEnComprobanteAsync(model);
+                if (!validacionProductoServicio.EsValido)
+                {
+                    ModelState.AddModelError("EntidadId", validacionProductoServicio.MensajeError);
+                    await CargarDatosParaVista(model.UsuarioId);
+                    return View("Index", model);
+                }
+
                 _context.Reclamacion.Add(model);
                 await _context.SaveChangesAsync();
+
 
                 // Obtener datos del usuario
                 var usuario = await _context.Usuarios
@@ -130,6 +302,7 @@ namespace Marimon.Controllers
             {
                 _logger.LogError(ex, "Error al crear reclamación");
                 var innerMessage = ex.InnerException != null ? ex.InnerException.Message : "No inner exception";
+                await CargarDatosParaVista(model.UsuarioId);
                 return Content("Error al guardar: " + ex.Message + " | Detalle interno: " + innerMessage);
             }
         }
@@ -142,6 +315,88 @@ namespace Marimon.Controllers
             ViewBag.Categorias = await _context.Categorias.ToListAsync();
             ViewBag.Productos = await _context.Autopartes.ToListAsync();
             ViewBag.Servicios = await _context.Servicio.ToListAsync();
+        }
+
+        private async Task<(bool EsValido, string MensajeError)> ValidarComprobanteAsync(string usuarioId, string numeroComprobante)
+        {
+            if (string.IsNullOrEmpty(numeroComprobante))
+            {
+                return (false, "El número de comprobante es requerido.");
+            }
+
+            var comprobante = await _context.Comprobante
+                .Include(c => c.Venta)
+                .ThenInclude(v => v.Usuario)
+                .FirstOrDefaultAsync(c => c.com_id.ToString() == numeroComprobante &&
+                                          c.Venta.Usuario.usu_id == usuarioId);
+
+            if (comprobante != null)
+            {
+                return (true, "");
+            }
+
+            return (false, "El número de comprobante no existe o no pertenece a tu cuenta.");
+        }
+
+        private async Task<(bool EsValido, string MensajeError)> ValidarProductoServicioEnComprobanteAsync(Reclamacion model)
+        {
+            if (model.TipoEntidad == TipoEntidad.Producto)
+            {
+                var detalleVenta = await _context.DetalleVentas
+                    .Include(dv => dv.Venta)
+                    .ThenInclude(v => v.Usuario)
+                    .Include(dv => dv.Autoparte)
+                    .Where(dv => dv.AutoParteId == model.EntidadId &&
+                                 dv.Venta.Usuario.usu_id == model.UsuarioId)
+                    .FirstOrDefaultAsync();
+
+                if (detalleVenta == null)
+                {
+                    return (false, "El producto seleccionado no está registrado en tus compras.");
+                }
+
+                var comprobanteProducto = await _context.Comprobante
+                    .FirstOrDefaultAsync(c => c.VentaId == detalleVenta.VentaId &&
+                                             c.com_id.ToString() == model.NumeroReferencia);
+
+                if (comprobanteProducto == null)
+                {
+                    return (false, "El producto seleccionado no está registrado en este comprobante.");
+                }
+
+                var montoMaximo = detalleVenta.det_cantidad * detalleVenta.Autoparte.aut_precio;
+                if (model.Monto > montoMaximo)
+                {
+                    return (false, $"El monto reclamado no puede exceder el monto pagado por este producto (S/. {montoMaximo:F2}).");
+                }
+            }
+            else if (model.TipoEntidad == TipoEntidad.Servicio)
+            {
+                var reserva = await _context.Reserva
+                    .Include(r => r.Usuario)
+                    .Where(r => r.Usuario.usu_id == model.UsuarioId)
+                    .ToListAsync(); 
+
+                var reservaEncontrada = reserva
+                    .FirstOrDefault(r => r.ser_id == model.EntidadId &&
+                                        r.res_id.ToString() == model.NumeroReferencia);
+
+                if (reservaEncontrada == null)
+                {
+                    return (false, "El servicio seleccionado no está registrado como una reserva tuya.");
+                }
+
+                if (model.Monto <= 0)
+                {
+                    return (false, "El monto debe ser mayor a cero.");
+                }
+                else if (model.Monto > 1000)
+                {
+                    return (false, "El monto no puede exceder S/. 1,000 para servicios.");
+                }
+            }
+
+            return (true, "");
         }
 
         public IActionResult Confirmacion()
