@@ -1,23 +1,35 @@
 :root {
-    --primary-color: #e50914;          /* Rojo brillante */
-    --primary-dark: #b30710;           /* Rojo oscuro para hover */
-    --secondary-color: #141414;        /* Negro para elementos secundarios */
-    --light-color: #f5f5f5;            /* Blanco ligeramente grisáceo */
-    --pure-white: #ffffff;             /* Blanco puro */
-    --dark-gray: #333333;              /* Gris oscuro para textos */
-    --mid-gray: #8c8c8c;               /* Gris medio para elementos secundarios */
-    --light-gray: #e6e6e6;             /* Gris claro para bordes y separadores */
-    
+    --primary-color: #e50914;
+    /* Rojo brillante */
+    --primary-dark: #b30710;
+    /* Rojo oscuro para hover */
+    --secondary-color: #141414;
+    /* Negro para elementos secundarios */
+    --light-color: #f5f5f5;
+    /* Blanco ligeramente grisáceo */
+    --pure-white: #ffffff;
+    /* Blanco puro */
+    --dark-gray: #333333;
+    /* Gris oscuro para textos */
+    --mid-gray: #8c8c8c;
+    /* Gris medio para elementos secundarios */
+    --light-gray: #e6e6e6;
+    /* Gris claro para bordes y separadores */
+
     /* Colores de estado */
-    --pendiente-color: #ffbe0b;        /* Amarillo para pendiente */
+    --pendiente-color: #ffbe0b;
+    /* Amarillo para pendiente */
     --pendiente-bg: rgba(255, 190, 11, 0.15);
-    --completado-color: #3cb371;       /* Verde para completado */
+    --completado-color: #3cb371;
+    /* Verde para completado */
     --completado-bg: rgba(60, 179, 113, 0.15);
-    --cancelado-color: #e50914;        /* Rojo para cancelado */
+    --cancelado-color: #e50914;
+    /* Rojo para cancelado */
     --cancelado-bg: rgba(229, 9, 20, 0.15);
-    --confirmada-color: #2196f3;       /* Azul para confirmada */
+    --confirmada-color: #2196f3;
+    /* Azul para confirmada */
     --confirmada-bg: rgba(33, 150, 243, 0.15);
-    
+
     /* Variables de diseño */
     --border-radius: 8px;
     --border-radius-lg: 12px;
@@ -25,14 +37,17 @@
     --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .filter-body {
-    padding: 1rem 1.5rem !important; /* Reducir padding */
+    padding: 1rem 1.5rem !important;
+    /* Reducir padding */
 }
 
 .filter-body h6 {
     font-weight: 600;
     color: var(--secondary-color);
-    margin-bottom: 0.8rem; /* Reducir margen */
+    margin-bottom: 0.8rem;
+    /* Reducir margen */
     font-size: 0.9rem;
     letter-spacing: 0.5px;
 }
@@ -40,21 +55,25 @@
 .status-filters {
     display: flex;
     flex-direction: column;
-    gap: 6px; /* Reducir gap entre elementos */
+    gap: 6px;
+    /* Reducir gap entre elementos */
 }
 
 .status-filter {
     display: flex;
     align-items: center;
-    padding: 8px 12px; /* Reducir padding vertical y horizontal */
-    border-radius: 16px; /* Menos redondeado */
+    padding: 8px 12px;
+    /* Reducir padding vertical y horizontal */
+    border-radius: 16px;
+    /* Menos redondeado */
     text-decoration: none;
     color: var(--dark-gray);
     transition: var(--transition);
     border: 1px solid transparent;
     background-color: #f8f9fa;
     position: relative;
-    max-width: 100%; /* Limitar ancho máximo */
+    max-width: 100%;
+    /* Limitar ancho máximo */
 }
 
 .status-filter:hover {
@@ -73,13 +92,15 @@
 }
 
 .status-filter .status-icon {
-    width: 28px; /* Reducido de 36px a 28px */
+    width: 28px;
+    /* Reducido de 36px a 28px */
     height: 28px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px; /* Reducir margen */
+    margin-right: 10px;
+    /* Reducir margen */
     flex-shrink: 0;
     transition: var(--transition);
 }
@@ -90,26 +111,31 @@
 }
 
 .status-filter .status-icon.bg-success {
-    background-color: var(--completado-color); /* Verde para "Completada" */
+    background-color: var(--completado-color);
+    /* Verde para "Completada" */
 }
 
 .status-filter .status-icon.bg-danger {
-    background-color: var(--cancelado-color); /* Rojo para "Cancelada" */
+    background-color: var(--cancelado-color);
+    /* Rojo para "Cancelada" */
 }
 
 .status-filter .status-icon.bg-warning {
-    background-color: var(--pendiente-color); /* Amarillo para "Pendiente" */
+    background-color: var(--pendiente-color);
+    /* Amarillo para "Pendiente" */
 }
 
 .status-filter .status-icon.bg-info {
-    background-color: var(--confirmada-color); /* Azul para "Confirmada" */
+    background-color: var(--confirmada-color);
+    /* Azul para "Confirmada" */
 }
 
 /* Texto del estado */
 .status-filter .status-label {
     flex-grow: 1;
     font-weight: 500;
-    font-size: 0.85rem; /* Reducir tamaño de fuente */
+    font-size: 0.85rem;
+    /* Reducir tamaño de fuente */
     color: var(--dark-gray);
 }
 
@@ -117,11 +143,15 @@
 .status-filter .status-badge {
     background-color: var(--primary-color);
     color: var(--pure-white);
-    padding: 4px 8px; /* Reducir padding */
-    border-radius: 12px; /* Menos redondeado */
-    font-size: 0.75rem; /* Reducir tamaño de fuente */
+    padding: 4px 8px;
+    /* Reducir padding */
+    border-radius: 12px;
+    /* Menos redondeado */
+    font-size: 0.75rem;
+    /* Reducir tamaño de fuente */
     font-weight: 700;
-    min-width: 24px; /* Reducir ancho mínimo */
+    min-width: 24px;
+    /* Reducir ancho mínimo */
     text-align: center;
     margin-left: auto;
 }
@@ -154,8 +184,10 @@
 .status-filters .status-filter {
     width: 100%;
     box-sizing: border-box;
-    min-height: auto; /* Permitir altura automática */
+    min-height: auto;
+    /* Permitir altura automática */
 }
+
 /* Estilos para el panel de filtros */
 .filter-panel {
     background-color: var(--pure-white);
@@ -184,12 +216,14 @@
 }
 
 /* Contenedor de servicios y secciones */
-.services-section, .date-filter {
+.services-section,
+.date-filter {
     padding: 1.5rem;
     border-bottom: 1px solid var(--light-gray);
 }
 
-.services-section p, .date-filter p {
+.services-section p,
+.date-filter p {
     font-weight: 600;
     color: var(--secondary-color);
     margin-bottom: 1rem;
@@ -233,7 +267,7 @@
     transition: var(--transition);
 }
 
-.service-checkbox input:checked + label {
+.service-checkbox input:checked+label {
     color: var(--primary-color);
 }
 
@@ -278,6 +312,7 @@
     from {
         opacity: 0.8;
     }
+
     to {
         opacity: 1;
     }
@@ -443,6 +478,18 @@
     color: var(--pure-white);
     transition: var(--transition);
     font-size: 0.9rem;
+    width: 100%;
+}
+
+.search-container .search-icon {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    z-index: 2;
+    pointer-events: none;
 }
 
 .search-container input::placeholder {
@@ -456,19 +503,8 @@
     outline: none;
 }
 
-.search-container button {
-    position: absolute;
-    left: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.9rem;
-    padding: 0.5rem;
-}
-
-.search-container button:hover {
+.search-container input:focus+.search-icon,
+.search-container:hover .search-icon {
     color: var(--pure-white);
 }
 
@@ -555,6 +591,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -596,21 +633,25 @@
     background-color: #ffc827;
 }
 
-.status-completada, .status-completado {
+.status-completada,
+.status-completado {
     background-color: var(--completado-color);
     color: var(--pure-white);
 }
 
-.status-completada:hover, .status-completado:hover {
+.status-completada:hover,
+.status-completado:hover {
     background-color: #47d384;
 }
 
-.status-cancelada, .status-cancelado {
+.status-cancelada,
+.status-cancelado {
     background-color: var(--cancelado-color);
     color: var(--pure-white);
 }
 
-.status-cancelada:hover, .status-cancelado:hover {
+.status-cancelada:hover,
+.status-cancelado:hover {
     background-color: #ff1a24;
 }
 
@@ -622,6 +663,7 @@
 .status-confirmada:hover {
     background-color: #32a8ff;
 }
+
 .filter-btn,
 button[type="submit"].filter-btn,
 button[onclick="filtrarReservas()"],
@@ -714,9 +756,10 @@ button[onclick*="filtrar"] {
 
 /* Estilo específico para el botón visto en la imagen */
 .col-lg-3 button[class*="aplicar"],
-.filter-panel + button[class*="aplicar"],
+.filter-panel+button[class*="aplicar"],
 button[class*="filtros"] {
-    width: 100px !important;           /* Cambiado de 100% a 200px */
+    width: 100px !important;
+    /* Cambiado de 100% a 200px */
     text-align: center !important;
     background-color: #e50914 !important;
     color: white !important;
@@ -724,8 +767,10 @@ button[class*="filtros"] {
     padding: 0.75rem 0 !important;
     margin-top: 1rem !important;
     margin-bottom: 1rem !important;
-    margin-left: auto !important;      /* Añadido para centrar */
-    margin-right: auto !important;     /* Añadido para centrar */
+    margin-left: auto !important;
+    /* Añadido para centrar */
+    margin-right: auto !important;
+    /* Añadido para centrar */
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -737,7 +782,8 @@ button[class*="filtros"] {
 /* Asegurar que cualquier botón con texto "aplicar filtros" tenga este estilo */
 button:contains("Aplicar Filtros"),
 button:contains("APLICAR FILTROS") {
-    width: 100px !important;           /* Cambiado de 100% a 200px */
+    width: 100px !important;
+    /* Cambiado de 100% a 200px */
     text-align: center !important;
     background-color: #e50914 !important;
     color: white !important;
@@ -745,8 +791,10 @@ button:contains("APLICAR FILTROS") {
     padding: 0.75rem 0 !important;
     margin-top: 1rem !important;
     margin-bottom: 1rem !important;
-    margin-left: auto !important;      /* Añadido para centrar */
-    margin-right: auto !important;     /* Añadido para centrar */
+    margin-left: auto !important;
+    /* Añadido para centrar */
+    margin-right: auto !important;
+    /* Añadido para centrar */
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -754,6 +802,7 @@ button:contains("APLICAR FILTROS") {
     text-transform: uppercase !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
+
 /* Estilos para el modal de cambio de estado */
 .status-modal .modal-content {
     border: none;
@@ -785,7 +834,8 @@ button:contains("APLICAR FILTROS") {
 }
 
 .status-modal .btn-close {
-    filter: invert(1) brightness(200%); /* Esto convierte la X negra en blanca */
+    filter: invert(1) brightness(200%);
+    /* Esto convierte la X negra en blanca */
     opacity: 0.8;
     transition: var(--transition);
 }
@@ -794,6 +844,7 @@ button:contains("APLICAR FILTROS") {
     opacity: 1;
     transform: rotate(90deg);
 }
+
 .status-modal .modal-body {
     padding: 1.8rem;
 }
@@ -1007,19 +1058,22 @@ button:contains("APLICAR FILTROS") {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.02);
     }
+
     100% {
         transform: scale(1);
     }
 }
+
 /* Media queries para responsive */
 @media (max-width: 992px) {
     .filter-panel {
         margin-bottom: 2rem;
     }
-    
+
     .table-scroll-container {
         max-height: 450px;
     }
@@ -1030,12 +1084,46 @@ button:contains("APLICAR FILTROS") {
         max-width: 100%;
         margin-top: 1rem;
     }
-    
-    .services-table th, .services-table td {
+
+    .services-table th,
+    .services-table td {
         padding: 1rem;
     }
-    
+
     .filter-btn {
         margin: 1rem;
     }
+}
+
+.no-results-message {
+    padding: 30px 20px;
+    text-align: center;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.no-results-message .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #626C66;
+}
+
+.no-results-message .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #626C66;
+    opacity: 0.7;
+}
+
+.no-results-message .empty-state p {
+    margin-bottom: 20px;
+    font-size: 1rem;
+    color: #333333;
+}
+
+.no-results-message .empty-state strong {
+    color: #000000;
+    font-weight: 600;
 }

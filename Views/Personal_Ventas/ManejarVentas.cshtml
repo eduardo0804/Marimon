@@ -193,39 +193,14 @@
         </div>
     </div>
 </div>
-
+<script src="~/js/consultaSyV.js" asp-append-version="true"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Search functionality
         const searchInput = document.getElementById('searchTable');
         if (searchInput) {
             searchInput.addEventListener('keyup', function () {
-                const searchTerm = this.value.toLowerCase();
-                const rows = document.querySelectorAll('.services-table tbody tr');
-
-                rows.forEach(row => {
-                    if (row.querySelector('td[colspan]')) {
-                        // Skip empty state row
-                        return;
-                    }
-
-                    const text = row.textContent.toLowerCase();
-                    if (text.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                // Show empty state if no results
-                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none' && !row.querySelector('td[colspan]'));
-                const emptyStateRow = document.querySelector('.services-table tbody tr td[colspan]')?.parentNode;
-
-                if (visibleRows.length === 0 && emptyStateRow) {
-                    emptyStateRow.style.display = '';
-                } else if (emptyStateRow) {
-                    emptyStateRow.style.display = 'none';
-                }
+                searchTable(this.value, '.services-table');
             });
         }
     });
