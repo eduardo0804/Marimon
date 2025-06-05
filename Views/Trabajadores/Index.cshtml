@@ -85,22 +85,21 @@
                 <h5 class="modal-title" id="modalCrearTrabajadorLabel">Agregar Trabajador</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="CrearTrabajador" asp-controller="Trabajadores" id="formCrearTrabajador" method="post">
+            <form asp-action="CrearTrabajador" asp-controller="Trabajadores" id="formCrearTrabajador" method="post" novalidate>
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
-                    <!-- Email input box -->
+                    <!-- Email input box - Cambié type="email" por type="text" -->
                     <div class="input_box mb-3">
                         <label asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Email)" class="form-label">Correo Electrónico</label>
-                        <input asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Email)" class="form-control" 
-                               autocomplete="username" aria-required="true" 
-                               placeholder="Ingresa tu correo electrónico" />
+                        <input asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Email)" type="text" class="form-control" 
+                               autocomplete="username" />
                         <span asp-validation-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Email)" class="text-danger"></span>
                     </div>
                     
                     <!-- Rol input box -->
                     <div class="input_box mb-3">
                         <label asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Rol)" class="form-label">Tipo de Rol</label>
-                        <select asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Rol)" class="form-select" aria-required="true">
+                        <select asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Rol)" class="form-select">
                             <option value="">Seleccionar rol...</option>
                             <option value="Personal_Servicio">Personal de Servicio</option>
                             <option value="Personal_Ventas">Personal de Ventas</option>
@@ -112,8 +111,7 @@
                     <div class="input_box mb-3">
                         <label asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Password)" class="form-label">Contraseña</label>
                         <input asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Password)" class="form-control" 
-                               type="password" autocomplete="new-password" aria-required="true" 
-                               placeholder="Ingresa tu contraseña" />
+                               type="password" autocomplete="new-password" />
                         <span asp-validation-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().Password)" class="text-danger"></span>
                     </div>
                     
@@ -121,8 +119,7 @@
                     <div class="input_box mb-3">
                         <label asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().ConfirmPassword)" class="form-label">Confirmar Contraseña</label>
                         <input asp-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().ConfirmPassword)" class="form-control" 
-                               type="password" autocomplete="new-password" aria-required="true" 
-                               placeholder="Confirma tu contraseña" />
+                               type="password" autocomplete="new-password" />
                         <span asp-validation-for="@(new Marimon.Controllers.CrearTrabajadorViewModel().ConfirmPassword)" class="text-danger"></span>
                     </div>
                 </div>
@@ -143,7 +140,7 @@
                 <h5 class="modal-title" id="modalEditarTrabajadorLabel">Editar Trabajador</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="EditarTrabajador" asp-controller="Trabajadores" id="formEditarTrabajador" method="post">
+            <form asp-action="EditarTrabajador" asp-controller="Trabajadores" id="formEditarTrabajador" method="post" novalidate>
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
                     <!-- Hidden ID field -->
@@ -153,14 +150,14 @@
                     <div class="input_box mb-3">
                         <label asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Email)" class="form-label">Correo Electrónico</label>
                         <input asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Email)" class="form-control" 
-                               readonly placeholder="Correo electrónico" />
+                               readonly/>
                         <span asp-validation-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Email)" class="text-danger"></span>
                     </div>
                     
                     <!-- Rol input box -->
                     <div class="input_box mb-3">
                         <label asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Rol)" class="form-label">Tipo de Rol</label>
-                        <select asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Rol)" class="form-select" aria-required="true">
+                        <select asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Rol)" class="form-select">
                             <option value="">Seleccionar rol...</option>
                             <option value="Personal_Servicio">Personal de Servicio</option>
                             <option value="Personal_Ventas">Personal de Ventas</option>
@@ -172,8 +169,7 @@
                     <div class="input_box mb-3">
                         <label asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Password)" class="form-label">Nueva Contraseña (opcional)</label>
                         <input asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Password)" class="form-control" 
-                               type="password" autocomplete="new-password" 
-                               placeholder="Deje en blanco si no desea cambiar" />
+                               type="password" autocomplete="new-password" />
                         <span asp-validation-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().Password)" class="text-danger"></span>
                         <small class="form-text text-muted">Deje en blanco si no desea cambiar la contraseña</small>
                     </div>
@@ -182,8 +178,7 @@
                     <div class="input_box mb-3">
                         <label asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().ConfirmPassword)" class="form-label">Confirmar Nueva Contraseña</label>
                         <input asp-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().ConfirmPassword)" class="form-control" 
-                               type="password" autocomplete="new-password" 
-                               placeholder="Confirma la nueva contraseña" />
+                               type="password" autocomplete="new-password"  />
                         <span asp-validation-for="@(new Marimon.Controllers.EditarTrabajadorViewModel().ConfirmPassword)" class="text-danger"></span>
                     </div>
                 </div>
@@ -204,7 +199,7 @@
                 <h5 class="modal-title" id="modalEliminarTrabajadorLabel">Eliminar Trabajador</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="EliminarTrabajador" asp-controller="Trabajadores" id="formEliminarTrabajador" method="post">
+            <form asp-action="EliminarTrabajador" asp-controller="Trabajadores" id="formEliminarTrabajador" method="post" novalidate>
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
                     <!-- Hidden ID field -->

@@ -69,36 +69,19 @@ document
 
 // Función para editar trabajador
 function editarUsuario(id, email, rol) {
-  // Obtener datos del servidor para asegurar consistencia
-  fetch(`/Trabajadores/ObtenerTrabajador?id=${id}`)
-    .then((response) => response.json())
-    .then((result) => {
-      if (result.success) {
-        const data = result.data;
-        
-        // Llenar el formulario con los datos
-        document.querySelector('#formEditarTrabajador input[name="Id"]').value = data.Id;
-        document.querySelector('#formEditarTrabajador input[name="Email"]').value = data.Email;
-        document.querySelector('#formEditarTrabajador select[name="Rol"]').value = data.Rol;
-        
-        // Limpiar campos de contraseña
-        document.querySelector('#formEditarTrabajador input[name="Password"]').value = "";
-        document.querySelector('#formEditarTrabajador input[name="ConfirmPassword"]').value = "";
+  // Llenar el formulario directamente con los datos que ya tenemos
+  document.querySelector('#formEditarTrabajador input[name="Id"]').value = id;
+  document.querySelector('#formEditarTrabajador input[name="Email"]').value = email;
+  document.querySelector('#formEditarTrabajador select[name="Rol"]').value = rol;
+  
+  // Limpiar campos de contraseña
+  document.querySelector('#formEditarTrabajador input[name="Password"]').value = "";
+  document.querySelector('#formEditarTrabajador input[name="ConfirmPassword"]').value = "";
 
-        limpiarErroresValidacion("formEditarTrabajador");
+  limpiarErroresValidacion("formEditarTrabajador");
 
-        const modal = new bootstrap.Modal(
-          document.getElementById("modalEditarTrabajador")
-        );
-        modal.show();
-      } else {
-        mostrarAlerta("error", "Error al obtener los datos del trabajador");
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      mostrarAlerta("error", "Error al obtener los datos del trabajador");
-    });
+  const modal = new bootstrap.Modal(document.getElementById("modalEditarTrabajador"));
+  modal.show();
 }
 
 document
