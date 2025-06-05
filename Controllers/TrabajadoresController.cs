@@ -64,12 +64,46 @@ namespace Marimon.Controllers
             return View(usuarios);
         }
 
+        // Nuevo método para manejar las validaciones con modelos fuertemente tipados
+        [HttpGet]
+        public IActionResult Crear()
+        {
+            return PartialView("_CrearTrabajador", new CrearTrabajadorViewModel());
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Editar(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            
+            var roles = await _userManager.GetRolesAsync(user);
+            var model = new EditarTrabajadorViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Rol = roles.FirstOrDefault() ?? "Sin Rol"
+            };
+            
+            return PartialView("_EditarTrabajador", model);
+        }
+
+        // Método CrearTrabajador modificado para mejor manejo de errores
         [HttpPost]
         public async Task<IActionResult> CrearTrabajador([FromBody] CrearTrabajadorViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .SelectMany(x => x.Value.Errors)
+                    .Select(x => x.ErrorMessage)
+                    .ToList();
+                
+                return Json(new { success = false, errors = errors });
             }
 
             try
@@ -111,7 +145,8 @@ namespace Marimon.Controllers
                 }
                 else
                 {
-                    return Json(new { success = false, errors = result.Errors.Select(e => e.Description) });
+                    var errors = result.Errors.Select(e => e.Description).ToList();
+                    return Json(new { success = false, errors = errors });
                 }
             }
             catch (Exception ex)
@@ -120,7 +155,6 @@ namespace Marimon.Controllers
                 return Json(new { success = false, errors = new[] { "Error interno del servidor." } });
             }
         }
-
 
         [HttpGet]
         public async Task<IActionResult> ObtenerTrabajador(string id)
@@ -154,27 +188,38 @@ namespace Marimon.Controllers
                 return Json(new { success = false, error = "Error interno del servidor." });
             }
         }
-        
+
+        // Método EditarTrabajador modificado para mejor manejo de errores
         [HttpPost]
         public async Task<IActionResult> EditarTrabajador([FromBody] EditarTrabajadorViewModel model)
         {
-            // Validación personalizada para contraseñas
+            // Validación manual personalizada ya que ModelState podría no validar correctamente con campos opcionales
+            var errores = new List<string>();
+            
+            if (string.IsNullOrEmpty(model.Rol))
+            {
+                errores.Add("El rol es obligatorio.");
+            }
+            else if (model.Rol != "Personal_Servicio" && model.Rol != "Personal_Ventas")
+            {
+                errores.Add("El rol debe ser Personal_Servicio o Personal_Ventas.");
+            }
+
             if (!string.IsNullOrEmpty(model.Password))
             {
-                if (string.IsNullOrEmpty(model.ConfirmPassword) || model.Password != model.ConfirmPassword)
-                {
-                    return Json(new { success = false, errors = new[] { "Las contraseñas no coinciden." } });
-                }
                 if (model.Password.Length < 6)
                 {
-                    return Json(new { success = false, errors = new[] { "La contraseña debe tener al menos 6 caracteres." } });
+                    errores.Add("La contraseña debe tener al menos 6 caracteres.");
+                }
+                if (string.IsNullOrEmpty(model.ConfirmPassword) || model.Password != model.ConfirmPassword)
+                {
+                    errores.Add("Las contraseñas no coinciden.");
                 }
             }
 
-            // Validar solo el rol obligatorio
-            if (string.IsNullOrEmpty(model.Rol))
+            if (errores.Any())
             {
-                return Json(new { success = false, errors = new[] { "El rol es obligatorio." } });
+                return Json(new { success = false, errors = errores });
             }
 
             try
@@ -193,7 +238,8 @@ namespace Marimon.Controllers
                     
                     if (!result.Succeeded)
                     {
-                        return Json(new { success = false, errors = result.Errors.Select(e => e.Description) });
+                        var passwordErrors = result.Errors.Select(e => e.Description).ToList();
+                        return Json(new { success = false, errors = passwordErrors });
                     }
                 }
 
