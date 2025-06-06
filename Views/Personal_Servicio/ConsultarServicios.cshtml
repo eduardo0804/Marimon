@@ -6,23 +6,27 @@
 }
 <link rel="stylesheet" href="~/css/manejarVenta.css" />
 
-
-<div class="container-fluid mt-4 my-4">
-    <ol class="breadcrumb m-0">
+<div class="container-fluid mt-4">
+    <ol class="breadcrumb">
         <li class="breadcrumb-item">
             <a asp-area="" asp-controller="Personal_Servicio" asp-action="Index">Módulo de Servicio</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">Consultar Reserva de Servicios</li>
     </ol>
-    <div class="page-header text-center m-0 p-0 pb-2">
+    <div class="page-header text-center my-4">
         <h2>Consultar Reserva de Servicios</h2>
     </div>
 
     <div class="row">
         <!-- Filters panel (Left side) -->
         <div class="col-lg-3">
-            <div class="filter-panel">
-                <h5 class="border-bottom pb-2 mb-3">Filtros de Búsqueda</h5>
+            <div class="filter-panel shadow-sm rounded-3">
+                <div class="filter-header p-3 rounded-top">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-filter me-2 "></i>
+                        <span>Filtrar resultados</span>
+                    </h5>
+                </div>
 
                 <div class="services-section">
                     <p class="fw-bold mb-2">Selecciona Servicios:</p>
@@ -63,7 +67,7 @@
                     }
                 </div>
 
-                <div class="date-filter mt-4">
+                <div class="date-filter mt-2">
                     <p class="fw-bold mb-2">Rango de Fechas:</p>
                     <div class="mb-3">
                         <label for="fechaDesde">Desde:</label>
@@ -77,8 +81,8 @@
                     </div>
                 </div>
                 <input type="hidden" id="estadoSeleccionado" value="@ViewBag.EstadoSeleccionado" />
-                <div class="filter-body p-3">
-                    <h6 class="mb-3">Filtrar por estado</h6>
+                <div class="filter-body mt-2 p-3">
+                    <h6 class="fw-bold mb-3">Filtrar por estado</h6>
                     <div class="status-filters">
                         <!-- Opción "Todos los estados" -->
                         <a href="javascript:void(0)" onclick="setEstado('')"
@@ -154,7 +158,7 @@
                         <div class="col-auto">
                             <div class="search-container">
                                 <i class="fas fa-search search-icon"></i>
-                                <input type="text" id="searchTable" placeholder="Buscar en tabla...">
+                                <input type="text" id="searchTable" placeholder="Buscar por ID de venta o autoparte...">
                             </div>
                         </div>
                     </div>
@@ -295,7 +299,7 @@
 
 <!-- Toast notification container -->
 <div class="toast-container" id="toastContainer"></div>
-<script src="~/js/consultaSyV.js" asp-append-version="true"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Show/hide additional services
@@ -335,7 +339,32 @@
         const searchInput = document.getElementById('searchTable');
         if (searchInput) {
             searchInput.addEventListener('keyup', function () {
-                searchTable(this.value, '.services-table');
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.services-table tbody tr');
+
+                rows.forEach(row => {
+                    if (row.querySelector('td[colspan]')) {
+                        // This is an empty state row, don't filter it
+                        return;
+                    }
+
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show empty state if no results
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none' && !row.querySelector('td[colspan]'));
+                const emptyStateRow = document.querySelector('.services-table tbody tr td[colspan]')?.parentNode;
+
+                if (visibleRows.length === 0 && emptyStateRow) {
+                    emptyStateRow.style.display = '';
+                } else if (emptyStateRow) {
+                    emptyStateRow.style.display = 'none';
+                }
             });
         }
 
@@ -441,7 +470,6 @@
         // SOLO aquí se recarga la página con los filtros aplicados
         window.location.href = url;
     }
-
 
     // Toast notification function
     function showToast(message, type = 'success') {

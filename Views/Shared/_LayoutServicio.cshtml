@@ -76,16 +76,14 @@
             <!-- Botón de cerrar sesión -->
             <form asp-area="Identity" asp-page="/Account/Logout"
                 asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <i class="fas fa-sign-out-alt"></i> <button>Cerrar Sesión</button>
+                <i class="fas fa-sign-out-alt"></i> <button>Cerrar Sesión</button>
             </form>
         </div>
     </header>
 
-    <div class="container">
-        <main role="main">
-            @RenderBody()
-        </main>
-    </div>
+    <main class="flex-grow-1 container py-4">
+        @RenderBody()
+    </main>
 
     <footer>
         <div class="footer-content">

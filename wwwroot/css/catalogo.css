@@ -743,6 +743,9 @@ body {
 .dropdown-item {
   padding: 8px 15px;
   transition: all 0.2s ease;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
 .dropdown-item:hover {

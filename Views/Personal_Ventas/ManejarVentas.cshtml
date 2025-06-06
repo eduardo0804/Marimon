@@ -8,15 +8,15 @@
 
 <link rel="stylesheet" href="~/css/consultarServicio.css" />
 
-<div class="container-fluid mt-1 my-4">
-    <ol class="breadcrumb py-3 m-0 ">
+<div class="container-fluid mt-4">
+    <ol class="breadcrumb ">
         <li class="breadcrumb-item">
             <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Módulo de Autopartes</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">Consultar Ventas de Autopartes</li>
     </ol>
 
-    <div class="page-header text-center m-0 p-0 pb-2">
+    <div class="page-header text-center my-4">
         <h2>Consultar Ventas de Autopartes</h2>
     </div>
 
@@ -28,7 +28,7 @@
                     <div class="filter-header p-3 rounded-top">
                         <h5 class="mb-0 d-flex align-items-center">
                             <i class="fas fa-filter me-2 "></i>
-                            <span>Filtrar resultados</span><!-- Cambien el color CARAJO -->
+                            <span>Filtrar resultados</span>
                         </h5>
                     </div>
                     <div class="filter-body p-3">
@@ -102,7 +102,6 @@
             </div>
         </div>
 
-
         <!-- Tabla (Right side) -->
         <div class="col-lg-9">
             <div class="table-container fade-in">
@@ -152,10 +151,10 @@
                                             data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal"
                                             data-estado-actual="@venta.Estado"
                                             style="display: inline-flex; align-items: center; gap: 4px;
-                          background-color:
-                          @(venta.Estado == "Pendiente" ? "#ffc107" :
-                                                                                                                                                                                       venta.Estado == "Completado" ? "#28a745" :
-                                                                                                                                                                                       venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
+                                                                      background-color:
+                                                                      @(venta.Estado == "Pendiente" ? "#ffc107" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           venta.Estado == "Completado" ? "#28a745" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
                                         @switch (venta.Estado)
                                                 {
                                                     case "Pendiente":
@@ -193,14 +192,39 @@
         </div>
     </div>
 </div>
-<script src="~/js/consultaSyV.js" asp-append-version="true"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Search functionality
         const searchInput = document.getElementById('searchTable');
         if (searchInput) {
             searchInput.addEventListener('keyup', function () {
-                searchTable(this.value, '.services-table');
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.services-table tbody tr');
+
+                rows.forEach(row => {
+                    if (row.querySelector('td[colspan]')) {
+                        // Skip empty state row
+                        return;
+                    }
+
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show empty state if no results
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none' && !row.querySelector('td[colspan]'));
+                const emptyStateRow = document.querySelector('.services-table tbody tr td[colspan]')?.parentNode;
+
+                if (visibleRows.length === 0 && emptyStateRow) {
+                    emptyStateRow.style.display = '';
+                } else if (emptyStateRow) {
+                    emptyStateRow.style.display = 'none';
+                }
             });
         }
     });
@@ -214,7 +238,6 @@
         document.getElementById('montoValor').innerText = 'S/.' + valor;
         document.getElementById('montoMaximoHidden').value = valor;
     }
-
 
     function setEstado(estado) {
         document.getElementById('estadoHidden').value = estado;
