@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function () {
         servicioSelect.disabled = false;
     }
 
-    // Cargar productos del comprobante seleccionado
+    // Reemplaza la función cargarProductosDelComprobante existente con esta versión:
     function cargarProductosDelComprobante(comprobante) {
         productoSelect.innerHTML = '<option value="">-- Seleccione Producto --</option>';
         
@@ -232,6 +232,21 @@ document.addEventListener("DOMContentLoaded", function () {
             option.dataset.nombre = producto.nombre;
             productoSelect.appendChild(option);
         });
+        
+        // Si solo hay un producto, seleccionarlo automáticamente
+        if (comprobante.productos.length === 1) {
+            const producto = comprobante.productos[0];
+            productoSelect.value = producto.id;
+            
+            // Ejecutar la lógica de selección
+            montoProducto.value = parseFloat(producto.montoTotal).toFixed(2);
+            montoProducto.max = producto.montoTotal;
+            document.getElementById("montoInfoProducto").textContent = `Monto máximo a reclamar: S/. ${parseFloat(producto.montoTotal).toFixed(2)}`;
+            
+            hiddenEntidadId.value = producto.id;
+            hiddenNombreEntidad.value = producto.nombre;
+            numeroReferencia.value = comprobanteSeleccionado.numero;
+        }
     }
 
     // Cargar servicio de la reserva seleccionada
@@ -249,8 +264,8 @@ document.addEventListener("DOMContentLoaded", function () {
         hiddenEntidadId.value = reserva.servicio.id;
         hiddenNombreEntidad.value = reserva.servicio.nombre;
         numeroReferencia.value = reserva.numero;
-        montoServicio.value = "50.00";
-        document.getElementById("montoInfoServicio").textContent = "Precio sugerido: S/. 50.00 (puedes cambiarlo)";
+        montoServicio.value = "100.00";
+        document.getElementById("montoInfoServicio").textContent = "Precio base: S/. 100.00 (puedes cambiarlo)";
     }
 
     // Manejar selección de producto

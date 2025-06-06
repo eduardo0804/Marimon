@@ -113,19 +113,29 @@ namespace Marimon.Controllers
                 aut_precio = a.aut_precio,
                 aut_cantidad = a.aut_cantidad,
                 aut_imagen = a.aut_imagen,
-                CategoriaNombre = a.Categoria.cat_nombre,
-                // Información de ofertas
-                OfertaId = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_id,
-                PorcentajeOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje,
-                DescripcionOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_descripcion,
-                FechaInicio = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio,
-                FechaFin = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin,
-                PrecioOferta = a.Ofertas.Any()
+                CategoriaNombre = a.Categoria != null ? a.Categoria.cat_nombre : string.Empty,
+                // Información de ofertas con manejo seguro de nulls
+                OfertaId = a.Ofertas != null && a.Ofertas.Any()
+                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_id
+                    : (int?)null,
+                PorcentajeOferta = a.Ofertas != null && a.Ofertas.Any()
+                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje
+                    : (decimal?)null,
+                DescripcionOferta = a.Ofertas != null && a.Ofertas.Any()
+                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_descripcion
+                    : null,
+                FechaInicio = a.Ofertas != null && a.Ofertas.Any()
+                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio
+                    : (DateTime?)null,
+                FechaFin = a.Ofertas != null && a.Ofertas.Any()
+                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin
+                    : (DateTime?)null,
+                PrecioOferta = a.Ofertas != null && a.Ofertas.Any()
                     ? a.aut_precio - (a.aut_precio * (a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje / 100m))
                     : (decimal?)null,
-                OfertaActiva = a.Ofertas.Any()
+                OfertaActiva = a.Ofertas != null && a.Ofertas.Any()
                     ? (hoy >= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio
-                    && hoy <= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin)
+                       && hoy <= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin)
                     : (bool?)null
             }).ToList();
 
