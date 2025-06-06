@@ -81,13 +81,14 @@ namespace Marimon.Controllers
 SERVICIOS DISPONIBLES: {servicesListText}
 
 FORMATO DE RESPUESTA OBLIGATORIO:
-- Problema detectado: [descripción breve]
-- Recomendación: [sugerencia específica]
+- Problema detectado: [descripción técnica detallada del problema identificado]
+- Recomendación: [acción específica y detallada que el cliente debe realizar inmediatamente, como ""Revisión completa del sistema con el scanner para identificar el problema"", ""Verificar nivel de refrigerante y revisar mangueras inmediatamente"", ""Programar diagnóstico computarizado urgente"", etc. Debe ser una instrucción completa y práctica]
 
-El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
-
-Si no corresponde a ningún servicio especializado, responde ""Ninguno"".
-Sé conciso y directo (máximo 3 frases).";
+IMPORTANTE: 
+- La recomendación debe ser una oración completa con acción específica y detallada
+- El servicio debe ser solo el nombre del servicio de la lista
+- La recomendación debe explicar QUÉ hacer, el servicio indica DÓNDE acudir
+- Máximo 3 frases para el problema y recomendación combinados";
 
                     parts.Add(new { text = prompt });
                     parts.Add(new { text = comment });
@@ -104,15 +105,14 @@ INSTRUCCIONES CRÍTICAS:
 3. Si no muestra claramente contenido automotriz, solicita una imagen adecuada
 
 FORMATO DE RESPUESTA OBLIGATORIO:
-- Problema detectado: [Si es automotriz: describe el problema. Si NO es automotriz: ""La imagen no muestra un vehículo o componente automotriz""]
-- Recomendación: [Si es automotriz: sugiere servicio. Si NO es automotriz: ""Proporciona una imagen de tu vehículo o componente para determinar el servicio necesario""]
-
-El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
+- Problema detectado: [Si es automotriz: describe el problema técnico específico y detallado. Si NO es automotriz: ""La imagen no muestra un vehículo o componente automotriz""]
+- Recomendación: [Si es automotriz: acción inmediata completa como ""Inspeccionar inmediatamente las pastillas de freno y verificar el grosor"", ""Verificar nivel de aceite del motor y revisar posibles fugas"", ""Revisar todas las conexiones eléctricas y cables sueltos"". Si NO es automotriz: ""Proporciona una imagen clara de tu vehículo o el componente específico con problemas""]
 
 REGLAS ESPECIALES:
+- La recomendación debe ser una oración completa con acción específica y detallada
+- El servicio debe ser solo el nombre exacto de la lista
 - Solo analiza imágenes que muestren vehículos, partes automotrices o componentes relacionados
-- Para capturas de pantalla, interfaces o contenido no automotriz: siempre responde ""Ninguno""
-- Sé estricto: si tienes duda sobre si es automotriz, responde ""Ninguno""";
+- Para capturas de pantalla, interfaces o contenido no automotriz: siempre responde ""Ninguno""";
 
                     parts.Add(new { text = prompt });
 
@@ -146,17 +146,16 @@ INSTRUCCIONES CRÍTICAS:
 3. Si ni la imagen es automotriz ni el comentario describe problemas automotrices, solicita información adecuada
 
 FORMATO DE RESPUESTA OBLIGATORIO:
-- Problema detectado: [descripción técnica concisa basada en contenido automotriz válido]
-- Recomendación: [sugerencia específica o solicitud de información adecuada]
-
-El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
+- Problema detectado: [descripción técnica detallada del problema basada en contenido automotriz válido]
+- Recomendación: [acción específica, detallada y práctica que el cliente debe realizar, como ""Verificar inmediatamente el nivel de refrigerante y revisar todas las mangueras del sistema"", ""Programar revisión completa del sistema eléctrico con scanner para identificar fallas"", ""Inspeccionar visualmente las pastillas de freno y medir el grosor de las mismas"", etc. Debe ser una instrucción completa]
 
 REGLAS ESPECIALES:
+- La recomendación debe ser una oración completa y detallada con la acción específica a realizar
+- El servicio debe ser únicamente el nombre exacto de la lista de servicios
+- La recomendación explica QUÉ hacer específicamente, el servicio indica DÓNDE ir
 - Si la imagen no es automotriz pero el comentario sí describe problemas automotrices: analiza solo el comentario
-- Si ni imagen ni comentario son automotrices: responde ""Ninguno""
 - Para mantenimiento básico (inflado de llantas, lavado): responde ""Ninguno""
-- Máximo 3 frases en total
-- Prioriza contenido automotriz real";
+- Máximo 3 frases en total para problema y recomendación";
 
                     parts.Add(new { text = prompt });
 
