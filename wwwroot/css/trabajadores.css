@@ -30,13 +30,6 @@ a:hover {
   text-decoration: none;
 }
 
-/* Breadcrumb */
-.breadcrumb {
-  background-color: var(--color-white);
-  border-radius: 8px;
-  padding: 12px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 .breadcrumb-item.active {
   color: var(--color-gray);
@@ -87,77 +80,6 @@ a:hover {
   outline: none !important;
   box-shadow: none !important;
   border: none !important;
-}
-
-/* Botón Primario */
-.btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  border: 2px solid var(--color-primary);
-}
-
-.btn-primary:hover {
-  background-color: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
-  color: var(--color-white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(228, 34, 41, 0.3);
-}
-
-.btn-primary:focus,
-.btn-primary:active {
-  background-color: var(--color-primary-dark) !important;
-  border-color: var(--color-primary-dark) !important;
-  color: var(--color-white) !important;
-}
-
-/* Botón Secundario */
-.btn-secondary {
-  background-color: var(--color-gray);
-  color: var(--color-white);
-  border: 2px solid var(--color-gray);
-}
-
-.btn-secondary:hover {
-  background-color: #4a5550;
-  border-color: #4a5550;
-  color: var(--color-white);
-  transform: translateY(-2px);
-}
-
-.btn-secondary:focus,
-.btn-secondary:active {
-  background-color: #4a5550 !important;
-  border-color: #4a5550 !important;
-  color: var(--color-white) !important;
-}
-
-/* Botón Peligro */
-.btn-danger {
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  border: 2px solid var(--color-primary);
-}
-
-.btn-danger:hover {
-  background-color: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
-  color: var(--color-white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(228, 34, 41, 0.3);
-}
-
-.btn-danger:focus,
-.btn-danger:active {
-  background-color: var(--color-primary-dark) !important;
-  border-color: var(--color-primary-dark) !important;
-  color: var(--color-white) !important;
-}
-
-/* Botones pequeños */
-.btn-sm {
-  padding: 6px 12px;
-  font-size: 0.875rem;
 }
 
 /* Inputs y Forms */
@@ -320,7 +242,7 @@ a:hover {
   color: var(--color-primary);
 }
 
-/* Validación */
+/* ValidaciÃ³n */
 .invalid-feedback {
   color: var(--color-primary);
   font-size: 0.875rem;
@@ -370,6 +292,7 @@ a:hover {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

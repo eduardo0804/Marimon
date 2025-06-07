@@ -8,15 +8,15 @@
 
 <link rel="stylesheet" href="~/css/consultarServicio.css" />
 
-<div class="container-fluid mt-1 my-4">
-    <ol class="breadcrumb py-3 m-0 ">
+<div class="container-fluid mt-4">
+    <ol class="breadcrumb ">
         <li class="breadcrumb-item">
             <a asp-area="" asp-controller="Personal_Ventas" asp-action="Index">Módulo de Autopartes</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">Consultar Ventas de Autopartes</li>
     </ol>
 
-    <div class="page-header text-center m-0 p-0 pb-2">
+    <div class="page-header text-center my-4">
         <h2>Consultar Ventas de Autopartes</h2>
     </div>
 
@@ -28,7 +28,7 @@
                     <div class="filter-header p-3 rounded-top">
                         <h5 class="mb-0 d-flex align-items-center">
                             <i class="fas fa-filter me-2 "></i>
-                            <span>Filtrar resultados</span><!-- Cambien el color CARAJO -->
+                            <span>Filtrar resultados</span>
                         </h5>
                     </div>
                     <div class="filter-body p-3">
@@ -95,13 +95,12 @@
                     <div class="filter-footer p-3 bg-light rounded-bottom">
                         <div class="d-flex flex-column align-items-center text-center">
                             <small class="text-dark mb-2">@(Model?.Count ?? 0) ventas encontradas</small>
-                            <button type="submit" class="btn btn-primary btn-filtro-large">Aplicar filtros</button>
+                            <button type="submit" class="btn btn-danger btn-filtro-large">Aplicar filtros</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
-
 
         <!-- Tabla (Right side) -->
         <div class="col-lg-9">
@@ -109,7 +108,7 @@
                 <div class="table-header">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h5 class="mb-0">Listado de Ventas</h5>
+                            <h5 class="mb-0">Listado de Autopartes</h5>
                         </div>
                         <div class="col-auto">
                             <div class="search-container">
@@ -152,10 +151,10 @@
                                             data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal"
                                             data-estado-actual="@venta.Estado"
                                             style="display: inline-flex; align-items: center; gap: 4px;
-                          background-color:
-                          @(venta.Estado == "Pendiente" ? "#ffc107" :
-                                                                                                                                                                                       venta.Estado == "Completado" ? "#28a745" :
-                                                                                                                                                                                       venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
+                                                                                          background-color:
+                                                                                          @(venta.Estado == "Pendiente" ? "#ffc107" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       venta.Estado == "Completado" ? "#28a745" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
                                         @switch (venta.Estado)
                                                 {
                                                     case "Pendiente":

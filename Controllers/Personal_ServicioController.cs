@@ -308,7 +308,9 @@ namespace Marimon.Controllers
 
                 var reserva = await _context.Reserva
                     .Include(r => r.Usuario)
+                    .Include(r => r.Servicio) // <-- Agrega esto
                     .FirstOrDefaultAsync(r => r.res_id == reservaId);
+
 
                 if (reserva == null)
                 {
@@ -372,7 +374,7 @@ namespace Marimon.Controllers
                             .Replace("{{LogoUrl}}", "https://marimonperu.com/wp-content/uploads/2021/06/logo-web-marimon.png")
                             .Replace("{{ReservaId}}", reservaId.ToString())
                             .Replace("{{NumeroReserva}}", reservaId.ToString())
-                            .Replace("{{Servicio}}", reserva.Servicio?.ser_nombre ?? "Servicio reservado") // Asegúrate de tener esto en el modelo
+                            .Replace("{{Servicio}}", reserva.Servicio.ser_nombre) // Asegúrate de tener esto en el modelo
                             .Replace("{{FechaReserva}}", reserva.res_fecha.ToString("dd/MM/yyyy"))
                             .Replace("{{Estado}}", estado.ToString())
                             .Replace("{{MensajeEstado}}", mensaje)
@@ -399,6 +401,7 @@ namespace Marimon.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error al cambiar estado de la reserva: {ex.Message}";
+                _logger.LogError(ex, "Error en CambiarEstadoReserva"); // <- si tienes ILogger
             }
 
             return RedirectToAction("ConsultarServicios");
