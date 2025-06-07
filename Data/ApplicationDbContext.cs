@@ -108,5 +108,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<CodigoDescuento> CodigosDescuento { get; set; }
     public DbSet<Favoritos> Favoritos { get; set; }
     public DbSet<Encuesta> Encuestas { get; set; }
+    public DbSet<OrdenTrabajo> OrdenTrabajos { get; set; } // Descomentar si se agrega la entidad OrdenTrabajo
 
 }

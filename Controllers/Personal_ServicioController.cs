@@ -407,6 +407,18 @@ namespace Marimon.Controllers
             return RedirectToAction("ConsultarServicios");
         }
 
+        public IActionResult OrdenTrabajo()
+        {
+            var ordenes = _context.OrdenTrabajos
+            .Include(o => o.Reserva)
+            .ThenInclude(r => r.Usuario) // Incluye el usuario de la reserva
+            .Include(o => o.Personal)       // El usuario asignado como personal
+            .Include(o => o.Autoparte)      // La autoparte usada
+            .ToList();
+
+            return View(ordenes);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

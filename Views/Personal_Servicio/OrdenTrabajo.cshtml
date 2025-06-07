@@ -1,0 +1,25 @@
+@model List<Marimon.Models.OrdenTrabajo>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Reserva - Placa</th>
+            <th>Cliente</th>
+            <th>Personal asignado</th>
+            <th>Autoparte</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var orden in Model)
+        {
+            <tr>
+                <td>@orden.OrdenTrabajoId</td>
+                <td>@orden.Reserva?.res_placa</td>
+                <td>@orden.Reserva?.Usuario?.usu_nombre @orden.Reserva?.Usuario?.usu_apellido</td>
+                <td>@orden.Personal?.usu_nombre @orden.Personal?.usu_apellido</td>
+                <td>@orden.Autoparte?.aut_nombre</td>
+            </tr>
+        }
+    </tbody>
+</table>

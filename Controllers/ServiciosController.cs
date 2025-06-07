@@ -543,6 +543,8 @@ REGLAS ESPECIALES:
             {
                 _context.Reserva.Add(reserva);
                 await _context.SaveChangesAsync();
+                
+                
                 await EnviarOrdenReservaPorCorreo(reserva);
 
                 TempData["ReservaExitosa"] = true;
