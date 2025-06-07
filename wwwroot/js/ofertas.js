@@ -137,7 +137,8 @@ function limpiarAlertasExistentes() {
     const alertasExistentes = document.querySelectorAll('.alert-danger');
     alertasExistentes.forEach(alerta => {
         if (alerta.textContent.includes('Debe seleccionar') || 
-            alerta.textContent.includes('no tienen ofertas')) {
+            alerta.textContent.includes('no tienen ofertas') ||
+            alerta.textContent.includes('ya tienen ofertas aplicadas')) {
             alerta.remove();
         }
     });
@@ -205,10 +206,32 @@ function verificarProductosConOferta() {
     };
 }
 
+// NUEVA FUNCIÓN: Verificar si todos los productos seleccionados ya tienen ofertas aplicadas
+function verificarProductosYaTienenOfertas() {
+    const checkboxesSeleccionados = document.querySelectorAll('.producto-check:checked');
+    let productosConOferta = 0;
+    
+    checkboxesSeleccionados.forEach(checkbox => {
+        const tieneOferta = checkbox.getAttribute('data-tiene-oferta');
+        if (tieneOferta === 'true') {
+            productosConOferta++;
+        }
+    });
+    
+    // Retorna true si TODOS los productos seleccionados ya tienen ofertas
+    return productosConOferta === checkboxesSeleccionados.length && checkboxesSeleccionados.length > 0;
+}
+
 // Event listeners para los botones con validaciones mejoradas
 document.getElementById('btnAplicarOferta').addEventListener('click', function() {
     if (!verificarProductosSeleccionados()) {
         mostrarMensajeError('Debe seleccionar al menos un producto para aplicar una oferta.');
+        return;
+    }
+    
+    // NUEVA VALIDACIÓN: Verificar si los productos ya tienen ofertas aplicadas
+    if (verificarProductosYaTienenOfertas()) {
+        mostrarMensajeError('Los productos seleccionados ya tienen ofertas aplicadas.');
         return;
     }
     
