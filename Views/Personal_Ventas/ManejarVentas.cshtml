@@ -95,7 +95,7 @@
                     <div class="filter-footer p-3 bg-light rounded-bottom">
                         <div class="d-flex flex-column align-items-center text-center">
                             <small class="text-dark mb-2">@(Model?.Count ?? 0) ventas encontradas</small>
-                            <button type="submit" class="btn btn-primary btn-filtro-large">Aplicar filtros</button>
+                            <button type="submit" class="btn btn-danger btn-filtro-large">Aplicar filtros</button>
                         </div>
                     </div>
                 </form>
@@ -108,7 +108,7 @@
                 <div class="table-header">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h5 class="mb-0">Listado de Ventas</h5>
+                            <h5 class="mb-0">Listado de Autopartes</h5>
                         </div>
                         <div class="col-auto">
                             <div class="search-container">
@@ -151,10 +151,10 @@
                                             data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal"
                                             data-estado-actual="@venta.Estado"
                                             style="display: inline-flex; align-items: center; gap: 4px;
-                                                                                      background-color:
-                                                                                      @(venta.Estado == "Pendiente" ? "#ffc107" :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           venta.Estado == "Completado" ? "#28a745" :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
+                                                                                          background-color:
+                                                                                          @(venta.Estado == "Pendiente" ? "#ffc107" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       venta.Estado == "Completado" ? "#28a745" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       venta.Estado == "Cancelado" ? "#dc3545" : "#6c757d");">
                                         @switch (venta.Estado)
                                                 {
                                                     case "Pendiente":
