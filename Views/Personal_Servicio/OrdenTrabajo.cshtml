@@ -1,4 +1,15 @@
 @model List<Marimon.Models.OrdenTrabajo>
+@{
+    ViewData["Title"] = "Ordenes de Trabajo";
+    ViewData["ActivePage"] = "OrdenTrabajo";
+    Layout = "_LayoutServicio";
+}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a asp-area="" asp-controller="Personal_Servicio" asp-action="Index">Módulo de Servicio</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Orden de Trabajo</li>
+</ol>
 <button class="btn btn-primary" onclick="abrirModalRegistrarOrden()">
     Registrar Orden
 </button>
@@ -12,6 +23,7 @@
             <th>Estado Reserva</th>
             <th>Personal asignado</th>
             <th>Autoparte</th>
+            <th>Descripción</th> <!-- Nueva columna -->
             <th>Descargar PDF</th> <!-- Nueva columna -->
         </tr>
     </thead>
@@ -35,9 +47,13 @@
                             <em>No asignado</em>
                         }
                     </span>
-                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalPersonal"
-                        data-ordenid="@orden.OrdenTrabajoId">Asignar</button>
+                    @if (orden.Personal == null)
+                    {
+                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalPersonal"
+                            data-ordenid="@orden.OrdenTrabajoId">Asignar</button>
+                    }
                 </td>
+
                 <td>
                     <span id="autoparte-nombre-@orden.OrdenTrabajoId">
                         @if (orden.Autoparte != null)
@@ -49,15 +65,31 @@
                             <em>No asignado</em>
                         }
                     </span>
-                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalAutoparte"
-                        data-ordenid="@orden.OrdenTrabajoId">Asignar</button>
+                    @if (orden.Autoparte == null)
+                    {
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalAutoparte"
+                            data-ordenid="@orden.OrdenTrabajoId">Asignar</button>
+                    }
                 </td>
+                <td>@orden.Descripcion</td>
                 <td>
-                    <a href="@Url.Action("DescargarPdf", "OrdenTrabajo", new { id = orden.OrdenTrabajoId })"
-                        class="btn btn-outline-secondary btn-sm" target="_blank" title="Descargar PDF">
-                        <i class="fa fa-file-pdf"></i> <!-- Ícono PDF de FontAwesome -->
-                    </a>
+                    @if (orden.Reserva?.Estado.ToString() == "Confirmada" || orden.Reserva?.Estado.ToString() ==
+                                    "Completada")
+                    {
+                        <a href="@Url.Action("DescargarPdf", "Personal_Servicio", new { id = orden.OrdenTrabajoId })"
+                            class="btn btn-outline-secondary btn-sm" target="_blank" title="Descargar PDF">
+                            <i class="fa fa-file-pdf"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-secondary btn-sm" disabled
+                            title="Disponible solo si la reserva está confirmada o completada">
+                            <i class="fa fa-file-pdf"></i>
+                        </button>
+                    }
                 </td>
+
             </tr>
         }
     </tbody>
@@ -323,6 +355,7 @@
         const reservaSelect = document.getElementById("reservaSelect");
         const reservaSeleccionadaInput = document.getElementById("reservaSeleccionada");
         const btnRegistrarOrden = document.getElementById("btnRegistrarOrden");
+        const descripcionInput = document.getElementById("descripcionInput");
 
         if (!servicioSelect) return;
 
@@ -368,6 +401,8 @@
 
         btnRegistrarOrden.addEventListener("click", function () {
             const reservaId = reservaSeleccionadaInput.value;
+            const descripcion = descripcionInput.value;
+
             if (!reservaId) {
                 alert("Selecciona una reserva.");
                 return;
@@ -376,19 +411,19 @@
             fetch("/Personal_Servicio/RegistrarOrden", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(parseInt(reservaId))
+                body: JSON.stringify({
+                    ReservaId: parseInt(reservaId),
+                    Descripcion: descripcion
+                })
             })
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) {
                         alert("Orden registrada exitosamente.");
-                        // Cierra el modal
                         bootstrap.Modal.getInstance(document.getElementById("modalRegistrarOrden")).hide();
-                        // Recarga la página para mostrar la orden nueva
                         location.reload();
                     } else {
                         alert(result.message || "Error al registrar la orden.");
-                        // Aquí NO cierras el modal, para que siga abierto
                     }
                 })
                 .catch(error => {
@@ -396,6 +431,5 @@
                     console.error(error);
                 });
         });
-
     }    
 </script>

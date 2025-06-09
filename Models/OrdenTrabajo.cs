@@ -33,8 +33,7 @@ namespace Marimon.Models
         public int CantidadUsada { get; set; }
 
         // Detalles del trabajo realizado
-        [NotMapped]
-        public string? Observaciones { get; set; }
+        public string? Descripcion { get; set; }
 
     }
 }

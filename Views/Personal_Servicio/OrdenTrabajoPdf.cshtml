@@ -1,0 +1,25 @@
+@model Marimon.Models.OrdenTrabajo
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Orden de Trabajo</title>
+    <style>
+        body { font-family: Arial; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        td, th { border: 1px solid #ccc; padding: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Orden de Trabajo #@Model.OrdenTrabajoId</h1>
+    <table>
+        <tr><th>Servicio</th><td>@Model.Reserva?.Servicio?.ser_nombre</td></tr>
+        <tr><th>Placa</th><td>@Model.Reserva?.res_placa</td></tr>
+        <tr><th>Cliente</th><td>@Model.Reserva?.Usuario?.usu_nombre @Model.Reserva?.Usuario?.usu_apellido</td></tr>
+        <tr><th>Estado</th><td>@Model.Reserva?.Estado</td></tr>
+        <tr><th>Personal Asignado</th><td>@Model.Personal?.usu_correo </td></tr>
+        <tr><th>Autoparte usada</th><td>@Model.Autoparte?.aut_nombre </td></tr>
+    </table>
+</body>
+</html>

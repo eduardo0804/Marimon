@@ -11,6 +11,10 @@ using Marimon.Services;
 using Marimon.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -21,13 +25,22 @@ namespace Marimon.Controllers
         private readonly ILogger<Personal_ServicioController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly PdfGeneratorService _pdfService;
+        private readonly ICompositeViewEngine _viewEngine;
+        private readonly ITempDataProvider _tempDataProvider;
+        private readonly IServiceProvider _serviceProvider;
 
 
-        public Personal_ServicioController(ILogger<Personal_ServicioController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public Personal_ServicioController(ILogger<Personal_ServicioController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager, PdfGeneratorService pdfService,
+        ICompositeViewEngine viewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
         {
             _context = context;
             _logger = logger;
             _userManager = userManager;
+            _pdfService = pdfService;
+            _viewEngine = viewEngine;
+            _tempDataProvider = tempDataProvider;
+            _serviceProvider = serviceProvider;
         }
 
         public IActionResult Index()
@@ -564,33 +577,98 @@ namespace Marimon.Controllers
 
         }
 
+        public class RegistrarOrdenDto
+        {
+            public int ReservaId { get; set; }
+            public string? Descripcion { get; set; }
+        }
+
+
         // Guardar orden con solo el ReservaId
         [HttpPost]
-        public IActionResult RegistrarOrden([FromBody] int reservaId)
+        public IActionResult RegistrarOrden([FromBody] RegistrarOrdenDto dto)
         {
-            // Verificar que exista la reserva
-            if (!_context.Reserva.Any(r => r.res_id == reservaId))
+            if (!_context.Reserva.Any(r => r.res_id == dto.ReservaId))
             {
                 return Json(new { success = false, message = "Reserva no válida." });
             }
 
-            // Verificar que no exista ya una orden asociada a esta reserva
-            if (_context.OrdenTrabajos.Any(o => o.ReservaId == reservaId))
+            if (_context.OrdenTrabajos.Any(o => o.ReservaId == dto.ReservaId))
             {
                 return Json(new { success = false, message = "Ya existe una orden para esta reserva." });
             }
 
             var orden = new OrdenTrabajo
             {
-                ReservaId = reservaId
+                ReservaId = dto.ReservaId,
+                Descripcion = dto.Descripcion // Solo se usa en memoria, no se guarda
             };
 
             _context.OrdenTrabajos.Add(orden);
             _context.SaveChanges();
 
-            return Json(new { success = true });
+            return Json(new
+            {
+                success = true,
+                message = "Orden registrada exitosamente.",
+                descripcionUsada = orden.Descripcion
+            });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> DescargarPdf(int id)
+        {
+            var orden = await _context.OrdenTrabajos
+                .Include(o => o.Reserva)
+                    .ThenInclude(r => r.Servicio)
+                .Include(o => o.Reserva)
+                    .ThenInclude(r => r.Usuario)
+                .Include(o => o.Personal)
+                .Include(o => o.Autoparte)
+                .FirstOrDefaultAsync(o => o.OrdenTrabajoId == id);
+
+            if (orden == null)
+                return NotFound();
+
+            // Renderiza la vista HTML a string
+            var htmlContent = await RenderViewToStringAsync("OrdenTrabajoPdf", orden);
+
+            // Genera el PDF con DinkToPdf
+            var pdf = _pdfService.GenerateComprobantePdf(htmlContent);
+
+            return File(pdf, "application/pdf", $"OrdenTrabajo_{id}.pdf");
+        }
+
+        private async Task<string> RenderViewToStringAsync<TModel>(string viewName, TModel model)
+        {
+            var actionContext = new ActionContext(HttpContext, RouteData, ControllerContext.ActionDescriptor);
+
+            using var sw = new StringWriter();
+            var viewResult = _viewEngine.FindView(actionContext, viewName, false);
+
+            if (viewResult.View == null)
+                throw new ArgumentNullException($"{viewName} no fue encontrada");
+
+            var viewDictionary = new ViewDataDictionary<TModel>(
+                metadataProvider: new EmptyModelMetadataProvider(),
+                modelState: new ModelStateDictionary())
+            {
+                Model = model
+            };
+
+            var tempData = new TempDataDictionary(HttpContext, _tempDataProvider);
+            var viewContext = new ViewContext(actionContext, viewResult.View, viewDictionary, tempData, sw, new HtmlHelperOptions());
+
+            await viewResult.View.RenderAsync(viewContext);
+            return sw.ToString();
+        }
+
+        public IActionResult TestPdf()
+        {
+            string html = "<h1>Hola PDF</h1><p>Esto es una prueba.</p>";
+            var pdf = _pdfService.GenerateComprobantePdf(html);
+            return File(pdf, "application/pdf", "prueba.pdf");
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
