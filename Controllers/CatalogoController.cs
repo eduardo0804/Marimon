@@ -32,32 +32,19 @@ namespace Marimon.Controllers
         public IActionResult Index(string buscar, int pagina = 1, string orden = null, List<int> categorias = null)
         {
             const int PaginasPorPagina = 12;
-
-            var ventasOnline = _context.DetalleVentas
-                .GroupBy(d => d.AutoParteId)
-                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(d => d.det_cantidad) });
-
-            var ventasPresenciales = _context.Salida
-                .GroupBy(s => s.AutoparteId)
-                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(s => s.sal_cantidad) });
-
-            var ventasTotales = ventasOnline
-                .Concat(ventasPresenciales)
-                .GroupBy(v => v.AutoparteId)
-                .Select(g => new { AutoparteId = g.Key, Total = g.Sum(x => x.Cantidad) })
-                .ToList();
-
-            // MODIFICACIÓN: Incluir las ofertas en la consulta
             var hoy = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Unspecified);
-            var autopartesQuery = _context.Autopartes
-                .Include(a => a.Categoria)
-                .Include(a => a.Ofertas) // Incluir ofertas
-                .AsQueryable();
 
+            // 1. Calcular ventas totales una sola vez y convertir a Dictionary para mejor rendimiento
+            var ventasTotalesDict = GetVentasTotalesDictionary();
+
+            // 2. Query base SIN Include inicialmente
+            var autopartesQuery = _context.Autopartes.AsQueryable();
+
+            // 3. Aplicar filtros ANTES de Include
             if (!string.IsNullOrEmpty(buscar))
             {
                 autopartesQuery = autopartesQuery
-                    .Where(a => EF.Functions.ILike(a.aut_nombre.ToLower(), $"%{buscar.ToLower()}%"));
+                    .Where(a => EF.Functions.ILike(a.aut_nombre, $"%{buscar}%")); 
             }
 
             if (categorias != null && categorias.Any())
@@ -65,12 +52,10 @@ namespace Marimon.Controllers
                 autopartesQuery = autopartesQuery.Where(a => categorias.Contains(a.CategoriaId));
             }
 
-            // Filtro de novedades (mostrar solo los 3 últimos por ID)
-            bool esNovedades = orden == "novedades";
-            if (esNovedades)
+            // 4. Aplicar ordenamiento ANTES de Include
+            if (orden == "novedades")
             {
-                autopartesQuery = autopartesQuery
-                    .OrderByDescending(a => a.aut_id);
+                autopartesQuery = autopartesQuery.OrderByDescending(a => a.aut_id);
             }
             else if (orden == "asc")
             {
@@ -82,68 +67,74 @@ namespace Marimon.Controllers
             }
             else if (orden == "mas_vendidas")
             {
+                var idsVendidos = ventasTotalesDict
+                    .OrderByDescending(v => v.Value)
+                    .Select(v => v.Key)
+                    .Take(100)
+                    .ToList();
+
                 autopartesQuery = autopartesQuery
-                    .AsEnumerable()
-                    .OrderByDescending(a =>
-                        ventasTotales.FirstOrDefault(v => v.AutoparteId == a.aut_id)?.Total ?? 0)
-                    .AsQueryable();
+                    .Where(a => idsVendidos.Contains(a.aut_id))
+                    .OrderBy(a => idsVendidos.IndexOf(a.aut_id));
             }
             else
             {
                 autopartesQuery = autopartesQuery.OrderBy(a => a.aut_id);
             }
 
+            // 5. Contar total ANTES de Include y paginación
             var totalAutopartes = autopartesQuery.Count();
 
             if (totalAutopartes == 0)
             {
                 ViewBag.Mensaje = "No se encontraron productos que coincidan con tu búsqueda.";
+                var emptyViewModel = new CatalogoViewModelModificado { Autopartes = new List<AutoparteViewModel>() };
+                ViewBag.Categorias = _context.Categorias.ToList();
+                return View(emptyViewModel);
             }
 
+            // 6. Aplicar paginación ANTES de Include
             autopartesQuery = autopartesQuery
                 .Skip((pagina - 1) * PaginasPorPagina)
                 .Take(PaginasPorPagina);
 
-            // MODIFICACIÓN: Convertir a AutoparteViewModel con información de ofertas
-            var autopartes = autopartesQuery.Select(a => new AutoparteViewModel
+            // 7. Ahora SÍ aplicar Include solo a los registros paginados
+            var autopartesConDatos = autopartesQuery
+                .Include(a => a.Categoria)
+                .Include(a => a.Ofertas.Where(o => o.ofe_fecha_inicio <= hoy && o.ofe_fecha_fin >= hoy))
+                .ToList();
+
+            // 8. Mapear a ViewModel optimizado - evitar múltiples OrderByDescending
+            var autopartes = autopartesConDatos.Select(a =>
             {
-                aut_id = a.aut_id,
-                aut_nombre = a.aut_nombre,
-                aut_descripcion = a.aut_descripcion,
-                aut_precio = a.aut_precio,
-                aut_cantidad = a.aut_cantidad,
-                aut_imagen = a.aut_imagen,
-                CategoriaNombre = a.Categoria != null ? a.Categoria.cat_nombre : string.Empty,
-                // Información de ofertas con manejo seguro de nulls
-                OfertaId = a.Ofertas != null && a.Ofertas.Any()
-                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_id
-                    : (int?)null,
-                PorcentajeOferta = a.Ofertas != null && a.Ofertas.Any()
-                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje
-                    : (decimal?)null,
-                DescripcionOferta = a.Ofertas != null && a.Ofertas.Any()
-                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_descripcion
-                    : null,
-                FechaInicio = a.Ofertas != null && a.Ofertas.Any()
-                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio
-                    : (DateTime?)null,
-                FechaFin = a.Ofertas != null && a.Ofertas.Any()
-                    ? a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin
-                    : (DateTime?)null,
-                PrecioOferta = a.Ofertas != null && a.Ofertas.Any()
-                    ? a.aut_precio - (a.aut_precio * (a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje / 100m))
-                    : (decimal?)null,
-                OfertaActiva = a.Ofertas != null && a.Ofertas.Any()
-                    ? (hoy >= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio
-                       && hoy <= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin)
-                    : (bool?)null
+                var ofertaActiva = a.Ofertas?.FirstOrDefault(); 
+
+                return new AutoparteViewModel
+                {
+                    aut_id = a.aut_id,
+                    aut_nombre = a.aut_nombre,
+                    aut_descripcion = a.aut_descripcion,
+                    aut_precio = a.aut_precio,
+                    aut_cantidad = a.aut_cantidad,
+                    aut_imagen = a.aut_imagen,
+                    CategoriaNombre = a.Categoria?.cat_nombre ?? string.Empty,
+
+                    // Información de ofertas simplificada
+                    OfertaId = ofertaActiva?.ofe_id,
+                    PorcentajeOferta = ofertaActiva?.ofe_porcentaje,
+                    DescripcionOferta = ofertaActiva?.ofe_descripcion,
+                    FechaInicio = ofertaActiva?.ofe_fecha_inicio,
+                    FechaFin = ofertaActiva?.ofe_fecha_fin,
+                    PrecioOferta = ofertaActiva != null
+                        ? a.aut_precio - (a.aut_precio * (ofertaActiva.ofe_porcentaje / 100m))
+                        : (decimal?)null,
+                    OfertaActiva = ofertaActiva != null
+                };
             }).ToList();
 
             var totalPaginas = (int)Math.Ceiling((double)totalAutopartes / PaginasPorPagina);
-
             var carrito = _context.Carritos.FirstOrDefault(c => c.UsuarioId == User.Identity.Name);
 
-            // MODIFICACIÓN: Usar CatalogoViewModelModificado en lugar del original
             var viewModel = new CatalogoViewModelModificado
             {
                 Autopartes = autopartes,
@@ -155,6 +146,23 @@ namespace Marimon.Controllers
 
             ViewBag.Categorias = _context.Categorias.ToList();
             return View(viewModel);
+        }
+
+        // Método auxiliar para ventas totales
+        private Dictionary<int, int> GetVentasTotalesDictionary()
+        {
+            var ventasOnline = _context.DetalleVentas
+                .GroupBy(d => d.AutoParteId)
+                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(d => d.det_cantidad) });
+
+            var ventasPresenciales = _context.Salida
+                .GroupBy(s => s.AutoparteId)
+                .Select(g => new { AutoparteId = g.Key, Cantidad = g.Sum(s => s.sal_cantidad) });
+
+            return ventasOnline
+                .Concat(ventasPresenciales)
+                .GroupBy(v => v.AutoparteId)
+                .ToDictionary(g => g.Key, g => g.Sum(x => x.Cantidad));
         }
 
         // GET: Catalogo/DetalleAutoparte/5
