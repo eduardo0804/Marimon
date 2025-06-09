@@ -742,4 +742,74 @@
             statusObserver.disconnect();
         }
     });
+    newBtnRegistrarOrden.addEventListener("click", function() {
+    const reservaId = reservaSeleccionadaInput.value;
+    const descripcion = descripcionInput.value;
+
+    if (!reservaId) {
+        showToast('error', 'Error', 'Selecciona una reserva.');
+        return;
+    }
+
+    // GUARDAR dimensiones originales del botón
+    const originalWidth = newBtnRegistrarOrden.offsetWidth;
+    const originalHeight = newBtnRegistrarOrden.offsetHeight;
+    const originalText = newBtnRegistrarOrden.innerHTML;
+    
+    // Fijar dimensiones para evitar deformación
+    newBtnRegistrarOrden.style.width = originalWidth + 'px';
+    newBtnRegistrarOrden.style.height = originalHeight + 'px';
+    newBtnRegistrarOrden.style.minWidth = originalWidth + 'px';
+    
+    // Deshabilitar botón y cambiar contenido
+    newBtnRegistrarOrden.disabled = true;
+    newBtnRegistrarOrden.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+    fetch("/Personal_Servicio/RegistrarOrden", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            ReservaId: parseInt(reservaId),
+            Descripcion: descripcion
+        })
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            // Mostrar éxito con checkmark
+            newBtnRegistrarOrden.innerHTML = '<i class="fas fa-check"></i>';
+            newBtnRegistrarOrden.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
+            
+            showToast('success', '¡Éxito!', 'Orden registrada exitosamente.');
+            
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById("modalRegistrarOrden")).hide();
+            }, 1000);
+
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        } else {
+            showToast('error', 'Error', result.message || 'Error al registrar la orden.');
+            // Restaurar botón en caso de error
+            restoreButton();
+        }
+    })
+    .catch(error => {
+        showToast('error', 'Error de Conexión', 'No se pudo conectar con el servidor.');
+        console.error(error);
+        // Restaurar botón en caso de error
+        restoreButton();
+    });
+    
+    // Función para restaurar el botón
+    function restoreButton() {
+        newBtnRegistrarOrden.disabled = false;
+        newBtnRegistrarOrden.innerHTML = originalText;
+        newBtnRegistrarOrden.style.width = '';
+        newBtnRegistrarOrden.style.height = '';
+        newBtnRegistrarOrden.style.minWidth = '';
+        newBtnRegistrarOrden.style.background = '';
+    }
+});
 </script>
