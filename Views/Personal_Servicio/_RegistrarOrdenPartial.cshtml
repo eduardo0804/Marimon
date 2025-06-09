@@ -1,0 +1,25 @@
+@model List<Servicio>
+
+<div>
+    <label>Servicio</label>
+    <select class="form-select" id="servicioSelect">
+        <option value="">-- Selecciona un servicio --</option>
+        @foreach (var servicio in Model)
+        {
+            <option value="@servicio.ser_id">@servicio.ser_nombre</option>
+        }
+    </select>
+</div>
+
+<div id="reservasContainer" class="mt-3">
+    <label>Reservas</label>
+    <select class="form-select" id="reservaSelect" disabled>
+        <option value="">Selecciona un servicio primero</option>
+    </select>
+</div>
+
+<input type="hidden" id="reservaSeleccionada" />
+
+<div class="mt-3 text-end">
+    <button id="btnRegistrarOrden" class="btn btn-success" disabled>Registrar Orden</button>
+</div>

@@ -1,13 +1,18 @@
 @model List<Marimon.Models.OrdenTrabajo>
-
+<button class="btn btn-primary" onclick="abrirModalRegistrarOrden()">
+    Registrar Orden
+</button>
 <table class="table">
     <thead>
         <tr>
             <th>ID</th>
+            <th>Servicio</th>
             <th>Reserva - Placa</th>
             <th>Cliente</th>
+            <th>Estado Reserva</th>
             <th>Personal asignado</th>
             <th>Autoparte</th>
+            <th>Descargar PDF</th> <!-- Nueva columna -->
         </tr>
     </thead>
     <tbody>
@@ -15,11 +20,382 @@
         {
             <tr>
                 <td>@orden.OrdenTrabajoId</td>
+                <td>@orden.Reserva?.Servicio?.ser_nombre</td>
                 <td>@orden.Reserva?.res_placa</td>
                 <td>@orden.Reserva?.Usuario?.usu_nombre @orden.Reserva?.Usuario?.usu_apellido</td>
-                <td>@orden.Personal?.usu_nombre @orden.Personal?.usu_apellido</td>
-                <td>@orden.Autoparte?.aut_nombre</td>
+                <td>@orden.Reserva?.Estado</td>
+                <td>
+                    <span id="personal-nombre-@orden.OrdenTrabajoId">
+                        @if (orden.Personal != null)
+                        {
+                            @orden.Personal.usu_correo
+                        }
+                        else
+                        {
+                            <em>No asignado</em>
+                        }
+                    </span>
+                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalPersonal"
+                        data-ordenid="@orden.OrdenTrabajoId">Asignar</button>
+                </td>
+                <td>
+                    <span id="autoparte-nombre-@orden.OrdenTrabajoId">
+                        @if (orden.Autoparte != null)
+                        {
+                            @orden.Autoparte.aut_nombre
+                        }
+                        else
+                        {
+                            <em>No asignado</em>
+                        }
+                    </span>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalAutoparte"
+                        data-ordenid="@orden.OrdenTrabajoId">Asignar</button>
+                </td>
+                <td>
+                    <a href="@Url.Action("DescargarPdf", "OrdenTrabajo", new { id = orden.OrdenTrabajoId })"
+                        class="btn btn-outline-secondary btn-sm" target="_blank" title="Descargar PDF">
+                        <i class="fa fa-file-pdf"></i> <!-- Ícono PDF de FontAwesome -->
+                    </a>
+                </td>
             </tr>
         }
     </tbody>
 </table>
+
+
+<div class="modal fade" id="modalAutoparte" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Asignar Autoparte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAutoparte">
+                    @* Token antifalsificación *@
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" id="ordenId" name="ordenId" />
+
+                    <div class="mb-3">
+                        <label for="categoriaSelect">Categoría</label>
+                        <select id="categoriaSelect" class="form-select">
+                            <option value="">Selecciona una categoría</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="autoparteSelect">Autoparte</label>
+                        <select id="autoparteSelect" class="form-select" disabled>
+                            <option value="">Selecciona una autoparte</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="guardarAutoparte()">Guardar Autoparte</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalPersonal" tabindex="-1" aria-labelledby="modalPersonalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Asignar Personal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAsignarPersonal">
+                    <input type="hidden" id="ordenIdPersonal" name="ordenId" />
+                    <div class="mb-3">
+                        <label for="personalSelect" class="form-label">Selecciona un personal</label>
+                        <select class="form-select" id="personalSelect" name="personalId" required>
+                            <option value="">Cargando...</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="guardarPersonal()">Asignar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalRegistrarOrden" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Orden de Trabajo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="modalBodyRegistrarOrden">
+                <!-- Aquí se cargará dinámicamente la vista parcial -->
+                <div class="text-center">
+                    <div class="spinner-border"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let modalElement = document.getElementById('modalAutoparte');
+
+    modalElement.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const ordenId = button.getAttribute('data-ordenid');
+        document.getElementById('ordenId').value = ordenId;
+
+        const categoriaSelect = document.getElementById('categoriaSelect');
+        categoriaSelect.innerHTML = '<option value="">Selecciona una categoría</option>';
+
+        fetch('/Personal_Servicio/GetCategorias')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(categoria => {
+                    let option = document.createElement("option");
+                    option.value = categoria.id;
+                    option.text = categoria.nombre;
+                    categoriaSelect.appendChild(option);
+                });
+            });
+    });
+
+    document.getElementById("categoriaSelect").addEventListener("change", function () {
+        const categoriaId = this.value;
+        console.log("Categoría seleccionada:", categoriaId);
+        const autoparteSelect = document.getElementById("autoparteSelect");
+
+        autoparteSelect.innerHTML = '<option value="">Selecciona una autoparte</option>';
+        autoparteSelect.disabled = true;
+
+        if (categoriaId) {
+            fetch(`/Personal_Servicio/GetAutopartesPorCategoria?categoriaId=${categoriaId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    data.forEach(autoparte => {
+                        let option = document.createElement("option");
+                        option.value = autoparte.id;
+                        option.text = autoparte.aut_nombre;
+                        autoparteSelect.appendChild(option);
+                    });
+                    autoparteSelect.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error al cargar autopartes:', error);
+                    // Aquí puedes mostrar un mensaje al usuario o manejar el error visualmente
+                });
+        }
+    });
+
+
+    function guardarAutoparte() {
+        const ordenId = document.getElementById("ordenId").value;
+        const autoparteSelect = document.getElementById("autoparteSelect");
+        const autoparteId = autoparteSelect.value;
+        const autoparteNombre = autoparteSelect.options[autoparteSelect.selectedIndex].text;
+
+        fetch("/Personal_Servicio/AsignarAutoparte", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: JSON.stringify({
+                ordenId: parseInt(ordenId),
+                autoparteId: parseInt(autoparteId)
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    const span = document.getElementById(`autoparte-nombre-${ordenId}`);
+                    span.textContent = autoparteNombre;
+                    bootstrap.Modal.getInstance(modalElement).hide();
+                } else {
+                    alert("Error al asignar la autoparte.");
+                }
+            });
+    }
+
+    modalElement.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('categoriaSelect').innerHTML = '<option value="">Selecciona una categoría</option>';
+        const autoparteSelect = document.getElementById("autoparteSelect");
+        autoparteSelect.innerHTML = '<option value="">Selecciona una autoparte</option>';
+        autoparteSelect.disabled = true;
+    });
+
+    let modalPersonal = document.getElementById('modalPersonal');
+
+    modalPersonal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const ordenId = button.getAttribute('data-ordenid');
+        document.getElementById('ordenIdPersonal').value = ordenId;
+
+        const personalSelect = document.getElementById('personalSelect');
+        personalSelect.innerHTML = '<option value="">Cargando personal...</option>';
+
+        // Aquí pides al backend la lista de usuarios con rol Personal_Servicio
+        fetch('/Personal_Servicio/ObtenerPersonalServicio')
+            .then(response => response.json())
+            .then(data => {
+                personalSelect.innerHTML = '<option value="">Selecciona un trabajador</option>';
+                data.forEach(personal => {
+                    let option = document.createElement("option");
+                    option.value = personal.id;
+                    option.text = personal.correo
+                    personalSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar personal:', error);
+                personalSelect.innerHTML = '<option value="">Error al cargar personal</option>';
+            });
+    });
+
+    function guardarPersonal() {
+        const ordenId = document.getElementById('ordenIdPersonal').value;
+        const personalSelect = document.getElementById('personalSelect');
+        const personalId = personalSelect.value;
+
+        console.log("Personal seleccionado:", personalId);
+
+        if (!personalId) {
+            alert('Debes seleccionar un trabajador.');
+            return;
+        }
+
+        fetch('/Personal_Servicio/AsignarPersonal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: JSON.stringify({
+                ordenId: parseInt(ordenId),
+                personalId: personalId
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`personal-nombre-${ordenId}`).textContent = data.correo;
+                    bootstrap.Modal.getInstance(document.getElementById('modalPersonal')).hide();
+                } else {
+                    alert(data.message || 'Error al asignar el personal.');
+                }
+            })
+            .catch(error => {
+                alert('Error de red o inesperado');
+                console.error(error);
+            });
+    }
+
+    modalPersonal.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('personalSelect').innerHTML = '<option value="">Selecciona un trabajador</option>';
+    });
+    function abrirModalRegistrarOrden() {
+        const modalBody = document.getElementById("modalBodyRegistrarOrden");
+        modalBody.innerHTML = '<div class="text-center"><div class="spinner-border"></div></div>';
+
+        fetch("/Personal_Servicio/RegistrarOrdenParcial")
+            .then(res => res.text())
+            .then(html => {
+                modalBody.innerHTML = html;
+                inicializarEventosServicioReserva(); // aquí se cargan los scripts
+                const modal = new bootstrap.Modal(document.getElementById("modalRegistrarOrden"));
+                modal.show();
+            })
+            .catch(err => {
+                console.error("Error al cargar el formulario:", err);
+                modalBody.innerHTML = '<div class="alert alert-danger">Error al cargar el formulario.</div>';
+            });
+    }
+
+    function inicializarEventosServicioReserva() {
+        const servicioSelect = document.getElementById("servicioSelect");
+        const reservaSelect = document.getElementById("reservaSelect");
+        const reservaSeleccionadaInput = document.getElementById("reservaSeleccionada");
+        const btnRegistrarOrden = document.getElementById("btnRegistrarOrden");
+
+        if (!servicioSelect) return;
+
+        servicioSelect.addEventListener("change", function () {
+            const servicioId = this.value;
+            reservaSelect.innerHTML = '<option value="">Cargando reservas...</option>';
+            reservaSelect.disabled = true;
+
+            if (servicioId) {
+                fetch(`/Personal_Servicio/GetReservasPorServicio?servicioId=${servicioId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        reservaSelect.innerHTML = data.length === 0
+                            ? '<option value="">No hay reservas para este servicio</option>'
+                            : '<option value="">Selecciona una reserva</option>';
+
+                        data.forEach(reserva => {
+                            const option = document.createElement("option");
+                            const fecha = new Date(reserva.fecha);
+                            const fechaFormateada = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
+                            option.value = reserva.id;
+                            option.text = `Reserva ID: ${reserva.id} - Fecha: ${fechaFormateada}`;
+                            reservaSelect.appendChild(option);
+                        });
+
+                        reservaSelect.disabled = false;
+                    })
+                    .catch(err => {
+                        console.error("Error al cargar reservas:", err);
+                        reservaSelect.innerHTML = '<option value="">Error al cargar reservas</option>';
+                        reservaSelect.disabled = true;
+                    });
+            } else {
+                reservaSelect.innerHTML = '<option value="">Selecciona un servicio primero</option>';
+                reservaSelect.disabled = true;
+            }
+        });
+
+        reservaSelect.addEventListener("change", function () {
+            reservaSeleccionadaInput.value = this.value;
+            btnRegistrarOrden.disabled = !this.value;
+        });
+
+        btnRegistrarOrden.addEventListener("click", function () {
+            const reservaId = reservaSeleccionadaInput.value;
+            if (!reservaId) {
+                alert("Selecciona una reserva.");
+                return;
+            }
+
+            fetch("/Personal_Servicio/RegistrarOrden", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(parseInt(reservaId))
+            })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.success) {
+                        alert("Orden registrada exitosamente.");
+                        // Cierra el modal
+                        bootstrap.Modal.getInstance(document.getElementById("modalRegistrarOrden")).hide();
+                        // Recarga la página para mostrar la orden nueva
+                        location.reload();
+                    } else {
+                        alert(result.message || "Error al registrar la orden.");
+                        // Aquí NO cierras el modal, para que siga abierto
+                    }
+                })
+                .catch(error => {
+                    alert("Error en la conexión.");
+                    console.error(error);
+                });
+        });
+
+    }    
+</script>

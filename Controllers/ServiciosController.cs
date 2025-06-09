@@ -543,8 +543,17 @@ REGLAS ESPECIALES:
             {
                 _context.Reserva.Add(reserva);
                 await _context.SaveChangesAsync();
-                
-                
+
+                // // Crear orden de trabajo ligada a esta reserva
+                // var ordenTrabajo = new OrdenTrabajo
+                // {
+                //     ReservaId = reserva.res_id,
+                //     // PersonalId y AutoparteId se asignarán después
+                // };
+
+                // _context.OrdenTrabajos.Add(ordenTrabajo);
+                // await _context.SaveChangesAsync();
+
                 await EnviarOrdenReservaPorCorreo(reserva);
 
                 TempData["ReservaExitosa"] = true;

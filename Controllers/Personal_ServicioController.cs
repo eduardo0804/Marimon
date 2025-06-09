@@ -9,6 +9,7 @@ using Marimon.Enums;
 using Marimon.Models;
 using Marimon.Services;
 using Marimon.ViewModel;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,11 +20,14 @@ namespace Marimon.Controllers
     {
         private readonly ILogger<Personal_ServicioController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public Personal_ServicioController(ILogger<Personal_ServicioController> logger, ApplicationDbContext context)
+
+        public Personal_ServicioController(ILogger<Personal_ServicioController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -137,12 +141,12 @@ namespace Marimon.Controllers
 
             // IMPORTANTE: Siempre mostrar TODOS los estados posibles
             var todosLosEstados = new List<string>
-    {
-        "Pendiente",
-        "Confirmada",
-        "Completada",
-        "Cancelada"
-    };
+            {
+                "Pendiente",
+                "Confirmada",
+                "Completada",
+                "Cancelada"
+            };
 
             ViewBag.EstadoSeleccionado = estado;
             // Usar todos los estados, NO los estados de las reservas filtradas
@@ -407,17 +411,186 @@ namespace Marimon.Controllers
             return RedirectToAction("ConsultarServicios");
         }
 
+        [HttpGet]
+        public JsonResult GetCategorias()
+        {
+            var categorias = _context.Categorias
+                .Select(c => new { id = c.cat_id, nombre = c.cat_nombre })
+                .ToList();
+
+            return Json(categorias);
+        }
+
+        [HttpGet]
+        public JsonResult GetAutopartesPorCategoria(int categoriaId)
+        {
+            var autopartes = _context.Autopartes
+                .Where(a => a.CategoriaId == categoriaId)
+                .Select(a => new { id = a.aut_id, aut_nombre = a.aut_nombre })
+                .ToList();
+
+            return Json(autopartes);
+        }
+
+        public class AsignarAutoparteModel
+        {
+            public int ordenId { get; set; }
+            public int autoparteId { get; set; }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AsignarAutoparte([FromBody] AsignarAutoparteModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var orden = _context.OrdenTrabajos.Find(model.ordenId);
+            if (orden == null) return NotFound();
+
+            orden.AutoparteId = model.autoparteId;
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AsignarPersonal([FromBody] AsignarPersonalViewModel model)
+        {
+            // Buscar la orden por Id
+            var orden = await _context.OrdenTrabajos.FindAsync(model.ordenId);
+            if (orden == null)
+            {
+                return Json(new { success = false, message = "Orden no encontrada" });
+            }
+
+            // Buscar el personal por Id (string)
+            var personal = await _context.Usuarios.FindAsync(model.personalId);
+            if (personal == null)
+            {
+                // Loguear en consola (puedes cambiar a logger si tienes configurado)
+                Console.WriteLine($"No se encontró personal con ID: {model.personalId}");
+
+                return Json(new { success = false, message = "Personal no encontrado" });
+            }
+
+            // Si personal encontrado, asignar y guardar
+            orden.PersonalId = model.personalId;
+            await _context.SaveChangesAsync();
+
+            // También puedes mostrar en consola info de personal encontrado
+            Console.WriteLine($"Personal asignado: {personal.usu_nombre} ({personal.usu_correo})");
+
+            // Retornar éxito con correo del personal
+            return Json(new { success = true, correo = personal.usu_correo });
+        }
+
+
+
+        public class AsignarPersonalViewModel
+        {
+            public int ordenId { get; set; }
+            public string personalId { get; set; }
+        }
+
+        public async Task<IActionResult> ObtenerPersonalServicio()
+        {
+            // 1. Obtener los usuarios que tienen el rol 'Personal_Servicio'
+            var usersInRole = await _userManager.GetUsersInRoleAsync("Personal_Servicio");
+
+            // 2. Obtener los IDs de esos usuarios (estos IDs deben coincidir con 'usu_id' en tu tabla Usuario)
+            var userIds = usersInRole.Select(u => u.Id).ToList();
+
+            // 3. Consultar la tabla Usuario para obtener la información detallada
+            var personalServicio = _context.Usuarios
+                .Where(u => userIds.Contains(u.usu_id))
+                .Select(u => new
+                {
+                    Id = u.usu_id,
+                    Nombre = u.usu_nombre,
+                    Apellido = u.usu_apellido,
+                    Correo = u.usu_correo
+                })
+                .ToList();
+
+            return Json(personalServicio);
+        }
+
+        // Tu acción que retorna la vista con la lista ordenes
         public IActionResult OrdenTrabajo()
         {
+
             var ordenes = _context.OrdenTrabajos
-            .Include(o => o.Reserva)
-            .ThenInclude(r => r.Usuario) // Incluye el usuario de la reserva
-            .Include(o => o.Personal)       // El usuario asignado como personal
-            .Include(o => o.Autoparte)      // La autoparte usada
-            .ToList();
+                .Include(o => o.Reserva)
+                    .ThenInclude(r => r.Usuario)
+                .Include(o => o.Reserva)
+                    .ThenInclude(r => r.Servicio)
+                .Include(o => o.Personal)
+                .Include(o => o.Autoparte)
+                .OrderBy(o => o.OrdenTrabajoId)
+                .ToList();
 
             return View(ordenes);
         }
+
+        // Carga la vista parcial con los servicios
+        public IActionResult RegistrarOrdenParcial()
+        {
+            var servicios = _context.Servicio.ToList();
+            return PartialView("_RegistrarOrdenPartial", servicios);
+        }
+
+        // Cargar reservas de un servicio
+        [HttpGet]
+        public JsonResult GetReservasPorServicio(int servicioId)
+        {
+            var reservas = _context.Reserva
+                .Where(r => r.ser_id == servicioId
+                         && !_context.OrdenTrabajos.Any(o => o.ReservaId == r.res_id))
+                .Select(r => new ReservaDto
+                {
+                    Id = r.res_id,
+                    Fecha = r.res_fecha // Asegúrate que el campo se llama así
+                })
+                .ToList();
+
+            return Json(reservas);
+        }
+
+
+        public class ReservaDto
+        {
+            public int Id { get; set; }
+            public DateTime Fecha { get; set; }
+
+        }
+
+        // Guardar orden con solo el ReservaId
+        [HttpPost]
+        public IActionResult RegistrarOrden([FromBody] int reservaId)
+        {
+            // Verificar que exista la reserva
+            if (!_context.Reserva.Any(r => r.res_id == reservaId))
+            {
+                return Json(new { success = false, message = "Reserva no válida." });
+            }
+
+            // Verificar que no exista ya una orden asociada a esta reserva
+            if (_context.OrdenTrabajos.Any(o => o.ReservaId == reservaId))
+            {
+                return Json(new { success = false, message = "Ya existe una orden para esta reserva." });
+            }
+
+            var orden = new OrdenTrabajo
+            {
+                ReservaId = reservaId
+            };
+
+            _context.OrdenTrabajos.Add(orden);
+            _context.SaveChanges();
+
+            return Json(new { success = true });
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
