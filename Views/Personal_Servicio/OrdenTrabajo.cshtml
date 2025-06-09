@@ -4,6 +4,9 @@
     ViewData["ActivePage"] = "OrdenTrabajo";
     Layout = "_LayoutServicio";
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/ordenTrabajo.css" />
+}
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
         <a asp-area="" asp-controller="Personal_Servicio" asp-action="Index">Módulo de Servicio</a>
@@ -148,7 +151,8 @@
                             <option value="">Cargando...</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="guardarPersonal()">Asignar</button>
+                    <!-- QUITAR el onclick y el type="submit" -->
+                    <button type="button" class="btn btn-primary" onclick="guardarPersonal()">Asignar</button>
                 </form>
             </div>
         </div>
@@ -173,9 +177,163 @@
 
 
 <script>
-    let modalElement = document.getElementById('modalAutoparte');
+    // ===== SISTEMA DE NOTIFICACIONES OPTIMIZADO =====
+    let activeToasts = new Map(); // Para rastrear toasts activos
+    let toastCounter = 0; // Contador único para IDs
 
-    modalElement.addEventListener('show.bs.modal', function (event) {
+    function showToast(type, title, message, duration = 4000) {
+        // Limpiar toasts viejos si hay más de 3
+        if (activeToasts.size >= 3) {
+            const oldestToast = activeToasts.keys().next().value;
+            hideToast(oldestToast);
+        }
+
+        // Crear contenedor si no existe
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            container.style.cssText = `
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            max-height: 90vh;
+            overflow: hidden;
+        `;
+            document.body.appendChild(container);
+        }
+
+        // Iconos según el tipo
+        const icons = {
+            success: '<i class="fas fa-check-circle"></i>',
+            error: '<i class="fas fa-exclamation-circle"></i>',
+            info: '<i class="fas fa-info-circle"></i>'
+        };
+
+        // Crear ID único
+        const toastId = 'toast-' + (++toastCounter);
+
+        // Crear el toast
+        const toastElement = document.createElement('div');
+        toastElement.className = `toast custom-toast ${type}`;
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('id', toastId);
+        toastElement.innerHTML = `
+        <div class="toast-header ${type}">
+            <span class="toast-icon">${icons[type]}</span>
+            <strong class="me-auto">${title}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            ${message}
+        </div>
+        <div class="toast-progress ${type}" style="animation-duration: ${duration}ms;"></div>
+    `;
+
+        // Agregar al contenedor
+        container.appendChild(toastElement);
+
+        // Inicializar el toast de Bootstrap
+        const toastInstance = new bootstrap.Toast(toastElement, {
+            delay: duration,
+            autohide: true
+        });
+
+        // Registrar en el mapa de toasts activos
+        activeToasts.set(toastId, {
+            element: toastElement,
+            instance: toastInstance,
+            timer: null
+        });
+
+        // Event listeners
+        toastElement.addEventListener('hide.bs.toast', function () {
+            toastElement.classList.add('hiding');
+        });
+
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            cleanupToast(toastId);
+        });
+
+        // Mostrar el toast
+        toastInstance.show();
+
+        // Timer de limpieza
+        const timer = setTimeout(() => {
+            if (activeToasts.has(toastId)) {
+                hideToast(toastId);
+            }
+        }, duration + 100);
+
+        activeToasts.get(toastId).timer = timer;
+
+        return toastInstance;
+    }
+
+    function hideToast(toastId) {
+        const toastData = activeToasts.get(toastId);
+        if (toastData) {
+            // Limpiar timer
+            if (toastData.timer) {
+                clearTimeout(toastData.timer);
+            }
+            // Ocultar toast
+            toastData.instance.hide();
+        }
+    }
+
+    function cleanupToast(toastId) {
+        const toastData = activeToasts.get(toastId);
+        if (toastData) {
+            // Limpiar timer
+            if (toastData.timer) {
+                clearTimeout(toastData.timer);
+            }
+
+            // Remover elemento del DOM
+            setTimeout(() => {
+                if (toastData.element.parentNode) {
+                    toastData.element.remove();
+                }
+            }, 300);
+
+            // Remover del mapa
+            activeToasts.delete(toastId);
+
+            // Limpiar contenedor si está vacío
+            const container = document.querySelector('.toast-container');
+            if (container && activeToasts.size === 0) {
+                setTimeout(() => {
+                    if (container.children.length === 0) {
+                        container.remove();
+                    }
+                }, 500);
+            }
+        }
+    }
+
+    // ===== GESTIÓN DE MODALES OPTIMIZADA =====
+    let modalEventListeners = new Map();
+
+    function addModalListener(modalId, eventType, handler) {
+        const key = `${modalId}-${eventType}`;
+
+        // Remover listener anterior si existe
+        if (modalEventListeners.has(key)) {
+            const modal = document.getElementById(modalId);
+            const oldHandler = modalEventListeners.get(key);
+            modal.removeEventListener(eventType, oldHandler);
+        }
+
+        // Agregar nuevo listener
+        const modal = document.getElementById(modalId);
+        modal.addEventListener(eventType, handler);
+        modalEventListeners.set(key, handler);
+    }
+
+    // ===== MODAL AUTOPARTE OPTIMIZADO =====
+    addModalListener('modalAutoparte', 'show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const ordenId = button.getAttribute('data-ordenid');
         document.getElementById('ordenId').value = ordenId;
@@ -192,12 +350,16 @@
                     option.text = categoria.nombre;
                     categoriaSelect.appendChild(option);
                 });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Error', 'Error al cargar las categorías.');
             });
     });
 
-    document.getElementById("categoriaSelect").addEventListener("change", function () {
+    // Event listener para categoría (solo uno)
+    let categoriaChangeHandler = function () {
         const categoriaId = this.value;
-        console.log("Categoría seleccionada:", categoriaId);
         const autoparteSelect = document.getElementById("autoparteSelect");
 
         autoparteSelect.innerHTML = '<option value="">Selecciona una autoparte</option>';
@@ -222,17 +384,32 @@
                 })
                 .catch(error => {
                     console.error('Error al cargar autopartes:', error);
-                    // Aquí puedes mostrar un mensaje al usuario o manejar el error visualmente
+                    showToast('error', 'Error', 'Error al cargar las autopartes.');
                 });
         }
-    });
+    };
 
+    // Remover listener anterior y agregar nuevo
+    const categoriaSelect = document.getElementById("categoriaSelect");
+    categoriaSelect.removeEventListener("change", categoriaChangeHandler);
+    categoriaSelect.addEventListener("change", categoriaChangeHandler);
 
     function guardarAutoparte() {
         const ordenId = document.getElementById("ordenId").value;
         const autoparteSelect = document.getElementById("autoparteSelect");
         const autoparteId = autoparteSelect.value;
         const autoparteNombre = autoparteSelect.options[autoparteSelect.selectedIndex].text;
+
+        if (!autoparteId) {
+            showToast('error', 'Error', 'Debes seleccionar una autoparte.');
+            return;
+        }
+
+        // Deshabilitar botón para evitar doble click
+        const btnGuardar = document.querySelector('.btn-success[onclick="guardarAutoparte()"]');
+        const originalText = btnGuardar.innerHTML;
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
 
         fetch("/Personal_Servicio/AsignarAutoparte", {
             method: "POST",
@@ -247,25 +424,40 @@
         })
             .then(response => {
                 if (response.ok) {
+                    showToast('success', '¡Éxito!', 'Autoparte asignada correctamente.');
+
                     const span = document.getElementById(`autoparte-nombre-${ordenId}`);
                     span.textContent = autoparteNombre;
+
+                    const buttons = document.querySelectorAll(`button[data-bs-target="#modalAutoparte"][data-ordenid="${ordenId}"]`);
+                    buttons.forEach(button => button.remove());
+
+                    const modalElement = document.getElementById('modalAutoparte');
                     bootstrap.Modal.getInstance(modalElement).hide();
                 } else {
-                    alert("Error al asignar la autoparte.");
+                    showToast('error', 'Error', 'Error al asignar la autoparte.');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Error de Conexión', 'No se pudo conectar con el servidor.');
+            })
+            .finally(() => {
+                // Restaurar botón
+                btnGuardar.disabled = false;
+                btnGuardar.innerHTML = originalText;
             });
     }
 
-    modalElement.addEventListener('hidden.bs.modal', function () {
+    addModalListener('modalAutoparte', 'hidden.bs.modal', function () {
         document.getElementById('categoriaSelect').innerHTML = '<option value="">Selecciona una categoría</option>';
         const autoparteSelect = document.getElementById("autoparteSelect");
         autoparteSelect.innerHTML = '<option value="">Selecciona una autoparte</option>';
         autoparteSelect.disabled = true;
     });
 
-    let modalPersonal = document.getElementById('modalPersonal');
-
-    modalPersonal.addEventListener('show.bs.modal', function (event) {
+    // ===== MODAL PERSONAL OPTIMIZADO =====
+    addModalListener('modalPersonal', 'show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const ordenId = button.getAttribute('data-ordenid');
         document.getElementById('ordenIdPersonal').value = ordenId;
@@ -273,7 +465,6 @@
         const personalSelect = document.getElementById('personalSelect');
         personalSelect.innerHTML = '<option value="">Cargando personal...</option>';
 
-        // Aquí pides al backend la lista de usuarios con rol Personal_Servicio
         fetch('/Personal_Servicio/ObtenerPersonalServicio')
             .then(response => response.json())
             .then(data => {
@@ -281,13 +472,14 @@
                 data.forEach(personal => {
                     let option = document.createElement("option");
                     option.value = personal.id;
-                    option.text = personal.correo
+                    option.text = personal.correo;
                     personalSelect.appendChild(option);
                 });
             })
             .catch(error => {
                 console.error('Error al cargar personal:', error);
                 personalSelect.innerHTML = '<option value="">Error al cargar personal</option>';
+                showToast('error', 'Error', 'Error al cargar el personal.');
             });
     });
 
@@ -296,12 +488,16 @@
         const personalSelect = document.getElementById('personalSelect');
         const personalId = personalSelect.value;
 
-        console.log("Personal seleccionado:", personalId);
-
         if (!personalId) {
-            alert('Debes seleccionar un trabajador.');
+            showToast('error', 'Error', 'Debes seleccionar un trabajador.');
             return;
         }
+
+        // Deshabilitar botón
+        const btnGuardar = document.querySelector('.btn-primary[onclick="guardarPersonal()"]');
+        const originalText = btnGuardar.innerHTML;
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Asignando...';
 
         fetch('/Personal_Servicio/AsignarPersonal', {
             method: 'POST',
@@ -317,21 +513,35 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById(`personal-nombre-${ordenId}`).textContent = data.correo;
+                    showToast('success', '¡Éxito!', 'Personal asignado correctamente.');
+
+                    const span = document.getElementById(`personal-nombre-${ordenId}`);
+                    span.textContent = data.correo;
+
+                    const buttons = document.querySelectorAll(`button[data-bs-target="#modalPersonal"][data-ordenid="${ordenId}"]`);
+                    buttons.forEach(button => button.remove());
+
                     bootstrap.Modal.getInstance(document.getElementById('modalPersonal')).hide();
                 } else {
-                    alert(data.message || 'Error al asignar el personal.');
+                    showToast('error', 'Error', data.message || 'Error al asignar el personal.');
                 }
             })
             .catch(error => {
-                alert('Error de red o inesperado');
+                showToast('error', 'Error de Conexión', 'No se pudo conectar con el servidor.');
                 console.error(error);
+            })
+            .finally(() => {
+                // Restaurar botón
+                btnGuardar.disabled = false;
+                btnGuardar.innerHTML = originalText;
             });
     }
 
-    modalPersonal.addEventListener('hidden.bs.modal', function () {
+    addModalListener('modalPersonal', 'hidden.bs.modal', function () {
         document.getElementById('personalSelect').innerHTML = '<option value="">Selecciona un trabajador</option>';
     });
+
+    // ===== MODAL REGISTRAR ORDEN OPTIMIZADO =====
     function abrirModalRegistrarOrden() {
         const modalBody = document.getElementById("modalBodyRegistrarOrden");
         modalBody.innerHTML = '<div class="text-center"><div class="spinner-border"></div></div>';
@@ -340,13 +550,14 @@
             .then(res => res.text())
             .then(html => {
                 modalBody.innerHTML = html;
-                inicializarEventosServicioReserva(); // aquí se cargan los scripts
+                inicializarEventosServicioReserva();
                 const modal = new bootstrap.Modal(document.getElementById("modalRegistrarOrden"));
                 modal.show();
             })
             .catch(err => {
                 console.error("Error al cargar el formulario:", err);
                 modalBody.innerHTML = '<div class="alert alert-danger">Error al cargar el formulario.</div>';
+                showToast('error', 'Error', 'Error al cargar el formulario.');
             });
     }
 
@@ -359,16 +570,22 @@
 
         if (!servicioSelect) return;
 
-        servicioSelect.addEventListener("change", function () {
+        // Limpiar event listeners anteriores
+        servicioSelect.replaceWith(servicioSelect.cloneNode(true));
+        const newServicioSelect = document.getElementById("servicioSelect");
+        const newReservaSelect = document.getElementById("reservaSelect");
+        const newBtnRegistrarOrden = document.getElementById("btnRegistrarOrden");
+
+        newServicioSelect.addEventListener("change", function () {
             const servicioId = this.value;
-            reservaSelect.innerHTML = '<option value="">Cargando reservas...</option>';
-            reservaSelect.disabled = true;
+            newReservaSelect.innerHTML = '<option value="">Cargando reservas...</option>';
+            newReservaSelect.disabled = true;
 
             if (servicioId) {
                 fetch(`/Personal_Servicio/GetReservasPorServicio?servicioId=${servicioId}`)
                     .then(res => res.json())
                     .then(data => {
-                        reservaSelect.innerHTML = data.length === 0
+                        newReservaSelect.innerHTML = data.length === 0
                             ? '<option value="">No hay reservas para este servicio</option>'
                             : '<option value="">Selecciona una reserva</option>';
 
@@ -378,35 +595,40 @@
                             const fechaFormateada = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
                             option.value = reserva.id;
                             option.text = `Reserva ID: ${reserva.id} - Fecha: ${fechaFormateada}`;
-                            reservaSelect.appendChild(option);
+                            newReservaSelect.appendChild(option);
                         });
 
-                        reservaSelect.disabled = false;
+                        newReservaSelect.disabled = false;
                     })
                     .catch(err => {
                         console.error("Error al cargar reservas:", err);
-                        reservaSelect.innerHTML = '<option value="">Error al cargar reservas</option>';
-                        reservaSelect.disabled = true;
+                        newReservaSelect.innerHTML = '<option value="">Error al cargar reservas</option>';
+                        newReservaSelect.disabled = true;
+                        showToast('error', 'Error', 'Error al cargar las reservas.');
                     });
             } else {
-                reservaSelect.innerHTML = '<option value="">Selecciona un servicio primero</option>';
-                reservaSelect.disabled = true;
+                newReservaSelect.innerHTML = '<option value="">Selecciona un servicio primero</option>';
+                newReservaSelect.disabled = true;
             }
         });
 
-        reservaSelect.addEventListener("change", function () {
+        newReservaSelect.addEventListener("change", function () {
             reservaSeleccionadaInput.value = this.value;
-            btnRegistrarOrden.disabled = !this.value;
+            newBtnRegistrarOrden.disabled = !this.value;
         });
 
-        btnRegistrarOrden.addEventListener("click", function () {
+        newBtnRegistrarOrden.addEventListener("click", function () {
             const reservaId = reservaSeleccionadaInput.value;
             const descripcion = descripcionInput.value;
 
             if (!reservaId) {
-                alert("Selecciona una reserva.");
+                showToast('error', 'Error', 'Selecciona una reserva.');
                 return;
             }
+
+            // Deshabilitar botón
+            newBtnRegistrarOrden.disabled = true;
+            newBtnRegistrarOrden.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Registrando...';
 
             fetch("/Personal_Servicio/RegistrarOrden", {
                 method: "POST",
@@ -419,17 +641,105 @@
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) {
-                        alert("Orden registrada exitosamente.");
+                        showToast('success', '¡Éxito!', 'Orden registrada exitosamente.');
                         bootstrap.Modal.getInstance(document.getElementById("modalRegistrarOrden")).hide();
-                        location.reload();
+
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000); // Aumentar tiempo para que se vea la notificación
                     } else {
-                        alert(result.message || "Error al registrar la orden.");
+                        showToast('error', 'Error', result.message || 'Error al registrar la orden.');
                     }
                 })
                 .catch(error => {
-                    alert("Error en la conexión.");
+                    showToast('error', 'Error de Conexión', 'No se pudo conectar con el servidor.');
                     console.error(error);
+                })
+                .finally(() => {
+                    newBtnRegistrarOrden.disabled = false;
+                    newBtnRegistrarOrden.innerHTML = 'REGISTRAR ORDEN';
                 });
         });
-    }    
+    }
+
+    // ===== OPTIMIZACIÓN DE PILLS DE ESTADO =====
+    let statusObserver = null;
+
+    function convertStatusToPills() {
+        const statusCells = document.querySelectorAll('.table tbody td:nth-child(5)');
+
+        statusCells.forEach(cell => {
+            // Evitar procesar celdas ya procesadas
+            if (cell.querySelector('.status-pill')) return;
+
+            const text = cell.textContent.trim();
+            if (text && text !== '') {
+                const pill = document.createElement('span');
+                pill.className = 'status-pill';
+                pill.textContent = text;
+
+                const statusLower = text.toLowerCase();
+                if (statusLower.includes('pendiente')) {
+                    pill.classList.add('status-pendiente');
+                } else if (statusLower.includes('confirmada')) {
+                    pill.classList.add('status-confirmada');
+                } else if (statusLower.includes('completada')) {
+                    pill.classList.add('status-completada');
+                } else if (statusLower.includes('cancelad')) {
+                    pill.classList.add('status-cancelada');
+                }
+
+                cell.innerHTML = '';
+                cell.appendChild(pill);
+            }
+        });
+    }
+
+    // ===== INICIALIZACIÓN OPTIMIZADA =====
+    document.addEventListener('DOMContentLoaded', function () {
+        // Convertir estados a pills
+        convertStatusToPills();
+
+        // Observer optimizado (solo uno)
+        if (statusObserver) {
+            statusObserver.disconnect();
+        }
+
+        statusObserver = new MutationObserver(function (mutations) {
+            let shouldUpdate = false;
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldUpdate = true;
+                }
+            });
+
+            if (shouldUpdate) {
+                setTimeout(convertStatusToPills, 100);
+            }
+        });
+
+        const tableBody = document.querySelector('.table tbody');
+        if (tableBody) {
+            statusObserver.observe(tableBody, {
+                childList: true,
+                subtree: true
+            });
+        }
+    });
+
+    // ===== LIMPIEZA AL SALIR DE LA PÁGINA =====
+    window.addEventListener('beforeunload', function () {
+        // Limpiar todos los toasts activos
+        activeToasts.forEach((toastData, toastId) => {
+            if (toastData.timer) {
+                clearTimeout(toastData.timer);
+            }
+        });
+        activeToasts.clear();
+
+        // Desconectar observer
+        if (statusObserver) {
+            statusObserver.disconnect();
+        }
+    });
 </script>
