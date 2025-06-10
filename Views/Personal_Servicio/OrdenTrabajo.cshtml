@@ -83,7 +83,6 @@
                             data-ordenid="@orden.OrdenTrabajoId">Asignar</button>
                     }
                 </td>
-
                 <td>
                     <span id="autoparte-nombre-@orden.OrdenTrabajoId">
                         @if (orden.Autoparte != null)
@@ -201,8 +200,34 @@
         </div>
     </div>
 </div>
-
-
+<!-- Toast de Éxito -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="toastExito" class="toast align-items-center text-white bg-success border-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>
+                <span id="toastExitoMessage">Mensaje de éxito.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Cerrar"></button>
+        </div>
+    </div>
+</div>
+<!-- Toast de Error -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-times-circle me-2"></i>
+                <span id="toastErrorMessage">Ha ocurrido un error.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Cerrar"></button>
+        </div>
+    </div>
+</div>
 <script>
     // ===== SISTEMA DE NOTIFICACIONES OPTIMIZADO =====
     let activeToasts = new Map(); // Para rastrear toasts activos
@@ -483,15 +508,17 @@
         autoparteSelect.disabled = true;
     });
 
-    // ===== MODAL PERSONAL OPTIMIZADO =====
-    addModalListener('modalPersonal', 'show.bs.modal', function (event) {
+    let modalPersonal = document.getElementById('modalPersonal');
+
+    modalPersonal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const ordenId = button.getAttribute('data-ordenid');
         document.getElementById('ordenIdPersonal').value = ordenId;
 
-        const personalSelect = document.getElementById('personalSelect');
-        personalSelect.innerHTML = '<option value="">Cargando personal...</option>';
+            const personalSelect = document.getElementById('personalSelect');
+            personalSelect.innerHTML = '<option value="">Cargando personal...</option>';
 
+        // Aquí pides al backend la lista de usuarios con rol Personal_Servicio
         fetch('/Personal_Servicio/ObtenerPersonalServicio')
             .then(response => response.json())
             .then(data => {
@@ -499,14 +526,13 @@
                 data.forEach(personal => {
                     let option = document.createElement("option");
                     option.value = personal.id;
-                    option.text = personal.correo;
+                    option.text = personal.correo
                     personalSelect.appendChild(option);
                 });
             })
             .catch(error => {
                 console.error('Error al cargar personal:', error);
                 personalSelect.innerHTML = '<option value="">Error al cargar personal</option>';
-                showToast('error', 'Error', 'Error al cargar el personal.');
             });
     });
 
@@ -516,7 +542,7 @@
         const personalId = personalSelect.value;
 
         if (!personalId) {
-            showToast('error', 'Error', 'Debes seleccionar un trabajador.');
+            alert('Debes seleccionar un trabajador.');
             return;
         }
 
@@ -540,21 +566,19 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showToast('success', '¡Éxito!', 'Personal asignado correctamente.');
-
-                    const span = document.getElementById(`personal-nombre-${ordenId}`);
-                    span.textContent = data.correo;
-
-                    const buttons = document.querySelectorAll(`button[data-bs-target="#modalPersonal"][data-ordenid="${ordenId}"]`);
-                    buttons.forEach(button => button.remove());
-
+                    document.getElementById(`personal-nombre-${ordenId}`).textContent = data.correo;
                     bootstrap.Modal.getInstance(document.getElementById('modalPersonal')).hide();
+
+                    // Mostrar toast con pequeño retraso para evitar conflicto con el modal
+                    setTimeout(() => {
+                        mostrarToastExito("Personal asignado exitosamente.");
+                    }, 300);
                 } else {
-                    showToast('error', 'Error', data.message || 'Error al asignar el personal.');
+                    alert(data.message || 'Error al asignar el personal.');
                 }
             })
             .catch(error => {
-                showToast('error', 'Error de Conexión', 'No se pudo conectar con el servidor.');
+                alert('Error de red o inesperado');
                 console.error(error);
             })
             .finally(() => {
@@ -563,6 +587,7 @@
                 btnGuardar.innerHTML = originalText;
             });
     }
+
 
     addModalListener('modalPersonal', 'hidden.bs.modal', function () {
         document.getElementById('personalSelect').innerHTML = '<option value="">Selecciona un trabajador</option>';
@@ -649,7 +674,7 @@
             const descripcion = descripcionInput.value;
 
             if (!reservaId) {
-                showToast('error', 'Error', 'Selecciona una reserva.');
+                alert("Selecciona una reserva.");
                 return;
             }
 
@@ -668,24 +693,22 @@
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) {
-                        showToast('success', '¡Éxito!', 'Orden registrada exitosamente.');
+                        alert("Orden registrada exitosamente.");
                         bootstrap.Modal.getInstance(document.getElementById("modalRegistrarOrden")).hide();
-
-                        setTimeout(() => {
-                            location.reload();
-                        }, 2000); // Aumentar tiempo para que se vea la notificación
+                        location.reload();
                     } else {
-                        showToast('error', 'Error', result.message || 'Error al registrar la orden.');
+                        alert(result.message || "Error al registrar la orden.");
                     }
                 })
                 .catch(error => {
-                    showToast('error', 'Error de Conexión', 'No se pudo conectar con el servidor.');
+                    alert("Error en la conexión.");
                     console.error(error);
                 })
                 .finally(() => {
                     newBtnRegistrarOrden.disabled = false;
                     newBtnRegistrarOrden.innerHTML = 'REGISTRAR ORDEN';
                 });
+
         });
     }
 
