@@ -53,7 +53,6 @@
                             data-ordenid="@orden.OrdenTrabajoId">Asignar</button>
                     }
                 </td>
-
                 <td>
                     <span id="autoparte-nombre-@orden.OrdenTrabajoId">
                         @if (orden.Autoparte != null)
@@ -148,7 +147,7 @@
                             <option value="">Cargando...</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="guardarPersonal()">Asignar</button>
+                    <button type="submit" class="btn btn-primary">Asignar</button>
                 </form>
             </div>
         </div>
@@ -170,8 +169,34 @@
         </div>
     </div>
 </div>
-
-
+<!-- Toast de Éxito -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="toastExito" class="toast align-items-center text-white bg-success border-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>
+                <span id="toastExitoMessage">Mensaje de éxito.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Cerrar"></button>
+        </div>
+    </div>
+</div>
+<!-- Toast de Error -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-times-circle me-2"></i>
+                <span id="toastErrorMessage">Ha ocurrido un error.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Cerrar"></button>
+        </div>
+    </div>
+</div>
 <script>
     let modalElement = document.getElementById('modalAutoparte');
 
@@ -263,33 +288,6 @@
         autoparteSelect.disabled = true;
     });
 
-    let modalPersonal = document.getElementById('modalPersonal');
-
-    modalPersonal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const ordenId = button.getAttribute('data-ordenid');
-        document.getElementById('ordenIdPersonal').value = ordenId;
-
-        const personalSelect = document.getElementById('personalSelect');
-        personalSelect.innerHTML = '<option value="">Cargando personal...</option>';
-
-        // Aquí pides al backend la lista de usuarios con rol Personal_Servicio
-        fetch('/Personal_Servicio/ObtenerPersonalServicio')
-            .then(response => response.json())
-            .then(data => {
-                personalSelect.innerHTML = '<option value="">Selecciona un trabajador</option>';
-                data.forEach(personal => {
-                    let option = document.createElement("option");
-                    option.value = personal.id;
-                    option.text = personal.correo
-                    personalSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error al cargar personal:', error);
-                personalSelect.innerHTML = '<option value="">Error al cargar personal</option>';
-            });
-    });
 
     function guardarPersonal() {
         const ordenId = document.getElementById('ordenIdPersonal').value;
@@ -299,7 +297,87 @@
         console.log("Personal seleccionado:", personalId);
 
         if (!personalId) {
-            alert('Debes seleccionar un trabajador.');
+            mostrarToastError('Debes seleccionar un trabajador.');
+            return;
+        }
+
+        fetch('/Personal_Servicio/AsignarPersonal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: JSON.stringify({
+                ordenId: parseInt(ordenId),
+                personalId: personalId
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Respuesta del servidor:", data);
+                if (data.success) {
+                    document.getElementById(`personal-nombre-${ordenId}`).textContent = data.correo;
+
+                    // Cerrar modal primero
+                    bootstrap.Modal.getInstance(document.getElementById('modalPersonal')).hide();
+
+                    // Mostrar toast con retardo para evitar que el toast aparezca debajo del modal
+                    setTimeout(() => {
+                        console.log("Llamando a mostrarToastExito...");
+                        mostrarToastExito("Personal asignado exitosamente.");
+                    }, 300);
+
+                } else {
+                    mostrarToastError(data.message || 'Error al asignar el personal.');
+                }
+            })
+            .catch(error => {
+                mostrarToastError('Error de red o inesperado');
+                console.error(error);
+            });
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        // Asignar listener al submit del formulario para evitar recarga y usar guardarPersonal
+        document.getElementById('formAsignarPersonal').addEventListener('submit', function (e) {
+            e.preventDefault();
+            guardarPersonal();
+        });
+
+        // Evento para cargar personal cuando se abre el modal
+        const modalPersonal = document.getElementById('modalPersonal');
+        modalPersonal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const ordenId = button.getAttribute('data-ordenid');
+            document.getElementById('ordenIdPersonal').value = ordenId;
+
+            const personalSelect = document.getElementById('personalSelect');
+            personalSelect.innerHTML = '<option value="">Cargando personal...</option>';
+
+            fetch('/Personal_Servicio/ObtenerPersonalServicio')
+                .then(response => response.json())
+                .then(data => {
+                    personalSelect.innerHTML = '<option value="">Selecciona un trabajador</option>';
+                    data.forEach(personal => {
+                        let option = document.createElement("option");
+                        option.value = personal.id;
+                        option.text = personal.correo;
+                        personalSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar personal:', error);
+                    personalSelect.innerHTML = '<option value="">Error al cargar personal</option>';
+                });
+        });
+    });
+
+    function guardarPersonal() {
+        const ordenId = document.getElementById('ordenIdPersonal').value;
+        const personalSelect = document.getElementById('personalSelect');
+        const personalId = personalSelect.value;
+
+        if (!personalId) {
+            mostrarToastError('Debes seleccionar un trabajador.');
             return;
         }
 
@@ -318,16 +396,24 @@
             .then(data => {
                 if (data.success) {
                     document.getElementById(`personal-nombre-${ordenId}`).textContent = data.correo;
+
+                    // Cerrar modal
                     bootstrap.Modal.getInstance(document.getElementById('modalPersonal')).hide();
+
+                    // Mostrar toast con pequeño retraso para evitar conflicto con el modal
+                    setTimeout(() => {
+                        mostrarToastExito("Personal asignado exitosamente.");
+                    }, 300);
                 } else {
-                    alert(data.message || 'Error al asignar el personal.');
+                    mostrarToastError(data.message || 'Error al asignar el personal.');
                 }
             })
             .catch(error => {
-                alert('Error de red o inesperado');
+                mostrarToastError('Error de red o inesperado');
                 console.error(error);
             });
     }
+
 
     modalPersonal.addEventListener('hidden.bs.modal', function () {
         document.getElementById('personalSelect').innerHTML = '<option value="">Selecciona un trabajador</option>';
@@ -404,7 +490,7 @@
             const descripcion = descripcionInput.value;
 
             if (!reservaId) {
-                alert("Selecciona una reserva.");
+                mostrarToastError("Selecciona una reserva.");
                 return;
             }
 
@@ -419,17 +505,32 @@
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) {
-                        alert("Orden registrada exitosamente.");
                         bootstrap.Modal.getInstance(document.getElementById("modalRegistrarOrden")).hide();
-                        location.reload();
+                        mostrarToastExito("Orden registrada exitosamente.");
+                        setTimeout(() => location.reload(), 2000); // Espera antes de recargar
                     } else {
-                        alert(result.message || "Error al registrar la orden.");
+                        mostrarToastError(result.message || "Error al registrar la orden.");
                     }
                 })
                 .catch(error => {
-                    alert("Error en la conexión.");
+                    mostrarToastError("Error en la conexión.");
                     console.error(error);
                 });
+
         });
-    }    
+
+    }
+    function mostrarToastExito(mensaje) {
+        const toastEl = document.getElementById("toastExito");
+        document.getElementById("toastExitoMessage").innerText = mensaje;
+        new bootstrap.Toast(toastEl).show();
+    }
+
+    function mostrarToastError(mensaje) {
+        const toastEl = document.getElementById("toastError");
+        document.getElementById("toastErrorMessage").innerText = mensaje;
+        new bootstrap.Toast(toastEl).show();
+    }
+
+
 </script>
