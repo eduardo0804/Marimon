@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Reportes de Power BI - Autopartes";
+    Layout = "_LayoutVentas";
+}
+
+<link rel="stylesheet" href="~/css/consultarServicio.css" />
+
+<div class="container-fluid mt-4">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-area="" asp-controller="Personal_Servicio" asp-action="Index">Módulo de Servicio</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Reportes</li>
+    </ol>
+
+    <!-- Encabezado -->
+    <div class="page-header text-center my-2">
+        <h2 class="fw-bold">Visualización de Reportes con Power BI</h2>
+        <p class="text-muted">Monitorea y analiza tus ventas de autopartes con reportes dinámicos</p>
+    </div>
+
+    <!-- Botón para descargar PDF -->
+    <div class="text-center my-3">
+        <button class="btn btn-danger" onclick="descargarReportePDF()">
+            <i class="fas fa-file-pdf"></i> Descargar Reporte en PDF
+        </button>
+    </div>
+
+    <!-- Reporte Embed -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div id="reporteCard" class="card shadow-sm border-0 rounded-4">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    <span>Reporte Integrado</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="ratio ratio-16x9">
+                        <!-- Reemplazar con tu embed real de Power BI -->
+                        <iframe src="https://media.discordapp.net/attachments/1155728657193639972/1381520555651366993/image.png?ex=68487987&is=68472807&hm=075d6dffe59e1ee857306bf75e89efcae8999b3dcd729f82cbeac599b488f89a&=&format=webp&quality=lossless&width=726&height=410"
+                                frameborder="0"
+                                allowfullscreen
+                                title="Reporte Power BI">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="card-footer text-muted text-center small">
+                    Fuente: Power BI - Datos en tiempo real actualizados automáticamente
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script html2pdf.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    function descargarReportePDF() {
+        const elemento = document.getElementById('reporteCard');
+
+        const opciones = {
+            margin: 0.3,
+            filename: 'Reporte_PowerBI_Autopartes.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opciones).from(elemento).save();
+    }
+</script>

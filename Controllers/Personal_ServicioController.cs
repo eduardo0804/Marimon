@@ -43,10 +43,20 @@ namespace Marimon.Controllers
             _serviceProvider = serviceProvider;
         }
 
+
+        
         public IActionResult Index()
         {
             return View();
         }
+
+        public ActionResult Reportes()
+        {
+            return View();
+
+        }
+
+
         public IActionResult LServicio()
         {
             var personalServicio = _context.Servicio.ToList();
