@@ -7,6 +7,35 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/ordenTrabajo.css" />
 }
+<style>
+    :root {
+        --primary-color: #dc2626;
+        --secondary-color: #6b7280;
+        --mid-gray: #9ca3af;
+        --transition: all 0.3s ease;
+    }
+
+    .breadcrumb-item a {
+        color: var(--secondary-color);
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .breadcrumb-item a:hover {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .breadcrumb-item+.breadcrumb-item::before {
+        color: var(--mid-gray);
+    }
+</style>
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
         <a asp-area="" asp-controller="Personal_Servicio" asp-action="Index">Módulo de Servicio</a>
@@ -515,8 +544,8 @@
         const ordenId = button.getAttribute('data-ordenid');
         document.getElementById('ordenIdPersonal').value = ordenId;
 
-            const personalSelect = document.getElementById('personalSelect');
-            personalSelect.innerHTML = '<option value="">Cargando personal...</option>';
+        const personalSelect = document.getElementById('personalSelect');
+        personalSelect.innerHTML = '<option value="">Cargando personal...</option>';
 
         // Aquí pides al backend la lista de usuarios con rol Personal_Servicio
         fetch('/Personal_Servicio/ObtenerPersonalServicio')
@@ -863,294 +892,294 @@
         }
     });
     // ===== FUNCIONALIDAD DEL BUSCADOR CON NORMALIZACIÓN DE TILDES =====
-let searchTimeout;
+    let searchTimeout;
 
-// Función para normalizar texto (quitar tildes, acentos y caracteres especiales)
-function normalizeText(text) {
-    return text
-        .toLowerCase()
-        .normalize('NFD')                    // Descomponer caracteres con tildes
-        .replace(/[\u0300-\u036f]/g, '')     // Eliminar marcas diacríticas (tildes, acentos)
-        .replace(/[ñ]/g, 'n')                // Opcional: convertir ñ a n
-        .trim();
-}
-
-// Inicialización cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function () {
-    initializeSearch();
-});
-
-function initializeSearch() {
-    const searchInput = document.getElementById('searchInput');
-
-    if (!searchInput) {
-        console.error('No se encontró el elemento de búsqueda');
-        return;
+    // Función para normalizar texto (quitar tildes, acentos y caracteres especiales)
+    function normalizeText(text) {
+        return text
+            .toLowerCase()
+            .normalize('NFD')                    // Descomponer caracteres con tildes
+            .replace(/[\u0300-\u036f]/g, '')     // Eliminar marcas diacríticas (tildes, acentos)
+            .replace(/[ñ]/g, 'n')                // Opcional: convertir ñ a n
+            .trim();
     }
 
-    console.log('Buscador inicializado correctamente');
-
-    // Event listeners para el input
-    searchInput.addEventListener('input', function () {
-        handleSearch();
+    // Inicialización cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function () {
+        initializeSearch();
     });
 
-    searchInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            performSearchImmediate();
-        }
-    });
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
 
-    // Atajos de teclado
-    document.addEventListener('keydown', function (e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-            e.preventDefault();
-            searchInput.focus();
-            searchInput.select();
-        }
-
-        if (e.key === 'Escape' && document.activeElement === searchInput) {
-            clearSearch();
-        }
-    });
-
-    // Auto-focus después de cargar
-    setTimeout(() => {
-        searchInput.focus();
-    }, 500);
-}
-
-function handleSearch() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-
-    clearTimeout(searchTimeout);
-
-    // Búsqueda inmediata si está vacío
-    if (searchInput.value.trim() === '') {
-        performSearchImmediate();
-        return;
-    }
-
-    // Debounce para búsquedas con texto
-    searchTimeout = setTimeout(() => {
-        performSearchImmediate();
-    }, 300);
-}
-
-// FUNCIÓN PRINCIPAL DE BÚSQUEDA - CON NORMALIZACIÓN DE TILDES
-function performSearchImmediate() {
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-
-    const searchTerm = searchInput.value.trim();
-    const normalizedSearchTerm = normalizeText(searchTerm);
-    const tableRows = document.querySelectorAll('.table tbody tr');
-    let visibleCount = 0;
-
-    // Limpiar highlights anteriores
-    clearHighlights();
-
-    console.log(`Buscando: "${searchTerm}" (normalizado: "${normalizedSearchTerm}")`);
-
-    tableRows.forEach((row, index) => {
-        if (searchTerm === '') {
-            // Mostrar todas las filas si no hay búsqueda
-            row.style.display = '';
-            visibleCount++;
+        if (!searchInput) {
+            console.error('No se encontró el elemento de búsqueda');
             return;
         }
 
-        // Buscar en todas las celdas de la fila
-        let found = false;
-        const cells = row.querySelectorAll('td');
-        
-        cells.forEach((cell, cellIndex) => {
-            // Saltar la columna del PDF (última columna)
-            if (cellIndex === cells.length - 1) return;
-            
-            const cellText = extractCellText(cell, cellIndex);
-            const normalizedCellText = normalizeText(cellText);
-            
-            // Comparar textos normalizados (sin tildes)
-            if (normalizedCellText.includes(normalizedSearchTerm)) {
-                found = true;
-                highlightTextInCell(cell, searchTerm, cellIndex, cellText);
-                console.log(`✓ Encontrado en fila ${index + 1}, celda ${cellIndex + 1}: "${cellText}" (normalizado: "${normalizedCellText}")`);
+        console.log('Buscador inicializado correctamente');
+
+        // Event listeners para el input
+        searchInput.addEventListener('input', function () {
+            handleSearch();
+        });
+
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearchImmediate();
             }
         });
 
-        // Mostrar u ocultar la fila
-        if (found) {
-            row.style.display = '';
-            visibleCount++;
+        // Atajos de teclado
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+
+            if (e.key === 'Escape' && document.activeElement === searchInput) {
+                clearSearch();
+            }
+        });
+
+        // Auto-focus después de cargar
+        setTimeout(() => {
+            searchInput.focus();
+        }, 500);
+    }
+
+    function handleSearch() {
+        const searchInput = document.getElementById('searchInput');
+        if (!searchInput) return;
+
+        clearTimeout(searchTimeout);
+
+        // Búsqueda inmediata si está vacío
+        if (searchInput.value.trim() === '') {
+            performSearchImmediate();
+            return;
+        }
+
+        // Debounce para búsquedas con texto
+        searchTimeout = setTimeout(() => {
+            performSearchImmediate();
+        }, 300);
+    }
+
+    // FUNCIÓN PRINCIPAL DE BÚSQUEDA - CON NORMALIZACIÓN DE TILDES
+    function performSearchImmediate() {
+        const searchInput = document.getElementById('searchInput');
+        if (!searchInput) return;
+
+        const searchTerm = searchInput.value.trim();
+        const normalizedSearchTerm = normalizeText(searchTerm);
+        const tableRows = document.querySelectorAll('.table tbody tr');
+        let visibleCount = 0;
+
+        // Limpiar highlights anteriores
+        clearHighlights();
+
+        console.log(`Buscando: "${searchTerm}" (normalizado: "${normalizedSearchTerm}")`);
+
+        tableRows.forEach((row, index) => {
+            if (searchTerm === '') {
+                // Mostrar todas las filas si no hay búsqueda
+                row.style.display = '';
+                visibleCount++;
+                return;
+            }
+
+            // Buscar en todas las celdas de la fila
+            let found = false;
+            const cells = row.querySelectorAll('td');
+
+            cells.forEach((cell, cellIndex) => {
+                // Saltar la columna del PDF (última columna)
+                if (cellIndex === cells.length - 1) return;
+
+                const cellText = extractCellText(cell, cellIndex);
+                const normalizedCellText = normalizeText(cellText);
+
+                // Comparar textos normalizados (sin tildes)
+                if (normalizedCellText.includes(normalizedSearchTerm)) {
+                    found = true;
+                    highlightTextInCell(cell, searchTerm, cellIndex, cellText);
+                    console.log(`✓ Encontrado en fila ${index + 1}, celda ${cellIndex + 1}: "${cellText}" (normalizado: "${normalizedCellText}")`);
+                }
+            });
+
+            // Mostrar u ocultar la fila
+            if (found) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Actualizar resultados
+        updateSearchResults(visibleCount, tableRows.length, searchTerm);
+
+        console.log(`Búsqueda completada: ${visibleCount}/${tableRows.length} resultados`);
+    }
+
+    function extractCellText(cell, cellIndex) {
+        let text = '';
+
+        switch (cellIndex) {
+            case 0: // ID
+            case 1: // Servicio
+            case 2: // Reserva-Placa
+            case 3: // Cliente
+            case 7: // Descripción
+                text = cell.textContent.trim();
+                break;
+
+            case 4: // Estado
+                const statusPill = cell.querySelector('.status-pill');
+                text = statusPill ? statusPill.textContent.trim() : cell.textContent.trim();
+                break;
+
+            case 5: // Personal
+                const personalSpan = cell.querySelector('span[id^="personal-nombre-"]');
+                text = personalSpan ? personalSpan.textContent.trim() : getTextWithoutButtons(cell);
+                break;
+
+            case 6: // Autoparte
+                const autoparteSpan = cell.querySelector('span[id^="autoparte-nombre-"]');
+                text = autoparteSpan ? autoparteSpan.textContent.trim() : getTextWithoutButtons(cell);
+                break;
+
+            default:
+                text = getTextWithoutButtons(cell);
+        }
+
+        return text;
+    }
+
+    function getTextWithoutButtons(cell) {
+        const clone = cell.cloneNode(true);
+        const buttons = clone.querySelectorAll('button, a, .btn, i');
+        buttons.forEach(btn => btn.remove());
+        return clone.textContent.trim();
+    }
+
+    // HIGHLIGHT MEJORADO - BUSCA LA COINCIDENCIA REAL EN EL TEXTO ORIGINAL
+    function highlightTextInCell(cell, searchTerm, cellIndex, originalText) {
+        const target = getTargetElement(cell, cellIndex);
+        if (target) {
+            highlightInElement(target, searchTerm, originalText);
+        }
+    }
+
+    function getTargetElement(cell, cellIndex) {
+        switch (cellIndex) {
+            case 4: // Estado
+                return cell.querySelector('.status-pill') || cell;
+            case 5: // Personal
+                return cell.querySelector('span[id^="personal-nombre-"]') || cell;
+            case 6: // Autoparte
+                return cell.querySelector('span[id^="autoparte-nombre-"]') || cell;
+            default:
+                return cell;
+        }
+    }
+
+    function highlightInElement(element, searchTerm, originalText) {
+        const text = originalText || element.textContent;
+        const normalizedText = normalizeText(text);
+        const normalizedSearchTerm = normalizeText(searchTerm);
+
+        // Encontrar la posición en el texto normalizado
+        const index = normalizedText.indexOf(normalizedSearchTerm);
+
+        if (index !== -1 && !element.querySelector('.highlight')) {
+            // Usar la posición para destacar en el texto original
+            const beforeText = text.substring(0, index);
+            const matchText = text.substring(index, index + normalizedSearchTerm.length);
+            const afterText = text.substring(index + normalizedSearchTerm.length);
+
+            element.innerHTML = beforeText +
+                '<mark class="highlight">' + matchText + '</mark>' +
+                afterText;
+        }
+    }
+
+    function clearHighlights() {
+        const highlights = document.querySelectorAll('.highlight');
+        highlights.forEach(highlight => {
+            const parent = highlight.parentNode;
+            if (parent) {
+                parent.textContent = parent.textContent; // Esto elimina todo el HTML interno
+            }
+        });
+    }
+
+    function updateSearchResults(visible, total, searchTerm) {
+        const searchResults = document.getElementById('searchResults');
+        const noResults = document.getElementById('noResults');
+
+        if (!searchResults || !noResults) return;
+
+        if (searchTerm === '') {
+            searchResults.classList.remove('show');
+            noResults.classList.remove('show');
+            return;
+        }
+
+        if (visible === 0) {
+            searchResults.classList.remove('show');
+            noResults.classList.add('show');
         } else {
-            row.style.display = 'none';
-        }
-    });
-
-    // Actualizar resultados
-    updateSearchResults(visibleCount, tableRows.length, searchTerm);
-    
-    console.log(`Búsqueda completada: ${visibleCount}/${tableRows.length} resultados`);
-}
-
-function extractCellText(cell, cellIndex) {
-    let text = '';
-
-    switch (cellIndex) {
-        case 0: // ID
-        case 1: // Servicio
-        case 2: // Reserva-Placa
-        case 3: // Cliente
-        case 7: // Descripción
-            text = cell.textContent.trim();
-            break;
-            
-        case 4: // Estado
-            const statusPill = cell.querySelector('.status-pill');
-            text = statusPill ? statusPill.textContent.trim() : cell.textContent.trim();
-            break;
-            
-        case 5: // Personal
-            const personalSpan = cell.querySelector('span[id^="personal-nombre-"]');
-            text = personalSpan ? personalSpan.textContent.trim() : getTextWithoutButtons(cell);
-            break;
-            
-        case 6: // Autoparte
-            const autoparteSpan = cell.querySelector('span[id^="autoparte-nombre-"]');
-            text = autoparteSpan ? autoparteSpan.textContent.trim() : getTextWithoutButtons(cell);
-            break;
-            
-        default:
-            text = getTextWithoutButtons(cell);
-    }
-
-    return text;
-}
-
-function getTextWithoutButtons(cell) {
-    const clone = cell.cloneNode(true);
-    const buttons = clone.querySelectorAll('button, a, .btn, i');
-    buttons.forEach(btn => btn.remove());
-    return clone.textContent.trim();
-}
-
-// HIGHLIGHT MEJORADO - BUSCA LA COINCIDENCIA REAL EN EL TEXTO ORIGINAL
-function highlightTextInCell(cell, searchTerm, cellIndex, originalText) {
-    const target = getTargetElement(cell, cellIndex);
-    if (target) {
-        highlightInElement(target, searchTerm, originalText);
-    }
-}
-
-function getTargetElement(cell, cellIndex) {
-    switch (cellIndex) {
-        case 4: // Estado
-            return cell.querySelector('.status-pill') || cell;
-        case 5: // Personal
-            return cell.querySelector('span[id^="personal-nombre-"]') || cell;
-        case 6: // Autoparte
-            return cell.querySelector('span[id^="autoparte-nombre-"]') || cell;
-        default:
-            return cell;
-    }
-}
-
-function highlightInElement(element, searchTerm, originalText) {
-    const text = originalText || element.textContent;
-    const normalizedText = normalizeText(text);
-    const normalizedSearchTerm = normalizeText(searchTerm);
-    
-    // Encontrar la posición en el texto normalizado
-    const index = normalizedText.indexOf(normalizedSearchTerm);
-    
-    if (index !== -1 && !element.querySelector('.highlight')) {
-        // Usar la posición para destacar en el texto original
-        const beforeText = text.substring(0, index);
-        const matchText = text.substring(index, index + normalizedSearchTerm.length);
-        const afterText = text.substring(index + normalizedSearchTerm.length);
-
-        element.innerHTML = beforeText +
-            '<mark class="highlight">' + matchText + '</mark>' +
-            afterText;
-    }
-}
-
-function clearHighlights() {
-    const highlights = document.querySelectorAll('.highlight');
-    highlights.forEach(highlight => {
-        const parent = highlight.parentNode;
-        if (parent) {
-            parent.textContent = parent.textContent; // Esto elimina todo el HTML interno
-        }
-    });
-}
-
-function updateSearchResults(visible, total, searchTerm) {
-    const searchResults = document.getElementById('searchResults');
-    const noResults = document.getElementById('noResults');
-
-    if (!searchResults || !noResults) return;
-
-    if (searchTerm === '') {
-        searchResults.classList.remove('show');
-        noResults.classList.remove('show');
-        return;
-    }
-
-    if (visible === 0) {
-        searchResults.classList.remove('show');
-        noResults.classList.add('show');
-    } else {
-        noResults.classList.remove('show');
-        searchResults.innerHTML = `
+            noResults.classList.remove('show');
+            searchResults.innerHTML = `
             Se encontr${visible === 1 ? 'ó' : 'aron'} 
             <span class="count">${visible}</span> 
             ${visible === 1 ? 'orden' : 'órdenes'} 
             de trabajo${visible > 1 ? 's' : ''} 
             de ${total} total${total > 1 ? 'es' : ''}
         `;
-        searchResults.classList.add('show');
+            searchResults.classList.add('show');
+        }
     }
-}
 
-function clearSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-    const noResults = document.getElementById('noResults');
+    function clearSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const noResults = document.getElementById('noResults');
 
-    if (!searchInput) return;
+        if (!searchInput) return;
 
-    searchInput.value = '';
-    clearHighlights();
+        searchInput.value = '';
+        clearHighlights();
 
-    // Mostrar todas las filas
-    const tableRows = document.querySelectorAll('.table tbody tr');
-    tableRows.forEach(row => row.style.display = '');
+        // Mostrar todas las filas
+        const tableRows = document.querySelectorAll('.table tbody tr');
+        tableRows.forEach(row => row.style.display = '');
 
-    // Ocultar resultados
-    if (searchResults) searchResults.classList.remove('show');
-    if (noResults) noResults.classList.remove('show');
+        // Ocultar resultados
+        if (searchResults) searchResults.classList.remove('show');
+        if (noResults) noResults.classList.remove('show');
 
-    searchInput.focus();
-    console.log('Búsqueda limpiada');
-}
-
-// Función global para testing
-window.testSearch = function (term) {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.value = term;
-        performSearchImmediate();
+        searchInput.focus();
+        console.log('Búsqueda limpiada');
     }
-};
 
-// Función para testing de normalización
-window.testNormalize = function (text) {
-    console.log(`Original: "${text}"`);
-    console.log(`Normalizado: "${normalizeText(text)}"`);
-    return normalizeText(text);
-};
+    // Función global para testing
+    window.testSearch = function (term) {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = term;
+            performSearchImmediate();
+        }
+    };
+
+    // Función para testing de normalización
+    window.testNormalize = function (text) {
+        console.log(`Original: "${text}"`);
+        console.log(`Normalizado: "${normalizeText(text)}"`);
+        return normalizeText(text);
+    };
 </script>
