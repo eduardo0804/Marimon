@@ -1837,7 +1837,7 @@ a[href="/Identity/Account/Login"]:hover {
   font-size: 12px;
   font-weight: bold;
   box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
-  z-index: 100;
+  z-index: 10;
   pointer-events: none;
 }
 
