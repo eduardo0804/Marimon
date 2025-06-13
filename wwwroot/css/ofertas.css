@@ -1,7 +1,7 @@
 /* Breadcrumb - Quitar estilos de enlaces */
 .breadcrumb-item a {
     text-decoration: none !important;
-    color: #626C66 !important;
+    color: #141414 !important;
     border: none !important;
     outline: none !important;
 }
@@ -12,7 +12,7 @@
 }
 
 .breadcrumb-item.active {
-    color: #000000 !important;
+    color: #e50914 !important;
 }
 
 /* Checkboxes personalizados */
@@ -30,54 +30,43 @@
     box-shadow: 0 0 0 0.2rem rgba(228, 34, 41, 0.25) !important;
 }
 
-/* Botones principales */
-.btn-success {
-    background-color: #E42229 !important;
-    border-color: #D42025 !important;
-    color: #FFFFFF !important;
+/* Botones principales - Eliminar bordes de focus */
+.btn:focus,
+.btn:active,
+.btn.active,
+.btn:active:focus,
+.btn.active:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
-.btn-success:hover {
-    background-color: #D42025 !important;
-    border-color: #c01d22 !important;
-    color: #FFFFFF !important;
+.btn-success:focus,
+.btn-success:active,
+.btn-success.active {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
-.btn-primary {
-    background-color: #626C66 !important;
-    border-color: #626C66 !important;
-    color: #FFFFFF !important;
+.btn-warning:focus,
+.btn-warning:active,
+.btn-warning.active {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
-.btn-primary:hover {
-    background-color: #4a544e !important;
-    border-color: #4a544e !important;
-    color: #FFFFFF !important;
+.btn-danger:focus,
+.btn-danger:active,
+.btn-danger.active {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
-.btn-danger {
-    background-color: #000000 !important;
-    border-color: #000000 !important;
-    color: #FFFFFF !important;
-}
-
-.btn-danger:hover {
-    background-color: #333333 !important;
-    border-color: #333333 !important;
-    color: #FFFFFF !important;
-}
-
-/* Botón secundario en modales */
-.btn-secondary {
-    background-color: #626C66 !important;
-    border-color: #626C66 !important;
-    color: #FFFFFF !important;
-}
-
-.btn-secondary:hover {
-    background-color: #4a544e !important;
-    border-color: #4a544e !important;
-    color: #FFFFFF !important;
+.btn-secondary:focus,
+.btn-secondary:active,
+.btn-secondary.active {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* Header de la tabla */
@@ -97,25 +86,6 @@
 
 .badge.bg-danger {
     background-color: #000000 !important;
-}
-
-/* Alertas */
-.alert-success {
-    background-color: rgba(228, 34, 41, 0.1) !important;
-    border-color: #E42229 !important;
-    color: #D42025 !important;
-}
-
-.alert-danger {
-    background-color: rgba(0, 0, 0, 0.1) !important;
-    border-color: #000000 !important;
-    color: #000000 !important;
-}
-
-.alert-info {
-    background-color: rgba(98, 108, 102, 0.1) !important;
-    border-color: #626C66 !important;
-    color: #626C66 !important;
 }
 
 /* Formularios */
@@ -152,4 +122,17 @@
 /* Icono de advertencia en modal */
 .text-warning {
     color: #E42229 !important;
+}
+
+/* Alertas personalizadas */
+.alert-success {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+    color: #155724 !important;
+}
+
+.alert-danger {
+    background-color: #f8d7da !important;
+    border-color: #f5c6cb !important;
+    color: #721c24 !important;
 }

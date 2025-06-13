@@ -189,8 +189,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const limpiarLi = document.createElement("li");
       const limpiarA = document.createElement("a");
-      limpiarA.classList.add("dropdown-item", "text-danger");
+      limpiarA.classList.add("dropdown-item");
       limpiarA.href = "#";
+      limpiarA.style.color = "#e42229"; // Rojo
+      limpiarA.style.fontWeight = "600";
       limpiarA.textContent = "Limpiar historial";
       limpiarA.addEventListener("click", function (e) {
         e.preventDefault();
@@ -241,6 +243,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Inicializar filtros desde URL
   inicializarFiltrosDesdeURL();
+  const dropdownToggle = document.getElementById("historialBusqueda");
+  if (dropdownToggle) {
+    dropdownToggle.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const dropdownMenu = this.nextElementSibling;
+      const isOpen = dropdownMenu.classList.contains("show");
+
+      // Cerrar todos los dropdowns abiertos
+      document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+        menu.classList.remove('show');
+      });
+
+      // Abrir/cerrar el dropdown actual
+      if (!isOpen) {
+        dropdownMenu.classList.add("show");
+      }
+    });
+
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener("click", function (e) {
+      if (!dropdownToggle.contains(e.target)) {
+        document.getElementById("historial-busquedas").classList.remove("show");
+      }
+    });
+  }
 });
 
 // === Funciones de modal ===
@@ -451,13 +480,13 @@ function inicializarFormularioResenia() {
           return response.ok
             ? response.text()
             : response.type === "opaqueredirect"
-            ? fetch(
+              ? fetch(
                 `/Catalogo/ObtenerReseniasAutoparte?aut_id=${autoparteId}`,
                 {
                   headers: { "X-Requested-With": "XMLHttpRequest" },
                 }
               ).then((r) => r.text())
-            : Promise.reject("Error en el envío");
+              : Promise.reject("Error en el envío");
         })
         .then((html) => {
           const container = document.querySelector(".resenias-list");
@@ -489,14 +518,14 @@ function inicializarFormularioResenia() {
   }
 }
 function mostrarToastResenia(mensaje = '¡Reseña enviada exitosamente!') {
-    const toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
-    toast.style.cssText = 'bottom: 20px; right: 20px; z-index: 9999; min-width: 250px;';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
+  const toast = document.createElement('div');
+  toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
+  toast.style.cssText = 'bottom: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'assertive');
+  toast.setAttribute('aria-atomic', 'true');
 
-    toast.innerHTML = `
+  toast.innerHTML = `
         <div class="d-flex">
             <div class="toast-body">
                 <i class="fas fa-check-circle me-2"></i>${mensaje}
@@ -505,14 +534,14 @@ function mostrarToastResenia(mensaje = '¡Reseña enviada exitosamente!') {
         </div>
     `;
 
-    document.body.appendChild(toast);
+  document.body.appendChild(toast);
 
-    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
-    bsToast.show();
+  const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+  bsToast.show();
 
-    toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-    });
+  toast.addEventListener('hidden.bs.toast', () => {
+    toast.remove();
+  });
 }
 
 
@@ -597,13 +626,13 @@ function eliminarResenia(reseniaId, autoparteId) {
     });
 }
 function mostrarMensajeExito(mensaje) {
-    const toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
-    toast.style.cssText = 'bottom: 20px; right: 20px; z-index: 9999; min-width: 250px;';
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    toast.innerHTML = `
+  const toast = document.createElement('div');
+  toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
+  toast.style.cssText = 'bottom: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'assertive');
+  toast.setAttribute('aria-atomic', 'true');
+  toast.innerHTML = `
         <div class="d-flex">
             <div class="toast-body">
                 <i class="fas fa-check-circle me-2"></i> ${mensaje}
@@ -612,13 +641,13 @@ function mostrarMensajeExito(mensaje) {
         </div>
     `;
 
-    document.body.appendChild(toast);
-    const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
-    bsToast.show();
+  document.body.appendChild(toast);
+  const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
+  bsToast.show();
 
-    toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-    });
+  toast.addEventListener('hidden.bs.toast', () => {
+    toast.remove();
+  });
 }
 // === Funciones de carrito ===
 function añadirAlCarritoAsync(autoparteId, cantidad) {
@@ -679,6 +708,53 @@ function agregarFavorito(icon) {
     var toast = new bootstrap.Toast(toastFavorito);
     toast.show();
   }
+}
+function mostrarMensajeError(mensaje) {
+  const toast = document.createElement('div');
+  toast.className = 'toast align-items-center text-white bg-danger border-0 position-fixed';
+  toast.style.cssText = 'bottom: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'assertive');
+  toast.setAttribute('aria-atomic', 'true');
+  toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-times-circle me-2"></i> ${mensaje}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+    `;
+
+  document.body.appendChild(toast);
+  const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
+  bsToast.show();
+
+  toast.addEventListener('hidden.bs.toast', () => {
+    toast.remove();
+  });
+}
+function agregarFavorito(icon, aut_id) {
+  const EsFavoritos = icon.classList.contains('fa-solid');
+  const url = EsFavoritos ? '/Catalogo/QuitarFavorito' : '/Catalogo/AgregarFavorito';  
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: JSON.stringify({ aut_id: aut_id })
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        icon.classList.remove(EsFavoritos ? 'fa-solid' : 'fa-regular');
+        icon.classList.add(EsFavoritos ? 'fa-regular' : 'fa-solid');
+        mostrarMensajeExito(data.message);
+      } else {
+        mostrarMensajeError(data.message);
+      }
+    })
+    .catch(() => mostrarMensajeError('Error al agregar a favoritos.'));
 }
 
 // === Funciones auxiliares para filtros ===

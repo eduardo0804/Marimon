@@ -7,7 +7,35 @@
 }
 
 <link href="/css/styleListaAuto.css" rel="stylesheet" type="text/css">
+<style>
+    :root {
+        --primary-color: #dc2626;
+        --secondary-color: #6b7280;
+        --mid-gray: #9ca3af;
+        --transition: all 0.3s ease;
+    }
 
+    .breadcrumb-item a {
+        color: var(--secondary-color);
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .breadcrumb-item a:hover {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .breadcrumb-item+.breadcrumb-item::before {
+        color: var(--mid-gray);
+    }
+</style>
 <div class="container">
     <div class="toast-container bottom-0 end-0 p-3">
         <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">

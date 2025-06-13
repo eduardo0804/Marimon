@@ -245,7 +245,7 @@ namespace Marimon.Controllers
             {
                 // Obtener usuarios con más de 10 ventas
                 var usuariosConMasDe10Ventas = await _context.Usuarios
-                    .Where(u => u.Ventas.Count() > 10)
+                    .Where(u => u.Ventas.Count() >= 1)
                     .ToListAsync();
 
                 if (usuariosConMasDe10Ventas.Count == 0)
@@ -359,6 +359,9 @@ namespace Marimon.Controllers
 
                 var htmlTemplate = await System.IO.File.ReadAllTextAsync(templatePath);
                 
+                // Generar la URL del catálogo
+                var catalogoUrl = Url.Action("Index", "Catalogo", null, Request.Scheme);
+                
                 // Reemplazar los placeholders con los valores reales
                 var htmlMessage = htmlTemplate
                     .Replace("{nombreUsuario}", nombreUsuario)
@@ -366,7 +369,8 @@ namespace Marimon.Controllers
                     .Replace("{descripcionDescuento}", descripcionDescuento)
                     .Replace("{porcentajeDescuento}", porcentajeDescuento.ToString("F0"))
                     .Replace("{nombreProducto}", nombreProducto)
-                    .Replace("{fechaExpiracion}", fechaExpiracion.ToString("dd/MM/yyyy"));
+                    .Replace("{fechaExpiracion}", fechaExpiracion.ToString("dd/MM/yyyy"))
+                    .Replace("{catalogoUrl}", catalogoUrl);
 
                 return htmlMessage;
             }
@@ -376,7 +380,6 @@ namespace Marimon.Controllers
                 return string.Empty;
             }
         }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

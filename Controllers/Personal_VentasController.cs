@@ -46,6 +46,13 @@ namespace Marimon.Controllers
             return View();
         }
 
+        public ActionResult Reportes()
+        {
+            return View();
+
+        }
+
+
         // GET: Admin/Entradas - Página de entrada de productos
         public ActionResult Entradas()
         {

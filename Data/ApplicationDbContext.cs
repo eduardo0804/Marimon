@@ -1,7 +1,6 @@
 using Marimon.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Marimon.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Marimon.Data;
@@ -28,6 +27,7 @@ public class ApplicationDbContext : IdentityDbContext
             .WithOne()
             .HasForeignKey<Usuario>(u => u.usu_id)
             .OnDelete(DeleteBehavior.Cascade);
+
 
         builder.Entity<Reserva>()
             .HasOne(r => r.Usuario)
@@ -104,7 +104,10 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<CarritoAutoparte> CarritoAutopartes { get; set; } = null!;
     public DbSet<Reclamacion> Reclamacion { get; set; } = null!;
     public DbSet<Resenia> Resenias { get; set; }
-    
     public DbSet<Oferta> Ofertas { get; set; }
     public DbSet<CodigoDescuento> CodigosDescuento { get; set; }
+    public DbSet<Favoritos> Favoritos { get; set; }
+    public DbSet<Encuesta> Encuestas { get; set; }
+    public DbSet<OrdenTrabajo> OrdenTrabajos { get; set; } // Descomentar si se agrega la entidad OrdenTrabajo
+
 }

@@ -41,6 +41,7 @@ namespace Marimon.Controllers
         public IActionResult Index()
         {
             var servicios = _context.Servicio.ToList();
+            ViewBag.UsuarioAutenticado = User.Identity.IsAuthenticated;
             return View(servicios);
         }
 
@@ -80,31 +81,38 @@ namespace Marimon.Controllers
 SERVICIOS DISPONIBLES: {servicesListText}
 
 FORMATO DE RESPUESTA OBLIGATORIO:
-- Problema detectado: [descripción breve]
-- Recomendación: [sugerencia específica]
+- Problema detectado: [descripción técnica detallada del problema identificado]
+- Recomendación: [acción específica y detallada que el cliente debe realizar inmediatamente, como ""Revisión completa del sistema con el scanner para identificar el problema"", ""Verificar nivel de refrigerante y revisar mangueras inmediatamente"", ""Programar diagnóstico computarizado urgente"", etc. Debe ser una instrucción completa y práctica]
 
-El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
-
-Si no corresponde a ningún servicio especializado, responde ""Ninguno"".
-Sé conciso y directo (máximo 3 frases).";
+IMPORTANTE: 
+- La recomendación debe ser una oración completa con acción específica y detallada
+- El servicio debe ser solo el nombre del servicio de la lista
+- La recomendación debe explicar QUÉ hacer, el servicio indica DÓNDE acudir
+- Máximo 3 frases para el problema y recomendación combinados";
 
                     parts.Add(new { text = prompt });
                     parts.Add(new { text = comment });
                 }
                 else if (string.IsNullOrWhiteSpace(comment) && (image != null && image.Length > 0))
                 {
-                    prompt = $@"Analiza esta imagen de un vehículo o componente automotriz y determina qué servicio es el más adecuado.
+                    prompt = $@"Analiza esta imagen para determinar si está relacionada con vehículos o servicios automotrices.
 
 SERVICIOS DISPONIBLES: {servicesListText}
 
+INSTRUCCIONES CRÍTICAS:
+1. PRIMERO verifica si la imagen muestra contenido automotriz real (vehículos, partes, componentes, motor, carrocería, etc.)
+2. Si es una captura de pantalla, interfaz de software, texto, memes, personas sin vehículos, paisajes, comida, animales, etc. - NO ES AUTOMOTRIZ
+3. Si no muestra claramente contenido automotriz, solicita una imagen adecuada
+
 FORMATO DE RESPUESTA OBLIGATORIO:
-- Problema detectado: [descripción breve]
-- Recomendación: [sugerencia específica]
+- Problema detectado: [Si es automotriz: describe el problema técnico específico y detallado. Si NO es automotriz: ""La imagen no muestra un vehículo o componente automotriz""]
+- Recomendación: [Si es automotriz: acción inmediata completa como ""Inspeccionar inmediatamente las pastillas de freno y verificar el grosor"", ""Verificar nivel de aceite del motor y revisar posibles fugas"", ""Revisar todas las conexiones eléctricas y cables sueltos"". Si NO es automotriz: ""Proporciona una imagen clara de tu vehículo o el componente específico con problemas""]
 
-El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
-
-Si no corresponde a ningún servicio especializado, responde ""Ninguno"".
-Sé conciso y directo (máximo 3 frases).";
+REGLAS ESPECIALES:
+- La recomendación debe ser una oración completa con acción específica y detallada
+- El servicio debe ser solo el nombre exacto de la lista
+- Solo analiza imágenes que muestren vehículos, partes automotrices o componentes relacionados
+- Para capturas de pantalla, interfaces o contenido no automotriz: siempre responde ""Ninguno""";
 
                     parts.Add(new { text = prompt });
 
@@ -132,22 +140,22 @@ Sé conciso y directo (máximo 3 frases).";
 
 SERVICIOS DISPONIBLES: {servicesListText}
 
-INSTRUCCIONES:
-1. Examina ambos inputs identificando componentes/sistemas afectados y síntomas
-2. Determina el servicio más adecuado de la lista proporcionada
+INSTRUCCIONES CRÍTICAS:
+1. PRIMERO verifica si la imagen muestra contenido automotriz real (vehículos, partes, componentes)
+2. Si la imagen NO es automotriz (captura de pantalla, interfaz, texto, etc.), basa el análisis SOLO en el comentario
+3. Si ni la imagen es automotriz ni el comentario describe problemas automotrices, solicita información adecuada
 
 FORMATO DE RESPUESTA OBLIGATORIO:
-- Problema detectado: [descripción técnica concisa]
-- Recomendación: [sugerencia específica]
-
-El servicio más adecuado es: [EXACTAMENTE uno de los servicios de la lista o ""Ninguno""]
+- Problema detectado: [descripción técnica detallada del problema basada en contenido automotriz válido]
+- Recomendación: [acción específica, detallada y práctica que el cliente debe realizar, como ""Verificar inmediatamente el nivel de refrigerante y revisar todas las mangueras del sistema"", ""Programar revisión completa del sistema eléctrico con scanner para identificar fallas"", ""Inspeccionar visualmente las pastillas de freno y medir el grosor de las mismas"", etc. Debe ser una instrucción completa]
 
 REGLAS ESPECIALES:
-- Si es mantenimiento básico (inflado de llantas, lavado): responde ""Ninguno""
-- Si no coincide con servicios especializados: responde ""Ninguno""
-- Usa SOLO los nombres exactos de la lista
-- Máximo 3 frases en total
-- Prioriza diagnóstico preciso";
+- La recomendación debe ser una oración completa y detallada con la acción específica a realizar
+- El servicio debe ser únicamente el nombre exacto de la lista de servicios
+- La recomendación explica QUÉ hacer específicamente, el servicio indica DÓNDE ir
+- Si la imagen no es automotriz pero el comentario sí describe problemas automotrices: analiza solo el comentario
+- Para mantenimiento básico (inflado de llantas, lavado): responde ""Ninguno""
+- Máximo 3 frases en total para problema y recomendación";
 
                     parts.Add(new { text = prompt });
 
@@ -228,21 +236,52 @@ REGLAS ESPECIALES:
                     var typedService = (dynamic)service;
                     // Formatear el resultado con colores de la paleta
                     string formattedResult = $@"
-                <div class='card mb-3'>
-                    <div class='card-body'>
-                        <h5 class='card-title' style='color: #E42229;'>Análisis</h5>
-                        <p class='card-text'>{FormatResultText(resultText)}</p>
-                        <h5 class='mt-3' style='color: #E42229;'>Servicio recomendado:</h5>
-                        <div class='mt-2'>
-                            <strong style='font-style: italic;'>{typedService.name}</strong>
-                        </div>
-                    </div>
-                </div>";
+                        <div class='card mb-3'>
+                            <div class='card-body'>
+                                <h5 class='card-title' style='color: #E42229;'>Análisis</h5>
+                                <p class='card-text'>{FormatResultText(resultText)}</p>
+                                <h5 class='mt-3' style='color: #E42229;'>Servicio recomendado:</h5>
+                                <div class='mt-2'>
+                                    <strong style='font-style: italic;'>{typedService.name}</strong>
+                                </div>
+                            </div>
+                        </div>";
 
                     return Json(new { success = true, result = formattedResult, url = typedService.url });
                 }
 
-                return Json(new { success = true, result = $"<div class='alert alert-info'>Análisis realizado: {resultText}</div><p>No se encontró un servicio adecuado.</p>" });
+                var finalResultText = FormatResultText(resultText);
+                bool isNonAutomotiveContent = resultText.ToLower().Contains("no muestra un vehículo") ||
+                                             resultText.ToLower().Contains("no es automotriz") ||
+                                             resultText.ToLower().Contains("proporciona una imagen");
+
+                if (isNonAutomotiveContent)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        result = $@"
+                        <div class='alert alert-info' style='background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-left: 4px solid #17a2b8;'>
+                            <div class='d-flex align-items-center'>
+                                <div style='font-size: 2rem; margin-right: 1rem;'>🚗</div>
+                                <div>
+                                    <strong>Análisis realizado:</strong><br>
+                                    {finalResultText}
+                                </div>
+                            </div>
+                        </div>"
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    result = $@"
+                    <div class='alert alert-info'>
+                        <strong>Análisis realizado:</strong> {finalResultText}
+                    </div>
+                    <p>No se encontró un servicio adecuado.</p>"
+                });
             }
             catch (Exception ex)
             {
@@ -259,12 +298,33 @@ REGLAS ESPECIALES:
         new { id = 4, name = "Sistema de Refrigeración", url = "/Servicios/Detalle/4" },
         new { id = 5, name = "Aire Acondicionado", url = "/Servicios/Detalle/5" },
         new { id = 3, name = "Mecatrónica y Electrónica", url = "/Servicios/Detalle/3" },
-        new { id = 6, name = "Mantenimientos y Frenos", url = "/Servicios/Detalle/6" },
-        new { id = 7, name = "Diagnóstico y Scanner", url = "/Servicios/Detalle/7" },
-        new { id = 8, name = "Planchado y Pintura Automotriz", url = "/Servicios/Detalle/8" },
-        new { id = 9, name = "Conversión a GLP", url = "/Servicios/Detalle/9" },
-        new { id = 10, name = "Conversión a GNV", url = "/Servicios/Detalle/10" }
+        new { id = 1, name = "Mantenimientos y Frenos", url = "/Servicios/Detalle/6" },
+        new { id = 2, name = "Diagnóstico y Scanner", url = "/Servicios/Detalle/7" },
+        new { id = 6, name = "Planchado y Pintura Automotriz", url = "/Servicios/Detalle/8" },
+        new { id = 7, name = "Conversión a GLP", url = "/Servicios/Detalle/9" },
+        new { id = 8, name = "Conversión a GNV", url = "/Servicios/Detalle/10" }
     };
+
+            var nonAutomotiveIndicators = new[]
+            {
+        "no muestra un vehículo",
+        "no muestra contenido automotriz",
+        "no es automotriz",
+        "captura de pantalla",
+        "interfaz de usuario",
+        "proporciona una imagen",
+        "imagen adecuada",
+        "imagen de tu vehículo"
+    };
+
+            var lowerResponse = aiResponse.ToLower();
+            bool isNonAutomotive = nonAutomotiveIndicators.Any(indicator =>
+                lowerResponse.Contains(indicator.ToLower()));
+
+            if (isNonAutomotive)
+            {
+                return null;
+            }
 
             // Buscar la línea que contiene "El servicio más adecuado es:"
             var lines = aiResponse.Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -287,6 +347,11 @@ REGLAS ESPECIALES:
                 {
                     var serviceName = serviceLine.Substring(colonIndex + 1).Trim();
 
+                    if (string.Equals(serviceName, "Ninguno", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return null;
+                    }
+
                     // Buscar coincidencia exacta primero
                     var exactMatch = services.FirstOrDefault(s =>
                         string.Equals(s.name, serviceName, StringComparison.OrdinalIgnoreCase));
@@ -308,8 +373,13 @@ REGLAS ESPECIALES:
                 }
             }
 
-            // Si no encuentra nada específico en la respuesta, usar el método de keywords como fallback
-            return DetermineServiceByKeywords(aiResponse);
+            // Si no encuentra nada específico, usar keywords como fallback solo si no es contenido no automotriz
+            if (!isNonAutomotive)
+            {
+                return DetermineServiceByKeywords(aiResponse);
+            }
+
+            return null;
         }
 
         // Método auxiliar de keywords como fallback (tu método original simplificado)
@@ -473,6 +543,17 @@ REGLAS ESPECIALES:
             {
                 _context.Reserva.Add(reserva);
                 await _context.SaveChangesAsync();
+
+                // // Crear orden de trabajo ligada a esta reserva
+                // var ordenTrabajo = new OrdenTrabajo
+                // {
+                //     ReservaId = reserva.res_id,
+                //     // PersonalId y AutoparteId se asignarán después
+                // };
+
+                // _context.OrdenTrabajos.Add(ordenTrabajo);
+                // await _context.SaveChangesAsync();
+
                 await EnviarOrdenReservaPorCorreo(reserva);
 
                 TempData["ReservaExitosa"] = true;

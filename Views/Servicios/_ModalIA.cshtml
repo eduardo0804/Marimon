@@ -641,7 +641,7 @@
                 document.getElementById("resultIntegration").style.display = "block";
 
                 if (data.success === false) {
-                    document.getElementById("resultContent").innerHTML = `<div class="alert alert-danger">${data.result}</div>`;
+                    document.getElementById("resultContent").innerHTML = `<div class="alert alert-danger">Error: No se pudo acceder al servicio recomendado. Por favor, intenta más tarde.</div>`;
                 } else {
                     document.getElementById("resultContent").innerHTML = data.result;
                     if (data.url) {

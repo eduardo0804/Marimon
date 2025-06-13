@@ -208,15 +208,9 @@ textarea.form-control {
   background-color: var(--primary-color);
   padding: 1rem;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 2rem;
+  text-align: center;
   box-shadow: var(--shadow);
 }
-
-
 
 /* Animación de entrada mejorada */
 @keyframes slideInUp {
@@ -323,4 +317,95 @@ select.form-control option:hover {
   border-width: 0 24px 24px 0;
   border-style: solid;
   border-color: var(--primary-color) var(--gray-light);
+}
+
+.confirmation-icon {
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.btn-home {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  /* Rojo */
+  border: none;
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 16px rgba(33, 33, 33, 0.3);
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+
+  /* Flex para centrar ícono y texto */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-home::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.btn-home:hover {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  /* Negro */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(33, 33, 33, 0.5);
+  color: white;
+}
+
+.btn-home:hover::before {
+  left: 100%;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.dropdown-menu {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.dropdown-menu .dropdown-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.dropdown-menu .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#listaComprobantes, #listaReservas {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    background: white;
 }

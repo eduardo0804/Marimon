@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.5;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-header {
+            background-color: #000000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .email-header img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .email-body {
+            padding: 30px;
+            color: #333333;
+        }
+
+        .success-section {
+            background-color: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .success-title {
+            color: #28a745;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+
+        .success-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .confirmation-text {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .details-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .detail-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #333;
+            min-width: 140px;
+            margin-right: 10px;
+        }
+
+        .detail-value {
+            color: #666;
+            flex: 1;
+        }
+
+        .response-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .response-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .response-item {
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .response-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .response-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .response-value {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nps-score {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .comment-box {
+            background-color: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 12px;
+            margin-left: 32px;
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .email-footer {
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .icon-survey::before { content: "📋"; }
+        .icon-calendar::before { content: "📅"; }
+        .icon-clock::before { content: "🕐"; }
+        .icon-user::before { content: "👤"; }
+        .icon-email::before { content: "📧"; }
+        .icon-comment::before { content: "💬"; }
+        .icon-id::before { content: "🆔"; }
+        .icon-rating::before { content: "⭐"; }
+        .icon-payment::before { content: "💳"; }
+        .icon-score::before { content: "📊"; }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .email-body {
+                padding: 20px;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detail-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+            
+            .comment-box {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+    </head>
+
+    <body>
+        <div class="email-container">
+            <!-- Header -->
+            <div class="email-header">
+                <img src="{{LogoUrl}}" alt="Marimon Logo" />
+            </div>
+
+            <!-- Body -->
+            <div class="email-body">
+                <div class="success-section">
+                    <h2 class="success-title">NUEVA ENCUESTA DE SATISFACCIÓN</h2>
+                    <p class="success-subtitle">Respuesta recibida de cliente</p>
+                </div>
+
+                <div class="confirmation-text">
+                    <strong>Notificación:</strong> Se ha recibido una nueva encuesta de satisfacción completada por un cliente. A continuación se detallan los resultados:
+                </div>
+
+                <ul class="details-list">
+                    <li class="detail-item">
+                        <span class="detail-icon icon-id"></span>
+                        <span class="detail-label">ID Encuesta:</span>
+                        <span class="detail-value">{{ID_ENCUESTA}}</span>
+                    </li>
+
+                    <li class="detail-item">
+                        <span class="detail-icon icon-user"></span>
+                        <span class="detail-label">Cliente:</span>
+                        <span class="detail-value"><strong>{{NOMBRE_CLIENTE}}</strong></span>
+                    </li>
+
+                    <li class="detail-item">
+                        <span class="detail-icon icon-email"></span>
+                        <span class="detail-label">Correo:</span>
+                        <span class="detail-value">{{CORREO_CLIENTE}}</span>
+                    </li>
+
+                    <li class="detail-item">
+                        <span class="detail-icon icon-calendar"></span>
+                        <span class="detail-label">Fecha envío:</span>
+                        <span class="detail-value">{{FECHA_ENVIO}}</span>
+                    </li>
+
+                    <li class="detail-item">
+                        <span class="detail-icon icon-clock"></span>
+                        <span class="detail-label">Hora envío:</span>
+                        <span class="detail-value">{{HORA_ENVIO}}</span>
+                    </li>
+                </ul>
+
+                <div class="response-section">
+                    <div class="response-title">📝 Respuestas de la Encuesta:</div>
+                    
+                    <div class="response-item">
+                        <div class="response-label">🌟 Agrado del Sistema:</div>
+                        <div class="response-value">{{AGRADO_SISTEMA}}</div>
+                    </div>
+
+                    <div class="response-item">
+                        <div class="response-label">💳 Facilidad de Pago:</div>
+                        <div class="response-value">{{FACILIDAD_PAGO}}</div>
+                    </div>
+
+                    <div class="response-item">
+                        <div class="response-label">📊 NPS Score (0-10):</div>
+                        <div class="response-value">
+                            <span class="nps-score">{{NPS_SCORE}}/10</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-icon icon-comment"></span>
+                    <span class="detail-label">Comentarios adicionales:</span>
+                    <div class="comment-box">
+                        {{COMENTARIOS}}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="email-footer">
+                Esta encuesta ha sido procesada automáticamente por el sistema de Marimon Autopartes.
+            </div>
+        </div>
+    </body>
+</html>

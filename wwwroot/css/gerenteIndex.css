@@ -1,0 +1,139 @@
+/* Estilos básicos */
+.admin-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+/* Header */
+.modulo-header {
+  width: 100%;
+}
+
+.modulo-title-bar {
+  background-color: #d42025;
+  color: white;
+  padding: 15px 25px;
+  text-align: left;
+}
+
+.modulo-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Contenido principal */
+.modulo-content {
+  padding: 60px;
+}
+
+.modulo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 40px;
+  justify-items: center;
+}
+
+.modulo-item {
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 350px;
+  max-width: 100%;
+}
+
+.modulo-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.modulo-item-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.card-content {
+  background-color: #f8f9fa;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0; /* Removido el padding para que la imagen ocupe todo el espacio */
+  overflow: hidden; /* Para evitar que la imagen se salga del contenedor */
+}
+
+.card-content img {
+  width: 100%; /* La imagen ocupará todo el ancho */
+  height: 100%; /* La imagen ocupará toda la altura */
+  object-fit: cover; /* Cambiado de 'contain' a 'cover' para llenar todo el espacio */
+  transition: transform 0.3s ease;
+}
+
+.modulo-item:hover .card-content img {
+  transform: scale(1.1);
+}
+
+.card-footer {
+  background-color: #1c1c1c;
+  color: white;
+  padding: 18px;
+  text-align: center;
+  transition: background-color 0.3s ease; /* Transición suave para el cambio de color */
+}
+
+/* Hover effect para el footer */
+.modulo-item:hover .card-footer {
+  background-color: #d42025; /* Cambia a rojo en hover */
+}
+
+/* Footer de las tarjetas */
+.card-footer span {
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+/* Footer principal */
+.modulo-footer {
+  background-color: #d42025;
+  color: white;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modulo-footer a {
+  color: white;
+  text-decoration: none;
+}
+
+.modulo-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modulo-grid {
+    grid-template-columns: 1fr;
+    grid-gap: 30px;
+  }
+  .modulo-content {
+    padding: 40px 20px;
+  }
+  .admin-container {
+    margin: 20px;
+    max-width: calc(100% - 40px);
+  }
+}

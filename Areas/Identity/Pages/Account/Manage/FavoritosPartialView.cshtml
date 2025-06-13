@@ -1,0 +1,70 @@
+@model Marimon.ViewModel.FavoritosViewModel
+<link rel="stylesheet" href="~/css/favoritos.css" asp-append-version="true">
+
+<div class="container">
+    @if (Model.Favoritos == null || !Model.Favoritos.Any())
+    {
+        <div class="empty-favorites">
+            @if (!string.IsNullOrEmpty(Model.TerminoBusqueda))
+            {
+                <i class="fas fa-search-minus"></i>
+                <h4>No se encontraron resultados</h4>
+                <p class="text-muted">No hay favoritos que coincidan con "<strong>@Model.TerminoBusqueda</strong>"</p>
+                <button onclick="document.getElementById('searchInput').value=''; buscarFavoritos('');" 
+                        class="btn btn-cart mt-2">
+                    <i class="fas fa-times-circle me-1"></i>Limpiar búsqueda
+                </button>
+            }
+            else
+            {
+                <i class="fas fa-heart-broken"></i>
+                <h4>Aún no tienes favoritos</h4>
+                <p class="text-muted">Explora nuestra tienda y guarda tus productos favoritos</p>
+                <a href="/Catalogo" class="btn btn-primary mt-2">
+                    <i class="fas fa-shopping-cart me-2"></i>Ir a la tienda
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            @foreach (var favorito in Model.Favoritos)
+            {
+                <div class="col favorito-item" id="favorito-@favorito.AutoparteId">
+                    <div class="card favorito-card">
+                        <div class="card-image-container">
+                            <img src="@favorito.AutoparteImagen" class="card-img-top" alt="@favorito.AutoparteNombre">
+                            <button class="remove-favorite-btn position-absolute top-0 end-0 m-3"
+                                onclick="eliminarFavorito(@favorito.AutoparteId)" title="Quitar de favoritos">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title">@favorito.AutoparteNombre</h5>
+                            <p class="card-description mb-3">@favorito.AutoparteDescripcion</p>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="price-tag">
+                                    S/ @favorito.AutopartePrecio.ToString("0.00")
+                                </div>
+                                <a asp-controller="Catalogo" asp-action="DetalleAutoparte" asp-route-id="@favorito.AutoparteId"
+                                    class="btn btn-details">
+                                    <i class="fas fa-eye me-1"></i>Detalles
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card-footer-custom">
+                            <button class="btn btn-cart w-100" onclick="añadirAlCarritoDesdeVista(@favorito.AutoparteId, 1)">
+                                <i class="fas fa-cart-plus me-2"></i>AÑADIR A CARRITO
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+<script src="~/js/Favoritos.js" asp-append-version="true" defer></script>

@@ -201,11 +201,20 @@
 
         <div class="slider-header text-center mb-4">
             <h1 class="slider-title">Nuestros Servicios</h1>
-            <button class="btn btn-link slider-button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            <a style="text-decoration: underline; color: white;">Consultar Servicios con IA</a>
-            </button>
+            @if (ViewBag.UsuarioAutenticado == true)
+            {
+                <button class="btn btn-link slider-button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <a style="text-decoration: underline; color: white;">Consultar Servicios con IA</a>
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-link slider-button" onclick="mostrarAlertaLogin()">
+                    <a style="text-decoration: underline; color: white;">Consultar Servicios con IA</a>
+                </button>
+            }
         </div>
-  
+
         <div class="slider-container2">
             <div class="swiper">
                 <div class="swiper-wrapper">
@@ -232,9 +241,110 @@
     @* <img src="https://firebasestorage.googleapis.com/v0/b/marimonapp.appspot.com/o/Assest_web%2Fasdsa.png?alt=media&token=fd6bcbec-8bdf-4971-bde3-52be968274e1"
         style="float:right; width: 100%; height: 100%;"> *@
 
+    <!-- Modal de Login Requerido para IA -->
+    <div class="modal fade" id="loginRequeridoIAModal" tabindex="-1" aria-labelledby="loginRequeridoIAModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="border-radius: 15px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #E42229 0%, #D42025 100%); color: #FFFFFF; border: none; padding: 2rem;">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3" style="font-size: 3rem;">
+                            🤖
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-1" id="loginRequeridoIAModalLabel"
+                                style="font-weight: 600; font-size: 1.3rem;">
+                                ¡Inicia Sesión para Usar la IA!
+                            </h5>
+                            <p class="mb-0" style="opacity: 0.9; font-size: 0.9rem;">
+                                Accede a diagnósticos inteligentes
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center" style="padding: 2.5rem;">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-center mb-3">
+                            <div
+                                style="width: 80px; height: 80px; background: linear-gradient(135deg, #E42229, #D42025); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(228, 34, 41, 0.3);">
+                                <i class="fas fa-brain fa-2x text-white"></i>
+                            </div>
+                        </div>
+                        <h5 style="color: #333; font-weight: 600; margin-bottom: 1rem;">
+                            Análisis Inteligente con IA
+                        </h5>
+                        <p style="color: #666; line-height: 1.6; margin-bottom: 2rem;">
+                            Para acceder a nuestro sistema de <strong>análisis con Inteligencia Artificial</strong> y
+                            obtener recomendaciones personalizadas de servicios automotrices, necesitas tener una cuenta
+                            activa.
+                        </p>
+
+                        <div
+                            style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                            <h6 style="color: #E42229; margin-bottom: 1rem;">
+                                <i class="fas fa-check-circle me-2"></i>¿Qué incluye?
+                            </h6>
+                            <ul style="list-style: none; padding: 0; margin: 0; text-align: left;">
+                                <li style="margin-bottom: 0.5rem; color: #555;">
+                                    <i class="fas fa-robot me-2" style="color: #E42229;"></i>
+                                    Análisis de imágenes automotrices
+                                </li>
+                                <li style="margin-bottom: 0.5rem; color: #555;">
+                                    <i class="fas fa-comments me-2" style="color: #E42229;"></i>
+                                    Diagnóstico por descripción de problemas
+                                </li>
+                                <li style="margin-bottom: 0.5rem; color: #555;">
+                                    <i class="fas fa-wrench me-2" style="color: #E42229;"></i>
+                                    Recomendaciones de servicios específicos
+                                </li>
+                                <li style="color: #555;">
+                                    <i class="fas fa-clock me-2" style="color: #E42229;"></i>
+                                    Respuestas instantáneas 24/7
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column gap-3">
+                        <a href="/Identity/Account/Login" class="btn btn-lg"
+                            style="background: linear-gradient(135deg, #E42229, #D42025); color: white; border: none; border-radius: 10px; padding: 1rem 2rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(228, 34, 41, 0.3);">
+                            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
+    function mostrarAlertaLogin() {
+        var modal = new bootstrap.Modal(document.getElementById('loginRequeridoIAModal'));
+        modal.show();
+    }
+
+    // Agregar hover effects
+    document.addEventListener('DOMContentLoaded', function () {
+        const loginBtn = document.querySelector('#loginRequeridoIAModal a[href="/Identity/Account/Login"]');
+        const registerBtn = document.querySelector('#loginRequeridoIAModal a[href="/Identity/Account/Register"]');
+
+        if (loginBtn) {
+            loginBtn.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 6px 20px rgba(228, 34, 41, 0.4)';
+            });
+
+            loginBtn.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 15px rgba(228, 34, 41, 0.3)';
+            });
+        }
+    });
     document.addEventListener('DOMContentLoaded', function () {
         AOS.init({ once: true });
     });

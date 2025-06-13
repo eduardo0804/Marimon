@@ -50,6 +50,10 @@
                         <i class="fas fa-store"></i>
                         <span>Volver a la Tienda</span>
                     </a>
+                    <button type="button" class="btn btn-survey" id="openSurveyModal">
+                        <i class="fas fa-star"></i>
+                        <span>Encuesta de Satisfacción</span>
+                    </button>
                     <a href="@Model.com_imagen" class="btn btn-download" download>
                         <i class="fas fa-download"></i>
                         <span>Descargar Comprobante</span>
@@ -73,9 +77,15 @@
         </div>
     </div>
 </div>
+<input type="hidden" name="user-name-hidden" value="@(ViewBag.FullName ?? "")" />
+<input type="hidden" name="user-email-hidden" value="@(ViewBag.UserEmail ?? "")" />
+<input type="hidden" name="user-id-hidden" value="@(ViewBag.UserId ?? "")" />
+@Html.AntiForgeryToken()
+@await Html.PartialAsync("EncuestaPartialView")
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="~/js/encuesta.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
             // Efecto visual para mejorar la experiencia

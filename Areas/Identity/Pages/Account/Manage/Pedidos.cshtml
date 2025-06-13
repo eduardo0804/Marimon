@@ -23,6 +23,9 @@
             <div class="sidebar-menu-item">
                 <a asp-area="Identity" asp-page="/Account/Manage/Citas">Mis Citas</a>
             </div>
+            <div class="sidebar-menu-item">
+                <a asp-area="Identity" asp-page="/Account/Manage/Favoritos">Favoritos</a>
+            </div>
             <div class="sidebar-menu-item exit">
                 <form asp-area="Identity" asp-page="/Account/Logout"
                     asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
