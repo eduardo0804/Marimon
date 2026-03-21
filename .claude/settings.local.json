@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find Migrations -type f -name *.cs)",
+      "Bash(find . -maxdepth 2 -type d ! -path */bin/* ! -path */obj/* ! -path */.git/*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(\"C:/Program Files/dotnet/dotnet.exe\" build)",
+      "Read(//c/Program Files/dotnet/**)",
+      "Bash(\"C:/Program Files/dotnet/dotnet.exe\" --version)",
+      "Bash(dotnet --version)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet run:*)",
+      "Bash(ping -n 1 db.vzvohiovfntdndwuoiji.supabase.co)",
+      "mcp__f8d0939f-074c-4bdb-80ff-a76e8d0fb156__list_projects",
+      "Bash(nslookup db.vzvohiovfntdndwuoiji.supabase.co 8.8.8.8)",
+      "mcp__f8d0939f-074c-4bdb-80ff-a76e8d0fb156__get_project",
+      "Bash(nslookup aws-0-us-west-2.pooler.supabase.com 8.8.8.8)",
+      "Bash(dotnet ef:*)",
+      "Bash(dotnet tool:*)",
+      "Bash(export PATH=\"$PATH:$HOME/.dotnet/tools\")",
+      "Bash(dotnet-ef migrations:*)",
+      "mcp__f8d0939f-074c-4bdb-80ff-a76e8d0fb156__apply_migration"
+    ]
+  }
+}
