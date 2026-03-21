@@ -152,41 +152,34 @@ namespace Marimon.Controllers
 
             try
             {
-                // Crear códigos de descuento para cada producto seleccionado
-                foreach (var autoparteId in productosSeleccionados)
+                var ids = productosSeleccionados.ToList();
+                var autopartesExistentes = await _context.Autopartes
+                    .Where(a => ids.Contains(a.aut_id))
+                    .Select(a => a.aut_id)
+                    .ToListAsync();
+
+                var descuentosExistentes = await _context.CodigosDescuento
+                    .Where(c => c.AutoparteId.HasValue && ids.Contains(c.AutoparteId.Value))
+                    .ToListAsync();
+
+                _context.CodigosDescuento.RemoveRange(descuentosExistentes);
+
+                var nuevosDescuentos = autopartesExistentes.Select(autoparteId => new CodigoDescuento
                 {
-                    // Verificar si el producto existe
-                    var autoparte = await _context.Autopartes.FindAsync(autoparteId);
-                    if (autoparte == null) continue;
+                    AutoparteId = autoparteId,
+                    cod_codigo = codigo,
+                    cod_descripcion = descripcion,
+                    cod_porcentaje = porcentaje,
+                    cod_fecha_creacion = fechaInicio,
+                    cod_fecha_expiracion = fechaFin,
+                    cod_utilizado = false,
+                    UsuarioId = null
+                });
 
-                    // Verificar si ya tiene un código de descuento activo y eliminarlo
-                    var descuentoExistente = await _context.CodigosDescuento
-                        .Where(c => c.AutoparteId == autoparteId)
-                        .FirstOrDefaultAsync();
-
-                    if (descuentoExistente != null)
-                    {
-                        _context.CodigosDescuento.Remove(descuentoExistente);
-                    }
-
-                    // Crear nuevo código de descuento
-                    var nuevoDescuento = new CodigoDescuento
-                    {
-                        AutoparteId = autoparteId,
-                        cod_codigo = codigo,
-                        cod_descripcion = descripcion,
-                        cod_porcentaje = porcentaje,
-                        cod_fecha_creacion = fechaInicio,
-                        cod_fecha_expiracion = fechaFin,
-                        cod_utilizado = false,
-                        UsuarioId = null // Se asignará cuando se envíe a usuarios específicos
-                    };
-
-                    _context.CodigosDescuento.Add(nuevoDescuento);
-                }
+                _context.CodigosDescuento.AddRange(nuevosDescuentos);
 
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Se aplicó el código de descuento correctamente a {productosSeleccionados.Length} producto(s).";
+                TempData["Success"] = $"Se aplicó el código de descuento correctamente a {autopartesExistentes.Count} producto(s).";
             }
             catch (Exception ex)
             {

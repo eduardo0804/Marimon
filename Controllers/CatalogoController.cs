@@ -193,20 +193,21 @@ namespace Marimon.Controllers
             // Obtener las reseñas relacionadas con la autoparte
             var resenias = await _context.Resenias
                 .Where(r => r.aut_id == id)
-                .Select(r => new ReseniaViewModel
-                {
-                    res_id = r.res_id,
-                    res_comentario = r.res_comentario,
-                    res_puntuacion = r.res_puntuacion,
-                    res_fecha = r.res_fecha,
-                    res_gusto = r.res_gusto,
-                    AutoparteId = r.aut_id,
-                    usuario_id = r.UsuarioId,
-                    usuario_nombre = _context.Usuario
-                        .Where(u => u.usu_id == r.UsuarioId)
-                        .Select(u => u.usu_nombre)
-                        .FirstOrDefault()
-                })
+                .Join(_context.Usuario,
+                    r => r.UsuarioId,
+                    u => u.usu_id,
+                    (r, u) => new ReseniaViewModel
+                    {
+                        res_id = r.res_id,
+                        res_comentario = r.res_comentario,
+                        res_puntuacion = r.res_puntuacion,
+                        res_fecha = r.res_fecha,
+                        res_gusto = r.res_gusto,
+                        AutoparteId = r.aut_id,
+                        usuario_id = r.UsuarioId,
+                        usuario_nombre = u.usu_nombre
+                    })
+                .AsNoTracking()
                 .ToListAsync();
 
             // Imprime el AutoparteId de la primera reseña (o recórrelas todas)
@@ -328,22 +329,22 @@ namespace Marimon.Controllers
             Console.WriteLine($"[DEBUG] ObtenerSeccionResenias recibe aut_id = {aut_id}");
             var resenias = await _context.Resenias
                 .Where(r => r.aut_id == aut_id)
-                .OrderByDescending(r => r.res_fecha) // Ordenar por fecha descendente
-                .Select(r => new ReseniaViewModel
-                {
-                    res_id = r.res_id,
-                    res_comentario = r.res_comentario,
-                    res_puntuacion = r.res_puntuacion,
-                    res_fecha = r.res_fecha,
-                    res_gusto = r.res_gusto,
-                    AutoparteId = r.aut_id,
-                    usuario_id = r.UsuarioId,
-                    usuario_nombre = _context.Usuario
-                        .Where(u => u.usu_id == r.UsuarioId)
-                        .Select(u => u.usu_nombre)
-                        .FirstOrDefault()
-
-                })
+                .OrderByDescending(r => r.res_fecha)
+                .Join(_context.Usuario,
+                    r => r.UsuarioId,
+                    u => u.usu_id,
+                    (r, u) => new ReseniaViewModel
+                    {
+                        res_id = r.res_id,
+                        res_comentario = r.res_comentario,
+                        res_puntuacion = r.res_puntuacion,
+                        res_fecha = r.res_fecha,
+                        res_gusto = r.res_gusto,
+                        AutoparteId = r.aut_id,
+                        usuario_id = r.UsuarioId,
+                        usuario_nombre = u.usu_nombre
+                    })
+                .AsNoTracking()
                 .ToListAsync();
 
             // Devolver la vista parcial que incluye todo el contenedor de reseñas con estilos

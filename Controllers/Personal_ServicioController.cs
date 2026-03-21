@@ -123,7 +123,7 @@ namespace Marimon.Controllers
             }
         }
 
-        public IActionResult ConsultarServicios(string nombreServicio, string fechaDesde, string fechaHasta, string estado)
+        public async Task<IActionResult> ConsultarServicios(string nombreServicio, string fechaDesde, string fechaHasta, string estado)
         {
             // Parse fechas y servicios como antes
             var serviciosSeleccionados = string.IsNullOrEmpty(nombreServicio)
@@ -140,27 +140,24 @@ namespace Marimon.Controllers
                 fechaFin = DateTime.SpecifyKind(hasta, DateTimeKind.Utc);
 
             // OBTENER TODAS LAS RESERVAS PRIMERO (sin filtro de estado)
-            var todasLasReservas = _context.Reserva
+            var query = _context.Reserva
                 .Include(r => r.Servicio)
                 .Include(r => r.Usuario)
                 .Where(r =>
                     (serviciosSeleccionados.Count == 0 || serviciosSeleccionados.Contains(r.Servicio.ser_nombre)) &&
                     (!fechaInicio.HasValue || r.res_fecha >= fechaInicio.Value) &&
                     (!fechaFin.HasValue || r.res_fecha <= fechaFin.Value)
-                // NO filtrar por estado aquí
                 )
+                .AsNoTracking();
+
+            var todasLasReservas = await query
                 .OrderBy(r => r.res_fecha)
                 .ThenBy(r => r.res_hora)
-                .ToList();
+                .ToListAsync();
 
-            // AHORA aplicar el filtro de estado solo para mostrar en la tabla
-            var reservasFiltradas = todasLasReservas;
-            if (!string.IsNullOrEmpty(estado))
-            {
-                reservasFiltradas = todasLasReservas
-                    .Where(r => r.Estado.ToString() == estado)
-                    .ToList();
-            }
+            var reservasFiltradas = string.IsNullOrEmpty(estado)
+                ? todasLasReservas
+                : todasLasReservas.Where(r => r.Estado.ToString() == estado).ToList();
 
             // IMPORTANTE: Siempre mostrar TODOS los estados posibles
             var todosLosEstados = new List<string>

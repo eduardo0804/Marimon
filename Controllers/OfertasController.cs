@@ -41,17 +41,17 @@ namespace Marimon.Controllers
                     aut_cantidad = a.aut_cantidad,
                     aut_imagen = a.aut_imagen,
                     CategoriaNombre = a.Categoria.cat_nombre,
-                    OfertaId = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_id,
-                    PorcentajeOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje,
-                    DescripcionOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_descripcion,
-                    FechaInicio = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio,
-                    FechaFin = a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin,
-                    PrecioOferta = a.Ofertas.Any() 
-                        ? a.aut_precio - (a.aut_precio * (a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_porcentaje / 100m))
+                    OfertaId = a.Ofertas.Max(o => (int?)o.ofe_id),
+                    PorcentajeOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).Select(o => (decimal?)o.ofe_porcentaje).FirstOrDefault(),
+                    DescripcionOferta = a.Ofertas.OrderByDescending(o => o.ofe_id).Select(o => o.ofe_descripcion).FirstOrDefault(),
+                    FechaInicio = a.Ofertas.OrderByDescending(o => o.ofe_id).Select(o => (DateTime?)o.ofe_fecha_inicio).FirstOrDefault(),
+                    FechaFin = a.Ofertas.OrderByDescending(o => o.ofe_id).Select(o => (DateTime?)o.ofe_fecha_fin).FirstOrDefault(),
+                    PrecioOferta = a.Ofertas.Any()
+                        ? a.aut_precio - (a.aut_precio * (a.Ofertas.OrderByDescending(o => o.ofe_id).Select(o => o.ofe_porcentaje).FirstOrDefault() / 100m))
                         : (decimal?)null,
-                    OfertaActiva = a.Ofertas.Any() 
-                        ? (hoy >= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_inicio 
-                        && hoy <= a.Ofertas.OrderByDescending(o => o.ofe_id).FirstOrDefault().ofe_fecha_fin)
+                    OfertaActiva = a.Ofertas.Any()
+                        ? (hoy >= a.Ofertas.OrderByDescending(o => o.ofe_id).Select(o => (DateTime?)o.ofe_fecha_inicio).FirstOrDefault()
+                        && hoy <= a.Ofertas.OrderByDescending(o => o.ofe_id).Select(o => (DateTime?)o.ofe_fecha_fin).FirstOrDefault())
                         : (bool?)null
                 })
                 .ToListAsync();
@@ -119,39 +119,32 @@ namespace Marimon.Controllers
 
             try
             {
-                // Crear ofertas para cada producto seleccionado
-                foreach (var autoparteId in productosSeleccionados)
+                var ids = productosSeleccionados.ToList();
+                var autopartesExistentes = await _context.Autopartes
+                    .Where(a => ids.Contains(a.aut_id))
+                    .Select(a => a.aut_id)
+                    .ToListAsync();
+
+                var ofertasExistentes = await _context.Ofertas
+                    .Where(o => ids.Contains(o.AutoparteId))
+                    .ToListAsync();
+
+                _context.Ofertas.RemoveRange(ofertasExistentes);
+
+                var nuevasOfertas = autopartesExistentes.Select(autoparteId => new Oferta
                 {
-                    // Verificar si el producto existe
-                    var autoparte = await _context.Autopartes.FindAsync(autoparteId);
-                    if (autoparte == null) continue;
+                    AutoparteId = autoparteId,
+                    ofe_descripcion = descripcion,
+                    ofe_porcentaje = porcentaje,
+                    ofe_fecha_inicio = fechaInicio,
+                    ofe_fecha_fin = fechaFin,
+                    ofe_activa = true
+                });
 
-                    // Verificar si ya tiene una oferta activa y eliminarla
-                    var ofertaExistente = await _context.Ofertas
-                        .Where(o => o.AutoparteId == autoparteId)
-                        .FirstOrDefaultAsync();
-
-                    if (ofertaExistente != null)
-                    {
-                        _context.Ofertas.Remove(ofertaExistente);
-                    }
-
-                    // Crear nueva oferta
-                    var nuevaOferta = new Oferta
-                    {
-                        AutoparteId = autoparteId,
-                        ofe_descripcion = descripcion,
-                        ofe_porcentaje = porcentaje,
-                        ofe_fecha_inicio = fechaInicio,
-                        ofe_fecha_fin = fechaFin,
-                        ofe_activa = true
-                    };
-
-                    _context.Ofertas.Add(nuevaOferta);
-                }
+                _context.Ofertas.AddRange(nuevasOfertas);
 
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Se aplicó la oferta correctamente a {productosSeleccionados.Length} producto(s).";
+                TempData["Success"] = $"Se aplicó la oferta correctamente a {autopartesExistentes.Count} producto(s).";
             }
             catch (Exception ex)
             {
