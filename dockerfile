@@ -9,7 +9,7 @@ COPY . ./
 RUN dotnet publish "Marimon.csproj" -c Release -o /app/out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
 # Instalar wkhtmltopdf y dependencias
